@@ -1,0 +1,29 @@
+# dependencies
+node_modules/
+
+# expo
+.expo/
+dist/
+
+# env
+.env
+.env.*
+
+# logs
+logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# build
+build/
+coverage/
+
+# android/ios generated
+mobile/android/
+mobile/ios/
+
+# vscode
+.vscode/
