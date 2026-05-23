@@ -21,7 +21,7 @@ const ScreenWrapper = ({
   const { theme } = useTheme();
 
   const basePadding = padding ? 16 : 0;
-  const backgroundColor = theme.colors.background || "#F8F9FA";
+  const backgroundColor = theme.colors.background ;
 
   // Render Strategy A: Scrollable Layout
   if (scrollable) {

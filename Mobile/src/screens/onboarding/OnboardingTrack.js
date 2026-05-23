@@ -1,8 +1,7 @@
 // src/screens/onboarding/OnboardingTrack.js
-import React from "react";
-import { StyleSheet, View, Image } from "react-native";
-import AppText from "../../components/common/AppText";
+import { Image, StyleSheet, View } from "react-native";
 import AppButton from "../../components/common/AppButton";
+import AppText from "../../components/common/AppText";
 import ScreenWrapper from "../../components/common/ScreenWrapper";
 import { useTheme } from "../../hooks/useTheme";
 
@@ -76,7 +75,7 @@ export default function OnboardingTrack({ navigation }) {
           <AppButton
             title="Get Started"
             fullWidth
-            onPress={() => navigation.navigate("RoleSelection")}
+            onPress={() => navigation.navigate("Welcome")}
             style={styles.button}
           />
         </View>

@@ -7,6 +7,7 @@ import RoleSelection from "../screens/auth/RoleSelection";
 import SuccessScreen from "../screens/auth/SuccessScreen";
 import DeviceBlockedScreen from "../screens/auth/DeviceBlockedScreen";
 import OTPVerificationScreen from "../screens/auth/OTPVerificationScreen";
+import WelcomeScreen from "../screens/auth/WelcomeScreen";
 
 // Import your onboarding screens
 import OnboardingSell from "../screens/onboarding/OnboardingSell";
@@ -34,6 +35,7 @@ const AuthNavigator = () => {
       <Stack.Screen name="OnboardingTrack" component={OnboardingTrack} />
 
       {/* Auth & Role Flow */}
+      <Stack.Screen name="Welcome" component={WelcomeScreen} />
       <Stack.Screen name="RoleSelection" component={RoleSelection} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />

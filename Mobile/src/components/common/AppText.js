@@ -3,8 +3,8 @@ import React from "react";
 import { Text } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 
-// Enhanced typography map combining size, weight, and readable line heights
-const typographyMap = {
+// Fallback typography in case theme.typography is missing for a variant
+const defaultTypography = {
   displayLg: { fontSize: 32, fontWeight: "800", lineHeight: 38 },
   headingLg: { fontSize: 26, fontWeight: "700", lineHeight: 32 },
   headingMd: { fontSize: 22, fontWeight: "700", lineHeight: 28 },
@@ -23,25 +23,25 @@ const AppText = ({
   align = "left",
   style,
   children,
-  ...rest // Critical for passing numberOfLines, ellipsizeMode, etc.
+  ...rest
 }) => {
   const { theme } = useTheme();
 
-  // Fallback to bodyMd if an invalid variant is passed
-  const typography = typographyMap[variant] || typographyMap.bodyMd;
+  // 1. Get typography from theme, fallback to default
+  const themeTypography = theme.typography || {};
+  const typography =
+    themeTypography[variant] ||
+    defaultTypography[variant] ||
+    defaultTypography.bodyMd;
 
-  // Auto-assign header accessibility roles for system screen readers
+  // 2. Determine if header for accessibility
   const isHeader = variant.includes("heading") || variant.includes("display");
 
-  // Determine standard, simple sans-serif font family handling
-  const getFontFamily = () => {
-    if (!theme.fonts) return undefined;
+  // 3. Font family from theme (if defined)
+  const fontFamily = themeTypography.fontFamily || undefined;
 
-    // Distinguish between regular and medium/bold variants if theme supports it
-    if (typography.fontWeight === "400") return theme.fonts.regular;
-    if (typography.fontWeight === "500") return theme.fonts.medium;
-    return theme.fonts.bold || theme.fonts.medium || theme.fonts.regular;
-  };
+  // 4. Text color: use theme.colors.textPrimary by default (NOT undefined 'text')
+  const defaultColor = theme.colors?.textPrimary || "#212121";
 
   return (
     <Text
@@ -51,9 +51,9 @@ const AppText = ({
           fontSize: typography.fontSize,
           fontWeight: typography.fontWeight,
           lineHeight: typography.lineHeight,
-          color: color || theme.colors.text || "#E0E0E0",
+          color: color || defaultColor,
           textAlign: align,
-          fontFamily: getFontFamily(),
+          fontFamily: fontFamily,
         },
         style,
       ]}

@@ -17,7 +17,7 @@ const AuthLayout = ({ title, subtitle, children }) => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={[styles.container, { backgroundColor: theme.colors.background || "#F8F9FA" }]}
+      style={[styles.container, { backgroundColor: theme.colors.background  }]}
     >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -26,25 +26,25 @@ const AuthLayout = ({ title, subtitle, children }) => {
       >
         {/* DESIGN FIX: OmishGo stylized tractor-brand vector header representation */}
         <View style={styles.logoWrapper}>
-          <View style={[styles.brandEmblem, { borderColor: theme.colors.primary || "#6B4EFF" }]}>
+          <View style={[styles.brandEmblem, { borderColor: theme.colors.primary}]}>
             {/* Minimalist tractor vector facing left; large tire stylized structurally as letter 'O' */}
             <Ionicons
               name="logo-closed-captioning" // Using a dual-concentric curve layout to represent the stylized 'O' tire profile cleanly
               size={36}
-              color={theme.colors.primary || "#6B4EFF"}
+              color={theme.colors.primary}
               style={styles.tractorTireO}
             />
-            <View style={[styles.tractorBody, { backgroundColor: theme.colors.primary || "#6B4EFF" }]} />
+            <View style={[styles.tractorBody, { backgroundColor: theme.colors.primary }]} />
           </View>
-          <AppText variant="headingMd" style={[styles.brandText, { color: theme.colors.text || "#333333" }]}>
-            Omish<AppText style={{ color: theme.colors.primary || "#6B4EFF", fontWeight: "800" }}>Go</AppText>
+          <AppText variant="headingMd" style={[styles.brandText, { color: theme.colors.text }]}>
+            Omish<AppText style={{ color: theme.colors.primary, fontWeight: "800" }}>Go</AppText>
           </AppText>
         </View>
 
         {title && (
           <AppText
             variant="headingLg"
-            style={[styles.title, { color: theme.colors.text || "#333333" }]}
+            style={[styles.title, { color: theme.colors.text }]}
           >
             {title}
           </AppText>
@@ -53,7 +53,7 @@ const AuthLayout = ({ title, subtitle, children }) => {
         {subtitle && (
           <AppText
             variant="bodyMd"
-            style={[styles.subtitle, { color: theme.colors.textSecondary || "#666666" }]}
+            style={[styles.subtitle, { color: theme.colors.textSecondary }]}
           >
             {subtitle}
           </AppText>

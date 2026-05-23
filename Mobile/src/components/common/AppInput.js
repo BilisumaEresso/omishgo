@@ -34,7 +34,7 @@ const AppInput = ({
       {label && (
         <AppText
           variant="label"
-          style={[styles.label, { color: theme.colors.text }]}
+          style={[styles.label, { color: theme.colors.textPrimary }]}
         >
           {label}
         </AppText>
@@ -73,7 +73,7 @@ const AppInput = ({
           onBlur={() => setFocused(false)}
           style={[
             styles.input,
-            { color: theme.colors.text || "#FFFFFF" },
+            { color: theme.colors.textPrimary || "#FFFFFF" },
             inputStyle,
           ]}
           {...rest}

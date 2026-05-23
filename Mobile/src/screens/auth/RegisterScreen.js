@@ -13,12 +13,14 @@ const RegisterScreen = ({ navigation, route }) => {
   const { theme } = useTheme();
   const { register } = useAuthStore();
 
-  const [form, setForm] = useState({ fullName: '', phone: '', email: '', pin: '', confirmPin: '' });
+  const [form, setForm] = useState({ fullName: '', phone: '', pin: '', confirmPin: '' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     if (form.pin !== form.confirmPin) return setErrors({ confirmPin: "PINs do not match" });
+    if (form.pin.length() < 4 || form.pin.length() > 6)
+      return setErrors({ confirmPin: "PIN length must be minimum 4 maximum 6" });
 
     setLoading(true);
     const result = await register({ ...form, role });
