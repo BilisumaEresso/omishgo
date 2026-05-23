@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AppText from "../common/AppText";
 import { useTheme } from "../../hooks/useTheme";
 import { ROLES } from "../../constants/roles";
+import { useAuthStore } from "../../store/auth.store";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const DRAWER_WIDTH = SCREEN_WIDTH * 0.75;
@@ -46,6 +47,7 @@ const COMMON_ITEMS = [
 
 const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
   const { theme } = useTheme();
+  const {logout}= useAuthStore()
   const slideAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [showModal, setShowModal] = useState(visible);
@@ -245,7 +247,8 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
                   },
                 ]}
                 onPress={() =>
-                  handleCloseAnimation({ label: "Logout", route: "Logout" })
+                {logout();
+                handleCloseAnimation({ label: "Logout" });}
                 }
               >
                 <Ionicons

@@ -1,147 +1,79 @@
-import { ScrollView, View } from "react-native";
-import AppButton from "../../components/common/AppButton";
-import AppCard from "../../components/common/AppCard";
-import AppText from "../../components/common/AppText";
-import ScreenWrapper from "../../components/common/ScreenWrapper";
-import { ROLES } from "../../constants/roles";
+import React, { useState } from "react";
+import { ScrollView, StyleSheet } from "react-native";
+import DashboardLayout from "../../components/layout/DashBoardLayout";
+import AppSidebar from "../../components/layout/AppSidebar";
+import DriverOnlineToggle from "../../components/driver/DriverOnlineToggle";
+import DriverStatsCards from "../../components/driver/DriverStatsCards";
+import CurrentAssignmentCard from "../../components/driver/CurrentAssignmentCard";
+import RecentAlertCard from "../../components/driver/RecentAlertCard";
 import { useTheme } from "../../hooks/useTheme";
-import { useAuthStore } from "../../store/auth.store.js";
 
-const StatCard = ({ label, value, theme }) => (
-  <AppCard
-    style={{
-      flex: 1,
-      alignItems: "center",
-      paddingVertical: theme.spacing.md,
-    }}
-  >
-    <AppText
-      variant="caption"
-      color={theme.colors.textSecondary}
-      style={{ marginBottom: theme.spacing.sm }}
-    >
-      {label}
-    </AppText>
-    <AppText variant="headingMd" color={theme.colors.primary}>
-      {value}
-    </AppText>
-  </AppCard>
-);
-
-const ActionButton = ({ label, theme }) => (
-  <AppCard
-    style={{
-      flex: 1,
-      paddingVertical: theme.spacing.lg,
-      alignItems: "center",
-    }}
-  >
-    <AppText
-      variant="label"
-      color={theme.colors.textPrimary}
-      style={{ textAlign: "center" }}
-    >
-      {label}
-    </AppText>
-  </AppCard>
-);
-
-const DriverDashboardScreen = () => {
+export default function DriverDashboardScreen({ navigation }) {
   const { theme } = useTheme();
-  const { logout } = useAuthStore();
+  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [isOnline, setIsOnline] = useState(true);
+  const [earnings, setEarnings] = useState(450);
+  const [tasksCount, setTasksCount] = useState(2);
+  const [assignmentState, setAssignmentState] = useState("In Transit");
+
+  const handleCompleteTrip = () => {
+    if (assignmentState === "In Transit") {
+      setAssignmentState("Completed");
+      setEarnings((prev) => prev + 240);
+      setTasksCount((prev) => Math.max(0, prev - 1));
+    } else {
+      setAssignmentState("In Transit");
+      setTasksCount((prev) => prev + 1);
+    }
+  };
+
+  const handleSidebarItemPress = (item) => {
+    if (item.route === "Logout") {
+      navigation.reset({ index: 0, routes: [{ name: "Welcome" }] });
+    } else if (item.route) {
+      navigation.navigate(item.route);
+    }
+  };
 
   return (
-    <ScreenWrapper scrollable>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={{ marginBottom: theme.spacing.xxxl }}>
-          <AppText
-            variant="bodyMd"
-            color={theme.colors.textSecondary}
-            style={{ marginBottom: theme.spacing.sm }}
-          >
-            Welcome Back 👋
-          </AppText>
-          <AppText variant="displayLg" color={theme.colors.textPrimary}>
-            Billy
-          </AppText>
-          <AppText
-            variant="label"
-            color={theme.colors.primary}
-            style={{ marginTop: theme.spacing.sm }}
-          >
-            {ROLES.DRIVER}
-          </AppText>
-        </View>
-
-        {/* Stats Section */}
-        <View style={{ marginBottom: theme.spacing.xxxl }}>
-          <AppText
-            variant="headingSm"
-            color={theme.colors.textPrimary}
-            style={{ marginBottom: theme.spacing.lg }}
-          >
-            Your Stats
-          </AppText>
-          <View style={{ gap: theme.spacing.md }}>
-            <StatCard label="Deliveries" value="28" theme={theme} />
-            <StatCard label="Trips" value="6" theme={theme} />
-            <StatCard label="Distance" value="187 km" theme={theme} />
-          </View>
-        </View>
-
-        {/* Quick Actions */}
-        <View style={{ marginBottom: theme.spacing.xxxl }}>
-          <AppText
-            variant="headingSm"
-            color={theme.colors.textPrimary}
-            style={{ marginBottom: theme.spacing.lg }}
-          >
-            Quick Actions
-          </AppText>
-          <View style={{ gap: theme.spacing.md }}>
-            <ActionButton label="My Route" theme={theme} />
-            <ActionButton label="Active Tasks" theme={theme} />
-            <ActionButton label="Delivery History" theme={theme} />
-          </View>
-        </View>
-
-        {/* Coming Soon */}
-        <View style={{ marginBottom: theme.spacing.xxxl }}>
-          <AppCard
-            style={{
-              alignItems: "center",
-              paddingVertical: theme.spacing.xl,
-              backgroundColor: theme.colors.primaryContainer,
-            }}
-          >
-            <AppText
-              variant="headingSm"
-              color={theme.colors.primary}
-              style={{ marginBottom: theme.spacing.md }}
-            >
-              More Features Coming Soon
-            </AppText>
-            <AppText
-              variant="bodyMd"
-              color={theme.colors.textSecondary}
-              style={{ textAlign: "center" }}
-            >
-              We're adding real-time route optimization and navigation.
-            </AppText>
-          </AppCard>
-          {/* Logout */}
-          <AppButton
-            title="Logout"
-            onPress={logout}
-            variant="danger"
-            fullWidth
-            style={{ marginBottom: theme.spacing.lg }}
+    <>
+      <DashboardLayout
+        title="Driver Dashboard"
+        subtitle="Good morning, Dawit"
+        role="driver"
+        activeTab="Deliveries"
+        onTabPress={(tab) => console.log(tab)}
+        scrollable={true}
+        showMenu={true}
+        onMenuPress={() => setSidebarVisible(true)}
+      >
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          <DriverOnlineToggle isOnline={isOnline} onToggle={setIsOnline} />
+          <DriverStatsCards earnings={earnings} tasksCount={tasksCount} />
+          <CurrentAssignmentCard
+            assignmentState={assignmentState}
+            onComplete={handleCompleteTrip}
           />
-        </View>
-      </ScrollView>
-    </ScreenWrapper>
-  );
-};
+          <RecentAlertCard />
+        </ScrollView>
+      </DashboardLayout>
 
-export default DriverDashboardScreen;
+      <AppSidebar
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+        role="driver"
+        onItemPress={handleSidebarItemPress}
+      />
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 32,
+  },
+});

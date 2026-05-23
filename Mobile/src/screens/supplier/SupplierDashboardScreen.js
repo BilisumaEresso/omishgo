@@ -1,147 +1,106 @@
-import { ScrollView, View } from "react-native";
-import AppButton from "../../components/common/AppButton";
-import AppCard from "../../components/common/AppCard";
-import AppText from "../../components/common/AppText";
-import ScreenWrapper from "../../components/common/ScreenWrapper";
-import { ROLES } from "../../constants/roles";
+import React, { useState } from "react";
+import { ScrollView, StyleSheet } from "react-native";
+import DashboardLayout from "../../components/layout/DashBoardLayout";
+import AppSidebar from "../../components/layout/AppSidebar";
+import SupplierQuickActions from "../../components/supplier/SupplierQuickActions";
+import SalesSummaryWidget from "../../components/supplier/SalesSummaryWidget";
+import InventoryLowStockWidget from "../../components/supplier/InventoryLowStockWidget";
+import MarketDemandNote from "../../components/supplier/MarketDemandNote";
+import RecentSupplierOrders from "../../components/supplier/RecentSupplierOrders";
 import { useTheme } from "../../hooks/useTheme";
-import { useAuthStore } from "../../store/auth.store.js";
 
-const StatCard = ({ label, value, theme }) => (
-  <AppCard
-    style={{
-      flex: 1,
-      alignItems: "center",
-      paddingVertical: theme.spacing.md,
-    }}
-  >
-    <AppText
-      variant="caption"
-      color={theme.colors.textSecondary}
-      style={{ marginBottom: theme.spacing.sm }}
-    >
-      {label}
-    </AppText>
-    <AppText variant="headingMd" color={theme.colors.primary}>
-      {value}
-    </AppText>
-  </AppCard>
-);
+// ---------- Mock Data (extended) ----------
+const mockOrders = [
+  {
+    id: "ORD-4092",
+    buyerName: "Adama Coop Union",
+    price: 125000,
+    status: "Pending",
+    date: "2025-04-18",
+    type: "cooperative",
+  },
+  {
+    id: "ORD-4091",
+    buyerName: "Bishoftu Agro Dealer",
+    price: 47800,
+    status: "Processing",
+    date: "2025-04-17",
+    type: "retailer",
+  },
+  {
+    id: "ORD-4090",
+    buyerName: "Debre Zeit Farm Center",
+    price: 82900,
+    status: "Delivered",
+    date: "2025-04-16",
+    type: "farmcenter",
+  },
+];
 
-const ActionButton = ({ label, theme }) => (
-  <AppCard
-    style={{
-      flex: 1,
-      paddingVertical: theme.spacing.lg,
-      alignItems: "center",
-    }}
-  >
-    <AppText
-      variant="label"
-      color={theme.colors.textPrimary}
-      style={{ textAlign: "center" }}
-    >
-      {label}
-    </AppText>
-  </AppCard>
-);
+const mockLowStockAlerts = [
+  {
+    id: "a1",
+    item: "DAP Fertilizer",
+    amount: "120 bags left",
+    status: "critical",
+  },
+  { id: "a2", item: "Urea 50kg", amount: "85 bags left", status: "warning" },
+];
 
-const SupplierDashboardScreen = () => {
+export default function SupplierDashboardScreen({ navigation }) {
   const { theme } = useTheme();
-  const { logout } = useAuthStore();
+  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [salesSum, setSalesSum] = useState(45200);
+
+  const handleAddSale = () => {
+    setSalesSum((prev) => prev + 3500);
+  };
+
+  const handleSidebarItemPress = (item) => {
+    if (item.route === "Logout") {
+      navigation.reset({ index: 0, routes: [{ name: "Welcome" }] });
+    } else if (item.route) {
+      navigation.navigate(item.route);
+    }
+  };
 
   return (
-    <ScreenWrapper scrollable>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={{ marginBottom: theme.spacing.xxxl }}>
-          <AppText
-            variant="bodyMd"
-            color={theme.colors.textSecondary}
-            style={{ marginBottom: theme.spacing.sm }}
-          >
-            Welcome Back 👋
-          </AppText>
-          <AppText variant="displayLg" color={theme.colors.textPrimary}>
-            Billy
-          </AppText>
-          <AppText
-            variant="label"
-            color={theme.colors.primary}
-            style={{ marginTop: theme.spacing.sm }}
-          >
-            {ROLES.SUPPLIER}
-          </AppText>
-        </View>
+    <>
+      <DashboardLayout
+        title="Supplier Dashboard"
+        subtitle="Good morning, Bekele Trading"
+        role="supplier"
+        activeTab="Dashboard"
+        onTabPress={(tab) => console.log(tab)}
+        scrollable={true}
+        showMenu={true}
+        onMenuPress={() => setSidebarVisible(true)}
+      >
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          <SupplierQuickActions onAddSale={handleAddSale} />
+          <SalesSummaryWidget salesSum={salesSum} onAddSale={handleAddSale} />
+          <InventoryLowStockWidget alerts={mockLowStockAlerts} />
+          <MarketDemandNote />
+          <RecentSupplierOrders orders={mockOrders} />
+        </ScrollView>
+      </DashboardLayout>
 
-        {/* Stats Section */}
-        <View style={{ marginBottom: theme.spacing.xxxl }}>
-          <AppText
-            variant="headingSm"
-            color={theme.colors.textPrimary}
-            style={{ marginBottom: theme.spacing.lg }}
-          >
-            Your Stats
-          </AppText>
-          <View style={{ gap: theme.spacing.md }}>
-            <StatCard label="Inventory" value="89" theme={theme} />
-            <StatCard label="Orders" value="34" theme={theme} />
-            <StatCard label="Revenue" value="$8,750" theme={theme} />
-          </View>
-        </View>
-
-        {/* Quick Actions */}
-        <View style={{ marginBottom: theme.spacing.xxxl }}>
-          <AppText
-            variant="headingSm"
-            color={theme.colors.textPrimary}
-            style={{ marginBottom: theme.spacing.lg }}
-          >
-            Quick Actions
-          </AppText>
-          <View style={{ gap: theme.spacing.md }}>
-            <ActionButton label="Manage Stock" theme={theme} />
-            <ActionButton label="Orders" theme={theme} />
-            <ActionButton label="Reports" theme={theme} />
-          </View>
-        </View>
-
-        {/* Coming Soon */}
-        <View style={{ marginBottom: theme.spacing.xxxl }}>
-          <AppCard
-            style={{
-              alignItems: "center",
-              paddingVertical: theme.spacing.xl,
-              backgroundColor: theme.colors.primaryContainer,
-            }}
-          >
-            <AppText
-              variant="headingSm"
-              color={theme.colors.primary}
-              style={{ marginBottom: theme.spacing.md }}
-            >
-              More Features Coming Soon
-            </AppText>
-            <AppText
-              variant="bodyMd"
-              color={theme.colors.textSecondary}
-              style={{ textAlign: "center" }}
-            >
-              We're adding advanced inventory and supply chain tools.
-            </AppText>
-          </AppCard>
-          {/* Logout */}
-          <AppButton
-            title="Logout"
-            onPress={logout}
-            variant="danger"
-            fullWidth
-            style={{ marginBottom: theme.spacing.lg }}
-          />
-        </View>
-      </ScrollView>
-    </ScreenWrapper>
+      <AppSidebar
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+        role="supplier"
+        onItemPress={handleSidebarItemPress}
+      />
+    </>
   );
-};
+}
 
-export default SupplierDashboardScreen;
+const styles = StyleSheet.create({
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 32,
+  },
+});
