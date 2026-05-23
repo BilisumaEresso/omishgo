@@ -35,7 +35,7 @@ const ROLE_MENU_ITEMS = {
   ],
   [ROLES.DRIVER]: [
     { label: "Deliveries", icon: "bicycle", route: "DriverDeliveries" },
-    { label: "History", icon: "time", route: "DriverHistory" }, // DESIGN FIX: Minimal privilege assignment matching system constraints
+    { label: "History", icon: "time", route: "DriverHistory" },
   ],
 };
 
@@ -48,8 +48,6 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
   const { theme } = useTheme();
   const slideAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-
-  // DESIGN FIX: Track visibility internally to guarantee closing animations play fully
   const [showModal, setShowModal] = useState(visible);
 
   useEffect(() => {
@@ -110,6 +108,13 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
 
   const menuItems = role ? ROLE_MENU_ITEMS[role] || [] : [];
 
+  const textPrimary = theme.colors.textPrimary || "#212121";
+  const textSecondary = theme.colors.textSecondary || "#757575";
+  const borderColor = theme.colors.border || "#F0F0F0";
+  const backgroundColor = theme.colors.surface || "#FFFFFF";
+  const pressedBg = theme.colors.backgroundSecondary || "#EEEEEE";
+  const errorColor = theme.colors.error || "#FF3B30";
+
   return (
     <Modal
       visible={showModal}
@@ -120,7 +125,10 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
       <View style={styles.overlay}>
         {/* Backdrop */}
         <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]}>
-          <Pressable style={{ flex: 1 }} onPress={() => handleCloseAnimation()} />
+          <Pressable
+            style={{ flex: 1 }}
+            onPress={() => handleCloseAnimation()}
+          />
         </Animated.View>
 
         {/* Drawer */}
@@ -128,7 +136,7 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
           style={[
             styles.drawer,
             {
-              backgroundColor: theme.colors.surface || "#FFFFFF",
+              backgroundColor: backgroundColor,
               transform: [{ translateX: slideAnim }],
             },
           ]}
@@ -139,8 +147,8 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
               style={[
                 styles.profileSection,
                 {
-                  borderBottomColor: theme.colors.border || "#F0F0F0",
-                  paddingHorizontal: theme.spacing.md || 16,
+                  borderBottomColor: borderColor,
+                  paddingHorizontal: theme.spacing?.md || 16,
                 },
               ]}
             >
@@ -155,16 +163,13 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
               <View style={styles.profileInfo}>
                 <AppText
                   variant="headingMd"
-                  style={{ color: theme.colors.text || "#333333", fontWeight: "600" }}
+                  style={{ color: textPrimary, fontWeight: "600" }}
                 >
                   User Name
                 </AppText>
                 <AppText
                   variant="bodySm"
-                  style={{
-                    color: theme.colors.textSecondary || "#666666",
-                    marginTop: 2,
-                  }}
+                  style={{ color: textSecondary, marginTop: 2 }}
                 >
                   {role ? role.charAt(0).toUpperCase() + role.slice(1) : "User"}
                 </AppText>
@@ -179,9 +184,7 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
                   style={({ pressed }) => [
                     styles.menuItem,
                     {
-                      backgroundColor: pressed
-                        ? theme.colors.surfaceHover || "#F5F5F5"
-                        : "transparent",
+                      backgroundColor: pressed ? pressedBg : "transparent",
                     },
                   ]}
                   onPress={() => handleCloseAnimation(item)}
@@ -189,13 +192,10 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
                   <Ionicons
                     name={item.icon}
                     size={20}
-                    color={theme.colors.text || "#333333"}
+                    color={textPrimary}
                     style={{ marginRight: 12 }}
                   />
-                  <AppText
-                    variant="bodyMd"
-                    style={{ color: theme.colors.text || "#333333" }}
-                  >
+                  <AppText variant="bodyMd" style={{ color: textPrimary }}>
                     {item.label}
                   </AppText>
                 </Pressable>
@@ -205,20 +205,19 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
               <View
                 style={{
                   height: 1,
-                  backgroundColor: theme.colors.border || "#F0F0F0",
+                  backgroundColor: borderColor,
                   marginVertical: 12,
                 }}
               />
 
-              {theme.colors.text && COMMON_ITEMS.map((item) => (
+              {/* Common items - always render (no condition) */}
+              {COMMON_ITEMS.map((item) => (
                 <Pressable
                   key={item.label}
                   style={({ pressed }) => [
                     styles.menuItem,
                     {
-                      backgroundColor: pressed
-                        ? theme.colors.surfaceHover || "#F5F5F5"
-                        : "transparent",
+                      backgroundColor: pressed ? pressedBg : "transparent",
                     },
                   ]}
                   onPress={() => handleCloseAnimation(item)}
@@ -226,13 +225,10 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
                   <Ionicons
                     name={item.icon}
                     size={20}
-                    color={theme.colors.text}
+                    color={textPrimary}
                     style={{ marginRight: 12 }}
                   />
-                  <AppText
-                    variant="bodyMd"
-                    style={{ color: theme.colors.text }}
-                  >
+                  <AppText variant="bodyMd" style={{ color: textPrimary }}>
                     {item.label}
                   </AppText>
                 </Pressable>
@@ -243,11 +239,9 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
                 style={({ pressed }) => [
                   styles.menuItem,
                   {
-                    marginTop: "auto", // Push logout cleanly down toward the base of the sidebar container
+                    marginTop: "auto",
                     marginBottom: 16,
-                    backgroundColor: pressed
-                      ? theme.colors.surfaceHover || "#F5F5F5"
-                      : "transparent",
+                    backgroundColor: pressed ? pressedBg : "transparent",
                   },
                 ]}
                 onPress={() =>
@@ -257,10 +251,13 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
                 <Ionicons
                   name="log-out-outline"
                   size={20}
-                  color={theme.colors.error || "#FF3B30"}
+                  color={errorColor}
                   style={{ marginRight: 12 }}
                 />
-                <AppText variant="bodyMd" style={{ color: theme.colors.error || "#FF3B30", fontWeight: "500" }}>
+                <AppText
+                  variant="bodyMd"
+                  style={{ color: errorColor, fontWeight: "500" }}
+                >
                   Logout
                 </AppText>
               </Pressable>

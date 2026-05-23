@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   KeyboardAvoidingView,
-  Platform
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AppText from "../common/AppText";
@@ -14,37 +14,51 @@ import { useTheme } from "../../hooks/useTheme";
 const AuthLayout = ({ title, subtitle, children }) => {
   const { theme } = useTheme();
 
+  const textPrimary = theme.colors.textPrimary || "#212121";
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={[styles.container, { backgroundColor: theme.colors.background  }]}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* DESIGN FIX: OmishGo stylized tractor-brand vector header representation */}
+        {/* Logo section */}
         <View style={styles.logoWrapper}>
-          <View style={[styles.brandEmblem, { borderColor: theme.colors.primary}]}>
-            {/* Minimalist tractor vector facing left; large tire stylized structurally as letter 'O' */}
+          <View
+            style={[styles.brandEmblem, { borderColor: theme.colors.primary }]}
+          >
             <Ionicons
-              name="logo-closed-captioning" // Using a dual-concentric curve layout to represent the stylized 'O' tire profile cleanly
+              name="logo-closed-captioning"
               size={36}
               color={theme.colors.primary}
               style={styles.tractorTireO}
             />
-            <View style={[styles.tractorBody, { backgroundColor: theme.colors.primary }]} />
+            <View
+              style={[
+                styles.tractorBody,
+                { backgroundColor: theme.colors.primary },
+              ]}
+            />
           </View>
-          <AppText variant="headingMd" style={[styles.brandText, { color: theme.colors.text }]}>
-            Omish<AppText style={{ color: theme.colors.primary, fontWeight: "800" }}>Go</AppText>
+          <AppText
+            variant="headingMd"
+            style={[styles.brandText, { color: textPrimary }]}
+          >
+            Omish
+            <AppText style={{ color: theme.colors.primary, fontWeight: "800" }}>
+              Go
+            </AppText>
           </AppText>
         </View>
 
         {title && (
           <AppText
             variant="headingLg"
-            style={[styles.title, { color: theme.colors.text }]}
+            style={[styles.title, { color: textPrimary }]}
           >
             {title}
           </AppText>
@@ -59,9 +73,7 @@ const AuthLayout = ({ title, subtitle, children }) => {
           </AppText>
         )}
 
-        <View style={styles.formContainer}>
-          {children}
-        </View>
+        <View style={styles.formContainer}>{children}</View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -89,7 +101,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
-    backgroundColor: "transparent", // Clean minimalist alpha layout representation
+    backgroundColor: "transparent",
   },
   tractorTireO: {
     position: "absolute",

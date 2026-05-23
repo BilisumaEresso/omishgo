@@ -10,10 +10,7 @@ import OTPVerificationScreen from "../screens/auth/OTPVerificationScreen";
 import WelcomeScreen from "../screens/auth/WelcomeScreen";
 
 // Import your onboarding screens
-import OnboardingSell from "../screens/onboarding/OnboardingSell";
-import OnboardingBuy from "../screens/onboarding/OnboardingBuy";
-import OnboardingSupply from "../screens/onboarding/OnboardingSupply";
-import OnboardingTrack from "../screens/onboarding/OnboardingTrack";
+import OnboardingCarousel from "../screens/onboarding/OnboardingCarousel";
 
 const Stack = createNativeStackNavigator();
 
@@ -29,10 +26,7 @@ const AuthNavigator = () => {
       <Stack.Screen name="Splash" component={SplashScreen} />
 
       {/* Onboarding Sequence */}
-      <Stack.Screen name="OnboardingSell" component={OnboardingSell} />
-      <Stack.Screen name="OnboardingBuy" component={OnboardingBuy} />
-      <Stack.Screen name="OnboardingSupply" component={OnboardingSupply} />
-      <Stack.Screen name="OnboardingTrack" component={OnboardingTrack} />
+      <Stack.Screen name="OnboardingSell" component={OnboardingCarousel} />
 
       {/* Auth & Role Flow */}
       <Stack.Screen name="Welcome" component={WelcomeScreen} />

@@ -26,6 +26,9 @@ const AppHeader = ({
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
 
+  const textColor = theme.colors.textPrimary || "#212121";
+  const secondaryTextColor = theme.colors.textSecondary || "#757575";
+
   return (
     <View
       style={[
@@ -33,7 +36,7 @@ const AppHeader = ({
         {
           paddingTop: insets.top + 8,
           paddingBottom: 12,
-          paddingHorizontal: theme.spacing.md || 16,
+          paddingHorizontal: theme.spacing?.md || 16,
           backgroundColor: theme.colors.background || "#FFFFFF",
           borderBottomWidth: 1,
           borderBottomColor: theme.colors.border || "#F0F0F0",
@@ -48,11 +51,7 @@ const AppHeader = ({
             hitSlop={8}
             style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
           >
-            <Ionicons
-              name="arrow-back"
-              size={ICON_SIZE}
-              color={theme.colors.text || "#333333"}
-            />
+            <Ionicons name="arrow-back" size={ICON_SIZE} color={textColor} />
           </Pressable>
         )}
         {showMenu && (
@@ -61,15 +60,19 @@ const AppHeader = ({
             hitSlop={8}
             style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
           >
-            <Ionicons name="menu" size={ICON_SIZE} color={theme.colors.text || "#333333"} />
+            <Ionicons name="menu" size={ICON_SIZE} color={textColor} />
           </Pressable>
         )}
 
-        {/* DESIGN FIX: Dynamically apply margin only if an icon precedes the text */}
-        <View style={[styles.titleContainer, { marginLeft: (showBack || showMenu) ? 12 : 0 }]}>
+        <View
+          style={[
+            styles.titleContainer,
+            { marginLeft: showBack || showMenu ? 12 : 0 },
+          ]}
+        >
           <AppText
             variant="headingMd"
-            style={{ color: theme.colors.text || "#333333", fontWeight: "700" }}
+            style={{ color: textColor, fontWeight: "700" }}
             numberOfLines={1}
           >
             {title}
@@ -77,10 +80,7 @@ const AppHeader = ({
           {subtitle ? (
             <AppText
               variant="bodySm"
-              style={{
-                color: theme.colors.textSecondary || "#666666",
-                opacity: 0.7,
-              }}
+              style={{ color: secondaryTextColor, opacity: 0.7 }}
               numberOfLines={1}
             >
               {subtitle}
@@ -104,11 +104,7 @@ const AppHeader = ({
                   { opacity: pressed ? 0.6 : 1 },
                 ]}
               >
-                <Ionicons
-                  name="search"
-                  size={ICON_SIZE}
-                  color={theme.colors.text || "#333333"}
-                />
+                <Ionicons name="search" size={ICON_SIZE} color={textColor} />
               </Pressable>
             )}
             {showNotification && (
@@ -123,7 +119,7 @@ const AppHeader = ({
                 <Ionicons
                   name="notifications-outline"
                   size={ICON_SIZE}
-                  color={theme.colors.text || "#333333"}
+                  color={textColor}
                 />
                 <View
                   style={[
