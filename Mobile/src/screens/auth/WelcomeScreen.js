@@ -66,7 +66,7 @@ export default function WelcomeScreen({ navigation }) {
             <AppButton
               title="Create Account"
               fullWidth
-              onPress={() => navigation.navigate("RoleSelection")}
+              onPress={() => navigation.navigate("Register")}
             />
 
             <AppButton

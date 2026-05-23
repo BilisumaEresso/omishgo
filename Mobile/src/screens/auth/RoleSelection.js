@@ -6,10 +6,13 @@ import AppButton from "../../components/common/AppButton";
 import ScreenWrapper from "../../components/common/ScreenWrapper";
 import { useTheme } from "../../hooks/useTheme";
 import { ROLES } from "../../constants/roles";
+import { useAuthStore } from "../../store/auth.store";
 
 export default function RoleSelection({ navigation }) {
   const { theme } = useTheme();
   const [selectedRole, setSelectedRole] = useState(null);
+
+  const { requestRole, switchRole } = useAuthStore();
 
   const roles = [
     {
@@ -38,12 +41,71 @@ export default function RoleSelection({ navigation }) {
     },
   ];
 
+  const handleContinue = async () => {
+    if (!selectedRole) return;
+
+    try {
+      // 🌾 FARMER (DEFAULT ROLE - NO REQUEST NEEDED)
+      if (selectedRole === ROLES.FARMER) {
+        const result = await switchRole("farmer");
+
+        if (!result.success) return;
+
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "FarmerDashboard" }],
+        });
+
+        return;
+      }
+
+      // 🛒 BUYER OR 🚚 DRIVER (ACTIVE AFTER REQUEST + SWITCH)
+      if (selectedRole === ROLES.BUYER || selectedRole === ROLES.DRIVER) {
+        const request = await requestRole(selectedRole);
+
+        if (!request.success) return;
+
+        const switchRes = await switchRole(selectedRole);
+
+        if (!switchRes.success) return;
+
+        navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name:
+                selectedRole === ROLES.BUYER
+                  ? "BuyerDashboard"
+                  : "DriverDashboard",
+            },
+          ],
+        });
+
+        return;
+      }
+
+      // 🏪 SUPPLIER (PENDING APPROVAL FLOW)
+      if (selectedRole === ROLES.SUPPLIER) {
+        const request = await requestRole("supplier");
+
+        if (!request.success) return;
+
+        navigation.navigate("SupplierPending");
+
+        return;
+      }
+    } catch (error) {
+      console.log("Role selection error:", error);
+    }
+  };
+
   return (
     <ScreenWrapper>
       <View style={styles.container}>
         <AppText variant="headingMd" style={styles.heading}>
           Choose Your Role
         </AppText>
+
         <AppText
           variant="bodyMd"
           color={theme.colors.textSecondary}
@@ -68,10 +130,12 @@ export default function RoleSelection({ navigation }) {
               <View style={styles.iconBox}>
                 <AppText variant="displaySm">{item.icon}</AppText>
               </View>
+
               <View style={styles.cardInfo}>
                 <AppText variant="bodyLg" style={{ fontWeight: "600" }}>
                   {item.title}
                 </AppText>
+
                 <AppText variant="bodySm" color={theme.colors.textSecondary}>
                   {item.desc}
                 </AppText>
@@ -83,9 +147,7 @@ export default function RoleSelection({ navigation }) {
         <AppButton
           title="Continue"
           disabled={!selectedRole}
-          onPress={() =>
-            navigation.navigate("Register", { role: selectedRole })
-          }
+          onPress={handleContinue}
           fullWidth
         />
       </View>
@@ -94,10 +156,21 @@ export default function RoleSelection({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  heading: { textAlign: "center", marginBottom: 8 },
-  subtext: { textAlign: "center", marginBottom: 24 },
-  list: { gap: 12 },
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  heading: {
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  subtext: {
+    textAlign: "center",
+    marginBottom: 24,
+  },
+  list: {
+    gap: 12,
+  },
   card: {
     flexDirection: "row",
     alignItems: "center",
@@ -115,5 +188,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 16,
   },
-  cardInfo: { flex: 1 },
+  cardInfo: {
+    flex: 1,
+  },
 });

@@ -137,7 +137,7 @@ export default function LoginScreen({ navigation }) {
               Don't have an account?{" "}
             </AppText>
             <TouchableOpacity
-              onPress={() => navigation.navigate("RoleSelection")}
+              onPress={() => navigation.navigate("Register")}
             >
               <AppText
                 variant="bodyMd"

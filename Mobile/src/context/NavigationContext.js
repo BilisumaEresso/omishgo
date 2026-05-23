@@ -1,23 +1,17 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext } from "react";
 import { useAuthStore } from "../store/auth.store.js";
 
 const NavigationContext = createContext();
 
 export const NavigationProvider = ({ children }) => {
-  const [activeRole, setActiveRole] = useState(null);
-  const { isAuthenticated, user } = useAuthStore();
-
-  // Sync NavigationContext with auth store state
-  useEffect(() => {
-    if (isAuthenticated && user?.activeRole) {
-      setActiveRole(user.activeRole);
-    } else {
-      setActiveRole(null);
-    }
-  }, [isAuthenticated, user?.activeRole]);
+  const { isAuthenticated, activeRole } = useAuthStore();
 
   return (
-    <NavigationContext.Provider value={{ activeRole, setActiveRole }}>
+    <NavigationContext.Provider
+      value={{
+        activeRole: isAuthenticated ? activeRole : null,
+      }}
+    >
       {children}
     </NavigationContext.Provider>
   );

@@ -19,4 +19,9 @@ export const API_ENDPOINTS = {
     requestDeviceMove: "/api/v1/auth/request-device-move",
     confirmDeviceMove: "/api/v1/auth/confirm-device-move",
   },
+  role: {
+    myRoles: "/api/v1/roles/my-roles",
+    requestRole: "/api/v1/roles/request-role",
+    switchRole: "/api/v1/roles/switch-role",
+  },
 };

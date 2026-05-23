@@ -66,7 +66,7 @@ const AppInput = ({
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={theme.colors.textSecondary || "#666666"}
+          placeholderTextColor={ "#666666"}
           secureTextEntry={secure}
           keyboardType={keyboardType}
           onFocus={() => setFocused(true)}

@@ -67,7 +67,7 @@ export default function SuccessScreen({ navigation }) {
           <AppButton
             title="Go to Dashboard ➔"
             fullWidth
-            onPress={() => navigation.navigate("Dashboard")}
+            onPress={() => navigation.navigate("RoleSelection")}
           />
         </View>
       </View>

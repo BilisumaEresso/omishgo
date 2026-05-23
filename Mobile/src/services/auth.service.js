@@ -10,7 +10,6 @@ const authService = {
         name: userData.name,
         phone: userData.phone,
         pin: userData.pin,
-        role: userData.role,
       };
 
       // Only include email if it's provided and not empty
@@ -22,7 +21,6 @@ const authService = {
         API_ENDPOINTS.auth.register,
         registrationData,
       );
-
       if (response.data.success) {
         return {
           success: true,

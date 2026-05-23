@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { API_BASE_URL } from "../constants/api.js";
 import authService from "../services/auth.service.js";
+import roleService from "../services/role.service.js";
 import storageService from "../services/storage.service.js";
 
 const isTokenExpired = (token) => {
@@ -86,18 +87,24 @@ export const useAuthStore = create(
       isLoading: false,
       isInitializingAuth: true,
       error: null,
+      roles: [],
+      activeRole: null,
 
       register: async (userData) => {
         set({ isLoading: true, error: null });
 
         try {
           const result = await authService.register(userData);
-console.log(result)
           if (!result.success) {
             set({ isLoading: false, error: result.message });
             return result;
           }
-
+          set({
+            user: result.data.user,
+            roles: result.data.user.roles || ["farmer"],
+            activeRole: "farmer",
+            isAuthenticated: false, // or true depending backend login flow
+          });
           set({ isLoading: false });
           return result;
         } catch (error) {
@@ -125,7 +132,8 @@ console.log(result)
           set({
             user: result.data.user,
             token: result.data.token,
-            refreshToken: result.data.refreshToken || null,
+            roles: result.data.user.roles || [],
+            activeRole: result.data.user.activeRole,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -154,7 +162,11 @@ console.log(result)
               isAuthenticated: false,
               isLoading: false,
               isInitializingAuth: false,
+              error: null,
+              roles: [],
+              activeRole: null,
             });
+
             return false;
           }
 
@@ -231,6 +243,78 @@ console.log(result)
           return false;
         }
       },
+      requestRole: async (role) => {
+        set({ isLoading: true, error: null });
+
+        try {
+          const result = await roleService.requestRole(role);
+
+          if (!result.success) {
+            set({
+              isLoading: false,
+              error: result.message,
+            });
+
+            return result;
+          }
+
+          set((state) => ({
+            roles: result.data?.roles || state.roles,
+            isLoading: false,
+          }));
+
+          return result;
+        } catch (error) {
+          set({
+            isLoading: false,
+            error: error.message,
+          });
+
+          return {
+            success: false,
+            message: error.message,
+          };
+        }
+      },
+      switchRole: async (role) => {
+        set({ isLoading: true, error: null });
+
+        try {
+          const result = await roleService.switchRole(role);
+
+          if (!result.success) {
+            set({
+              isLoading: false,
+              error: result.message,
+            });
+
+            return result;
+          }
+
+          set((state) => ({
+            user: {
+              ...state.user,
+              ...result.data,
+            },
+            activeRole: result.data.activeRole,
+            roles: result.data.roles,
+            isLoading: false,
+            error: null,
+          }));
+
+          return result;
+        } catch (error) {
+          set({
+            isLoading: false,
+            error: error.message,
+          });
+
+          return {
+            success: false,
+            message: error.message,
+          };
+        }
+      },
 
       logout: async () => {
         set({ isLoading: true });
@@ -246,6 +330,8 @@ console.log(result)
             isLoading: false,
             isInitializingAuth: false,
             error: null,
+            roles: [],
+            activeRole: null,
           });
 
           return { success: true };
@@ -273,8 +359,9 @@ console.log(result)
       partialize: (state) => ({
         user: state.user,
         token: state.token,
-        refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
+        roles: state.roles,
+        activeRole: state.activeRole,
       }),
     },
   ),
