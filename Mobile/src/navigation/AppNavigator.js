@@ -7,12 +7,17 @@ import BuyerNavigator from "./BuyerNavigator.js";
 import DriverNavigator from "./DriverNavigator.js";
 import FarmerNavigator from "./FarmerNavigator.js";
 import SupplierNavigator from "./SupplierNavigator.js";
+import RoleSelectionModal from "../screens/role/RoleSelectionModal.js";
 
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
   const user = useAuthStore((state) => state.user);
   const activeRole = user?.activeRole;
+
+  if (!activeRole) {
+    return <RoleSelectionModal />;
+  }
 
   if (!activeRole) {
     return null;

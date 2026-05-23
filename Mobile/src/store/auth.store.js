@@ -92,7 +92,7 @@ export const useAuthStore = create(
 
         try {
           const result = await authService.register(userData);
-
+console.log(result)
           if (!result.success) {
             set({ isLoading: false, error: result.message });
             return result;

@@ -23,8 +23,8 @@ const RegisterScreen = ({ navigation, route }) => {
       return setErrors({ confirmPin: "PIN length must be minimum 4 maximum 6" });
 
     setLoading(true);
-    const result = await register({ ...form, role });
-
+    const result = await register({ ...form });
+    console.log(result)
     if (result.success) {
       navigation.navigate('Success');
     } else {

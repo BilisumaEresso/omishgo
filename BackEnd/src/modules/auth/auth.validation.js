@@ -15,15 +15,6 @@ export const registerValidation = z.object({
       .trim()
       .min(2, "Name must be at least 2 characters long"),
 
-    email: z
-      .string()
-      .email("Invalid email address")
-      .toLowerCase()
-      .trim()
-      .optional()
-      .or(z.literal(""))
-      .transform((value) => (value === "" ? undefined : value)),
-
     pin: z
       .string({ required_error: "PIN is required" })
       .regex(

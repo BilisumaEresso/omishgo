@@ -24,7 +24,6 @@ export const register = asyncHandler(async (req, res, next) => {
   // All new users register as FARMER (farmer-first onboarding)
   const user = await authService.registerUser({
     name,
-    email,
     phone,
     pin,
   });
@@ -49,7 +48,6 @@ export const login = asyncHandler(async (req, res, next) => {
   const { email, phone, pin, deviceId } = req.body;
 
   const result = await authService.loginUser({
-    email,
     phone,
     pin,
     deviceId,
@@ -76,7 +74,6 @@ export const login = asyncHandler(async (req, res, next) => {
   const loginResponseUser = {
     id: user._id,
     name: user.name,
-    email: user.email,
     phone: user.phone,
     role: user.role, // backward compatibility
     activeRole: user.activeRole,
