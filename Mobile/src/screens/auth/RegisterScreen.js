@@ -66,7 +66,6 @@ const RegisterScreen = ({ navigation, route }) => {
 
     setLoading(true);
     const result = await register({ ...form });
-    console.log(result);
     if (result.success) {
       navigation.replace("Success", {
         phone: form.phone,

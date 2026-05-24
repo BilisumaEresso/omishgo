@@ -47,7 +47,7 @@ const COMMON_ITEMS = [
 
 const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
   const { theme } = useTheme();
-  const {logout}= useAuthStore()
+  const {logout, user}= useAuthStore()
   const slideAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [showModal, setShowModal] = useState(visible);
@@ -167,7 +167,7 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
                   variant="headingMd"
                   style={{ color: textPrimary, fontWeight: "600" }}
                 >
-                  User Name
+                  {user.name}
                 </AppText>
                 <AppText
                   variant="bodySm"

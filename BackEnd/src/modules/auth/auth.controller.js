@@ -27,7 +27,7 @@ export const register = asyncHandler(async (req, res, next) => {
     phone,
     pin,
   });
-
+console.log(user)
   sendResponse(res, {
     statusCode: 201,
     success: true,
@@ -87,6 +87,7 @@ export const login = asyncHandler(async (req, res, next) => {
     data: {
       user: loginResponseUser,
       token,
+      refreshToken: result.refreshToken, 
     },
   });
 });

@@ -4,7 +4,7 @@ import { API_ENDPOINTS } from "../constants/api";
 const roleService = {
   async getMyRoles() {
     try {
-      const response = await api.get(API_ENDPOINTS.roles.myRoles);
+      const response = await api.get(API_ENDPOINTS.role.myRoles);
 
       return {
         success: true,
@@ -20,7 +20,7 @@ const roleService = {
 
   async requestRole(role) {
     try {
-      const response = await api.post(API_ENDPOINTS.roles.requestRole, {
+      const response = await api.post(API_ENDPOINTS.role.requestRole, {
         role,
       });
 
@@ -39,7 +39,7 @@ const roleService = {
 
   async switchRole(role) {
     try {
-      const response = await api.post(API_ENDPOINTS.roles.switchRole, { role });
+      const response = await api.post(API_ENDPOINTS.role.switchRole, { role });
 
       return {
         success: true,

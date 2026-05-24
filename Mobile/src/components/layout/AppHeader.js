@@ -5,8 +5,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AppText from "../common/AppText";
 import { useTheme } from "../../hooks/useTheme";
+import { useNavigation } from "@react-navigation/native";
 
-const ICON_SIZE = 22;
+const ICON_SIZE = 30;
 
 const AppHeader = ({
   title,
@@ -25,6 +26,7 @@ const AppHeader = ({
 }) => {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
 
   const textColor = theme.colors.textPrimary || "#212121";
   const secondaryTextColor = theme.colors.textSecondary || "#757575";
@@ -47,7 +49,7 @@ const AppHeader = ({
       <View style={styles.left}>
         {showBack && (
           <Pressable
-            onPress={onBackPress}
+            onPress={onBackPress || navigation.goBack}
             hitSlop={8}
             style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
           >
@@ -56,7 +58,7 @@ const AppHeader = ({
         )}
         {showMenu && (
           <Pressable
-            onPress={onMenuPress}
+            onPress={onMenuPress || (() => navigation.openDrawer?.())}
             hitSlop={8}
             style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
           >

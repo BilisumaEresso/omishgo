@@ -100,11 +100,13 @@ export const useAuthStore = create(
             return result;
           }
           set({
-            user: result.data.user,
-            roles: result.data.user.roles || ["farmer"],
-            activeRole: "farmer",
-            isAuthenticated: false, // or true depending backend login flow
+            user: result.data,
+            roles: result.data.roles,
+            activeRole: result.data.activeRole,
+            isAuthenticated: false,
+            error: null,
           });
+          await storageService.setUser(result.data);
           set({ isLoading: false });
           return result;
         } catch (error) {
@@ -125,9 +127,13 @@ export const useAuthStore = create(
           }
 
           // Store refreshToken in AsyncStorage (via storageService)
+          await storageService.setToken(result.data.token);
+
           if (result.data.refreshToken) {
             await storageService.setRefreshToken(result.data.refreshToken);
           }
+
+          await storageService.setUser(result.data.user);
 
           set({
             user: result.data.user,
@@ -291,17 +297,14 @@ export const useAuthStore = create(
             return result;
           }
 
-          set((state) => ({
-            user: {
-              ...state.user,
-              ...result.data,
-            },
-            activeRole: result.data.activeRole,
-            roles: result.data.roles,
+          set({
+            user: result.data.user,
+            activeRole: result.data.user.activeRole,
+            roles: result.data.user.roles,
             isLoading: false,
             error: null,
-          }));
-
+          });
+          await storageService.setUser(result.data.user);
           return result;
         } catch (error) {
           set({
