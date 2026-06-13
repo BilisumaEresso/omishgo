@@ -1,0 +1,84 @@
+{
+  "common": {
+    "submit": "አስገባ",
+    "continue": "ቀጥል",
+    "cancel": "ሰርዝ",
+    "save": "አስቀምጥ",
+    "loading": "በመጫን ላይ...",
+    "skip": "ዝለል"
+  },
+  "onboarding": {
+    "slide1Title": "ምርትዎን በቀጥታ ይሸጡ",
+    "slide1Desc": "ሰብልዎን ያስገቡ፣ ከተረጋገጡ ገዢዎች ጋር ያያያዙ — ሸምጋዮች አያስፈልጉም።",
+    "slide2Title": "ከምንጩ ቀጥታ ይግዙ",
+    "slide2Desc": "ከአካባቢ አርሶ አደሮች ጥራት ያለው ምርት በተመጣጣኝ ዋጋ ያግኙ።",
+    "slide3Title": "በቋንቋዎ ይወያዩ",
+    "slide3Desc": "በአማርኛ፣ በኦሮምኛ ወይም በእንግሊዝኛ ቀጥታ ይላኩ ወይም ይደውሉ።"
+  },
+  "languagePicker": {
+    "title": "ቋንቋ ይምረጡ",
+    "subtitle": "ለመቀጠል የሚፈልጉትን ቋንቋ ይምረጡ",
+    "english": "English",
+    "amharic": "አማርኛ",
+    "oromo": "Afaan Oromoo"
+  },
+  "auth": {
+    "loginTitle": "እንኳን ደህና መጡ",
+    "loginSubtitle": "ወደ መለያዎ ይግቡ",
+    "registerTitle": "መለያ ይፍጠሩ",
+    "registerSubtitle": "ዛሬውኑ ኦሚሽጎን ይቀላቀሉ",
+    "phoneLabel": "ስልክ ቁጥር",
+    "phonePlaceholder": "ምሳሌ 0911234567",
+    "pinLabel": "ሚስጥራዊ ቁጥር (4-6 አሃዝ)",
+    "pinPlaceholder": "ሚስጥራዊ ቁጥር ያስገቡ",
+    "nameLabel": "ሙሉ ስም",
+    "namePlaceholder": "ሙሉ ስምዎን ያስገቡ",
+    "roleLabel": "እኔ...",
+    "roleFarmer": "አርሶ አደር",
+    "roleBuyer": "ገዢ",
+    "roleAdmin": "አስተዳዳሪ",
+    "emailLabel": "ኢሜይል (አማራጭ)",
+    "emailPlaceholder": "ኢሜይልዎን ያስገቡ",
+    "locationLabel": "አድራሻ",
+    "regionLabel": "ክልል",
+    "zoneLabel": "ዞን",
+    "kebeleLabel": "ቀበሌ",
+    "langLabel": "የሚመርጡት ቋንቋ",
+    "loginBtn": "ግባ",
+    "registerBtn": "ተመዝገብ",
+    "hasAccount": "መለያ አልዎት? ይግቡ"
+  },
+  "product": {
+    "createTitle": "አዲስ ምርት ያስገቡ",
+    "editTitle": "ምርት ያስተካክሉ",
+    "titleLabel": "የምርት ስም",
+    "titlePlaceholder": "ምሳሌ፡ ቀይ ሽንኩርት",
+    "descLabel": "መግለጫ",
+    "descPlaceholder": "ስለ ምርትዎ ተጨማሪ መረጃ",
+    "priceLabel": "ዋጋ (በብር)",
+    "pricePlaceholder": "ምሳሌ፡ 15",
+    "unitLabel": "መለኪያ",
+    "unitPlaceholder": "ምሳሌ፡ ኪ.ግ፣ ኩንታል",
+    "quantityLabel": "ያለው ብዛት",
+    "quantityPlaceholder": "ምሳሌ፡ 100",
+    "draftSaved": "ያለ በይነመረብ ተቀምጧል። መስመር ላይ ሲሆኑ ይላካል።",
+    "draftBanner": "ያለ በይነመረብ እየሰሩ ነው።",
+    "syncing": "በመላክ ላይ..."
+  },
+  "browse": {
+    "title": "የገበያ ቦታ",
+    "searchPlaceholder": "ምርቶችን ይፈልጉ...",
+    "filterRegion": "በክልል አጣራ",
+    "noListings": "ምንም ምርት የለም — የመጀመሪያውን ምርት ያስገቡ",
+    "offlineBanner": "ከዚህ በፊት የታዩ (ያለ በይነመረብ)",
+    "messageBtn": "መልእክት ላክ",
+    "callBtn": "ደውል"
+  },
+  "messaging": {
+    "title": "መልእክቶች",
+    "placeholder": "መልእክት ይጻፉ...",
+    "send": "ላክ",
+    "noMessages": "ምንም መልእክት የለም",
+    "offlineError": "ያለ በይነመረብ መልእክት መላክ አይቻልም"
+  }
+}

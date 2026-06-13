@@ -10,6 +10,7 @@ import PriceTrendWidget from "../../components/buyer/PriceTrendWidget";
 import FeaturedProductsList from "../../components/buyer/FeaturedProductsList";
 import NearbyFarmersList from "../../components/buyer/NearbyFarmersList";
 import RecentActivityList from "../../components/buyer/RecentActivityList";
+import AppText from "../../components/common/AppText";
 import { useTheme } from "../../hooks/useTheme";
 
 // ---------- Mock Data (extended) ----------
@@ -161,12 +162,12 @@ export default function BuyerDashboardScreen({ navigation }) {
               style={[styles.notice, { backgroundColor: theme.colors.success }]}
             >
               <Ionicons name="checkmark-circle" size={18} color="#FFF" />
-              <BuyerText
+              <AppText
                 variant="caption"
                 style={{ color: "#FFF", marginLeft: 8 }}
               >
                 {orderedNotice}
-              </BuyerText>
+              </AppText>
             </View>
           )}
           <CategoryFilters
@@ -191,12 +192,12 @@ export default function BuyerDashboardScreen({ navigation }) {
         >
           <Ionicons name="cart" size={24} color="#FFF" />
           <View style={styles.cartBadge}>
-            <BuyerText
+            <AppText
               variant="caption"
               style={{ color: "#FFF", fontWeight: "bold" }}
             >
               {cartCount}
-            </BuyerText>
+            </AppText>
           </View>
         </TouchableOpacity>
       )}

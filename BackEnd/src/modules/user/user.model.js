@@ -1,4 +1,3 @@
-// user.model.js
 import mongoose from "mongoose";
 import { ROLES } from "../../constants/roles.js";
 
@@ -9,17 +8,21 @@ const userSchema = new mongoose.Schema(
       required: [true, "Name is required"],
       trim: true,
     },
+    phone: {
+      type: String,
+      required: [true, "Phone is required"],
+      trim: true,
+      unique: true,
+    },
     email: {
       type: String,
-      unique: true,
       sparse: true,
       lowercase: true,
       trim: true,
     },
-    pin: {
+    pinHash: {
       type: String,
       required: [true, "PIN is required"],
-      minlength: [4, "PIN must be at least 4 digits long"],
       select: false, // Hidden from queries by default
     },
     role: {
@@ -29,104 +32,40 @@ const userSchema = new mongoose.Schema(
         values: Object.values(ROLES),
         message: "{VALUE} is not a valid role",
       },
-      default: "farmer",
+      default: ROLES.FARMER,
     },
-    roles: [
-      {
-        type: {
-          type: String,
-          enum: {
-            values: Object.values(ROLES).filter((role) => role !== ROLES.ADMIN),
-            message: "{VALUE} is not a valid role for users",
-          },
-          required: true,
-        },
-        status: {
-          type: String,
-          enum: {
-            values: ["active", "pending", "blocked"],
-            message: "{VALUE} is not a valid role status",
-          },
-          default: "active",
-        },
-        subscription: {
-          tier: { type: String, default: "free_trial" },
-          startsAt: { type: Date },
-          expiresAt: { type: Date },
-          isActive: { type: Boolean, default: false },
-        },
-      },
-    ],
-    activeRole: {
+    location: {
+      region: { type: String, required: true },
+      zone: { type: String, required: true },
+      kebele: { type: String, required: true },
+    },
+    preferredLang: {
       type: String,
-      enum: {
-        values: Object.values(ROLES),
-        message: "{VALUE} is not a valid role",
-      },
-      default: null,
+      enum: ["en", "am", "om"],
+      default: "am",
+      required: true,
     },
-    phone: {
-      type: String,
-      trim: true,
-      unique: true,
-      sparse: true,
-    },
-    profileImage: {
-      type: String,
-      default: "",
-    },
-    isBlocked: {
+    isVerified: {
       type: Boolean,
-      default: false,
-    },
-    activeDeviceId: {
-      type: String,
-      default: null,
-    },
-    lastLoginAt: {
-      type: Date,
-      default: null,
+      default: false, // Admin needs to approve
     },
   },
   {
     timestamps: true,
-  },
+  }
 );
 
-/**
- * Pre-save hook: Normalize user data and initialize multi-role support
- * Ensures email is lowercase and phone is trimmed
- * Auto-initializes roles array from existing role field for backward compatibility
- * Blocks admin role from user selection
- */
-userSchema.pre("save", function () {
+userSchema.pre("save", function (next) {
+  if (this.email === "") {
+    this.email = undefined;
+  }
   if (this.email) {
     this.email = this.email.toLowerCase().trim();
   }
   if (this.phone) {
     this.phone = this.phone.trim();
   }
-
-  // Block admin role selection
-  if (this.role === ROLES.ADMIN) {
-    throw new Error("Admin role cannot be assigned to users directly");
-  }
-
-  // Auto-initialize roles array from existing role field if roles is empty
-  if (this.role && (!this.roles || this.roles.length === 0)) {
-    this.roles = [
-      {
-        type: this.role,
-        status: "active",
-        subscriptionTier: "free",
-      },
-    ];
-  }
-
-  // Initialize activeRole from role if not set
-  if (this.role && !this.activeRole) {
-    this.activeRole = this.role;
-  }
+  next();
 });
 
 const User = mongoose.model("User", userSchema);

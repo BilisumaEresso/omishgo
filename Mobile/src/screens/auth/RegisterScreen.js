@@ -1,134 +1,120 @@
-// src/screens/auth/RegisterScreen.js
-import { useState } from "react";
-import { View } from "react-native";
-import AppButton from "../../components/common/AppButton";
-import AppInput from "../../components/common/AppInput";
-import ScreenWrapper from "../../components/common/ScreenWrapper";
-import { useTheme } from "../../hooks/useTheme";
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Alert } from "react-native";
+import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../../store/auth.store";
-import AppText from "../../components/common/AppText";
 
-const RegisterScreen = ({ navigation, route }) => {
-  const { theme } = useTheme();
-  const { register } = useAuthStore();
-
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    pin: "",
-    confirmPin: "",
-  });
-  const [errors, setErrors] = useState({});
+const RegisterScreen = ({ navigation }) => {
+  const { t, i18n } = useTranslation();
+  const register = useAuthStore((state) => state.register);
+  
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [pin, setPin] = useState("");
+  const [role, setRole] = useState("farmer");
+  const [email, setEmail] = useState("");
+  const [region, setRegion] = useState("");
+  const [zone, setZone] = useState("");
+  const [kebele, setKebele] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
-    if (!form.name) return setErrors({ name: "Name is required" });
-
-    if (form.name.length < 3 || form.name.length > 25)
-      return setErrors({
-        name: "Name should be 3 to 25 characters long",
-      });
-
-    if (!form.phone)
-      return setErrors({
-        phone: "Enter phone number",
-      });
-
-    if (form.phone.length !== 10)
-      return setErrors({
-        phone: "Phone number must have 10 digits",
-      });
-
-    if (!form.phone.startsWith("09") && !form.phone.startsWith("07"))
-      return setErrors({
-        phone: "Enter valid phone number",
-      });
-
-    if (!form.pin)
-      return setErrors({
-        pin: "Insert PIN",
-      });
-
-    if (form.pin.length < 4 || form.pin.length > 6)
-      return setErrors({
-        pin: "PIN length must be between 4 and 6",
-      });
-
-    if (!form.confirmPin)
-      return setErrors({
-        confirmPin: "Confirm PIN",
-      });
-
-    if (form.pin !== form.confirmPin)
-      return setErrors({
-        confirmPin: "PINs do not match",
-      });
-
+  const handleRegister = async () => {
+    if (!name || !phone || !pin || !region || !zone || !kebele) {
+      Alert.alert("Error", "Please fill all required fields");
+      return;
+    }
+    
     setLoading(true);
-    const result = await register({ ...form });
-    if (result.success) {
-      navigation.replace("Success", {
-        phone: form.phone,
-        pin: form.pin,
+    try {
+      const location = { region, zone, kebele };
+      const preferredLang = i18n.language || "am";
+      
+      await register({
+        name,
+        phone,
+        pin,
+        role,
+        email: email || undefined,
+        location,
+        preferredLang
       });
-    } else {
-      setErrors({ submit: result.message });
+      // Need to login automatically or redirect to login. MVP says "Account pending until Admin approves"
+      Alert.alert(
+        "Success", 
+        "Registration successful. Your account is pending admin approval.",
+        [{ text: "OK", onPress: () => navigation.navigate("Login") }]
+      );
+    } catch (error) {
+      Alert.alert("Error", error.message || "Failed to register");
+    } finally {
       setLoading(false);
     }
   };
+
   return (
-    <ScreenWrapper scrollable>
-      <View style={{ padding: 24 }}>
-        <AppText
-          variant="headingLg"
-          color={theme.colors.primary}
-          style={{ fontWeight: "700", marginBottom:"20" }}
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.title}>{t("auth.registerTitle")}</Text>
+        <Text style={styles.subtitle}>{t("auth.registerSubtitle")}</Text>
 
-        >
-          Create an account
-        </AppText>
-        <AppInput
-          label="Full Name"
-          value={form.name}
-          onChangeText={(t) => setForm({ ...form, name: t })}
-          error={errors.name}
-          placeholder="Lema Bikila"
-        />
-        <AppInput
-          label="Phone"
-          value={form.phone}
-          onChangeText={(t) => setForm({ ...form, phone: t })}
-          keyboardType="phone-pad"
-          error={errors.phone}
-          placeholder="09xxxxxxxx"
-        />
-        <AppInput
-          label="PIN"
-          value={form.pin}
-          onChangeText={(t) => setForm({ ...form, pin: t })}
-          secureTextEntry
-          keyboardType="number-pad"
-          error={errors.pin}
-          placeholder="xxxx"
-        />
-        <AppInput
-          label="Confirm PIN"
-          value={form.confirmPin}
-          onChangeText={(t) => setForm({ ...form, confirmPin: t })}
-          secureTextEntry
-          keyboardType="number-pad"
-          error={errors.confirmPin}
-          placeholder="xxxx"
-        />
+        <View style={styles.form}>
+          <Text style={styles.label}>{t("auth.nameLabel")}</Text>
+          <TextInput style={styles.input} placeholder={t("auth.namePlaceholder")} value={name} onChangeText={setName} />
 
-        <AppButton
-          title="Register"
-          onPress={handleSubmit}
-          loading={loading}
-          fullWidth
-        />
-      </View>
-    </ScreenWrapper>
+          <Text style={styles.label}>{t("auth.phoneLabel")}</Text>
+          <TextInput style={styles.input} placeholder={t("auth.phonePlaceholder")} keyboardType="phone-pad" value={phone} onChangeText={setPhone} />
+
+          <Text style={styles.label}>{t("auth.pinLabel")}</Text>
+          <TextInput style={styles.input} placeholder={t("auth.pinPlaceholder")} keyboardType="numeric" secureTextEntry maxLength={6} value={pin} onChangeText={setPin} />
+
+          <Text style={styles.label}>{t("auth.roleLabel")}</Text>
+          <View style={styles.roleContainer}>
+            <TouchableOpacity style={[styles.roleBtn, role === "farmer" && styles.roleActive]} onPress={() => setRole("farmer")}>
+              <Text style={[styles.roleText, role === "farmer" && styles.roleTextActive]}>{t("auth.roleFarmer")}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.roleBtn, role === "buyer" && styles.roleActive]} onPress={() => setRole("buyer")}>
+              <Text style={[styles.roleText, role === "buyer" && styles.roleTextActive]}>{t("auth.roleBuyer")}</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.label}>{t("auth.locationLabel")}</Text>
+          <TextInput style={styles.input} placeholder={t("auth.regionLabel")} value={region} onChangeText={setRegion} />
+          <TextInput style={styles.input} placeholder={t("auth.zoneLabel")} value={zone} onChangeText={setZone} />
+          <TextInput style={styles.input} placeholder={t("auth.kebeleLabel")} value={kebele} onChangeText={setKebele} />
+
+          <Text style={styles.label}>{t("auth.emailLabel")}</Text>
+          <TextInput style={styles.input} placeholder={t("auth.emailPlaceholder")} keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} />
+
+          <TouchableOpacity style={[styles.button, loading && styles.buttonDisabled]} onPress={handleRegister} disabled={loading}>
+            <Text style={styles.buttonText}>{loading ? t("common.loading") : t("auth.registerBtn")}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.linkButton} onPress={() => navigation.navigate("Login")}>
+            <Text style={styles.linkText}>{t("auth.hasAccount")}</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#fff" },
+  content: { padding: 24 },
+  title: { fontSize: 28, fontWeight: "bold", color: "#333", marginBottom: 8 },
+  subtitle: { fontSize: 16, color: "#666", marginBottom: 24 },
+  form: { gap: 12 },
+  label: { fontSize: 14, fontWeight: "600", color: "#444", marginBottom: -4, marginTop: 8 },
+  input: { borderWidth: 1, borderColor: "#ddd", padding: 14, borderRadius: 8, fontSize: 16 },
+  roleContainer: { flexDirection: "row", gap: 12 },
+  roleBtn: { flex: 1, padding: 14, borderRadius: 8, borderWidth: 1, borderColor: "#ddd", alignItems: "center" },
+  roleActive: { backgroundColor: "#e8f5e9", borderColor: "#2e7d32" },
+  roleText: { color: "#666", fontWeight: "600" },
+  roleTextActive: { color: "#2e7d32" },
+  button: { backgroundColor: "#2e7d32", padding: 16, borderRadius: 8, alignItems: "center", marginTop: 24 },
+  buttonDisabled: { opacity: 0.7 },
+  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  linkButton: { alignItems: "center", marginTop: 16, paddingBottom: 32 },
+  linkText: { color: "#2e7d32", fontSize: 14, fontWeight: "600" }
+});
+
 export default RegisterScreen;

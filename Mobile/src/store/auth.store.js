@@ -87,8 +87,7 @@ export const useAuthStore = create(
       isLoading: false,
       isInitializingAuth: true,
       error: null,
-      roles: [],
-      activeRole: null,
+      role: null,
 
       register: async (userData) => {
         set({ isLoading: true, error: null });
@@ -101,8 +100,7 @@ export const useAuthStore = create(
           }
           set({
             user: result.data,
-            roles: result.data.roles,
-            activeRole: result.data.activeRole,
+            role: result.data.role,
             isAuthenticated: false,
             error: null,
           });
@@ -138,8 +136,7 @@ export const useAuthStore = create(
           set({
             user: result.data.user,
             token: result.data.token,
-            roles: result.data.user.roles || [],
-            activeRole: result.data.user.activeRole,
+            role: result.data.user.role,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -169,8 +166,7 @@ export const useAuthStore = create(
               isLoading: false,
               isInitializingAuth: false,
               error: null,
-              roles: [],
-              activeRole: null,
+              role: null,
             });
 
             return false;
@@ -249,75 +245,8 @@ export const useAuthStore = create(
           return false;
         }
       },
-      requestRole: async (role) => {
-        set({ isLoading: true, error: null });
+      // MVP: Removed requestRole and switchRole since users only have a single role
 
-        try {
-          const result = await roleService.requestRole(role);
-
-          if (!result.success) {
-            set({
-              isLoading: false,
-              error: result.message,
-            });
-
-            return result;
-          }
-
-          set((state) => ({
-            roles: result.data?.roles || state.roles,
-            isLoading: false,
-          }));
-
-          return result;
-        } catch (error) {
-          set({
-            isLoading: false,
-            error: error.message,
-          });
-
-          return {
-            success: false,
-            message: error.message,
-          };
-        }
-      },
-      switchRole: async (role) => {
-        set({ isLoading: true, error: null });
-
-        try {
-          const result = await roleService.switchRole(role);
-
-          if (!result.success) {
-            set({
-              isLoading: false,
-              error: result.message,
-            });
-
-            return result;
-          }
-
-          set({
-            user: result.data.user,
-            activeRole: result.data.user.activeRole,
-            roles: result.data.user.roles,
-            isLoading: false,
-            error: null,
-          });
-          await storageService.setUser(result.data.user);
-          return result;
-        } catch (error) {
-          set({
-            isLoading: false,
-            error: error.message,
-          });
-
-          return {
-            success: false,
-            message: error.message,
-          };
-        }
-      },
 
       logout: async () => {
         set({ isLoading: true });
@@ -333,8 +262,7 @@ export const useAuthStore = create(
             isLoading: false,
             isInitializingAuth: false,
             error: null,
-            roles: [],
-            activeRole: null,
+            role: null,
           });
 
           return { success: true };
@@ -363,8 +291,7 @@ export const useAuthStore = create(
         user: state.user,
         token: state.token,
         isAuthenticated: state.isAuthenticated,
-        roles: state.roles,
-        activeRole: state.activeRole,
+        role: state.role,
       }),
     },
   ),

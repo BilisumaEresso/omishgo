@@ -4,8 +4,9 @@ import helmet from "helmet";
 import errorMiddleware from "./middleware/error.middleware.js";
 import notFoundMiddleware from "./middleware/notFound.middleware.js";
 import authRouter from "./modules/auth/auth.routes.js";
-import roleRouter from "./modules/roles/role.routes.js";
-import { refreshToken } from "./modules/auth/auth.controller.js";
+import adminRouter from "./modules/admin/admin.routes.js";
+import productRouter from "./modules/product/product.routes.js";
+import chatRouter from "./modules/chat/chat.routes.js";
 
 const app = express();
 
@@ -18,8 +19,9 @@ app.get("/", (req, res) => {
 });
 // routes
 app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/roles", roleRouter);
-app.post("/auth/refresh-token", refreshToken);
+app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/products", productRouter);
+app.use("/api/v1/messages", chatRouter);
 
 app.use(notFoundMiddleware);
 

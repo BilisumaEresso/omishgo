@@ -1,0 +1,84 @@
+{
+  "common": {
+    "submit": "Submit",
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "save": "Save",
+    "loading": "Loading...",
+    "skip": "Skip"
+  },
+  "onboarding": {
+    "slide1Title": "Sell Your Harvest Directly",
+    "slide1Desc": "Post your crops and connect with verified buyers across Ethiopia — no middlemen.",
+    "slide2Title": "Buy Fresh from the Source",
+    "slide2Desc": "Browse quality produce from local farmers at fair prices, direct from the field.",
+    "slide3Title": "Chat & Call in Your Language",
+    "slide3Desc": "Message or call sellers directly in Amharic, Afan Oromo, or English."
+  },
+  "languagePicker": {
+    "title": "Select Language",
+    "subtitle": "Choose your preferred language to continue",
+    "english": "English",
+    "amharic": "አማርኛ",
+    "oromo": "Afaan Oromoo"
+  },
+  "auth": {
+    "loginTitle": "Welcome Back",
+    "loginSubtitle": "Login to your account",
+    "registerTitle": "Create Account",
+    "registerSubtitle": "Join OmishGo today",
+    "phoneLabel": "Phone Number",
+    "phonePlaceholder": "e.g. 0911234567",
+    "pinLabel": "PIN (4-6 digits)",
+    "pinPlaceholder": "Enter your PIN",
+    "nameLabel": "Full Name",
+    "namePlaceholder": "Enter your full name",
+    "roleLabel": "I am a...",
+    "roleFarmer": "Farmer",
+    "roleBuyer": "Buyer",
+    "roleAdmin": "Admin",
+    "emailLabel": "Email (Optional)",
+    "emailPlaceholder": "Enter your email",
+    "locationLabel": "Location",
+    "regionLabel": "Region",
+    "zoneLabel": "Zone",
+    "kebeleLabel": "Kebele",
+    "langLabel": "Preferred Language",
+    "loginBtn": "Login",
+    "registerBtn": "Register",
+    "hasAccount": "Already have an account? Login"
+  },
+  "product": {
+    "createTitle": "Post New Listing",
+    "editTitle": "Edit Listing",
+    "titleLabel": "Product Title",
+    "titlePlaceholder": "e.g. Red Onions",
+    "descLabel": "Description",
+    "descPlaceholder": "Additional details about your crop",
+    "priceLabel": "Price (ETB)",
+    "pricePlaceholder": "e.g. 15",
+    "unitLabel": "Unit",
+    "unitPlaceholder": "e.g. kg, quintal",
+    "quantityLabel": "Available Quantity",
+    "quantityPlaceholder": "e.g. 100",
+    "draftSaved": "Saved as offline draft. Will sync when online.",
+    "draftBanner": "Working offline. Changes saved locally.",
+    "syncing": "Syncing drafts..."
+  },
+  "browse": {
+    "title": "Marketplace",
+    "searchPlaceholder": "Search crops...",
+    "filterRegion": "Filter by Region",
+    "noListings": "No listings yet — be the first to post",
+    "offlineBanner": "Showing cached results (offline)",
+    "messageBtn": "Message Seller",
+    "callBtn": "Call Seller"
+  },
+  "messaging": {
+    "title": "Messages",
+    "placeholder": "Type a message...",
+    "send": "Send",
+    "noMessages": "No messages yet",
+    "offlineError": "Cannot send message while offline"
+  }
+}

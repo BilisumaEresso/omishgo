@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import "./src/locales/i18n.js";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { NavigationProvider } from "./src/context/NavigationContext.js";
 import { ThemeProvider } from "./src/context/ThemeContext.js";
