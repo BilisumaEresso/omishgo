@@ -11,6 +11,7 @@ import FeaturedProductsList from "../../components/buyer/FeaturedProductsList";
 import NearbyFarmersList from "../../components/buyer/NearbyFarmersList";
 import RecentActivityList from "../../components/buyer/RecentActivityList";
 import AppText from "../../components/common/AppText";
+import AppButton from "../../components/common/AppButton";
 import { useTheme } from "../../hooks/useTheme";
 
 // ---------- Mock Data (extended) ----------
@@ -152,6 +153,16 @@ export default function BuyerDashboardScreen({ navigation }) {
           contentContainerStyle={styles.scrollContent}
         >
           <BuyerWeatherWidget />
+
+          {/* Browse Products CTA */}
+          <AppButton
+            title="🛒  Browse Products"
+            variant="primary"
+            fullWidth
+            onPress={() => navigation.navigate("Browse")}
+            style={{ marginBottom: 16 }}
+          />
+
           <BuyerQuickActions
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}

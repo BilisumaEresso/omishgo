@@ -1,4 +1,6 @@
+// auth.service.js
 import bcrypt from "bcryptjs";
+import { ROLES } from "../../constants/roles.js";
 import ApiError from "../../utils/ApiError.js";
 import generateToken from "../../utils/generateToken.js";
 import * as authRepository from "./auth.repository.js";
@@ -6,30 +8,45 @@ import * as authRepository from "./auth.repository.js";
 /**
  * Register a new user
  */
-export const registerUser = async ({ name, phone, pin, email, role, location, preferredLang }) => {
+export const registerUser = async ({
+  name,
+  phone,
+  pin,
+  email,
+  role,
+  location,
+  preferredLang,
+}) => {
   const normalizedPhone = phone.trim();
   const normalizedEmail = email?.trim() || undefined;
 
   // Check phone exists
   if (await authRepository.phoneExists(normalizedPhone)) {
-    throw new ApiError(409, "Phone number already exists", { phone: "already exists" });
+    throw new ApiError(409, "Phone number already exists", {
+      phone: "already exists",
+    });
   }
 
   // Check email exists
-  if (normalizedEmail && await authRepository.emailExists(normalizedEmail)) {
-    throw new ApiError(409, "Email already exists", { email: "already exists" });
+  if (normalizedEmail && (await authRepository.emailExists(normalizedEmail))) {
+    throw new ApiError(409, "Email already exists", {
+      email: "already exists",
+    });
   }
 
   // Hash PIN
   const salt = await bcrypt.genSalt(10);
   const pinHash = await bcrypt.hash(pin, salt);
 
+  // Use input role, fallback to FARMER
+  const finalRole = role || ROLES.FARMER;
+
   // Create User
   const newUserData = {
     name,
     phone: normalizedPhone,
     pinHash,
-    role,
+    role: finalRole,
     location,
     preferredLang,
     email: normalizedEmail,

@@ -1,3 +1,4 @@
+// device.service.js
 /**
  * Device Service
  * Handles device validation with development bypass and production enforcement
@@ -34,38 +35,20 @@ export const logDeviceInfo = (deviceId, source, metadata = {}) => {
 
 /**
  * Validate device for login
- * In development: Skip strict device lock, log for debugging
+ * In development: Always return { valid: true } (skips all checks)
  * In production: Enforce one-device-per-account rule
  *
  * @param {Object} user - User document from database
  * @param {string} incomingDeviceId - Device ID from login request
  * @returns {Object} Validation result
- * {
- *   valid: boolean,
- *   message: string (if invalid),
- *   shouldMoveDevice: boolean (if invalid in production)
- * }
  */
 export const validateDeviceForLogin = (user, incomingDeviceId) => {
-  const mode = isDevMode() ? "DEVELOPMENT" : "PRODUCTION";
-
-  // In development mode: Always allow, skip strict validation
+  // In development mode: always valid, no further checks
   if (isDevMode()) {
-    logDeviceInfo(incomingDeviceId, "LOGIN_DEVELOPMENT_BYPASS", {
-      userId: user._id,
-      previousDeviceId: user.activeDeviceId?.substring(0, 12) + "...",
-      newDeviceId: incomingDeviceId?.substring(0, 12) + "...",
-      reason: "Development mode - device lock disabled",
-    });
-
-    return {
-      valid: true,
-      message: "Development mode - device validation bypassed",
-      isDevelopmentBypass: true,
-    };
+    return { valid: true };
   }
 
-  // In production mode: Enforce strict one-device-per-account
+  // In production mode: enforce strict one-device-per-account
   if (user.activeDeviceId && user.activeDeviceId !== incomingDeviceId) {
     logDeviceInfo(incomingDeviceId, "LOGIN_DEVICE_MISMATCH", {
       userId: user._id,

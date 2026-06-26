@@ -4,68 +4,93 @@ import ApiError from "../../utils/ApiError.js";
 import Product from "./product.model.js";
 
 /**
- * @desc    Create a new product
- * @route   POST /api/products
+ * @desc    Get all active listings (public)
+ * @route   GET /api/v1/products
+ * @access  Public
+ * @query   ?cropType=Teff&region=Oromia
+ */
+export const getProducts = asyncHandler(async (req, res) => {
+  const { cropType, region } = req.query;
+
+  // Public endpoint: only return active listings
+  const query = { status: "active" };
+
+  if (cropType) {
+    // Case-insensitive partial match on cropType
+    query.cropType = { $regex: cropType, $options: "i" };
+  }
+  if (region) {
+    query["location.region"] = { $regex: region, $options: "i" };
+  }
+
+  const products = await Product.find(query)
+    .populate("farmerId", "name phone location")
+    .sort("-createdAt");
+
+  return sendResponse(res, {
+    statusCode: 200,
+    message: "Products retrieved successfully",
+    data: { products, count: products.length },
+  });
+});
+
+/**
+ * @desc    Get a single listing by ID (public)
+ * @route   GET /api/v1/products/:id
+ * @access  Public
+ */
+export const getProductById = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id).populate(
+    "farmerId",
+    "name phone location"
+  );
+
+  if (!product) {
+    throw new ApiError(404, "Product not found");
+  }
+
+  return sendResponse(res, {
+    statusCode: 200,
+    message: "Product retrieved successfully",
+    data: { product },
+  });
+});
+
+/**
+ * @desc    Create a new product listing
+ * @route   POST /api/v1/products
  * @access  Private (Farmer only)
  */
 export const createProduct = asyncHandler(async (req, res) => {
-  const { title, description, price, unit, quantity, region, images } = req.body;
+  const { cropType, quantity, unit, price, description, photos, location, status } = req.body;
 
-  if (!title || price === undefined) {
-    throw new ApiError(400, "Title and price are required");
+  if (!cropType || price === undefined || quantity === undefined) {
+    throw new ApiError(400, "cropType, price, and quantity are required");
   }
 
   const product = await Product.create({
     farmerId: req.user._id,
-    title,
-    description,
-    price,
-    unit,
+    cropType,
     quantity,
-    region,
-    images: images || [],
-    status: "pending", // Default to pending approval
+    unit,           // defaults to "kg" in schema
+    price,
+    description,
+    photos: photos || [],
+    location: location || {},
+    status: status || "active",
   });
 
-  sendResponse(res, 201, "Product created successfully and is pending approval", { product });
+  return sendResponse(res, {
+    statusCode: 201,
+    message: "Product listing created successfully",
+    data: { product },
+  });
 });
 
 /**
- * @desc    Get all active products with filters
- * @route   GET /api/products
- * @access  Private (Buyer or Admin)
- */
-export const getProducts = asyncHandler(async (req, res) => {
-  const { region, minPrice, maxPrice, status } = req.query;
-
-  // Build filter query
-  const query = {};
-
-  // If normal user, only see approved products. Admin can override.
-  if (req.user.role === "admin" && status) {
-    query.status = status;
-  } else if (req.user.role !== "admin") {
-    query.status = "approved"; // Buyers only see approved by default
-  }
-
-  if (region) query.region = region;
-  if (minPrice !== undefined || maxPrice !== undefined) {
-    query.price = {};
-    if (minPrice !== undefined) query.price.$gte = Number(minPrice);
-    if (maxPrice !== undefined) query.price.$lte = Number(maxPrice);
-  }
-
-  const products = await Product.find(query)
-    .populate("farmerId", "name phone location") // Populate farmer details
-    .sort("-createdAt");
-
-  sendResponse(res, 200, "Products retrieved successfully", { products });
-});
-
-/**
- * @desc    Update a product
- * @route   PUT /api/products/:id
- * @access  Private (Farmer Owner only)
+ * @desc    Update a product listing
+ * @route   PUT /api/v1/products/:id
+ * @access  Private (Farmer — own listing only)
  */
 export const updateProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
@@ -74,24 +99,31 @@ export const updateProduct = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Product not found");
   }
 
-  // Check ownership
-  if (product.farmerId.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+  // Ownership check — only the farmer who created it can update
+  if (product.farmerId.toString() !== req.user._id.toString()) {
     throw new ApiError(403, "Not authorized to update this product");
   }
+
+  // Prevent farmerId from being overwritten via body
+  delete req.body.farmerId;
 
   const updatedProduct = await Product.findByIdAndUpdate(
     req.params.id,
     { $set: req.body },
     { new: true, runValidators: true }
-  );
+  ).populate("farmerId", "name phone location");
 
-  sendResponse(res, 200, "Product updated successfully", { product: updatedProduct });
+  return sendResponse(res, {
+    statusCode: 200,
+    message: "Product updated successfully",
+    data: { product: updatedProduct },
+  });
 });
 
 /**
- * @desc    Delete a product
- * @route   DELETE /api/products/:id
- * @access  Private (Farmer Owner or Admin)
+ * @desc    Delete a product listing
+ * @route   DELETE /api/v1/products/:id
+ * @access  Private (Farmer — own listing only)
  */
 export const deleteProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
@@ -100,12 +132,16 @@ export const deleteProduct = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Product not found");
   }
 
-  // Check ownership or admin
-  if (product.farmerId.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+  // Ownership check — only the farmer who created it can delete
+  if (product.farmerId.toString() !== req.user._id.toString()) {
     throw new ApiError(403, "Not authorized to delete this product");
   }
 
   await product.deleteOne();
 
-  sendResponse(res, 200, "Product deleted successfully");
+  return sendResponse(res, {
+    statusCode: 200,
+    message: "Product deleted successfully",
+    data: null,
+  });
 });

@@ -13,15 +13,21 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async () => {
     if (!phone || !pin) {
-      Alert.alert("Error", "Please fill all fields");
+      Alert.alert(t("common.error") || "Error", t("auth.fillRequired") || "Please fill all fields");
       return;
     }
     setLoading(true);
     try {
-      await login(phone, pin);
-      // Navigation will be handled automatically by RootNavigator if authenticated
+      const result = await login(phone, pin);
+      if (!result.success) {
+        Alert.alert(
+          t("common.error") || "Error",
+          result.message || t("auth.loginFailed") || "Login failed. Check your credentials."
+        );
+      }
+      // If success, isAuthenticated flips → RootNavigator swaps automatically
     } catch (error) {
-      Alert.alert("Error", error.message || "Failed to login");
+      Alert.alert(t("common.error") || "Error", error.message || "An unexpected error occurred");
     } finally {
       setLoading(false);
     }

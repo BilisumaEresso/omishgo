@@ -10,7 +10,11 @@ import * as authService from "./auth.service.js";
 export const register = asyncHandler(async (req, res) => {
   const user = await authService.registerUser(req.body);
 
-  sendResponse(res, 201, "User registered successfully", { user });
+  sendResponse(res, {
+    statusCode: 201,
+    message: "User registered successfully",
+    data: { user },
+  });
 });
 
 /**
@@ -21,7 +25,11 @@ export const register = asyncHandler(async (req, res) => {
 export const login = asyncHandler(async (req, res) => {
   const data = await authService.loginUser(req.body);
 
-  sendResponse(res, 200, "Login successful", data);
+  sendResponse(res, {
+    statusCode: 200,
+    message: "Login successful",
+    data,
+  });
 });
 
 /**
@@ -30,7 +38,6 @@ export const login = asyncHandler(async (req, res) => {
  * @access  Private (Requires JWT)
  */
 export const getMe = asyncHandler(async (req, res) => {
-  // req.user is set by auth middleware
   const user = {
     id: req.user._id,
     name: req.user.name,
@@ -41,5 +48,9 @@ export const getMe = asyncHandler(async (req, res) => {
     isVerified: req.user.isVerified,
   };
 
-  sendResponse(res, 200, "User profile retrieved successfully", { user });
+  sendResponse(res, {
+    statusCode: 200,
+    message: "User profile retrieved successfully",
+    data: { user },
+  });
 });

@@ -18,7 +18,7 @@ export const getUsers = asyncHandler(async (req, res) => {
 
   const users = await User.find(query).sort("-createdAt");
 
-  sendResponse(res, 200, "Users retrieved", { users });
+  sendResponse(res, { statusCode: 200, message: "Users retrieved", data: { users } });
 });
 
 /**
@@ -35,7 +35,7 @@ export const approveUser = asyncHandler(async (req, res) => {
 
   if (!user) throw new ApiError(404, "User not found");
 
-  sendResponse(res, 200, "User approved successfully", { user });
+  sendResponse(res, { statusCode: 200, message: "User approved successfully", data: { user } });
 });
 
 /**
@@ -52,7 +52,7 @@ export const rejectUser = asyncHandler(async (req, res) => {
 
   if (!user) throw new ApiError(404, "User not found");
 
-  sendResponse(res, 200, "User rejected successfully", { user });
+  sendResponse(res, { statusCode: 200, message: "User rejected successfully", data: { user } });
 });
 
 /**
@@ -65,7 +65,7 @@ export const getPendingProducts = asyncHandler(async (req, res) => {
     .populate("farmerId", "name phone location")
     .sort("createdAt");
 
-  sendResponse(res, 200, "Pending products retrieved", { products });
+  sendResponse(res, { statusCode: 200, message: "Pending products retrieved", data: { products } });
 });
 
 /**
@@ -82,7 +82,7 @@ export const approveProduct = asyncHandler(async (req, res) => {
 
   if (!product) throw new ApiError(404, "Product not found");
 
-  sendResponse(res, 200, "Product approved successfully", { product });
+  sendResponse(res, { statusCode: 200, message: "Product approved successfully", data: { product } });
 });
 
 /**
@@ -99,5 +99,5 @@ export const rejectProduct = asyncHandler(async (req, res) => {
 
   if (!product) throw new ApiError(404, "Product not found");
 
-  sendResponse(res, 200, "Product rejected successfully", { product });
+  sendResponse(res, { statusCode: 200, message: "Product rejected successfully", data: { product } });
 });

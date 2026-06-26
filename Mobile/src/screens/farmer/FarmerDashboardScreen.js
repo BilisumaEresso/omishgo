@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
+import { ScrollView, StyleSheet, View, Text } from "react-native";
 import DashboardLayout from "../../components/layout/DashBoardLayout";
 import AppSidebar from "../../components/layout/AppSidebar";
 import WeatherWidget from "../../components/farmer/WeatherWidget";
@@ -7,6 +7,7 @@ import QuickActionsGrid from "../../components/farmer/QuickActionsGrid";
 import MarketTrendsList from "../../components/farmer/MarketTrendsList";
 import RecentOrdersList from "../../components/farmer/RecentOrdersList";
 import AddProductModal from "../../components/farmer/AddProductModal";
+import AppButton from "../../components/common/AppButton";
 import { useTheme } from "../../hooks/useTheme";
 
 // Mock data (can be moved to a separate file)
@@ -109,6 +110,16 @@ export default function FarmerDashboardScreen({ navigation, route }) {
   const [orders] = useState(mockOrders);
   const [modalVisible, setModalVisible] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+
+  // Show a brief success banner when returning from PostProductScreen
+  useEffect(() => {
+    if (route?.params?.successMessage) {
+      setSuccessMsg(route.params.successMessage);
+      const timer = setTimeout(() => setSuccessMsg(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [route?.params?.successMessage]);
 
   const handleAddProduct = (newProduct) => {
     const product = {
@@ -155,6 +166,11 @@ export default function FarmerDashboardScreen({ navigation, route }) {
         showMenu={true}
         onMenuPress={() => setSidebarVisible(true)}
       >
+        {successMsg ? (
+          <View style={styles.successBanner}>
+            <Text style={styles.successText}>✓ {successMsg}</Text>
+          </View>
+        ) : null}
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
@@ -162,9 +178,18 @@ export default function FarmerDashboardScreen({ navigation, route }) {
           <WeatherWidget />
           <QuickActionsGrid
             productCount={products.length}
-            onAddPress={() => setModalVisible(true)}
+            onAddPress={() => navigation.navigate("PostProduct")}
             onOrdersPress={() => navigation.navigate("FarmerOrders")}
             onTrainingPress={() => navigation.navigate("FarmerTraining")}
+          />
+
+          {/* Messages shortcut */}
+          <AppButton
+            title="💬  Messages"
+            variant="outline"
+            fullWidth
+            onPress={() => navigation.navigate("Conversations")}
+            style={{ marginBottom: 16 }}
           />
           <MarketTrendsList
             trends={marketTrends}
@@ -193,5 +218,16 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     paddingBottom: 32,
+  },
+  successBanner: {
+    backgroundColor: "#2e7d32",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    marginBottom: 8,
+  },
+  successText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 14,
   },
 });

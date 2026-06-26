@@ -93,20 +93,36 @@ export const useAuthStore = create(
         set({ isLoading: true, error: null });
 
         try {
+          // Step 1: Create the account
           const result = await authService.register(userData);
           if (!result.success) {
             set({ isLoading: false, error: result.message });
             return result;
           }
+
+          // Step 2: Immediately log in with the same credentials so the
+          // user lands directly on their role dashboard. RootNavigator will
+          // swap to AppNavigator as soon as isAuthenticated flips to true.
+          const loginResult = await authService.login(userData.phone, userData.pin);
+          if (!loginResult.success) {
+            // Registration worked but auto-login failed — send them to Login screen
+            set({ isLoading: false, error: null });
+            return { success: true, autoLoginFailed: true };
+          }
+
+          await storageService.setToken(loginResult.data.token);
+          await storageService.setUser(loginResult.data.user);
+
           set({
-            user: result.data,
-            role: result.data.role,
-            isAuthenticated: false,
+            user: loginResult.data.user,
+            token: loginResult.data.token,
+            role: loginResult.data.user.role,
+            isAuthenticated: true,
+            isLoading: false,
             error: null,
           });
-          await storageService.setUser(result.data);
-          set({ isLoading: false });
-          return result;
+
+          return { success: true };
         } catch (error) {
           set({ isLoading: false, error: error.message });
           return { success: false, message: error.message };

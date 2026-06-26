@@ -10,9 +10,13 @@ const authService = {
         name: userData.name,
         phone: userData.phone,
         pin: userData.pin,
+        // role comes from userData — never hardcoded (backend defaults to "farmer" if missing)
+        role: userData.role,
+        location: userData.location,
+        preferredLang: userData.preferredLang,
       };
 
-      // Only include email if it's provided and not empty
+      // Only include email if provided and non-empty
       if (userData.email && userData.email.trim()) {
         registrationData.email = userData.email;
       }

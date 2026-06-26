@@ -40,7 +40,9 @@ export const RootNavigator = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false, animationEnabled: false }}>
+      <Stack.Navigator
+        screenOptions={{ headerShown: false, animationEnabled: false }}
+      >
         {isAuthenticated ? (
           <Stack.Screen name="App" component={AppNavigator} />
         ) : (

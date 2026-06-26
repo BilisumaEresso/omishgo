@@ -47,15 +47,15 @@ const userSchema = new mongoose.Schema(
     },
     isVerified: {
       type: Boolean,
-      default: false, // Admin needs to approve
+      default: true, // Admin needs to approve
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-userSchema.pre("save", function (next) {
+userSchema.pre("save", function () {
   if (this.email === "") {
     this.email = undefined;
   }
@@ -65,7 +65,6 @@ userSchema.pre("save", function (next) {
   if (this.phone) {
     this.phone = this.phone.trim();
   }
-  next();
 });
 
 const User = mongoose.model("User", userSchema);

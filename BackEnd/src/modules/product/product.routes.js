@@ -1,28 +1,28 @@
 import express from "express";
 import { protect, authorize } from "../../middleware/auth.middleware.js";
+import { ROLES } from "../../constants/roles.js";
 import {
-  createProduct,
   getProducts,
+  getProductById,
+  createProduct,
   updateProduct,
   deleteProduct,
 } from "./product.controller.js";
-import { ROLES } from "../../constants/roles.js";
 
 const router = express.Router();
 
-// All product routes require authentication
-router.use(protect);
+// ─── Public routes (no auth required) ────────────────────────────────────────
+router.get("/", getProducts);
+router.get("/:id", getProductById);
 
-// Farmer only routes
-router.post("/", authorize(ROLES.FARMER), createProduct);
+// ─── Protected routes ─────────────────────────────────────────────────────────
+// POST — farmer creates a listing
+router.post("/", protect, authorize(ROLES.FARMER), createProduct);
 
-// Farmer owner can update
-router.put("/:id", authorize(ROLES.FARMER), updateProduct);
+// PUT — farmer updates their own listing
+router.put("/:id", protect, authorize(ROLES.FARMER), updateProduct);
 
-// Farmer owner or admin can delete
-router.delete("/:id", authorize(ROLES.FARMER, ROLES.ADMIN), deleteProduct);
-
-// Buyer or admin can view
-router.get("/", authorize(ROLES.BUYER, ROLES.ADMIN), getProducts);
+// DELETE — farmer deletes their own listing
+router.delete("/:id", protect, authorize(ROLES.FARMER), deleteProduct);
 
 export default router;
