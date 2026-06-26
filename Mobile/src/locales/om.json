@@ -1,0 +1,84 @@
+{
+  "common": {
+    "submit": "Galchi",
+    "continue": "Itti fufi",
+    "cancel": "Haqi",
+    "save": "Olkaa'i",
+    "loading": "Fe'aa jira...",
+    "skip": "Irraanfadhu"
+  },
+  "onboarding": {
+    "slide1Title": "Oomisha Kee Kallattiin Gurguri",
+    "slide1Desc": "Qonnaa kee galchi, bittootaa mirkana'aa Itoophiyaa keessa jiraniif walqunnamii uumi.",
+    "slide2Title": "Madda Irraa Bitadhu",
+    "slide2Desc": "Oomisha qulqulluu qotee bultoota naannoo irraa gatii madaalawaan argadhu.",
+    "slide3Title": "Afaan Keetiin Dubbadhu",
+    "slide3Desc": "Afaan Oromoo, Amaariffaa, yookiin Ingliziidhaan ergaa ergi ykn bilbili."
+  },
+  "languagePicker": {
+    "title": "Afaan Filadhu",
+    "subtitle": "Itti fufuuf afaan filadhu",
+    "english": "English",
+    "amharic": "አማርኛ",
+    "oromo": "Afaan Oromoo"
+  },
+  "auth": {
+    "loginTitle": "Baga Nagaan Deebitan",
+    "loginSubtitle": "Herrega keessanitti seenaa",
+    "registerTitle": "Herrega Uumi",
+    "registerSubtitle": "Har'a OmishGo itti makami",
+    "phoneLabel": "Lakk. Bilbilaa",
+    "phonePlaceholder": "Fkn 0911234567",
+    "pinLabel": "PIN (lakkoofsa 4-6)",
+    "pinPlaceholder": "PIN keessan galchaa",
+    "nameLabel": "Maqaa Guutuu",
+    "namePlaceholder": "Maqaa guutuu keessan galchaa",
+    "roleLabel": "Ani...",
+    "roleFarmer": "Qotee bulaa",
+    "roleBuyer": "Bitaa",
+    "roleAdmin": "Bulchaa",
+    "emailLabel": "Imeelii (Filannoo)",
+    "emailPlaceholder": "Imeelii keessan galchaa",
+    "locationLabel": "Iddoo",
+    "regionLabel": "Naannoo",
+    "zoneLabel": "Godina",
+    "kebeleLabel": "Aanaa/Ganda",
+    "langLabel": "Afaan Filatame",
+    "loginBtn": "Seeni",
+    "registerBtn": "Galmaa'i",
+    "hasAccount": "Herrega qabduu? Seeni"
+  },
+  "product": {
+    "createTitle": "Oomisha Haaraa Galchi",
+    "editTitle": "Oomisha Sirreessi",
+    "titleLabel": "Maqaa Oomishaa",
+    "titlePlaceholder": "Fkn: Qullubbii Diimaa",
+    "descLabel": "Ibsa",
+    "descPlaceholder": "Odeeffannoo dabalataa",
+    "priceLabel": "Gatii (Birrii)",
+    "pricePlaceholder": "Fkn: 15",
+    "unitLabel": "Safartuu",
+    "unitPlaceholder": "Fkn: kg, kuntaala",
+    "quantityLabel": "Hanga Jiru",
+    "quantityPlaceholder": "Fkn: 100",
+    "draftSaved": "Sarara malee kuufameera. Yeroo sararri jiru ni ergama.",
+    "draftBanner": "Sarara malee hojjechaa jirta.",
+    "syncing": "Ergaa jira..."
+  },
+  "browse": {
+    "title": "Gabaa",
+    "searchPlaceholder": "Oomisha barbaadi...",
+    "filterRegion": "Naannoon adda baasi",
+    "noListings": "Oomishni hin jiru — kan jalqabaa galchi",
+    "offlineBanner": "Kan duraan ilaalame (sarara malee)",
+    "messageBtn": "Ergaa Ergi",
+    "callBtn": "Bilbili"
+  },
+  "messaging": {
+    "title": "Ergaawwan",
+    "placeholder": "Ergaa barreessi...",
+    "send": "Ergi",
+    "noMessages": "Ergaan hin jiru",
+    "offlineError": "Sarara malee ergaa erguun hin danda'amu"
+  }
+}

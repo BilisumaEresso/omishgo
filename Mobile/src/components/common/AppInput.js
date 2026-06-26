@@ -34,7 +34,7 @@ const AppInput = ({
       {label && (
         <AppText
           variant="label"
-          style={[styles.label, { color: theme.colors.text }]}
+          style={[styles.label, { color: theme.colors.textPrimary }]}
         >
           {label}
         </AppText>
@@ -66,14 +66,14 @@ const AppInput = ({
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={theme.colors.textSecondary || "#666666"}
+          placeholderTextColor={ "#666666"}
           secureTextEntry={secure}
           keyboardType={keyboardType}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           style={[
             styles.input,
-            { color: theme.colors.text || "#FFFFFF" },
+            { color: theme.colors.textPrimary || "#FFFFFF" },
             inputStyle,
           ]}
           {...rest}

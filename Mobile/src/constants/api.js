@@ -5,7 +5,7 @@
 // - Localhost (Physical Android Device): http://<YOUR_PC_IP>:5000
 // - Production: https://api.omishgo.com
 
-export const API_BASE_URL = "http://10.4.111.174:5000";
+export const API_BASE_URL = "http://192.168.43.37:5000";
 
 export const API_ENDPOINTS = {
   // Check
@@ -18,5 +18,22 @@ export const API_ENDPOINTS = {
     logout: "/api/v1/auth/logout",
     requestDeviceMove: "/api/v1/auth/request-device-move",
     confirmDeviceMove: "/api/v1/auth/confirm-device-move",
+  },
+  role: {
+    myRoles: "/api/v1/roles/my-roles",
+    requestRole: "/api/v1/roles/request-role",
+    switchRole: "/api/v1/roles/switch-role",
+  },
+  products: {
+    list: "/api/v1/products",
+    detail: (id) => `/api/v1/products/${id}`,
+    create: "/api/v1/products",
+    update: (id) => `/api/v1/products/${id}`,
+    delete: (id) => `/api/v1/products/${id}`,
+  },
+  messages: {
+    thread: (userId) => `/api/v1/messages/thread/${userId}`,
+    send: "/api/v1/messages",
+    conversations: "/api/v1/messages/conversations",
   },
 };

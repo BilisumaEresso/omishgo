@@ -11,15 +11,16 @@ const ErrorMessage = ({ message, onRetry, inline = false, style }) => {
 
   if (!message) return null;
 
-  // Variant A: Inline banner error (Perfect for forms, card callouts, or small headers)
+  // Variant A: Inline banner error
   if (inline) {
+    const errorColor = theme.colors.error || "#FF3B30";
     return (
       <View
         style={[
           styles.inlineContainer,
           {
-            backgroundColor: `${theme.colors.error || "#FF3B30"}15`, // Alpha tint color injection
-            borderColor: theme.colors.error || "#FF3B30",
+            backgroundColor: errorColor + "20", // 20% opacity (8‑digit hex)
+            borderColor: errorColor,
           },
           style,
         ]}
@@ -27,12 +28,12 @@ const ErrorMessage = ({ message, onRetry, inline = false, style }) => {
         <Ionicons
           name="alert-circle-outline"
           size={20}
-          color={theme.colors.error || "#FF3B30"}
+          color={errorColor}
           style={styles.inlineIcon}
         />
         <AppText
           variant="bodySm"
-          style={{ color: theme.colors.text || "#333333", flex: 1 }}
+          style={{ color: theme.colors.textPrimary || "#212121", flex: 1 }}
         >
           {message}
         </AppText>
@@ -40,25 +41,19 @@ const ErrorMessage = ({ message, onRetry, inline = false, style }) => {
     );
   }
 
-  // Variant B: Full-screen display wrapper (Perfect for failed page fetches or network timeouts)
+  // Variant B: Full-screen display wrapper
+  const errorColor = theme.colors.error || "#FF3B30";
   return (
     <View style={[styles.fullscreenContainer, style]}>
       <View
-        style={[
-          styles.iconWrapper,
-          { backgroundColor: `${theme.colors.error || "#FF3B30"}10` },
-        ]}
+        style={[styles.iconWrapper, { backgroundColor: errorColor + "10" }]}
       >
-        <Ionicons
-          name="alert-circle"
-          size={40}
-          color={theme.colors.error || "#FF3B30"}
-        />
+        <Ionicons name="alert-circle" size={40} color={errorColor} />
       </View>
 
       <AppText
         variant="headingSm"
-        style={[styles.title, { color: theme.colors.text || "#333333" }]}
+        style={[styles.title, { color: theme.colors.textPrimary || "#212121" }]}
       >
         An Error Occurred
       </AppText>
@@ -68,7 +63,7 @@ const ErrorMessage = ({ message, onRetry, inline = false, style }) => {
         align="center"
         style={[
           styles.message,
-          { color: theme.colors.textSecondary || "#666666" },
+          { color: theme.colors.textSecondary || "#757575" },
         ]}
       >
         {message}

@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { API_BASE_URL } from "../constants/api.js";
 import authService from "../services/auth.service.js";
+import roleService from "../services/role.service.js";
 import storageService from "../services/storage.service.js";
 
 const isTokenExpired = (token) => {
@@ -86,20 +87,42 @@ export const useAuthStore = create(
       isLoading: false,
       isInitializingAuth: true,
       error: null,
+      role: null,
 
       register: async (userData) => {
         set({ isLoading: true, error: null });
 
         try {
+          // Step 1: Create the account
           const result = await authService.register(userData);
-
           if (!result.success) {
             set({ isLoading: false, error: result.message });
             return result;
           }
 
-          set({ isLoading: false });
-          return result;
+          // Step 2: Immediately log in with the same credentials so the
+          // user lands directly on their role dashboard. RootNavigator will
+          // swap to AppNavigator as soon as isAuthenticated flips to true.
+          const loginResult = await authService.login(userData.phone, userData.pin);
+          if (!loginResult.success) {
+            // Registration worked but auto-login failed — send them to Login screen
+            set({ isLoading: false, error: null });
+            return { success: true, autoLoginFailed: true };
+          }
+
+          await storageService.setToken(loginResult.data.token);
+          await storageService.setUser(loginResult.data.user);
+
+          set({
+            user: loginResult.data.user,
+            token: loginResult.data.token,
+            role: loginResult.data.user.role,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
+
+          return { success: true };
         } catch (error) {
           set({ isLoading: false, error: error.message });
           return { success: false, message: error.message };
@@ -118,14 +141,18 @@ export const useAuthStore = create(
           }
 
           // Store refreshToken in AsyncStorage (via storageService)
+          await storageService.setToken(result.data.token);
+
           if (result.data.refreshToken) {
             await storageService.setRefreshToken(result.data.refreshToken);
           }
 
+          await storageService.setUser(result.data.user);
+
           set({
             user: result.data.user,
             token: result.data.token,
-            refreshToken: result.data.refreshToken || null,
+            role: result.data.user.role,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -154,7 +181,10 @@ export const useAuthStore = create(
               isAuthenticated: false,
               isLoading: false,
               isInitializingAuth: false,
+              error: null,
+              role: null,
             });
+
             return false;
           }
 
@@ -231,6 +261,8 @@ export const useAuthStore = create(
           return false;
         }
       },
+      // MVP: Removed requestRole and switchRole since users only have a single role
+
 
       logout: async () => {
         set({ isLoading: true });
@@ -246,6 +278,7 @@ export const useAuthStore = create(
             isLoading: false,
             isInitializingAuth: false,
             error: null,
+            role: null,
           });
 
           return { success: true };
@@ -273,8 +306,8 @@ export const useAuthStore = create(
       partialize: (state) => ({
         user: state.user,
         token: state.token,
-        refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
+        role: state.role,
       }),
     },
   ),

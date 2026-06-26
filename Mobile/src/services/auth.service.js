@@ -10,10 +10,13 @@ const authService = {
         name: userData.name,
         phone: userData.phone,
         pin: userData.pin,
+        // role comes from userData — never hardcoded (backend defaults to "farmer" if missing)
         role: userData.role,
+        location: userData.location,
+        preferredLang: userData.preferredLang,
       };
 
-      // Only include email if it's provided and not empty
+      // Only include email if provided and non-empty
       if (userData.email && userData.email.trim()) {
         registrationData.email = userData.email;
       }
@@ -22,7 +25,6 @@ const authService = {
         API_ENDPOINTS.auth.register,
         registrationData,
       );
-
       if (response.data.success) {
         return {
           success: true,
@@ -43,14 +45,9 @@ const authService = {
 
   async login(phone, pin) {
     try {
-      // Retrieve device ID before sending request
-      const deviceId = await getDeviceId();
-      console.log("LOGIN PAYLOAD DEVICE_ID:", deviceId);
-
       const response = await api.post(API_ENDPOINTS.auth.login, {
         phone,
         pin,
-        deviceId,
       });
 
       if (response.data.success) {
@@ -64,30 +61,12 @@ const authService = {
         };
       }
 
-      // Check for DEVICE_ALREADY_ACTIVE error from backend
-      if (response.data.data?.code === "DEVICE_ALREADY_ACTIVE") {
-        return {
-          success: false,
-          errorType: "DEVICE_BLOCKED",
-          message: response.data.message,
-          phone, // Pass phone for device move flow
-        };
-      }
-
       return {
         success: false,
         message: response.data.message,
         errors: response.data.errors,
       };
     } catch (error) {
-      if (error.response?.data?.data?.code === "DEVICE_ALREADY_ACTIVE") {
-        return {
-          success: false,
-          errorType: "DEVICE_BLOCKED",
-          message: error.response.data.message,
-          phone,
-        };
-      }
       return handleApiError(error);
     }
   },

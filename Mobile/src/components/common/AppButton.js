@@ -15,7 +15,6 @@ const AppButton = ({
 }) => {
   const { theme } = useTheme();
 
-  // Dynamic style calculation for the button container
   const getButtonStyles = (pressed) => {
     const isButtonDisabled = disabled || loading;
     let variantStyle = {};
@@ -61,7 +60,6 @@ const AppButton = ({
     ];
   };
 
-  // DESIGN FIX: Dynamically match text color to variant to avoid white-on-white layout failures
   const getTextColor = () => {
     if (disabled) {
       return theme.colors.textSecondary || "#666666";
@@ -72,10 +70,10 @@ const AppButton = ({
       case "ghost":
         return theme.colors.primary || "#6B4EFF";
       case "secondary":
-        // Fallback checks if secondary variants use a dark contrast label
-        return "#FFFFFF";
+      case "danger":
       default:
-        return theme.colors.background || "#FFFFFF";
+        // Use inverse text (white) for solid colored backgrounds
+        return theme.colors.textInverse || "#FFFFFF";
     }
   };
 

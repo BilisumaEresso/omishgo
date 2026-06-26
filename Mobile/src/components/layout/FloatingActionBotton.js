@@ -33,7 +33,11 @@ const FloatingActionButton = ({
       accessibilityRole="button"
       accessibilityLabel="Floating action button"
     >
-      <Ionicons name={icon} size={24} color="#fff" />
+      <Ionicons
+        name={icon}
+        size={24}
+        color={theme.colors.textInverse || "#FFFFFF"}
+      />
     </Pressable>
   );
 };

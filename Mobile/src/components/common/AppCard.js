@@ -11,12 +11,11 @@ const AppCard = ({ children, style, onPress, disabled = false }) => {
     {
       backgroundColor: theme.colors.surface || "#FFFFFF",
       borderColor: theme.colors.border || "#F0F0F0",
-      borderWidth: theme.colors.border ? 1 : 0.5,
+      borderWidth: 1, // simplified: always 1px if border color exists
     },
     style,
   ];
 
-  // If onPress is provided, swap out the View for an interactive Pressable element
   if (onPress) {
     return (
       <Pressable

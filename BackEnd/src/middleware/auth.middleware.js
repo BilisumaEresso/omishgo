@@ -1,35 +1,63 @@
 import jwt from "jsonwebtoken";
+import User from "../modules/user/user.model.js";
 import ApiError from "../utils/ApiError.js";
+import asyncHandler from "../utils/asyncHandler.js";
 
-const isAuth = (req, res, next) => {
-  // 1. Get the Authorization header
-  const authHeader = req.headers.authorization || req.headers.Authorization;
+/**
+ * Protect routes - verify JWT token and attach user to req
+ */
+export const protect = asyncHandler(async (req, res, next) => {
+  let token;
 
-  // 2. Check if the header exists and follows the 'Bearer <token>' pattern
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return next(new ApiError(401, "Access denied. No token provided."));
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
   }
 
-  // 3. Extract the actual token string
-  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return next(new ApiError(401, "Not authorized to access this route"));
+  }
 
   try {
-    // 4. Verify the token using your secret key
+    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // 5. Assign the decoded user data to the request object
-    req.user = decoded;
+    // Fetch user from database
+    req.user = await User.findById(decoded.sub || decoded.id);
 
-    // 6. Pass control to the next middleware or router handler
-    next();
-  } catch (error) {
-    // 7. Handle specific JWT errors gracefully
-    let message = "Invalid token.";
-    if (error.name === "TokenExpiredError") {
-      message = "Token has expired.";
+    if (!req.user) {
+      return next(new ApiError(401, "User no longer exists"));
     }
-    next(new ApiError(401, message));
-  }
-};
 
-export default isAuth;
+    // Check if user is verified (Optional: maybe not strictly required for all routes, 
+    // but good to have if MVP requires Admin approval before doing actions)
+    // We will leave this to specific controllers or a separate middleware if needed.
+
+    next();
+  } catch (err) {
+    let message = "Not authorized to access this route";
+    if (err.name === "TokenExpiredError") {
+      message = "Token expired";
+    }
+    return next(new ApiError(401, message));
+  }
+});
+
+/**
+ * Grant access to specific roles
+ */
+export const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new ApiError(
+          403,
+          `User role ${req.user.role} is not authorized to access this route`
+        )
+      );
+    }
+    next();
+  };
+};

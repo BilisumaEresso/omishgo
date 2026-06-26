@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { NavigationProvider } from "./src/context/NavigationContext.js";
 import { ThemeProvider } from "./src/context/ThemeContext.js";
+import "./src/locales/i18n.js";
 import RootNavigator from "./src/navigation/RootNavigator.js";
 import { getDeviceId } from "./src/utils/deviceId.js";
 

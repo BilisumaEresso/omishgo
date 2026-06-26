@@ -1,171 +1,148 @@
-// src/screens/auth/LoginScreen.js
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  View,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
-import AppText from "../../components/common/AppText";
-import AppButton from "../../components/common/AppButton";
-import AppInput from "../../components/common/AppInput";
-import { useTheme } from "../../hooks/useTheme";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from "react-native";
+import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../../store/auth.store";
 
-export default function LoginScreen({ navigation }) {
-  const { theme } = useTheme();
-  const { login } = useAuthStore();
-
+const LoginScreen = ({ navigation }) => {
+  const { t } = useTranslation();
+  const login = useAuthStore((state) => state.login);
+  
   const [phone, setPhone] = useState("");
   const [pin, setPin] = useState("");
-  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!phone.trim()) newErrors.phone = "Phone number is required";
-    if (!pin.trim()) newErrors.pin = "PIN is required";
-    else if (!/^\d{4,6}$/.test(pin)) newErrors.pin = "PIN must be 4-6 digits";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async () => {
-    if (!validateForm()) return;
+  const handleLogin = async () => {
+    if (!phone || !pin) {
+      Alert.alert(t("common.error") || "Error", t("auth.fillRequired") || "Please fill all fields");
+      return;
+    }
     setLoading(true);
     try {
       const result = await login(phone, pin);
       if (!result.success) {
-        setErrors({ submit: result.message || "Login failed" });
+        Alert.alert(
+          t("common.error") || "Error",
+          result.message || t("auth.loginFailed") || "Login failed. Check your credentials."
+        );
       }
+      // If success, isAuthenticated flips → RootNavigator swaps automatically
     } catch (error) {
-      setErrors({ submit: error.message || "Login failed" });
+      Alert.alert(t("common.error") || "Error", error.message || "An unexpected error occurred");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
-    >
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          backgroundColor: theme.colors.background,
-        }}
-      >
-        {/* Hero Section */}
-        <View style={styles.heroContainer}>
-          <Image
-            source={require("../../assets/images/hero-teff.png")}
-            style={styles.heroImage}
-            resizeMode="cover"
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        <Text style={styles.title}>{t("auth.loginTitle")}</Text>
+        <Text style={styles.subtitle}>{t("auth.loginSubtitle")}</Text>
+
+        <View style={styles.form}>
+          <Text style={styles.label}>{t("auth.phoneLabel")}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder={t("auth.phonePlaceholder")}
+            keyboardType="phone-pad"
+            value={phone}
+            onChangeText={setPhone}
           />
-          <View
-            style={[
-              styles.heroOverlay,
-              { backgroundColor: theme.colors.background + "66" },
-            ]}
+
+          <Text style={styles.label}>{t("auth.pinLabel")}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder={t("auth.pinPlaceholder")}
+            keyboardType="numeric"
+            secureTextEntry
+            maxLength={6}
+            value={pin}
+            onChangeText={setPin}
           />
+
+          <TouchableOpacity 
+            style={[styles.button, loading && styles.buttonDisabled]} 
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>
+              {loading ? t("common.loading") : t("auth.loginBtn")}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.linkButton} 
+            onPress={() => navigation.navigate("Register")}
+          >
+            <Text style={styles.linkText}>{t("auth.noAccount")}</Text>
+          </TouchableOpacity>
         </View>
-
-        {/* Login Form */}
-        <View
-          style={[
-            styles.formContainer,
-            { backgroundColor: theme.colors.background },
-          ]}
-        >
-          <View style={styles.headingBlock}>
-            <AppText
-              variant="bodyLg"
-              color={theme.colors.primary}
-              style={{ fontWeight: "700" }}
-            >
-              OmishGo
-            </AppText>
-            <AppText variant="headingMd" color={theme.colors.text}>
-              Welcome Back
-            </AppText>
-          </View>
-
-          {errors.submit && (
-            <AppText
-              color={theme.colors.error}
-              variant="caption"
-              style={{ marginBottom: 10 }}
-            >
-              {errors.submit}
-            </AppText>
-          )}
-
-          <View style={styles.inputGroup}>
-            <AppInput
-              label="Phone Number"
-              placeholder="911 234 567"
-              value={phone}
-              onChangeText={setPhone}
-              keyboardType="phone-pad"
-              error={errors.phone}
-            />
-            <AppInput
-              label="PIN"
-              placeholder="••••"
-              value={pin}
-              onChangeText={(t) => setPin(t.replace(/[^0-9]/g, ""))}
-              keyboardType="number-pad"
-              secureTextEntry
-              error={errors.pin}
-            />
-          </View>
-
-          <AppButton
-            title="Login"
-            fullWidth
-            onPress={handleSubmit}
-            loading={loading}
-            style={{ marginBottom: 24 }}
-          />
-
-          <View style={styles.footerRow}>
-            <AppText variant="bodyMd" color={theme.colors.textSecondary}>
-              Don't have an account?{" "}
-            </AppText>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("RoleSelection")}
-            >
-              <AppText
-                variant="bodyMd"
-                color={theme.colors.primary}
-                style={{ fontWeight: "700" }}
-              >
-                Sign Up
-              </AppText>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </View>
+    </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  heroContainer: { height: 220, width: "100%" },
-  heroImage: { width: "100%", height: "100%" },
-  heroOverlay: { ...StyleSheet.absoluteFillObject },
-  formContainer: {
+  container: {
     flex: 1,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    marginTop: -24,
-    padding: 24,
+    backgroundColor: "#fff",
   },
-  headingBlock: { alignItems: "center", marginBottom: 32 },
-  inputGroup: { gap: 20, marginBottom: 24 },
-  footerRow: { flexDirection: "row", justifyContent: "center" },
+  content: {
+    flex: 1,
+    padding: 24,
+    justifyContent: "center",
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 32,
+  },
+  form: {
+    gap: 16,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#444",
+    marginBottom: -8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    padding: 16,
+    borderRadius: 8,
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: "#2e7d32",
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 16,
+  },
+  buttonDisabled: {
+    opacity: 0.7,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  linkButton: {
+    alignItems: "center",
+    marginTop: 16,
+  },
+  linkText: {
+    color: "#2e7d32",
+    fontSize: 14,
+    fontWeight: "600",
+  },
 });
+
+export default LoginScreen;
