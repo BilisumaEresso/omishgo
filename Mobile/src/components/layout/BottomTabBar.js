@@ -1,68 +1,114 @@
 // src/components/layout/BottomTabBar.js
-import React from "react";
-import { View, Pressable, StyleSheet } from "react-native";
+import React, { useRef, useEffect } from "react";
+import { View, Pressable, StyleSheet, Animated, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import AppText from "../common/AppText"; // Assuming you have this
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AppText from "../common/AppText";
 import { useTheme } from "../../hooks/useTheme";
 import { ROLE_TABS } from "../../constants/navigationTabs";
 import { ROLES } from "../../constants/roles";
+import * as NavigationBar from "expo-navigation-bar";
 
-const TAB_ICON_SIZE = 22;
+const TAB_ICON_SIZE = 24;
 
 const BottomTabBar = ({ role, activeTab, onTabPress }) => {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
   const tabs = ROLE_TABS[role] || ROLE_TABS[ROLES.FARMER];
+
+  const primary = theme.colors.primary || "#4CAF50";
+  const primaryLight = theme.colors.primaryLight || "#81C784";
+  const surface = theme.colors.surface || "#FFFFFF";
+  const border = theme.colors.border || "#E0E0E0";
+  const textSecondary = theme.colors.textSecondary || "#757575";
+  const tabInactive = theme.colors.tabInactive || "#9E9E9E";
+
+  // Hide Android navigation bar (works in production builds)
+  useEffect(() => {
+    if (Platform.OS === "android") {
+      NavigationBar.setVisibilityAsync("hidden");
+      return () => NavigationBar.setVisibilityAsync("visible");
+    }
+  }, []);
+
+  // Tab bar sits exactly above system UI (home indicator / nav buttons)
+  const bottomMargin = insets.bottom;
+
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const animatePress = (toValue) => {
+    Animated.spring(scaleAnim, {
+      toValue,
+      useNativeDriver: true,
+      speed: 100,
+      bounciness: 12,
+    }).start();
+  };
 
   return (
     <View
       style={[
         styles.container,
         {
-          backgroundColor: theme.colors.surface || "#FFFFFF",
-          borderTopWidth: 1,
-          borderTopColor: theme.colors.border || "#F0F0F0",
-          paddingBottom: theme.spacing.md || 20, // Accommodates iOS safe area
-          paddingTop: theme.spacing.sm || 10,
+          backgroundColor: surface,
+          borderTopColor: border,
+          marginBottom: bottomMargin,
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16,
+          ...Platform.select({
+            ios: {
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: -4 },
+              shadowOpacity: 0.08,
+              shadowRadius: 12,
+            },
+            android: { elevation: 10 },
+          }),
         },
       ]}
     >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.label;
-        const color = isActive
-          ? theme.colors.primary || "#6B4EFF"
-          : theme.colors.textSecondary || "#999999";
+        const iconName = isActive ? tab.activeIcon || tab.icon : tab.icon;
+        const iconColor = isActive ? primary : tabInactive;
+        const labelColor = isActive ? primary : textSecondary;
 
         return (
           <Pressable
             key={tab.label}
             onPress={() => onTabPress && onTabPress(tab)}
-            style={styles.tab}
+            onPressIn={() => animatePress(0.9)}
+            onPressOut={() => animatePress(1)}
             accessibilityRole="button"
             accessibilityState={{ selected: isActive }}
+            style={styles.tab}
           >
-            {/* DESIGN FIX: Added the active background pill from the mockups */}
-            <View
+            {isActive && (
+              <View
+                style={[styles.activeIndicator, { backgroundColor: primary }]}
+              />
+            )}
+            <Animated.View
               style={[
                 styles.iconContainer,
-                isActive && {
-                  backgroundColor: theme.colors.primaryLight || "#F3F0FF",
+                {
+                  backgroundColor: isActive ? primaryLight : "transparent",
+                  transform: [{ scale: scaleAnim }],
+                  ...(isActive && { width: 48, height: 38, borderRadius: 22 }),
                 },
               ]}
             >
               <Ionicons
-                name={isActive ? tab.activeIcon || tab.icon : tab.icon}
+                name={iconName}
                 size={TAB_ICON_SIZE}
-                color={color}
+                color={iconColor}
               />
-            </View>
-
+            </Animated.View>
             <AppText
               variant="caption"
-              style={{
-                color,
-                marginTop: 4,
-                fontWeight: isActive ? "600" : "400",
-              }}
+              style={[
+                styles.label,
+                { color: labelColor, fontWeight: isActive ? "700" : "400" },
+              ]}
               numberOfLines={1}
             >
               {tab.label}
@@ -79,16 +125,37 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
+    paddingTop: 10,
+    paddingBottom: 6,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    alignSelf: "stretch",
   },
   tab: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    minHeight: 56,
   },
   iconContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-    borderRadius: 16, // Creates the pill shape
+    width: 44,
+    height: 38,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 2,
+  },
+  activeIndicator: {
+    position: "absolute",
+    top: 0,
+    width: 24,
+    height: 3,
+    borderRadius: 1.5,
+    alignSelf: "center",
+  },
+  label: {
+    marginTop: 2,
+    fontSize: 12,
+    textAlign: "center",
   },
 });
 

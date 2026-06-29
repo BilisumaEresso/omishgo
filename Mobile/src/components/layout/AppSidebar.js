@@ -8,6 +8,7 @@ import {
   Dimensions,
   StyleSheet,
   SafeAreaView,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AppText from "../common/AppText";
@@ -16,7 +17,7 @@ import { ROLES } from "../../constants/roles";
 import { useAuthStore } from "../../store/auth.store";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
-const DRAWER_WIDTH = SCREEN_WIDTH * 0.75;
+const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.75, 320); // capped at 320 for tablets
 
 const ROLE_MENU_ITEMS = {
   [ROLES.FARMER]: [
@@ -47,7 +48,7 @@ const COMMON_ITEMS = [
 
 const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
   const { theme } = useTheme();
-  const {logout, user}= useAuthStore()
+  const { logout, user } = useAuthStore();
   const slideAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [showModal, setShowModal] = useState(visible);
@@ -102,20 +103,28 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
       if (callbackItem && onItemPress) {
         onItemPress(callbackItem);
       }
-      if (onClose) {
-        onClose();
-      }
+      if (onClose) onClose();
     });
   };
 
   const menuItems = role ? ROLE_MENU_ITEMS[role] || [] : [];
 
+  // Theme shortcuts
   const textPrimary = theme.colors.textPrimary || "#212121";
   const textSecondary = theme.colors.textSecondary || "#757575";
-  const borderColor = theme.colors.border || "#F0F0F0";
+  const borderColor = theme.colors.border || "#E0E0E0";
   const backgroundColor = theme.colors.surface || "#FFFFFF";
   const pressedBg = theme.colors.backgroundSecondary || "#EEEEEE";
-  const errorColor = theme.colors.error || "#FF3B30";
+  const errorColor = theme.colors.error || "#F44336";
+  const primaryColor = theme.colors.primary || "#4CAF50";
+  const spacing = theme.spacing || { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 };
+  const radius = theme.radius || { sm: 8, md: 12 };
+
+  // Logout handler – we ensure the route is 'Logout' so dashboard can catch it
+  const handleLogout = () => {
+    logout();
+    handleCloseAnimation({ label: "Logout", route: "Logout" });
+  };
 
   return (
     <Modal
@@ -130,6 +139,7 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
           <Pressable
             style={{ flex: 1 }}
             onPress={() => handleCloseAnimation()}
+            accessibilityLabel="Close menu"
           />
         </Animated.View>
 
@@ -138,48 +148,59 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
           style={[
             styles.drawer,
             {
-              backgroundColor: backgroundColor,
+              backgroundColor,
               transform: [{ translateX: slideAnim }],
             },
           ]}
         >
           <SafeAreaView style={styles.drawerContent}>
-            {/* Profile area */}
-            <View
+            {/* Profile section – now tappable */}
+            <Pressable
               style={[
                 styles.profileSection,
                 {
                   borderBottomColor: borderColor,
-                  paddingHorizontal: theme.spacing?.md || 16,
+                  paddingHorizontal: spacing.lg,
                 },
               ]}
+              onPress={() =>
+                handleCloseAnimation({ label: "Profile", route: "Profile" })
+              }
+              accessibilityRole="button"
+              accessibilityLabel="View profile"
             >
               <View
                 style={[
                   styles.profileAvatar,
-                  { backgroundColor: theme.colors.primary || "#6B4EFF" },
+                  { backgroundColor: primaryColor },
                 ]}
               >
-                <Ionicons name="person" size={24} color="#fff" />
+                <Ionicons name="person" size={26} color="#fff" />
               </View>
               <View style={styles.profileInfo}>
                 <AppText
-                  variant="headingMd"
-                  style={{ color: textPrimary, fontWeight: "600" }}
+                  variant="headingSm"
+                  style={{ color: textPrimary, fontWeight: "700" }}
+                  numberOfLines={1}
                 >
-                  {user.name}
+                  {user?.name || "Farmer"}
                 </AppText>
                 <AppText
-                  variant="bodySm"
+                  variant="caption"
                   style={{ color: textSecondary, marginTop: 2 }}
                 >
                   {role ? role.charAt(0).toUpperCase() + role.slice(1) : "User"}
                 </AppText>
               </View>
-            </View>
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={textSecondary}
+              />
+            </Pressable>
 
             {/* Menu items */}
-            <View style={styles.menuList}>
+            <View style={[styles.menuList, { paddingHorizontal: spacing.md }]}>
               {menuItems.map((item) => (
                 <Pressable
                   key={item.label}
@@ -187,17 +208,23 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
                     styles.menuItem,
                     {
                       backgroundColor: pressed ? pressedBg : "transparent",
+                      borderRadius: radius.sm,
                     },
                   ]}
                   onPress={() => handleCloseAnimation(item)}
+                  accessibilityRole="button"
+                  accessibilityLabel={item.label}
                 >
                   <Ionicons
                     name={item.icon}
-                    size={20}
+                    size={24} // increased from 20
                     color={textPrimary}
-                    style={{ marginRight: 12 }}
+                    style={{ marginRight: spacing.sm }}
                   />
-                  <AppText variant="bodyMd" style={{ color: textPrimary }}>
+                  <AppText
+                    variant="bodyMd"
+                    style={{ color: textPrimary, fontWeight: "500" }}
+                  >
                     {item.label}
                   </AppText>
                 </Pressable>
@@ -205,14 +232,13 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
 
               {/* Divider */}
               <View
-                style={{
-                  height: 1,
-                  backgroundColor: borderColor,
-                  marginVertical: 12,
-                }}
+                style={[
+                  styles.divider,
+                  { backgroundColor: borderColor, marginVertical: spacing.md },
+                ]}
               />
 
-              {/* Common items - always render (no condition) */}
+              {/* Common items */}
               {COMMON_ITEMS.map((item) => (
                 <Pressable
                   key={item.label}
@@ -220,46 +246,55 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
                     styles.menuItem,
                     {
                       backgroundColor: pressed ? pressedBg : "transparent",
+                      borderRadius: radius.sm,
                     },
                   ]}
                   onPress={() => handleCloseAnimation(item)}
+                  accessibilityRole="button"
+                  accessibilityLabel={item.label}
                 >
                   <Ionicons
                     name={item.icon}
-                    size={20}
+                    size={24}
                     color={textPrimary}
-                    style={{ marginRight: 12 }}
+                    style={{ marginRight: spacing.sm }}
                   />
-                  <AppText variant="bodyMd" style={{ color: textPrimary }}>
+                  <AppText
+                    variant="bodyMd"
+                    style={{ color: textPrimary, fontWeight: "500" }}
+                  >
                     {item.label}
                   </AppText>
                 </Pressable>
               ))}
 
-              {/* Logout */}
+              {/* Logout – now clearly separated and tappable */}
               <Pressable
                 style={({ pressed }) => [
                   styles.menuItem,
+                  styles.logoutItem,
                   {
+                    backgroundColor: pressed
+                      ? errorColor + "15"
+                      : "transparent",
+                    borderRadius: radius.sm,
                     marginTop: "auto",
-                    marginBottom: 16,
-                    backgroundColor: pressed ? pressedBg : "transparent",
+                    marginBottom: spacing.lg,
                   },
                 ]}
-                onPress={() =>
-                {logout();
-                handleCloseAnimation({ label: "Logout" });}
-                }
+                onPress={handleLogout}
+                accessibilityRole="button"
+                accessibilityLabel="Logout"
               >
                 <Ionicons
                   name="log-out-outline"
-                  size={20}
+                  size={24}
                   color={errorColor}
-                  style={{ marginRight: 12 }}
+                  style={{ marginRight: spacing.sm }}
                 />
                 <AppText
                   variant="bodyMd"
-                  style={{ color: errorColor, fontWeight: "500" }}
+                  style={{ color: errorColor, fontWeight: "600" }}
                 >
                   Logout
                 </AppText>
@@ -284,7 +319,17 @@ const styles = StyleSheet.create({
   drawer: {
     width: DRAWER_WIDTH,
     height: "100%",
-    elevation: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 2, height: 0 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 20,
+      },
+    }),
   },
   drawerContent: {
     flex: 1,
@@ -292,13 +337,13 @@ const styles = StyleSheet.create({
   profileSection: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 24,
+    paddingVertical: 20,
     borderBottomWidth: 1,
   },
   profileAvatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -308,16 +353,20 @@ const styles = StyleSheet.create({
   },
   menuList: {
     flex: 1,
-    paddingHorizontal: 12,
     paddingTop: 8,
   },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
+    paddingVertical: 14, // ensures minimum 48pt touch height with icon
     paddingHorizontal: 12,
-    borderRadius: 8,
     marginBottom: 4,
+  },
+  divider: {
+    height: 1,
+  },
+  logoutItem: {
+    // already styled inline, but keep base if needed
   },
 });
 
