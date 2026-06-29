@@ -1,13 +1,15 @@
 // src/components/layout/AppHeader.js
-import React from "react";
-import { View, Pressable, StyleSheet } from "react-native";
+import React, { useRef } from "react";
+import { View, Pressable, StyleSheet, Animated, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AppText from "../common/AppText";
 import { useTheme } from "../../hooks/useTheme";
 import { useNavigation } from "@react-navigation/native";
 
-const ICON_SIZE = 30;
+const ICON_SIZE = 32;
+const TOUCHABLE_SIZE = 48; // explicit minimum touch target
+const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
 
 const AppHeader = ({
   title,
@@ -28,48 +30,103 @@ const AppHeader = ({
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
 
+  const primaryColor = theme.colors.primary || "#6B4EFF";
   const textColor = theme.colors.textPrimary || "#212121";
   const secondaryTextColor = theme.colors.textSecondary || "#757575";
+  const backgroundColor = theme.colors.background || "#FFFFFF";
+  const borderColor = theme.colors.border || "#F0F0F0";
+
+  // ---- Pro touch feedback (scale + opacity) ----
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const animatePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.93,
+      useNativeDriver: true,
+      speed: 100,
+      bounciness: 10,
+    }).start();
+  };
+  const animatePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 100,
+      bounciness: 10,
+    }).start();
+  };
+
+  const renderIconButton = (iconName, onPress, badge = false) => (
+    <Pressable
+      onPress={onPress}
+      hitSlop={HIT_SLOP}
+      onPressIn={animatePressIn}
+      onPressOut={animatePressOut}
+      accessibilityRole="button"
+      accessibilityLabel={iconName}
+      style={({ pressed }) => [
+        styles.iconButton,
+        { opacity: pressed ? 0.7 : 1 },
+      ]}
+    >
+      <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+        <Ionicons name={iconName} size={ICON_SIZE} color={textColor} />
+        {badge && (
+          <View
+            style={[
+              styles.badge,
+              {
+                backgroundColor: theme.colors.notification || "#FF3B30",
+                borderColor: backgroundColor,
+              },
+            ]}
+          />
+        )}
+      </Animated.View>
+    </Pressable>
+  );
 
   return (
     <View
       style={[
         styles.container,
         {
-          paddingTop: insets.top + 8,
-          paddingBottom: 12,
-          paddingHorizontal: theme.spacing?.md || 16,
-          backgroundColor: theme.colors.background || "#FFFFFF",
-          borderBottomWidth: 1,
-          borderBottomColor: theme.colors.border || "#F0F0F0",
+          paddingTop: insets.top + 10,
+          paddingBottom: 14,
+          paddingHorizontal: 16,
+          backgroundColor,
+          borderBottomColor: borderColor,
+          // subtle shadow for depth (pro feel)
+          ...Platform.select({
+            ios: {
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.05,
+              shadowRadius: 8,
+            },
+            android: {
+              elevation: 3,
+            },
+          }),
         },
       ]}
     >
-      {/* Left section */}
+      {/* ---- Left section ---- */}
       <View style={styles.left}>
-        {showBack && (
-          <Pressable
-            onPress={onBackPress || navigation.goBack}
-            hitSlop={8}
-            style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
-          >
-            <Ionicons name="arrow-back" size={ICON_SIZE} color={textColor} />
-          </Pressable>
-        )}
-        {showMenu && (
-          <Pressable
-            onPress={onMenuPress || (() => navigation.openDrawer?.())}
-            hitSlop={8}
-            style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
-          >
-            <Ionicons name="menu" size={ICON_SIZE} color={textColor} />
-          </Pressable>
-        )}
+        {showBack &&
+          renderIconButton(
+            "arrow-back",
+            onBackPress || (() => navigation.goBack()),
+          )}
+        {showMenu &&
+          renderIconButton(
+            "menu",
+            onMenuPress || (() => navigation.openDrawer?.()),
+          )}
 
         <View
           style={[
             styles.titleContainer,
-            { marginLeft: showBack || showMenu ? 12 : 0 },
+            { marginLeft: showBack || showMenu ? 14 : 0 },
           ]}
         >
           <AppText
@@ -82,7 +139,7 @@ const AppHeader = ({
           {subtitle ? (
             <AppText
               variant="bodySm"
-              style={{ color: secondaryTextColor, opacity: 0.7 }}
+              style={{ color: secondaryTextColor, opacity: 0.8, marginTop: 2 }}
               numberOfLines={1}
             >
               {subtitle}
@@ -91,64 +148,43 @@ const AppHeader = ({
         </View>
       </View>
 
-      {/* Right section */}
+      {/* ---- Right section ---- */}
       <View style={styles.right}>
         {rightComponent ? (
           rightComponent
         ) : (
           <>
-            {showSearch && (
-              <Pressable
-                onPress={onSearchPress}
-                hitSlop={8}
-                style={({ pressed }) => [
-                  styles.iconButton,
-                  { opacity: pressed ? 0.6 : 1 },
-                ]}
-              >
-                <Ionicons name="search" size={ICON_SIZE} color={textColor} />
-              </Pressable>
-            )}
-            {showNotification && (
-              <Pressable
-                onPress={onNotificationPress}
-                hitSlop={8}
-                style={({ pressed }) => [
-                  styles.iconButton,
-                  { opacity: pressed ? 0.6 : 1 },
-                ]}
-              >
-                <Ionicons
-                  name="notifications-outline"
-                  size={ICON_SIZE}
-                  color={textColor}
-                />
-                <View
-                  style={[
-                    styles.badge,
-                    { backgroundColor: theme.colors.error || "#FF3B30" },
-                  ]}
-                />
-              </Pressable>
-            )}
+            {showSearch && renderIconButton("search", onSearchPress)}
+            {showNotification &&
+              renderIconButton(
+                "notifications-outline",
+                onNotificationPress,
+                true,
+              )}
             {showProfile && (
               <Pressable
                 onPress={onProfilePress}
-                hitSlop={8}
-                style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+                hitSlop={HIT_SLOP}
+                onPressIn={animatePressIn}
+                onPressOut={animatePressOut}
+                style={({ pressed }) => [
+                  styles.avatarButton,
+                  { opacity: pressed ? 0.7 : 1 },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel="Profile"
               >
-                <View
+                <Animated.View
                   style={[
                     styles.avatar,
-                    { backgroundColor: theme.colors.primary || "#6B4EFF" },
+                    {
+                      backgroundColor: primaryColor,
+                      transform: [{ scale: scaleAnim }],
+                    },
                   ]}
                 >
-                  <Ionicons
-                    name="person"
-                    size={18}
-                    color={theme.colors.background || "#FFFFFF"}
-                  />
-                </View>
+                  <Ionicons name="person" size={20} color="#fff" />
+                </Animated.View>
               </Pressable>
             )}
           </>
@@ -176,25 +212,36 @@ const styles = StyleSheet.create({
   right: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 8, // consistent spacing between right icons
   },
   iconButton: {
-    marginLeft: 16,
+    width: TOUCHABLE_SIZE,
+    height: TOUCHABLE_SIZE,
+    alignItems: "center",
+    justifyContent: "center",
+    // marginLeft is now handled by gap
   },
   badge: {
     position: "absolute",
-    top: -2,
-    right: -4,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    top: 2,
+    right: 2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 1.5,
   },
-  avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+  avatarButton: {
+    width: TOUCHABLE_SIZE,
+    height: TOUCHABLE_SIZE,
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 16,
+  },
+  avatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

@@ -1,14 +1,78 @@
-// Simple branded splash — shown by RootNavigator during bootstrap.
-// No navigation logic here; RootNavigator handles all routing after restoreSession.
-import React from "react";
-import { View, Text, ActivityIndicator, StyleSheet, Image } from "react-native";
+// src/screens/SplashScreen.js
+import React, { useEffect, useRef } from "react";
+import { View, StyleSheet, Image, Animated, StatusBar } from "react-native";
+import { useTheme } from "../../hooks/useTheme";
+import { useAuthStore } from "../../store/auth.store";
 
-export default function SplashScreen() {
+export default function SplashScreen({ navigation }) {
+  const { theme } = useTheme();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.8)).current;
+
+  useEffect(() => {
+    // Animate logo entrance
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 4,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Navigate after 2 seconds
+    const timer = setTimeout(() => {
+      if (isAuthenticated) {
+        navigation.replace("App"); // or your main navigator
+      } else {
+        navigation.replace("Auth"); // or "Login"
+      }
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const backgroundColor = theme.colors.background || "#FFFFFF";
+  const primaryColor = theme.colors.primary || "#4CAF50";
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.brand}>OmishGo</Text>
-      <Text style={styles.tagline}>Connecting Farmers and Markets</Text>
-      <ActivityIndicator size="large" color="#2e7d32" style={styles.loader} />
+    <View style={[styles.container, { backgroundColor }]}>
+      <StatusBar barStyle="dark-content" backgroundColor={backgroundColor} />
+
+      <Animated.View
+        style={[
+          styles.logoContainer,
+          {
+            opacity: fadeAnim,
+            transform: [{ scale: scaleAnim }],
+          },
+        ]}
+      >
+        <Image
+          source={require("../../../assets/logo.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </Animated.View>
+
+      {/* Subtle loading dots */}
+      <View style={styles.dotsRow}>
+        <View style={[styles.dot, { backgroundColor: primaryColor }]} />
+        <View
+          style={[
+            styles.dot,
+            styles.dotCenter,
+            { backgroundColor: primaryColor },
+          ]}
+        />
+        <View style={[styles.dot, { backgroundColor: primaryColor }]} />
+      </View>
     </View>
   );
 }
@@ -16,24 +80,30 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
     justifyContent: "center",
-    padding: 32,
+    alignItems: "center",
   },
-  brand: {
-    fontSize: 42,
-    fontWeight: "900",
-    color: "#2e7d32",
-    letterSpacing: 1,
-    marginBottom: 12,
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 40,
   },
-  tagline: {
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 48,
+  logo: {
+    width: 200,
+    height: 200,
   },
-  loader: {
-    marginTop: 16,
+  dotsRow: {
+    flexDirection: "row",
+    gap: 8,
+    position: "absolute",
+    bottom: 60,
+  },
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    opacity: 0.4,
+  },
+  dotCenter: {
+    opacity: 0.8,
   },
 });

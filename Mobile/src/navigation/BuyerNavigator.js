@@ -10,7 +10,7 @@ const Stack = createNativeStackNavigator();
 const BuyerNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="BuyerDashboard"  component={BuyerDashboardScreen} />
+      <Stack.Screen name="BuyerHome"  component={BuyerDashboardScreen} />
       <Stack.Screen name="Browse"          component={BrowseScreen} />
       <Stack.Screen name="ListingDetail"   component={ListingDetailScreen} />
       <Stack.Screen name="Conversations"   component={ConversationsScreen} />

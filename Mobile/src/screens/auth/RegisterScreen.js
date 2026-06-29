@@ -1,19 +1,24 @@
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+// src/screens/auth/RegisterScreen.js
+import React, { useState, useRef } from "react";
 import {
-  Alert,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
   View,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  Animated,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import AppText from "../../components/common/AppText";
+import AppInput from "../../components/common/AppInput";
+import AppButton from "../../components/common/AppButton";
+import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
-const RegisterScreen = ({ navigation }) => {
-  const { t, i18n } = useTranslation();
+export default function RegisterScreen({ navigation }) {
+  const { theme } = useTheme();
   const register = useAuthStore((state) => state.register);
 
   const [name, setName] = useState("");
@@ -25,45 +30,71 @@ const RegisterScreen = ({ navigation }) => {
   const [zone, setZone] = useState("");
   const [kebele, setKebele] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [registerError, setRegisterError] = useState("");
+
+  const primary = theme.colors.primary || "#4CAF50";
+  const textPrimary = theme.colors.textPrimary || "#212121";
+  const textSecondary = theme.colors.textSecondary || "#757575";
+  const backgroundColor = theme.colors.background || "#FFFFFF";
+  const errorColor = theme.colors.error || "#F44336";
+
+  // Simple scale animation based on scroll
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const logoScale = scrollY.interpolate({
+    inputRange: [0, 150],
+    outputRange: [1, 0.6],
+    extrapolate: "clamp",
+  });
+
+  const clearFieldError = (field) => {
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
+    if (registerError) setRegisterError("");
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    if (!name.trim()) newErrors.name = "Full name is required.";
+    if (!phone.trim()) newErrors.phone = "Phone number is required.";
+    if (!pin.trim() || pin.trim().length < 4)
+      newErrors.pin = "Create a PIN with at least 4 digits.";
+    if (!region.trim()) newErrors.region = "Region is required.";
+    if (!zone.trim()) newErrors.zone = "Zone is required.";
+    if (!kebele.trim()) newErrors.kebele = "Kebele is required.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleRegister = async () => {
-    if (!name || !phone || !pin || !region || !zone || !kebele) {
-      Alert.alert(
-        t("common.error") || "Error",
-        t("auth.fillRequired") || "Please fill all required fields",
-      );
-      return;
-    }
-
+    if (!validate()) return;
     setLoading(true);
+    setRegisterError("");
     try {
       const result = await register({
-        name,
-        phone,
-        pin,
+        name: name.trim(),
+        phone: phone.trim(),
+        pin: pin.trim(),
         role,
-        email: email || undefined,
-        location: { region, zone, kebele },
-        preferredLang: i18n.language || "am",
+        email: email.trim() || undefined,
+        location: {
+          region: region.trim(),
+          zone: zone.trim(),
+          kebele: kebele.trim(),
+        },
+        preferredLang: "en",
       });
-
       if (!result.success) {
-        Alert.alert(
-          t("common.error") || "Error",
-          result.message || "Registration failed",
-        );
+        setRegisterError(result.message || "Registration failed. Try again.");
         return;
       }
-
       if (result.autoLoginFailed) {
-        // Registration OK but auto-login failed — send to Login screen manually
         navigation.replace("Login");
       }
-      // Otherwise isAuthenticated is now true → RootNavigator swaps to AppNavigator automatically
+      // on success, auth store will flip → navigate to dashboard automatically
     } catch (error) {
-      Alert.alert(
-        t("common.error") || "Error",
-        error.message || "An error occurred",
+      setRegisterError(
+        error.message || "Something went wrong. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -71,165 +102,393 @@ const RegisterScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>{t("auth.registerTitle")}</Text>
-        <Text style={styles.subtitle}>{t("auth.registerSubtitle")}</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={[styles.container, { backgroundColor }]}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        onScroll={(e) => scrollY.setValue(e.nativeEvent.contentOffset.y)}
+        scrollEventThrottle={16}
+      >
+        {/* Animated logo – uses scale, zero layout errors */}
+        <View style={styles.logoWrapper}>
+          <Animated.View
+            style={{
+              transform: [{ scale: logoScale }],
+            }}
+          >
+            <Image
+              source={require("../../../assets/logo.png")}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+          </Animated.View>
+        </View>
+
+        <AppText
+          variant="headingLg"
+          style={[styles.title, { color: textPrimary }]}
+        >
+          Create Account
+        </AppText>
+        <AppText
+          variant="bodyMd"
+          style={[styles.subtitle, { color: textSecondary }]}
+        >
+          Join OmishGo and start trading
+        </AppText>
 
         <View style={styles.form}>
-          <Text style={styles.label}>{t("auth.nameLabel")}</Text>
-          <TextInput
-            style={styles.input}
-            placeholder={t("auth.namePlaceholder")}
-            value={name}
-            onChangeText={setName}
-          />
-
-          <Text style={styles.label}>{t("auth.phoneLabel")}</Text>
-          <TextInput
-            style={styles.input}
-            placeholder={t("auth.phonePlaceholder")}
-            keyboardType="phone-pad"
-            value={phone}
-            onChangeText={setPhone}
-          />
-
-          <Text style={styles.label}>{t("auth.pinLabel")}</Text>
-          <TextInput
-            style={styles.input}
-            placeholder={t("auth.pinPlaceholder")}
-            keyboardType="numeric"
-            secureTextEntry
-            maxLength={6}
-            value={pin}
-            onChangeText={setPin}
-          />
-
-          <Text style={styles.label}>{t("auth.roleLabel")}</Text>
-          <View style={styles.roleContainer}>
-            <TouchableOpacity
-              style={[styles.roleBtn, role === "farmer" && styles.roleActive]}
-              onPress={() => setRole("farmer")}
-            >
-              <Text
-                style={[
-                  styles.roleText,
-                  role === "farmer" && styles.roleTextActive,
-                ]}
-              >
-                {t("auth.roleFarmer")}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.roleBtn, role === "buyer" && styles.roleActive]}
-              onPress={() => setRole("buyer")}
-            >
-              <Text
-                style={[
-                  styles.roleText,
-                  role === "buyer" && styles.roleTextActive,
-                ]}
-              >
-                {t("auth.roleBuyer")}
-              </Text>
-            </TouchableOpacity>
+          {/* Name */}
+          <View style={styles.inputGroup}>
+            <AppText style={[styles.label, { color: textSecondary }]}>
+              Full Name
+            </AppText>
+            <AppInput
+              placeholder="e.g. Bekele Tadesse"
+              value={name}
+              onChangeText={(t) => {
+                setName(t);
+                clearFieldError("name");
+              }}
+              leftIcon="person-outline"
+              style={errors.name ? { borderColor: errorColor } : {}}
+            />
+            {errors.name && (
+              <View style={styles.errorRow}>
+                <Ionicons name="alert-circle" size={14} color={errorColor} />
+                <AppText style={[styles.errorText, { color: errorColor }]}>
+                  {errors.name}
+                </AppText>
+              </View>
+            )}
           </View>
 
-          <Text style={styles.label}>{t("auth.locationLabel")}</Text>
-          <TextInput
-            style={styles.input}
-            placeholder={t("auth.regionLabel")}
-            value={region}
-            onChangeText={setRegion}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder={t("auth.zoneLabel")}
-            value={zone}
-            onChangeText={setZone}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder={t("auth.kebeleLabel")}
-            value={kebele}
-            onChangeText={setKebele}
-          />
+          {/* Phone */}
+          <View style={styles.inputGroup}>
+            <AppText style={[styles.label, { color: textSecondary }]}>
+              Phone Number
+            </AppText>
+            <AppInput
+              placeholder="e.g. 0911223344"
+              keyboardType="phone-pad"
+              value={phone}
+              onChangeText={(t) => {
+                setPhone(t);
+                clearFieldError("phone");
+              }}
+              leftIcon="call-outline"
+              style={errors.phone ? { borderColor: errorColor } : {}}
+            />
+            {errors.phone && (
+              <View style={styles.errorRow}>
+                <Ionicons name="alert-circle" size={14} color={errorColor} />
+                <AppText style={[styles.errorText, { color: errorColor }]}>
+                  {errors.phone}
+                </AppText>
+              </View>
+            )}
+          </View>
 
-          <Text style={styles.label}>{t("auth.emailLabel")}</Text>
-          <TextInput
-            style={styles.input}
-            placeholder={t("auth.emailPlaceholder")}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
-          />
+          {/* PIN */}
+          <View style={styles.inputGroup}>
+            <AppText style={[styles.label, { color: textSecondary }]}>
+              Create a PIN
+            </AppText>
+            <AppInput
+              placeholder="At least 4 digits"
+              keyboardType="numeric"
+              secureTextEntry
+              maxLength={6}
+              value={pin}
+              onChangeText={(t) => {
+                setPin(t);
+                clearFieldError("pin");
+              }}
+              leftIcon="lock-closed-outline"
+              style={errors.pin ? { borderColor: errorColor } : {}}
+            />
+            {errors.pin && (
+              <View style={styles.errorRow}>
+                <Ionicons name="alert-circle" size={14} color={errorColor} />
+                <AppText style={[styles.errorText, { color: errorColor }]}>
+                  {errors.pin}
+                </AppText>
+              </View>
+            )}
+          </View>
 
-          <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handleRegister}
-            disabled={loading}
+          {/* Role */}
+          <View style={styles.inputGroup}>
+            <AppText style={[styles.label, { color: textSecondary }]}>
+              I am a...
+            </AppText>
+            <View style={styles.roleContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.roleBtn,
+                  {
+                    borderColor:
+                      role === "farmer" ? primary : theme.colors.border,
+                    backgroundColor:
+                      role === "farmer" ? primary + "15" : "transparent",
+                  },
+                ]}
+                onPress={() => setRole("farmer")}
+                activeOpacity={0.8}
+              >
+                <Ionicons
+                  name="leaf"
+                  size={18}
+                  color={role === "farmer" ? primary : textSecondary}
+                />
+                <AppText
+                  style={[
+                    styles.roleText,
+                    { color: role === "farmer" ? primary : textSecondary },
+                  ]}
+                >
+                  Farmer
+                </AppText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.roleBtn,
+                  {
+                    borderColor:
+                      role === "buyer" ? primary : theme.colors.border,
+                    backgroundColor:
+                      role === "buyer" ? primary + "15" : "transparent",
+                  },
+                ]}
+                onPress={() => setRole("buyer")}
+                activeOpacity={0.8}
+              >
+                <Ionicons
+                  name="cart"
+                  size={18}
+                  color={role === "buyer" ? primary : textSecondary}
+                />
+                <AppText
+                  style={[
+                    styles.roleText,
+                    { color: role === "buyer" ? primary : textSecondary },
+                  ]}
+                >
+                  Buyer
+                </AppText>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Location */}
+          <AppText
+            variant="headingSm"
+            style={[styles.sectionTitle, { color: textPrimary }]}
           >
-            <Text style={styles.buttonText}>
-              {loading ? t("common.loading") : t("auth.registerBtn")}
-            </Text>
-          </TouchableOpacity>
+            Location
+          </AppText>
+
+          <View style={styles.inputGroup}>
+            <AppText style={[styles.label, { color: textSecondary }]}>
+              Region
+            </AppText>
+            <AppInput
+              placeholder="e.g. Oromia"
+              value={region}
+              onChangeText={(t) => {
+                setRegion(t);
+                clearFieldError("region");
+              }}
+              leftIcon="location-outline"
+              style={errors.region ? { borderColor: errorColor } : {}}
+            />
+            {errors.region && (
+              <View style={styles.errorRow}>
+                <Ionicons name="alert-circle" size={14} color={errorColor} />
+                <AppText style={[styles.errorText, { color: errorColor }]}>
+                  {errors.region}
+                </AppText>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.inputGroup}>
+            <AppText style={[styles.label, { color: textSecondary }]}>
+              Zone
+            </AppText>
+            <AppInput
+              placeholder="e.g. Jimma"
+              value={zone}
+              onChangeText={(t) => {
+                setZone(t);
+                clearFieldError("zone");
+              }}
+              style={errors.zone ? { borderColor: errorColor } : {}}
+            />
+            {errors.zone && (
+              <View style={styles.errorRow}>
+                <Ionicons name="alert-circle" size={14} color={errorColor} />
+                <AppText style={[styles.errorText, { color: errorColor }]}>
+                  {errors.zone}
+                </AppText>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.inputGroup}>
+            <AppText style={[styles.label, { color: textSecondary }]}>
+              Kebele
+            </AppText>
+            <AppInput
+              placeholder="e.g. Bure"
+              value={kebele}
+              onChangeText={(t) => {
+                setKebele(t);
+                clearFieldError("kebele");
+              }}
+              style={errors.kebele ? { borderColor: errorColor } : {}}
+            />
+            {errors.kebele && (
+              <View style={styles.errorRow}>
+                <Ionicons name="alert-circle" size={14} color={errorColor} />
+                <AppText style={[styles.errorText, { color: errorColor }]}>
+                  {errors.kebele}
+                </AppText>
+              </View>
+            )}
+          </View>
+
+          {/* Email */}
+          <View style={styles.inputGroup}>
+            <AppText style={[styles.label, { color: textSecondary }]}>
+              Email (optional)
+            </AppText>
+            <AppInput
+              placeholder="e.g. bek@example.com"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+              leftIcon="mail-outline"
+            />
+          </View>
+
+          {registerError ? (
+            <View
+              style={[
+                styles.errorBanner,
+                { backgroundColor: errorColor + "15" },
+              ]}
+            >
+              <Ionicons name="alert-circle" size={16} color={errorColor} />
+              <AppText style={[styles.errorBannerText, { color: errorColor }]}>
+                {registerError}
+              </AppText>
+            </View>
+          ) : null}
+
+          <AppButton
+            title={loading ? "Creating Account..." : "Sign Up"}
+            onPress={handleRegister}
+            loading={loading}
+            disabled={loading}
+            fullWidth
+            style={styles.loginButton}
+          />
 
           <TouchableOpacity
             style={styles.linkButton}
             onPress={() => navigation.navigate("Login")}
+            activeOpacity={0.7}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Text style={styles.linkText}>{t("auth.hasAccount")}</Text>
+            <AppText style={[styles.linkText, { color: primary }]}>
+              Already have an account? Sign in
+            </AppText>
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </KeyboardAvoidingView>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  content: { padding: 24 },
-  title: { fontSize: 28, fontWeight: "bold", color: "#333", marginBottom: 8 },
-  subtitle: { fontSize: 16, color: "#666", marginBottom: 24 },
-  form: { gap: 12 },
+  container: { flex: 1 },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingBottom: 40,
+  },
+  logoWrapper: {
+    alignItems: "center",
+    marginTop: 32,
+    marginBottom: 20,
+  },
+  logo: {
+    width: 200,
+    height: 200,
+  },
+  title: {
+    textAlign: "center",
+    fontWeight: "700",
+    marginBottom: 8,
+  },
+  subtitle: {
+    textAlign: "center",
+    marginBottom: 24,
+  },
+  form: { gap: 4 },
+  inputGroup: { marginBottom: 12 },
   label: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#444",
-    marginBottom: -4,
+    fontWeight: "500",
+    marginBottom: 4,
+  },
+  errorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+    gap: 4,
+  },
+  errorText: { fontSize: 12, flex: 1 },
+  errorBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 8,
+    gap: 6,
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  errorBannerText: { fontSize: 13, flex: 1 },
+  roleContainer: {
+    flexDirection: "row",
+    gap: 12,
     marginTop: 8,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    padding: 14,
-    borderRadius: 8,
-    fontSize: 16,
-  },
-  roleContainer: { flexDirection: "row", gap: 12 },
   roleBtn: {
     flex: 1,
-    padding: 14,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ddd",
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    gap: 8,
   },
-  roleActive: { backgroundColor: "#e8f5e9", borderColor: "#2e7d32" },
-  roleText: { color: "#666", fontWeight: "600" },
-  roleTextActive: { color: "#2e7d32" },
-  button: {
-    backgroundColor: "#2e7d32",
-    padding: 16,
-    borderRadius: 8,
+  roleText: { fontWeight: "600", fontSize: 15 },
+  sectionTitle: {
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  loginButton: { marginTop: 24 },
+  linkButton: {
     alignItems: "center",
-    marginTop: 24,
+    marginTop: 20,
   },
-  buttonDisabled: { opacity: 0.7 },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-  linkButton: { alignItems: "center", marginTop: 16, paddingBottom: 32 },
-  linkText: { color: "#2e7d32", fontSize: 14, fontWeight: "600" },
+  linkText: { fontWeight: "600", fontSize: 14 },
 });
-
-export default RegisterScreen;

@@ -1,16 +1,29 @@
-import React, { useState, useEffect } from "react";
-import { ScrollView, StyleSheet, View, Text } from "react-native";
-import DashboardLayout from "../../components/layout/DashBoardLayout";
-import AppSidebar from "../../components/layout/AppSidebar";
-import WeatherWidget from "../../components/farmer/WeatherWidget";
-import QuickActionsGrid from "../../components/farmer/QuickActionsGrid";
-import MarketTrendsList from "../../components/farmer/MarketTrendsList";
-import RecentOrdersList from "../../components/farmer/RecentOrdersList";
-import AddProductModal from "../../components/farmer/AddProductModal";
+// src/screens/farmer/FarmerDashboardScreen.js
+import { useEffect, useState, useRef } from "react";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Animated,
+  Dimensions,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import AppButton from "../../components/common/AppButton";
+import AddProductModal from "../../components/farmer/AddProductModal";
+import MarketTrendsList from "../../components/farmer/MarketTrendsList";
+import QuickActionsGrid from "../../components/farmer/QuickActionsGrid";
+import AppSidebar from "../../components/layout/AppSidebar";
+import DashboardLayout from "../../components/layout/DashBoardLayout";
 import { useTheme } from "../../hooks/useTheme";
+import AgriPriceChangeWidget from "../../components/farmer/AgriPriceChangeWidget";
+import SummaryCard from "../../components/SummaryCard";
+import FloatingActionButton from "../../components/layout/FloatingActionBotton";
 
-// Mock data (can be moved to a separate file)
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const CARD_GAP = 12;
+
+// ---------- mock data (unchanged) ----------
 const mockProducts = [
   {
     id: "p1",
@@ -104,15 +117,60 @@ const marketTrends = [
   },
 ];
 
+// ---------- helper hook: animated number ----------
+const useAnimatedNumber = (target, duration = 800) => {
+  const animatedValue = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    animatedValue.setValue(0);
+    Animated.timing(animatedValue, {
+      toValue: 1,
+      duration,
+      useNativeDriver: false,
+    }).start();
+  }, [target]);
+  return animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, target],
+  });
+};
+
+// ---------- main screen ----------
 export default function FarmerDashboardScreen({ navigation, route }) {
   const { theme } = useTheme();
+  const primaryColor = theme.colors.primary || "#4CAF50";
+  const textPrimary = theme.colors.textPrimary || "#333";
+  const textSecondary = theme.colors.textSecondary || "#666";
+  const cardBg = theme.colors.card || "#fff";
+
   const [products, setProducts] = useState(mockProducts);
-  const [orders] = useState(mockOrders);
+  const [orders, setOrders] = useState(mockOrders);
   const [modalVisible, setModalVisible] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Show a brief success banner when returning from PostProductScreen
+  // Dynamic biggest price mover
+  const biggestMover = marketTrends.reduce((prev, curr) => {
+    const prevVal = parseFloat(prev.demandChange);
+    const currVal = parseFloat(curr.demandChange);
+    return Math.abs(currVal) > Math.abs(prevVal) ? curr : prev;
+  });
+
+  // Fake KPIs (replace with real data later)
+  const todaySales = 12;
+  const activeOrders = orders.filter((o) => o.status !== "Completed").length;
+  const revenue = 47800; // ETB
+
+  // Time‑based greeting
+  const hours = new Date().getHours();
+  const greeting =
+    hours < 12
+      ? "Good morning"
+      : hours < 17
+        ? "Good afternoon"
+        : "Good evening";
+
+  // Success message from route params
   useEffect(() => {
     if (route?.params?.successMessage) {
       setSuccessMsg(route.params.successMessage);
@@ -120,6 +178,14 @@ export default function FarmerDashboardScreen({ navigation, route }) {
       return () => clearTimeout(timer);
     }
   }, [route?.params?.successMessage]);
+
+  // Pull‑to‑refresh handler
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    // Simulate data fetch – replace with actual API calls
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setRefreshing(false);
+  };
 
   const handleAddProduct = (newProduct) => {
     const product = {
@@ -142,13 +208,24 @@ export default function FarmerDashboardScreen({ navigation, route }) {
     setProducts([product, ...products]);
   };
 
+  // Order actions
+  const markOrderCompleted = (orderId) => {
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, status: "Completed" } : o)),
+    );
+  };
+
+  const markOrderPendingPickup = (orderId) => {
+    setOrders((prev) =>
+      prev.map((o) =>
+        o.id === orderId ? { ...o, status: "Pending Pickup" } : o,
+      ),
+    );
+  };
+
   const handleSidebarItemPress = (item) => {
     if (item.route === "Logout") {
-      // Navigate to login/welcome screen
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Welcome" }],
-      });
+      navigation.reset({ index: 0, routes: [{ name: "Welcome" }] });
     } else if (item.route) {
       navigation.navigate(item.route);
     }
@@ -158,76 +235,301 @@ export default function FarmerDashboardScreen({ navigation, route }) {
     <>
       <DashboardLayout
         title="Farmer Dashboard"
-        subtitle="Welcome back, Bekele!"
+        subtitle={`${greeting}, Bekele!`}
         role="farmer"
         activeTab="Home"
         onTabPress={(tab) => console.log(tab)}
         scrollable={true}
         showMenu={true}
         onMenuPress={() => setSidebarVisible(true)}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
+        notificationMessage={successMsg}
+        onDismissNotification={() => setSuccessMsg("")}
+        contentPaddingHorizontal={12} // tight, space‑efficient padding
       >
-        {successMsg ? (
-          <View style={styles.successBanner}>
-            <Text style={styles.successText}>✓ {successMsg}</Text>
-          </View>
-        ) : null}
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          <WeatherWidget />
-          <QuickActionsGrid
-            productCount={products.length}
-            onAddPress={() => navigation.navigate("PostProduct")}
-            onOrdersPress={() => navigation.navigate("FarmerOrders")}
-            onTrainingPress={() => navigation.navigate("FarmerTraining")}
+        {/* ---- Summary KPIs ---- */}
+        <View style={styles.summaryRow}>
+          <SummaryCard
+            icon="cart-outline"
+            label="Today's Sales"
+            value={todaySales}
+            color="#FF9800"
+            onPress={() => navigation.navigate("FarmerOrders")}
           />
+          <SummaryCard
+            icon="time-outline"
+            label="Active Orders"
+            value={activeOrders}
+            color="#2196F3"
+            onPress={() => navigation.navigate("FarmerOrders")}
+          />
+          <SummaryCard
+            icon="wallet-outline"
+            label="Revenue"
+            value={revenue}
+            prefix="ETB "
+            color="#4CAF50"
+            onPress={() => navigation.navigate("FarmerFinance")}
+          />
+        </View>
 
-          {/* Messages shortcut */}
-          <AppButton
-            title="💬  Messages"
-            variant="outline"
-            fullWidth
-            onPress={() => navigation.navigate("Conversations")}
-            style={{ marginBottom: 16 }}
+        {/* ---- Agri Price Change (tappable) ---- */}
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() =>
+            navigation.navigate("MarketDetails", { crop: biggestMover.crop })
+          }
+        >
+          <AgriPriceChangeWidget
+            productName={biggestMover.crop}
+            currentPrice={`${biggestMover.price}/q`}
+            changePercent={parseFloat(biggestMover.demandChange)}
+            changeLabel="Demand Change"
           />
-          <MarketTrendsList
-            trends={marketTrends}
-            onSellPress={(crop) => console.log("Sell", crop)}
-          />
-          <RecentOrdersList orders={orders.slice(0, 3)} />
-        </ScrollView>
-        <AddProductModal
-          visible={modalVisible}
-          onClose={() => setModalVisible(false)}
-          onSubmit={handleAddProduct}
+        </TouchableOpacity>
+
+        {/* ---- Quick Actions ---- */}
+        <QuickActionsGrid
+          productCount={products.length}
+          onAddPress={() => navigation.navigate("PostProduct")}
+          onOrdersPress={() => navigation.navigate("FarmerOrders")}
+          onTrainingPress={() => navigation.navigate("FarmerTraining")}
         />
+
+        {/* Messages shortcut */}
+        <AppButton
+          title="🔔 Messages"
+          variant="outline"
+          fullWidth
+          onPress={() => navigation.navigate("Conversations")}
+          style={{ marginTop: 16, marginBottom: 16 }}
+        />
+
+        {/* ---- Market Trends with "See All" ---- */}
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: textPrimary }]}>
+            Market Trends
+          </Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("MarketTrendsFull")}
+          >
+            <Text style={[styles.seeAll, { color: primaryColor }]}>
+              See All
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <MarketTrendsList
+          trends={marketTrends}
+          onSellPress={(crop) => console.log("Sell", crop)}
+        />
+
+        {/* ---- Recent Orders with inline actions ---- */}
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: textPrimary }]}>
+            Recent Orders
+          </Text>
+          <TouchableOpacity onPress={() => navigation.navigate("FarmerOrders")}>
+            <Text style={[styles.seeAll, { color: primaryColor }]}>
+              View All
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {orders.slice(0, 3).map((order) => (
+          <View
+            key={order.id}
+            style={[styles.orderCard, { backgroundColor: cardBg }]}
+          >
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.orderItem, { color: textPrimary }]}>
+                {order.item}
+              </Text>
+              <Text style={{ color: textSecondary, fontSize: 12 }}>
+                {order.buyer} • {order.date}
+              </Text>
+              <View style={styles.orderStatusRow}>
+                <View
+                  style={[
+                    styles.statusDot,
+                    {
+                      backgroundColor:
+                        order.status === "Completed"
+                          ? "#4CAF50"
+                          : order.status === "Processing"
+                            ? "#FF9800"
+                            : "#2196F3",
+                    },
+                  ]}
+                />
+                <Text style={{ fontSize: 12, color: textSecondary }}>
+                  {order.status}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.orderActions}>
+              {order.status !== "Completed" && (
+                <TouchableOpacity
+                  style={[
+                    styles.orderActionBtn,
+                    { backgroundColor: "#4CAF50" },
+                  ]}
+                  onPress={() => markOrderCompleted(order.id)}
+                >
+                  <Ionicons name="checkmark" size={18} color="#fff" />
+                </TouchableOpacity>
+              )}
+              {order.status !== "Pending Pickup" && (
+                <TouchableOpacity
+                  style={[
+                    styles.orderActionBtn,
+                    { backgroundColor: "#2196F3" },
+                  ]}
+                  onPress={() => markOrderPendingPickup(order.id)}
+                >
+                  <Ionicons name="bicycle" size={18} color="#fff" />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        ))}
+
+        {/* Bottom spacer to prevent FAB overlap */}
+        <View style={{ height: 80 }} />
       </DashboardLayout>
 
+      {/* ---- Floating Action Button ---- */}
+      <FloatingActionButton
+        onPress={() => navigation.navigate("PostProduct")}
+        bottom={150} // lifts it above the bottom tab bar
+      />
+
+      {/* ---- Sidebar & Modal ---- */}
       <AppSidebar
         visible={sidebarVisible}
         onClose={() => setSidebarVisible(false)}
         role="farmer"
         onItemPress={handleSidebarItemPress}
       />
+
+      <AddProductModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onSubmit={handleAddProduct}
+      />
     </>
   );
 }
 
+// ---------- styles ----------
 const styles = StyleSheet.create({
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 32,
+  summaryRow: {
+    flexDirection: "row",
+    gap: 12, // ← this is the breathing room you need
+    marginBottom: 16,
+    marginTop: 8,
   },
-  successBanner: {
-    backgroundColor: "#2e7d32",
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+  summaryCard: {
+    width: (SCREEN_WIDTH - 24 - CARD_GAP * 2) / 3, // 12px padding each side + 12px gap
+    padding: 12,
+    borderRadius: 16,
+    alignItems: "center",
+  },
+  summaryIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 8,
   },
-  successText: {
-    color: "#fff",
-    fontWeight: "600",
+  summaryLabel: {
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 4,
+    fontWeight: "500",
+  },
+  summaryValue: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  summaryPrefix: {
     fontSize: 14,
+    color: "#333",
+    fontWeight: "600",
+  },
+  summarySuffix: {
+    fontSize: 12,
+    color: "#888",
+    marginLeft: 2,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  seeAll: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  orderCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 8,
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  orderItem: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+  orderStatusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 6,
+    gap: 4,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  orderActions: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  orderActionBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  fab: {
+    position: "absolute",
+    right: 20,
+    bottom: 90, // above bottom tab bar
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
   },
 });
