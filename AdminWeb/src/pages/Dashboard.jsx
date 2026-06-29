@@ -12,8 +12,8 @@ const Dashboard = () => {
     setLoading(true);
     try {
       const [usersRes, productsRes] = await Promise.all([
-        api.get("/admin/users?isVerified=false"),
-        api.get("/admin/products"),
+        api.get("/api/v1/admin/users?isVerified=false"),
+        api.get("/api/v1/admin/products"),
       ]);
       setPendingUsers(usersRes.data.data.users || []);
       setPendingProducts(productsRes.data.data.products || []);
@@ -30,7 +30,7 @@ const Dashboard = () => {
 
   const handleUserAction = async (id, action) => {
     try {
-      await api.put(`/admin/users/${id}/${action}`);
+      await api.put(`/api/v1/admin/users/${id}/${action}`);
       setPendingUsers(pendingUsers.filter((u) => u._id !== id));
     } catch (error) {
       alert(`Failed to ${action} user`);
@@ -39,7 +39,7 @@ const Dashboard = () => {
 
   const handleProductAction = async (id, action) => {
     try {
-      await api.put(`/admin/products/${id}/${action}`);
+      await api.put(`/api/v1/admin/products/${id}/${action}`);
       setPendingProducts(pendingProducts.filter((p) => p._id !== id));
     } catch (error) {
       alert(`Failed to ${action} product`);

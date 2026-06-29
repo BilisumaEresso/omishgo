@@ -1,8 +1,11 @@
-import React, { useState } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+// src/screens/buyer/BuyerDashboardScreen.js
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import DashboardLayout from "../../components/layout/DashBoardLayout";
 import AppSidebar from "../../components/layout/AppSidebar";
+import FloatingActionButton from "../../components/layout/FloatingActionBotton";
+import SummaryCard from "../../components/SummaryCard"; // reuse the existing component
 import BuyerWeatherWidget from "../../components/buyer/BuyerWeatherWidget";
 import BuyerQuickActions from "../../components/buyer/BuyerQuickActions";
 import CategoryFilters from "../../components/buyer/CategoryFilters";
@@ -11,10 +14,16 @@ import FeaturedProductsList from "../../components/buyer/FeaturedProductsList";
 import NearbyFarmersList from "../../components/buyer/NearbyFarmersList";
 import RecentActivityList from "../../components/buyer/RecentActivityList";
 import AppText from "../../components/common/AppText";
-import AppButton from "../../components/common/AppButton";
 import { useTheme } from "../../hooks/useTheme";
+import api from "../../config/api";
+import { API_ENDPOINTS } from "../../constants/api";
+import { useAuthStore } from "../../store/auth.store";
+import AgriPriceChangeWidget from "../../components/common/AgriPriceChangeWidget";
 
-// ---------- Mock Data (extended) ----------
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const CARD_GAP = 12;
+
+// Mock data
 const mockProducts = [
   {
     id: "p1",
@@ -106,16 +115,63 @@ const categories = ["All", "Tomato", "Teff", "Onion", "Garlic"];
 
 export default function BuyerDashboardScreen({ navigation }) {
   const { theme } = useTheme();
+  const user = useAuthStore((state) => state.user);
+
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [cartCount, setCartCount] = useState(0);
-  const [orderedNotice, setOrderedNotice] = useState(null);
+  const [successMsg, setSuccessMsg] = useState("");
+  const [products, setProducts] = useState(mockProducts);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // KPI data
+  const activeOrders = 2;
+  const savedItems = 5;
+
+  const primaryColor = theme.colors.primary || "#2E7DFF";
+  const textPrimary = theme.colors.textPrimary || "#1C2430";
+
+  useEffect(() => {
+    const fetchRealProducts = async () => {
+      try {
+        const res = await api.get(API_ENDPOINTS.products.list);
+        const fetched = res.data?.data?.products || [];
+        if (fetched.length > 0) {
+          const formatted = fetched.map((p) => ({
+            id: p._id,
+            name: `${p.quantity}${p.unit || "kg"} ${p.cropType}`,
+            price: p.price,
+            category: p.cropType,
+            farmerName: p.farmerId?.name || "Farmer",
+            farmerAvatar:
+              "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+            location: p.location?.region || "Ethiopia",
+            image:
+              p.photos?.[0] ||
+              "https://images.unsplash.com/photo-1618512496248-a07fe83766a4?w=600",
+            isPremium: false,
+          }));
+          setProducts(formatted);
+        }
+      } catch (err) {
+        console.warn("Using mock products:", err.message);
+      }
+    };
+    fetchRealProducts();
+  }, []);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    // Simulate data refresh
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setRefreshing(false);
+  };
 
   const handlePlaceOrder = (product) => {
     setCartCount((prev) => prev + 1);
-    setOrderedNotice(`Placed order for ${product.name}!`);
-    setTimeout(() => setOrderedNotice(null), 3000);
+    setSuccessMsg(`Added ${product.name} to your cart!`);
+    setTimeout(() => setSuccessMsg(""), 3000);
   };
 
   const handleSidebarItemPress = (item) => {
@@ -126,8 +182,7 @@ export default function BuyerDashboardScreen({ navigation }) {
     }
   };
 
-  // Filter products based on search & category
-  const filteredProducts = mockProducts.filter((p) => {
+  const filteredProducts = products.filter((p) => {
     const matchesSearch =
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.farmerName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -140,77 +195,88 @@ export default function BuyerDashboardScreen({ navigation }) {
     <>
       <DashboardLayout
         title="Buyer Dashboard"
-        subtitle="Salam, Hana!"
+        subtitle={`Welcome, ${user?.name || ""}!`}
         role="buyer"
         activeTab="Marketplace"
         onTabPress={(tab) => console.log(tab)}
         scrollable={true}
         showMenu={true}
         onMenuPress={() => setSidebarVisible(true)}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
+        notificationMessage={successMsg}
+        onDismissNotification={() => setSuccessMsg("")}
+        contentPaddingHorizontal={12}
       >
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          <BuyerWeatherWidget />
-
-          {/* Browse Products CTA */}
-          <AppButton
-            title="🛒  Browse Products"
-            variant="primary"
-            fullWidth
+        {/* KPI Cards */}
+        <View style={styles.summaryRow}>
+          <SummaryCard
+            icon="cart-outline"
+            label="Active Orders"
+            value={activeOrders}
+            color="#FF9800"
+            onPress={() => navigation.navigate("BuyerOrders")}
+          />
+          <SummaryCard
+            icon="bookmark-outline"
+            label="Saved Items"
+            value={savedItems}
+            color="#4CAF50"
+            onPress={() => navigation.navigate("BuyerSaved")}
+          />
+          <SummaryCard
+            icon="storefront-outline"
+            label="Products"
+            value={products.length}
+            color="#2196F3"
             onPress={() => navigation.navigate("Browse")}
-            style={{ marginBottom: 16 }}
           />
+        </View>
 
-          <BuyerQuickActions
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onFilterPress={() => {}}
-          />
-          {orderedNotice && (
-            <View
-              style={[styles.notice, { backgroundColor: theme.colors.success }]}
-            >
-              <Ionicons name="checkmark-circle" size={18} color="#FFF" />
-              <AppText
-                variant="caption"
-                style={{ color: "#FFF", marginLeft: 8 }}
-              >
-                {orderedNotice}
-              </AppText>
-            </View>
-          )}
-          <CategoryFilters
-            categories={categories}
-            selected={selectedCategory}
-            onSelect={setSelectedCategory}
-          />
-          <PriceTrendWidget />
-          <FeaturedProductsList
-            products={filteredProducts}
-            onOrder={handlePlaceOrder}
-          />
-          <NearbyFarmersList farmers={mockFarmers} />
-          <RecentActivityList activities={mockActivities} />
-        </ScrollView>
+        <AgriPriceChangeWidget />
+
+        <BuyerQuickActions
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onFilterPress={() => {}}
+        />
+
+        <CategoryFilters
+          categories={categories}
+          selected={selectedCategory}
+          onSelect={setSelectedCategory}
+        />
+
+        <PriceTrendWidget />
+
+        {/* Featured Products */}
+        <View style={styles.sectionHeader}>
+          <TouchableOpacity onPress={() => navigation.navigate("Browse")}>
+            <AppText style={{ color: primaryColor, fontWeight: "600" }}>
+              See All
+            </AppText>
+          </TouchableOpacity>
+        </View>
+        <FeaturedProductsList
+          products={filteredProducts}
+          onOrder={handlePlaceOrder}
+        />
+        <NearbyFarmersList farmers={mockFarmers} />
+
+        {/* Recent Activity */}
+        <RecentActivityList activities={mockActivities} />
+
+        {/* Bottom spacer so FAB doesn't hide content */}
+        <View style={{ height: 80 }} />
       </DashboardLayout>
 
+      {/* Floating Cart Button */}
       {cartCount > 0 && (
-        <TouchableOpacity
-          style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+        <FloatingActionButton
           onPress={() => navigation.navigate("BuyerOrders")}
-        >
-          <Ionicons name="cart" size={24} color="#FFF" />
-          <View style={styles.cartBadge}>
-            <AppText
-              variant="caption"
-              style={{ color: "#FFF", fontWeight: "bold" }}
-            >
-              {cartCount}
-            </AppText>
-          </View>
-        </TouchableOpacity>
+          icon="cart"
+          bottom={90}
+        />
       )}
 
       <AppSidebar
@@ -224,41 +290,17 @@ export default function BuyerDashboardScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 80,
-  },
-  notice: {
+  summaryRow: {
     flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
-    borderRadius: 12,
+    gap: CARD_GAP,
     marginBottom: 16,
+    marginTop: 8,
   },
-  fab: {
-    position: "absolute",
-    bottom: 80,
-    right: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 8,
-  },
-  cartBadge: {
-    position: "absolute",
-    top: -6,
-    right: -6,
-    backgroundColor: "#BA1A1A",
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
+    marginTop: 20,
+    marginBottom: 12,
   },
 });

@@ -1,9 +1,8 @@
-import React from "react";
-import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import AppText from "../common/AppText";
-import AppCard from "../common/AppCard";
+import { StyleSheet, View } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
+import AppCard from "./AppCard";
+import AppText from "./AppText";
 
 export default function AgriPriceChangeWidget({
   productName = "Teff",
@@ -43,7 +42,10 @@ export default function AgriPriceChangeWidget({
           <AppText variant="caption" style={{ color: textSecondary }}>
             {changeLabel}
           </AppText>
-          <AppText variant="headingSm" style={{ color: changeColor, fontWeight: "bold" }}>
+          <AppText
+            variant="headingSm"
+            style={{ color: changeColor, fontWeight: "bold" }}
+          >
             {isPositive ? `+${changePercent}%` : `${changePercent}%`}
           </AppText>
         </View>

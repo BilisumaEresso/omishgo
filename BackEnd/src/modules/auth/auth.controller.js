@@ -54,3 +54,16 @@ export const getMe = asyncHandler(async (req, res) => {
     data: { user },
   });
 });
+
+/**
+ * @desc    Logout user
+ * @route   POST /api/auth/logout
+ * @access  Private (Requires JWT)
+ */
+export const logout = asyncHandler(async (req, res) => {
+  sendResponse(res, {
+    statusCode: 200,
+    message: "Logged out successfully",
+    data: null,
+  });
+});
