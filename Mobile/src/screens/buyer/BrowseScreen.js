@@ -1,8 +1,15 @@
 // Mobile/src/screens/buyer/BrowseScreen.js
 import React, { useState, useEffect, useCallback } from "react";
 import {
-  View, FlatList, StyleSheet, ActivityIndicator,
-  TextInput, TouchableOpacity, RefreshControl,
+  View,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+  TextInput,
+  TouchableOpacity,
+  RefreshControl,
+  StatusBar,
+  Platform,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import ScreenWrapper from "../../components/common/ScreenWrapper";
@@ -15,38 +22,72 @@ import { useTheme } from "../../hooks/useTheme";
 // ─── Product Card ─────────────────────────────────────────────────────────────
 const ProductCard = ({ product, onView, theme }) => {
   const farmer = product.farmerId || {};
-  const loc    = product.location  || {};
+  const loc = product.location || {};
 
   return (
-    <View style={[styles.card, { backgroundColor: theme.colors.surface || "#fff", borderColor: theme.colors.border || "#eee" }]}>
+    <View
+      style={[
+        styles.card,
+        {
+          backgroundColor: theme.colors.surface || "#fff",
+          borderColor: theme.colors.border || "#eee",
+          // shadow for both platforms
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.05,
+          shadowRadius: 4,
+          elevation: 2,
+        },
+      ]}
+    >
       {/* Top row: crop type + price */}
       <View style={styles.cardHeader}>
-        <AppText variant="headingSm" style={{ color: theme.colors.textPrimary }}>{product.cropType}</AppText>
-        <AppText variant="headingSm" style={[styles.price, { color: theme.colors.primary || "#2e7d32" }]}>
+        <AppText
+          variant="headingSm"
+          style={{ color: theme.colors.textPrimary }}
+        >
+          {product.cropType}
+        </AppText>
+        <AppText
+          variant="headingSm"
+          style={[styles.price, { color: theme.colors.primary || "#2e7d32" }]}
+        >
           {product.price} ETB
         </AppText>
       </View>
 
       {/* Quantity + unit */}
-      <AppText variant="bodyMd" style={{ color: theme.colors.textSecondary || "#666" }}>
+      <AppText
+        variant="bodyMd"
+        style={{ color: theme.colors.textSecondary || "#666" }}
+      >
         {product.quantity} {product.unit || "kg"}
       </AppText>
 
       {/* Location */}
-      {(loc.region || loc.zone) ? (
-        <AppText variant="bodySm" style={[styles.location, { color: theme.colors.textSecondary || "#888" }]}>
+      {loc.region || loc.zone ? (
+        <AppText
+          variant="bodySm"
+          style={[
+            styles.location,
+            { color: theme.colors.textSecondary || "#888" },
+          ]}
+        >
           📍 {[loc.region, loc.zone].filter(Boolean).join(", ")}
         </AppText>
       ) : null}
 
       {/* Farmer name */}
       {farmer.name ? (
-        <AppText variant="bodySm" style={{ color: theme.colors.textSecondary || "#888", marginTop: 2 }}>
+        <AppText
+          variant="bodySm"
+          style={{ color: theme.colors.textSecondary || "#888", marginTop: 2 }}
+        >
           🌾 {farmer.name}
         </AppText>
       ) : null}
 
-      {/* View button */}
+      {/* View button – full width */}
       <AppButton
         title="View"
         variant="outline"
@@ -59,14 +100,14 @@ const ProductCard = ({ product, onView, theme }) => {
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 export default function BrowseScreen({ navigation }) {
-  const { t }      = useTranslation();
-  const { theme }  = useTheme();
+  const { t } = useTranslation();
+  const { theme } = useTheme();
 
-  const [allProducts, setAllProducts]   = useState([]);
-  const [loading, setLoading]           = useState(true);
-  const [refreshing, setRefreshing]     = useState(false);
-  const [error, setError]               = useState("");
-  const [search, setSearch]             = useState("");
+  const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
 
   const fetchProducts = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -77,30 +118,40 @@ export default function BrowseScreen({ navigation }) {
       const res = await api.get(API_ENDPOINTS.products.list);
       setAllProducts(res.data?.data?.products || []);
     } catch (err) {
-      setError(err?.response?.data?.message || err.message || "Failed to load products");
+      setError(
+        err?.response?.data?.message ||
+          err.message ||
+          "Failed to load products",
+      );
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   }, []);
 
-  useEffect(() => { fetchProducts(); }, [fetchProducts]);
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   // Client-side filter by crop type
   const filtered = search.trim()
-    ? allProducts.filter(p =>
-        p.cropType?.toLowerCase().includes(search.trim().toLowerCase())
+    ? allProducts.filter((p) =>
+        p.cropType?.toLowerCase().includes(search.trim().toLowerCase()),
       )
     : allProducts;
 
-  const handleView = (product) => navigation.navigate("ListingDetail", { product });
+  const handleView = (product) =>
+    navigation.navigate("ListingDetail", { product });
 
   // ── Render states ──
   if (loading) {
     return (
       <ScreenWrapper>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={theme.colors.primary || "#2e7d32"} />
+          <ActivityIndicator
+            size="large"
+            color={theme.colors.primary || "#2e7d32"}
+          />
           <AppText variant="bodyMd" style={styles.centerText}>
             {t("common.loading") || "Loading..."}
           </AppText>
@@ -111,22 +162,61 @@ export default function BrowseScreen({ navigation }) {
 
   return (
     <ScreenWrapper padding={false}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.surface || "#fff", borderBottomColor: theme.colors.border || "#eee" }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <AppText variant="headingMd">←</AppText>
+      {/* Updated header */}
+      <View
+        style={[
+          styles.header,
+          {
+            backgroundColor: theme.colors.surface || "#fff",
+            borderBottomColor: theme.colors.border || "#eee",
+            // Android: StatusBar.currentHeight + 10; iOS: safe fallback
+            paddingTop:
+              Platform.OS === "android"
+                ? (StatusBar.currentHeight || 24) + 10
+                : 10,
+          },
+        ]}
+      >
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backBtn}
+        >
+          <AppText
+            variant="headingMd"
+            style={{ color: theme.colors.primary || "#2e7d32" }}
+          >
+            ←
+          </AppText>
         </TouchableOpacity>
-        <AppText variant="headingMd" style={{ flex: 1 }}>
+        <AppText
+          variant="headingMd"
+          style={{ flex: 1, textAlign: "center", marginRight: 40 }}
+        >
           {t("browse.title") || "Browse Products"}
         </AppText>
+        {/* Empty view to balance the left back button width */}
+        <View style={{ width: 40 }} />
       </View>
 
       {/* Search bar */}
-      <View style={[styles.searchBar, { backgroundColor: theme.colors.surface || "#fff", borderColor: theme.colors.border || "#ddd" }]}>
+      <View
+        style={[
+          styles.searchBar,
+          {
+            backgroundColor: theme.colors.surface || "#fff",
+            borderColor: theme.colors.border || "#ddd",
+          },
+        ]}
+      >
         <AppText style={styles.searchIcon}>🔍</AppText>
         <TextInput
-          style={[styles.searchInput, { color: theme.colors.textPrimary || "#333" }]}
-          placeholder={t("browse.searchPlaceholder") || "Search by crop type..."}
+          style={[
+            styles.searchInput,
+            { color: theme.colors.textPrimary || "#333" },
+          ]}
+          placeholder={
+            t("browse.searchPlaceholder") || "Search by crop type..."
+          }
           placeholderTextColor={theme.colors.textSecondary || "#999"}
           value={search}
           onChangeText={setSearch}
@@ -137,8 +227,17 @@ export default function BrowseScreen({ navigation }) {
 
       {error ? (
         <View style={styles.center}>
-          <AppText variant="bodyMd" style={{ color: theme.colors.error || "red" }}>{error}</AppText>
-          <AppButton title="Retry" onPress={() => fetchProducts()} style={{ marginTop: 12 }} />
+          <AppText
+            variant="bodyMd"
+            style={{ color: theme.colors.error || "red" }}
+          >
+            {error}
+          </AppText>
+          <AppButton
+            title="Retry"
+            onPress={() => fetchProducts()}
+            style={{ marginTop: 12 }}
+          />
         </View>
       ) : (
         <FlatList
@@ -160,7 +259,9 @@ export default function BrowseScreen({ navigation }) {
             <View style={styles.center}>
               <AppText style={styles.emptyIcon}>🌾</AppText>
               <AppText variant="headingSm" style={styles.centerText}>
-                {search ? (t("browse.noMatch") || "No listings match your search") : (t("browse.empty") || "No listings available right now")}
+                {search
+                  ? t("browse.noMatch") || "No listings match your search"
+                  : t("browse.empty") || "No listings available right now"}
               </AppText>
             </View>
           }
@@ -175,9 +276,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingBottom: 12,
     borderBottomWidth: 1,
-    gap: 8,
   },
   backBtn: { padding: 4 },
   searchBar: {
@@ -200,11 +300,26 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     gap: 4,
   },
-  cardHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   price: { fontWeight: "700" },
   location: { marginTop: 4 },
-  viewBtn: { marginTop: 12, alignSelf: "flex-end" },
-  center: { flex: 1, justifyContent: "center", alignItems: "center", padding: 32, gap: 8 },
+  viewBtn: {
+    marginTop: 12,
+    alignSelf: "stretch", // full width
+    borderRadius: 10,
+    paddingVertical: 10,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 32,
+    gap: 8,
+  },
   centerText: { textAlign: "center", color: "#666" },
   emptyIcon: { fontSize: 48 },
 });

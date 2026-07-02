@@ -1,14 +1,14 @@
 // src/components/layout/AppHeader.js
-import React, { useRef } from "react";
-import { View, Pressable, StyleSheet, Animated, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import AppText from "../common/AppText";
-import { useTheme } from "../../hooks/useTheme";
 import { useNavigation } from "@react-navigation/native";
+import { useRef } from "react";
+import { Animated, Platform, Pressable, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTheme } from "../../hooks/useTheme";
+import AppText from "../common/AppText";
 
-const ICON_SIZE = 32;
-const TOUCHABLE_SIZE = 48; // explicit minimum touch target
+const ICON_SIZE = 24;
+const TOUCHABLE_SIZE = 44;
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
 
 const AppHeader = ({
@@ -25,6 +25,7 @@ const AppHeader = ({
   onSearchPress,
   onProfilePress,
   rightComponent,
+  notificationCount = 0,
 }) => {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
@@ -33,8 +34,8 @@ const AppHeader = ({
   const primaryColor = theme.colors.primary || "#6B4EFF";
   const textColor = theme.colors.textPrimary || "#212121";
   const secondaryTextColor = theme.colors.textSecondary || "#757575";
-  const backgroundColor = theme.colors.background || "#FFFFFF";
-  const borderColor = theme.colors.border || "#F0F0F0";
+  const surfaceColor = theme.colors.surface || "#FFFFFF";
+  const borderColor = theme.colors.border || "#E0E0E0";
 
   // ---- Pro touch feedback (scale + opacity) ----
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -55,7 +56,8 @@ const AppHeader = ({
     }).start();
   };
 
-  const renderIconButton = (iconName, onPress, badge = false) => (
+  // Renders an icon button with optional badge dot
+  const renderIconButton = (iconName, onPress, { badge = false } = {}) => (
     <Pressable
       onPress={onPress}
       hitSlop={HIT_SLOP}
@@ -65,7 +67,7 @@ const AppHeader = ({
       accessibilityLabel={iconName}
       style={({ pressed }) => [
         styles.iconButton,
-        { opacity: pressed ? 0.7 : 1 },
+        { opacity: pressed ? 0.6 : 1 },
       ]}
     >
       <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
@@ -76,7 +78,7 @@ const AppHeader = ({
               styles.badge,
               {
                 backgroundColor: theme.colors.notification || "#FF3B30",
-                borderColor: backgroundColor,
+                borderColor: surfaceColor,
               },
             ]}
           />
@@ -90,21 +92,21 @@ const AppHeader = ({
       style={[
         styles.container,
         {
-          paddingTop: insets.top + 10,
-          paddingBottom: 14,
-          paddingHorizontal: 16,
-          backgroundColor,
+          paddingTop: insets.top + 6,
+          paddingBottom: 10,
+          paddingHorizontal: 14,
+          backgroundColor: surfaceColor,
           borderBottomColor: borderColor,
-          // subtle shadow for depth (pro feel)
+          borderBottomWidth: StyleSheet.hairlineWidth,
           ...Platform.select({
             ios: {
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.05,
+              shadowOpacity: 0.06,
               shadowRadius: 8,
             },
             android: {
-              elevation: 3,
+              elevation: 4,
             },
           }),
         },
@@ -131,7 +133,7 @@ const AppHeader = ({
         >
           <AppText
             variant="headingMd"
-            style={{ color: textColor, fontWeight: "700" }}
+            style={{ fontSize: 18, fontWeight: "700", color: textColor }}
             numberOfLines={1}
           >
             {title}
@@ -139,7 +141,12 @@ const AppHeader = ({
           {subtitle ? (
             <AppText
               variant="bodySm"
-              style={{ color: secondaryTextColor, opacity: 0.8, marginTop: 2 }}
+              style={{
+                fontSize: 13,
+                color: secondaryTextColor,
+                opacity: 0.7,
+                marginTop: 2,
+              }}
               numberOfLines={1}
             >
               {subtitle}
@@ -156,11 +163,9 @@ const AppHeader = ({
           <>
             {showSearch && renderIconButton("search", onSearchPress)}
             {showNotification &&
-              renderIconButton(
-                "notifications-outline",
-                onNotificationPress,
-                true,
-              )}
+              renderIconButton("notifications-outline", onNotificationPress, {
+                badge: notificationCount > 0,
+              })}
             {showProfile && (
               <Pressable
                 onPress={onProfilePress}
@@ -169,7 +174,7 @@ const AppHeader = ({
                 onPressOut={animatePressOut}
                 style={({ pressed }) => [
                   styles.avatarButton,
-                  { opacity: pressed ? 0.7 : 1 },
+                  { opacity: pressed ? 0.6 : 1 },
                 ]}
                 accessibilityRole="button"
                 accessibilityLabel="Profile"
@@ -183,7 +188,7 @@ const AppHeader = ({
                     },
                   ]}
                 >
-                  <Ionicons name="person" size={20} color="#fff" />
+                  <Ionicons name="person" size={18} color="#fff" />
                 </Animated.View>
               </Pressable>
             )}
@@ -212,14 +217,13 @@ const styles = StyleSheet.create({
   right: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8, // consistent spacing between right icons
+    gap: 8,
   },
   iconButton: {
     width: TOUCHABLE_SIZE,
     height: TOUCHABLE_SIZE,
     alignItems: "center",
     justifyContent: "center",
-    // marginLeft is now handled by gap
   },
   badge: {
     position: "absolute",

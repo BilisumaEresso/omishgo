@@ -1,17 +1,17 @@
 // src/screens/farmer/PostProductScreen.js
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-  View,
-  StyleSheet,
-  Alert,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    View,
 } from "react-native";
-import AppHeader from "../../components/layout/AppHeader";
-import AppText from "../../components/common/AppText";
-import AppInput from "../../components/common/AppInput";
 import AppButton from "../../components/common/AppButton";
+import AppInput from "../../components/common/AppInput";
+import AppText from "../../components/common/AppText";
+import AppHeader from "../../components/layout/AppHeader";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
@@ -66,7 +66,7 @@ export default function PostProductScreen({ navigation }) {
         },
       });
 
-      navigation.navigate("FarmerDashboard", {
+      navigation.navigate("FarmerTabs", {
         successMessage: "Your listing was posted successfully!",
       });
     } catch (err) {

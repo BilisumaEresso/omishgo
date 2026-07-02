@@ -6,48 +6,50 @@ const buyerTheme = {
   role: "buyer",
 
   colors: {
-    primary: "#2E7DFF",
-    primaryDark: "#1565C0",
-    primaryLight: "#7FB3FF",
-    primaryContainer: "#E6F0FF",
+    ...baseTheme.colors,
+    primary: "#1565C0",
+    primaryDark: "#0D47A1",
+    primaryLight: "#5E92F3",
+    primaryContainer: "#E3F2FD",
 
-    secondary: "#4CAF50",
+    secondary: "#00897B",
+    accent: "#26A69A",
 
-    accent: "#4CAF50",
-
-    background: "#F8FAFF",
-    backgroundSecondary: "#EDF4FF",
+    background: "#F5F8FF",
+    backgroundSecondary: "#EBF3FF",
 
     surface: "#FFFFFF",
     surfaceElevated: "#FFFFFF",
 
     card: "#FFFFFF",
 
-    textPrimary: "#1C2430",
-    textSecondary: "#627086",
-    textMuted: "#A0AEC0",
+    textPrimary: "#0D1B2A",
+    textSecondary: "#4A6080",
+    textMuted: "#8FA3BE",
     textInverse: "#FFFFFF",
 
-    border: "#DCE8FF",
-    divider: "#EAF1FF",
+    border: "#D0DEF5",
+    divider: "#E8EFFE",
 
-    success: "#4CAF50",
-    warning: "#FF9800",
-    error: "#E53935",
-    info: "#2E7DFF",
+    success: "#2E7D32",
+    warning: "#EF6C00",
+    error: "#C62828",
+    info: "#1565C0",
 
-    disabled: "#C4D1E5",
+    disabled: "#B8CADF",
 
     inputBackground: "#FFFFFF",
-    inputBorder: "#D9E6FF",
-    inputFocused: "#2E7DFF",
-    inputError: "#E53935",
+    inputBorder: "#C5D9F5",
+    inputFocused: "#1565C0",
+    inputError: "#C62828",
 
-    tabActive: "#2E7DFF",
-    tabInactive: "#8DA0BC",
+    tabActive: "#1565C0",
+    tabInactive: "#8FA3BE",
+    tabBar: "#FFFFFF",
+    notification: "#FF5252",
 
-    overlay: "rgba(0,0,0,0.3)",
-    shadow: "#000",
+    overlay: "rgba(0,0,0,0.4)",
+    shadow: "#000000",
   },
 };
 

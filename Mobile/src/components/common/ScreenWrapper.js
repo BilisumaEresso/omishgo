@@ -1,12 +1,11 @@
 // src/components/common/ScreenWrapper.js
-import React from "react";
 import {
-  SafeAreaView,
-  KeyboardAvoidingView,
-  ScrollView,
-  Platform,
-  View,
-  StyleSheet,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    View,
+    StatusBar,
 } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 
@@ -21,60 +20,37 @@ const ScreenWrapper = ({
   const { theme } = useTheme();
 
   const basePadding = padding ? 16 : 0;
-  const backgroundColor = theme.colors.background ;
+  const backgroundColor = theme.colors.background;
 
-  // Render Strategy A: Scrollable Layout
-  if (scrollable) {
-    return (
-      <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
-        <KeyboardAvoidingView
-          style={styles.flex}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          enabled={!disableKeyboardAvoid}
-        >
-          <ScrollView
-            style={[styles.flex, style]}
-            contentContainerStyle={[
-              {
-                flexGrow: 1,
-                padding: basePadding, // DESIGN FIX: Keeps padding on the inner engine to avoid shadow clipping
-              },
-              contentContainerStyle,
-            ]}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          >
-            {children}
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
-    );
-  }
+  const inner = scrollable ? (
+    <ScrollView
+      style={[styles.flex, style]}
+      contentContainerStyle={[{ flexGrow: 1, padding: basePadding }, contentContainerStyle]}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+    >
+      {children}
+    </ScrollView>
+  ) : (
+    <View style={[styles.flex, { padding: basePadding }, style]}>{children}</View>
+  );
 
-  // Render Strategy B: Fixed Static Layout (e.g., Maps, Full Dashboards)
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
+    <View style={[styles.root, { backgroundColor }]}> 
+      <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         enabled={!disableKeyboardAvoid}
       >
-        <View
-          style={[
-            styles.flex,
-            { padding: basePadding },
-            style
-          ]}
-        >
-          {children}
-        </View>
+        {inner}
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
+  root: {
     flex: 1,
   },
   flex: {
