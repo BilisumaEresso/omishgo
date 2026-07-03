@@ -5,7 +5,7 @@
 // - Localhost (Physical Android Device): http://<YOUR_PC_IP>:5000
 // - Production: https://api.omishgo.com
 
-export const API_BASE_URL = "http://192.168.43.37:5000";
+export const API_BASE_URL = "http://192.168.0.3:5000";
 
 export const API_ENDPOINTS = {
   // Check
