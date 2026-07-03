@@ -1,6 +1,7 @@
-import { StatusBar } from "expo-status-bar";
+import { setStatusBarStyle, StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import * as NavigationBar from "expo-navigation-bar";
 import { NavigationProvider } from "./src/context/NavigationContext.js";
 import { ThemeProvider } from "./src/context/ThemeContext.js";
 import "./src/locales/i18n.js";
@@ -19,6 +20,21 @@ export default function App() {
       }
     };
     initializeDevice();
+
+    const setSystemUi = async () => {
+      try {
+        if (typeof NavigationBar.setVisibilityAsync === "function") {
+          await NavigationBar.setVisibilityAsync("hidden");
+        }
+        if (typeof NavigationBar.setBehaviorAsync === "function") {
+          await NavigationBar.setBehaviorAsync("overlay-swipe");
+        }
+        setStatusBarStyle("dark");
+      } catch (error) {
+        console.warn("Failed to configure navigation/status bar:", error);
+      }
+    };
+    setSystemUi();
   }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

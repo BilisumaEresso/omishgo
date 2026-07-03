@@ -1,17 +1,14 @@
 // src/components/layout/DashboardLayout.js
-import React from "react";
 import {
-  View,
-  ScrollView,
-  StyleSheet,
-  RefreshControl,
-  Text,
-  TouchableOpacity,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import ScreenWrapper from "../common/ScreenWrapper";
-import AppHeader from "./AppHeader";
-import BottomTabBar from "./BottomTabBar";
 import { useTheme } from "../../hooks/useTheme";
+import AppHeader from "./AppHeader";
 
 const DashboardLayout = ({
   title,
@@ -20,17 +17,12 @@ const DashboardLayout = ({
   children,
   scrollable = true,
   showHeader = true,
-  showTabs = true,
-  activeTab,
-  onTabPress,
-  disablePadding = false,
   refreshing = false,
   onRefresh,
   notificationMessage,
   onDismissNotification,
-  // 👇 new prop if you ever need full control
-  contentPaddingHorizontal = 12,
-  contentPaddingVertical = 16,
+  contentPaddingHorizontal = 16,
+  contentPaddingVertical = 12,
   ...headerProps
 }) => {
   const { theme } = useTheme();
@@ -39,86 +31,74 @@ const DashboardLayout = ({
   const successColor = theme.colors.success || "#2e7d32";
 
   return (
-    <ScreenWrapper>
-      <View style={styles.flex}>
-        {showHeader && (
-          <AppHeader title={title} subtitle={subtitle} {...headerProps} />
-        )}
+    <View style={[styles.flex, { backgroundColor }]}>
+      {showHeader && (
+        <AppHeader
+          title={title}
+          subtitle={subtitle}
+          {...headerProps} // notificationCount, showBack, etc. passed through
+        />
+      )}
 
-        {notificationMessage ? (
-          <View
-            style={[
-              styles.notificationBanner,
-              { backgroundColor: successColor },
-            ]}
-          >
-            <Text style={styles.notificationText}>{notificationMessage}</Text>
-            {onDismissNotification && (
-              <TouchableOpacity
-                onPress={onDismissNotification}
-                style={styles.dismissBtn}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <Text style={styles.dismissText}>✕</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        ) : null}
-
-        <View style={[styles.content, { backgroundColor }]}>
-          {scrollable ? (
-            <ScrollView
-              contentContainerStyle={[
-                styles.scrollContent,
-                // Apply custom horizontal/vertical padding
-                {
-                  paddingHorizontal: contentPaddingHorizontal,
-                  paddingVertical: contentPaddingVertical,
-                },
-                // If full-bleed is needed, override to 0
-                disablePadding && { padding: 0 },
-              ]}
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-              refreshControl={
-                onRefresh ? (
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    colors={[primaryColor]}
-                    tintColor={primaryColor}
-                    title="Refreshing…"
-                    titleColor={primaryColor}
-                  />
-                ) : undefined
-              }
+      {notificationMessage ? (
+        <View
+          style={[styles.notificationBanner, { backgroundColor: successColor }]}
+        >
+          <Text style={styles.notificationText}>{notificationMessage}</Text>
+          {onDismissNotification && (
+            <TouchableOpacity
+              onPress={onDismissNotification}
+              style={styles.dismissBtn}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              {children}
-            </ScrollView>
-          ) : (
-            <View
-              style={[
-                styles.flex,
-                !disablePadding && {
-                  paddingHorizontal: contentPaddingHorizontal,
-                  paddingVertical: contentPaddingVertical,
-                },
-              ]}
-            >
-              {children}
-            </View>
+              <Text style={styles.dismissText}>✕</Text>
+            </TouchableOpacity>
           )}
         </View>
+      ) : null}
 
-        {showTabs && (
-          <BottomTabBar
-            role={role}
-            activeTab={activeTab}
-            onTabPress={onTabPress}
-          />
+      <View style={styles.content}>
+        {scrollable ? (
+          <ScrollView
+            contentContainerStyle={[
+              styles.scrollContent,
+              {
+                paddingHorizontal: contentPaddingHorizontal,
+                paddingVertical: contentPaddingVertical,
+              },
+            ]}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            refreshControl={
+              onRefresh ? (
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  colors={[primaryColor]}
+                  tintColor={primaryColor}
+                  title="Refreshing…"
+                  titleColor={primaryColor}
+                />
+              ) : undefined
+            }
+          >
+            {children}
+          </ScrollView>
+        ) : (
+          <View
+            style={[
+              styles.flex,
+              {
+                paddingHorizontal: contentPaddingHorizontal,
+                paddingVertical: contentPaddingVertical,
+              },
+            ]}
+          >
+            {children}
+          </View>
         )}
       </View>
-    </ScreenWrapper>
+    </View>
   );
 };
 
@@ -131,18 +111,13 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    // default values are set inline now, this is just for base
-  },
-  staticPadding: {
-    // kept for compatibility, but now inline handles it
   },
   notificationBanner: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 12,
+    height: 44,
     paddingHorizontal: 16,
-    marginBottom: 2,
   },
   notificationText: {
     color: "#fff",

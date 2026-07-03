@@ -7,6 +7,7 @@ import authRouter from "./modules/auth/auth.routes.js";
 import adminRouter from "./modules/admin/admin.routes.js";
 import productRouter from "./modules/product/product.routes.js";
 import messageRouter from "./modules/messages/message.routes.js";
+import notificationRouter from "./modules/notification/notification.routes.js";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/messages", messageRouter);
+app.use("/api/v1/notifications", notificationRouter);
 
 app.use(notFoundMiddleware);
 

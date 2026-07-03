@@ -1,24 +1,27 @@
 // src/screens/farmer/FarmerDashboardScreen.js
-import { useEffect, useState, useRef } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-  Animated,
-  Dimensions,
-} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useEffect, useRef, useState } from "react";
+import {
+    Animated,
+    Dimensions,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import AgriPriceChangeWidget from "../../components/common/AgriPriceChangeWidget";
 import AppButton from "../../components/common/AppButton";
 import AddProductModal from "../../components/farmer/AddProductModal";
 import MarketTrendsList from "../../components/farmer/MarketTrendsList";
 import QuickActionsGrid from "../../components/farmer/QuickActionsGrid";
 import AppSidebar from "../../components/layout/AppSidebar";
 import DashboardLayout from "../../components/layout/DashBoardLayout";
-import { useTheme } from "../../hooks/useTheme";
-import AgriPriceChangeWidget from "../../components/farmer/AgriPriceChangeWidget";
-import SummaryCard from "../../components/SummaryCard";
 import FloatingActionButton from "../../components/layout/FloatingActionBotton";
+import SummaryCard from "../../components/SummaryCard";
+import api from "../../config/api";
+import { API_ENDPOINTS } from "../../constants/api";
+import { useTheme } from "../../hooks/useTheme";
+import { useAuthStore } from "../../store/auth.store";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_GAP = 12;
@@ -137,6 +140,7 @@ const useAnimatedNumber = (target, duration = 800) => {
 // ---------- main screen ----------
 export default function FarmerDashboardScreen({ navigation, route }) {
   const { theme } = useTheme();
+  const user = useAuthStore((state) => state.user);
   const primaryColor = theme.colors.primary || "#4CAF50";
   const textPrimary = theme.colors.textPrimary || "#333";
   const textSecondary = theme.colors.textSecondary || "#666";
@@ -179,12 +183,38 @@ export default function FarmerDashboardScreen({ navigation, route }) {
     }
   }, [route?.params?.successMessage]);
 
+  const fetchProducts = async () => {
+    try {
+      const res = await api.get(API_ENDPOINTS.products.list);
+      // Filter products on the client side to show only those belonging to the logged-in farmer
+      const farmerProducts = (res.data?.data?.products || []).filter(
+        (p) => (p.farmerId?._id || p.farmerId) === user?.id,
+      );
+      setProducts(farmerProducts);
+    } catch (e) {
+      console.warn("Failed to load farmer products:", e.message);
+    }
+  };
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchProducts();
+    }
+  }, [user?.id]);
+
   // Pull‑to‑refresh handler
   const handleRefresh = async () => {
     setRefreshing(true);
-    // Simulate data fetch – replace with actual API calls
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await fetchProducts();
     setRefreshing(false);
+  };
+
+  const safeNavigate = (screenName, params = {}) => {
+    try {
+      navigation.navigate(screenName, params);
+    } catch (err) {
+      console.warn(`Screen "${screenName}" not yet built.`);
+    }
   };
 
   const handleAddProduct = (newProduct) => {
@@ -235,7 +265,7 @@ export default function FarmerDashboardScreen({ navigation, route }) {
     <>
       <DashboardLayout
         title="Farmer Dashboard"
-        subtitle={`${greeting}, Bekele!`}
+        subtitle={`${greeting}, ${user?.name || ""}!`}
         role="farmer"
         activeTab="Home"
         onTabPress={(tab) => console.log(tab)}
@@ -255,14 +285,14 @@ export default function FarmerDashboardScreen({ navigation, route }) {
             label="Today's Sales"
             value={todaySales}
             color="#FF9800"
-            onPress={() => navigation.navigate("FarmerOrders")}
+            onPress={() => safeNavigate("FarmerOrders")}
           />
           <SummaryCard
             icon="time-outline"
             label="Active Orders"
             value={activeOrders}
             color="#2196F3"
-            onPress={() => navigation.navigate("FarmerOrders")}
+            onPress={() => safeNavigate("FarmerOrders")}
           />
           <SummaryCard
             icon="wallet-outline"
@@ -270,7 +300,7 @@ export default function FarmerDashboardScreen({ navigation, route }) {
             value={revenue}
             prefix="ETB "
             color="#4CAF50"
-            onPress={() => navigation.navigate("FarmerFinance")}
+            onPress={() => safeNavigate("FarmerFinance")}
           />
         </View>
 
@@ -278,7 +308,7 @@ export default function FarmerDashboardScreen({ navigation, route }) {
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() =>
-            navigation.navigate("MarketDetails", { crop: biggestMover.crop })
+            safeNavigate("MarketDetails", { crop: biggestMover.crop })
           }
         >
           <AgriPriceChangeWidget
@@ -293,8 +323,8 @@ export default function FarmerDashboardScreen({ navigation, route }) {
         <QuickActionsGrid
           productCount={products.length}
           onAddPress={() => navigation.navigate("PostProduct")}
-          onOrdersPress={() => navigation.navigate("FarmerOrders")}
-          onTrainingPress={() => navigation.navigate("FarmerTraining")}
+          onOrdersPress={() => safeNavigate("FarmerOrders")}
+          onTrainingPress={() => safeNavigate("FarmerTraining")}
         />
 
         {/* Messages shortcut */}
@@ -311,9 +341,7 @@ export default function FarmerDashboardScreen({ navigation, route }) {
           <Text style={[styles.sectionTitle, { color: textPrimary }]}>
             Market Trends
           </Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("MarketTrendsFull")}
-          >
+          <TouchableOpacity onPress={() => safeNavigate("MarketTrendsFull")}>
             <Text style={[styles.seeAll, { color: primaryColor }]}>
               See All
             </Text>
@@ -329,7 +357,7 @@ export default function FarmerDashboardScreen({ navigation, route }) {
           <Text style={[styles.sectionTitle, { color: textPrimary }]}>
             Recent Orders
           </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("FarmerOrders")}>
+          <TouchableOpacity onPress={() => safeNavigate("FarmerOrders")}>
             <Text style={[styles.seeAll, { color: primaryColor }]}>
               View All
             </Text>

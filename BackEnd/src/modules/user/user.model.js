@@ -47,7 +47,7 @@ const userSchema = new mongoose.Schema(
     },
     isVerified: {
       type: Boolean,
-      default: true, // Admin needs to approve
+      default: true, // Dev mode: auto-verified. Set to false to require Admin approval in production.
     },
   },
   {

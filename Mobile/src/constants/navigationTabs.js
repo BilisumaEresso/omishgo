@@ -7,8 +7,8 @@ export const ROLE_TABS = {
     { label: "Home",   icon: "home",     route: "FarmerHome" },
     { label: "Orders", icon: "cart",     route: "FarmerOrders" },
     { label: "Products", icon: "leaf",   route: "FarmerProducts" },
-    { label: "Profile", icon: "person",  route: "FarmerProfile" },
     { label: "Insights", icon: "bar-chart", route: "FarmerAnalytics" },
+    { label: "Profile", icon: "person",  route: "FarmerProfile" },
   ],
   [ROLES.BUYER]: [
     { label: "Home",      icon: "home",       route: "BuyerHome" },

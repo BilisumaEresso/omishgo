@@ -1,11 +1,11 @@
 // src/screens/auth/RoleSelection.js
-import React, { useState } from "react";
-import { StyleSheet, View, TouchableOpacity, ScrollView } from "react-native";
-import AppText from "../../components/common/AppText";
+import { useState } from "react";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import AppButton from "../../components/common/AppButton";
+import AppText from "../../components/common/AppText";
 import ScreenWrapper from "../../components/common/ScreenWrapper";
-import { useTheme } from "../../hooks/useTheme";
 import { ROLES } from "../../constants/roles";
+import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
 export default function RoleSelection({ navigation }) {
@@ -53,7 +53,7 @@ export default function RoleSelection({ navigation }) {
 
         navigation.reset({
           index: 0,
-          routes: [{ name: "FarmerDashboard" }],
+          routes: [{ name: "FarmerTabs" }],
         });
 
         return;
@@ -75,7 +75,7 @@ export default function RoleSelection({ navigation }) {
             {
               name:
                 selectedRole === ROLES.BUYER
-                  ? "BuyerDashboard"
+                  ? "BuyerTabs"
                   : "DriverDashboard",
             },
           ],

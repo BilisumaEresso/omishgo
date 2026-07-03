@@ -29,6 +29,9 @@ const baseTheme = {
     warning: "#FF9800",
     error: "#F44336",
     info: "#2196F3",
+    notification: "#FF5252",
+    tabBar: "#FFFFFF",
+    statusBar: "dark-content",
 
     disabled: "#CFCFCF",
 

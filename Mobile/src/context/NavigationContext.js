@@ -4,7 +4,8 @@ import { useAuthStore } from "../store/auth.store.js";
 const NavigationContext = createContext();
 
 export const NavigationProvider = ({ children }) => {
-  const { isAuthenticated, activeRole } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
+  const activeRole = user?.role ?? null;
 
   return (
     <NavigationContext.Provider
