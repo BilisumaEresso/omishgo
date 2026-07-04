@@ -38,8 +38,8 @@ export default function SplashScreen({ navigation }) {
     return () => clearTimeout(timer);
   }, []);
 
-  const backgroundColor = theme.colors.background || "#FFFFFF";
-  const primaryColor = theme.colors.primary || "#4CAF50";
+  const backgroundColor = theme?.colors?.background || "#FFFFFF";
+  const primaryColor = theme?.colors?.primary || "#4CAF50";
 
   return (
     <View style={[styles.container, { backgroundColor }]}>

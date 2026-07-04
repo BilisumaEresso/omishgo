@@ -21,20 +21,20 @@ const MessageBubble = ({ message, isMe, theme }) => (
       style={[
         styles.bubble,
         isMe
-          ? [styles.bubbleMe,   { backgroundColor: theme.colors.primary || "#2e7d32" }]
-          : [styles.bubbleThem, { backgroundColor: theme.colors.surface || "#fff",
-                                  borderColor: theme.colors.border || "#e0e0e0" }],
+          ? [styles.bubbleMe,   { backgroundColor: theme?.colors?.primary || "#2e7d32" }]
+          : [styles.bubbleThem, { backgroundColor: theme?.colors?.surface || "#fff",
+                                  borderColor: theme?.colors?.border || "#e0e0e0" }],
       ]}
     >
       <AppText
         variant="bodyMd"
-        style={{ color: isMe ? "#fff" : (theme.colors.textPrimary || "#333") }}
+        style={{ color: isMe ? "#fff" : (theme?.colors?.textPrimary || "#333") }}
       >
         {message.content}
       </AppText>
       <AppText
         variant="label"
-        style={[styles.timestamp, { color: isMe ? "rgba(255,255,255,0.65)" : (theme.colors.textSecondary || "#aaa") }]}
+        style={[styles.timestamp, { color: isMe ? "rgba(255,255,255,0.65)" : (theme?.colors?.textSecondary || "#aaa") }]}
       >
         {formatTime(message.createdAt)}
       </AppText>
@@ -149,20 +149,20 @@ export default function ChatScreen({ route, navigation }) {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background || "#f5f7fa" }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme?.colors?.background || "#f5f7fa" }]}>
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.surface || "#fff", borderBottomColor: theme.colors.border || "#e8e8e8" }]}>
+      <View style={[styles.header, { backgroundColor: theme?.colors?.surface || "#fff", borderBottomColor: theme?.colors?.border || "#e8e8e8" }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-          <AppText variant="headingMd" style={{ color: theme.colors.primary || "#2e7d32" }}>←</AppText>
+          <AppText variant="headingMd" style={{ color: theme?.colors?.primary || "#2e7d32" }}>←</AppText>
         </TouchableOpacity>
 
         <View style={styles.headerInfo}>
-          <View style={[styles.avatar, { backgroundColor: theme.colors.primary || "#2e7d32" }]}>
+          <View style={[styles.avatar, { backgroundColor: theme?.colors?.primary || "#2e7d32" }]}>
             <AppText style={{ color: "#fff", fontWeight: "700" }}>
               {(userName || "?")[0].toUpperCase()}
             </AppText>
           </View>
-          <AppText variant="headingSm" style={{ color: theme.colors.textPrimary || "#333" }}>
+          <AppText variant="headingSm" style={{ color: theme?.colors?.textPrimary || "#333" }}>
             {userName || t("messaging.unknownUser") || "Chat"}
           </AppText>
         </View>
@@ -171,11 +171,11 @@ export default function ChatScreen({ route, navigation }) {
       {/* Messages */}
       {loading ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={theme.colors.primary || "#2e7d32"} />
+          <ActivityIndicator size="large" color={theme?.colors?.primary || "#2e7d32"} />
         </View>
       ) : error && messages.length === 0 ? (
         <View style={styles.center}>
-          <AppText style={{ color: theme.colors.error || "red", textAlign: "center" }}>{error}</AppText>
+          <AppText style={{ color: theme?.colors?.error || "red", textAlign: "center" }}>{error}</AppText>
         </View>
       ) : (
         <KeyboardAvoidingView
@@ -196,7 +196,7 @@ export default function ChatScreen({ route, navigation }) {
             ListEmptyComponent={
               <View style={styles.center}>
                 <AppText style={{ fontSize: 36 }}>💬</AppText>
-                <AppText variant="bodyMd" style={{ color: theme.colors.textSecondary || "#999", marginTop: 8, textAlign: "center" }}>
+                <AppText variant="bodyMd" style={{ color: theme?.colors?.textSecondary || "#999", marginTop: 8, textAlign: "center" }}>
                   {t("messaging.noMessages") || "No messages yet. Say hello!"}
                 </AppText>
               </View>
@@ -204,11 +204,11 @@ export default function ChatScreen({ route, navigation }) {
           />
 
           {/* Input bar */}
-          <View style={[styles.inputBar, { backgroundColor: theme.colors.surface || "#fff", borderTopColor: theme.colors.border || "#e8e8e8" }]}>
+          <View style={[styles.inputBar, { backgroundColor: theme?.colors?.surface || "#fff", borderTopColor: theme?.colors?.border || "#e8e8e8" }]}>
             <TextInput
-              style={[styles.input, { backgroundColor: theme.colors.background || "#f0f0f0", color: theme.colors.textPrimary || "#333" }]}
+              style={[styles.input, { backgroundColor: theme?.colors?.background || "#f0f0f0", color: theme?.colors?.textPrimary || "#333" }]}
               placeholder={t("messaging.placeholder") || "Type a message..."}
-              placeholderTextColor={theme.colors.textSecondary || "#aaa"}
+              placeholderTextColor={theme?.colors?.textSecondary || "#aaa"}
               value={text}
               onChangeText={setText}
               multiline
@@ -216,7 +216,7 @@ export default function ChatScreen({ route, navigation }) {
               returnKeyType="default"
             />
             <TouchableOpacity
-              style={[styles.sendBtn, { backgroundColor: theme.colors.primary || "#2e7d32" }, (!text.trim() || sending) && styles.sendBtnDisabled]}
+              style={[styles.sendBtn, { backgroundColor: theme?.colors?.primary || "#2e7d32" }, (!text.trim() || sending) && styles.sendBtnDisabled]}
               onPress={handleSend}
               disabled={!text.trim() || sending}
               activeOpacity={0.8}

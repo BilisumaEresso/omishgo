@@ -12,26 +12,26 @@ export default function PriceTrendWidget() {
         <View>
           <AppText
             variant="caption"
-            style={{ color: theme.colors.textSecondary }}
+            style={{ color: theme?.colors?.textSecondary }}
           >
             Teff Price Trend
           </AppText>
-          <AppText variant="headingLg" style={{ color: theme.colors.primary }}>
+          <AppText variant="headingLg" style={{ color: theme?.colors?.primary }}>
             3,450 ETB
           </AppText>
           <View
             style={[
               styles.badge,
-              { backgroundColor: theme.colors.success + "20" },
+              { backgroundColor: theme?.colors?.success + "20" },
             ]}
           >
-            <AppText variant="caption" style={{ color: theme.colors.success }}>
+            <AppText variant="caption" style={{ color: theme?.colors?.success }}>
               +4.2% up
             </AppText>
           </View>
           <AppText
             variant="caption"
-            style={{ color: theme.colors.textSecondary, marginTop: 8 }}
+            style={{ color: theme?.colors?.textSecondary, marginTop: 8 }}
           >
             Rising demand in central Ethiopia.
           </AppText>
@@ -40,31 +40,31 @@ export default function PriceTrendWidget() {
           <View
             style={[
               styles.bar,
-              { height: 32, backgroundColor: theme.colors.primary + "30" },
+              { height: 32, backgroundColor: theme?.colors?.primary + "30" },
             ]}
           />
           <View
             style={[
               styles.bar,
-              { height: 44, backgroundColor: theme.colors.primary + "40" },
+              { height: 44, backgroundColor: theme?.colors?.primary + "40" },
             ]}
           />
           <View
             style={[
               styles.bar,
-              { height: 56, backgroundColor: theme.colors.primary + "60" },
+              { height: 56, backgroundColor: theme?.colors?.primary + "60" },
             ]}
           />
           <View
             style={[
               styles.bar,
-              { height: 68, backgroundColor: theme.colors.primary + "80" },
+              { height: 68, backgroundColor: theme?.colors?.primary + "80" },
             ]}
           />
           <View
             style={[
               styles.bar,
-              { height: 80, backgroundColor: theme.colors.primary },
+              { height: 80, backgroundColor: theme?.colors?.primary },
             ]}
           />
         </View>

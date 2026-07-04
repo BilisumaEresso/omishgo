@@ -1,6 +1,6 @@
 // src/components/layout/AppHeader.js
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation as useRNNavigation } from "@react-navigation/native";
 import { useRef } from "react";
 import { Animated, Platform, Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -29,13 +29,16 @@ const AppHeader = ({
 }) => {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
+  let navigation = null;
+  try {
+    navigation = useRNNavigation();
+  } catch (_) {}
 
-  const primaryColor = theme.colors.primary || "#6B4EFF";
-  const textColor = theme.colors.textPrimary || "#212121";
-  const secondaryTextColor = theme.colors.textSecondary || "#757575";
-  const surfaceColor = theme.colors.surface || "#FFFFFF";
-  const borderColor = theme.colors.border || "#E0E0E0";
+  const primaryColor = theme?.colors?.primary || "#6B4EFF";
+  const textColor = theme?.colors?.textPrimary || "#212121";
+  const secondaryTextColor = theme?.colors?.textSecondary || "#757575";
+  const surfaceColor = theme?.colors?.surface || "#FFFFFF";
+  const borderColor = theme?.colors?.border || "#E0E0E0";
 
   // ---- Pro touch feedback (scale + opacity) ----
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -77,7 +80,7 @@ const AppHeader = ({
             style={[
               styles.badge,
               {
-                backgroundColor: theme.colors.notification || "#FF3B30",
+                backgroundColor: theme?.colors?.notification || "#FF3B30",
                 borderColor: surfaceColor,
               },
             ]}
@@ -117,12 +120,12 @@ const AppHeader = ({
         {showBack &&
           renderIconButton(
             "arrow-back",
-            onBackPress || (() => navigation.goBack()),
+            onBackPress || (() => navigation?.goBack()),
           )}
         {showMenu &&
           renderIconButton(
             "menu",
-            onMenuPress || (() => navigation.openDrawer?.()),
+            onMenuPress || (() => navigation?.openDrawer?.()),
           )}
 
         <View

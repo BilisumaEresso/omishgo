@@ -8,13 +8,13 @@ import { useTheme } from "../../hooks/useTheme";
 const getStatusColor = (status, theme) => {
   switch (status) {
     case "Pending":
-      return { bg: theme.colors.border, text: theme.colors.textSecondary };
+      return { bg: theme?.colors?.border, text: theme?.colors?.textSecondary };
     case "Processing":
-      return { bg: theme.colors.warning + "20", text: theme.colors.warning };
+      return { bg: theme?.colors?.warning + "20", text: theme?.colors?.warning };
     case "Delivered":
-      return { bg: theme.colors.success + "20", text: theme.colors.success };
+      return { bg: theme?.colors?.success + "20", text: theme?.colors?.success };
     default:
-      return { bg: theme.colors.border, text: theme.colors.textSecondary };
+      return { bg: theme?.colors?.border, text: theme?.colors?.textSecondary };
   }
 };
 
@@ -25,12 +25,12 @@ export default function RecentSupplierOrders({ orders }) {
       <View style={styles.header}>
         <AppText
           variant="headingSm"
-          style={{ color: theme.colors.textPrimary }}
+          style={{ color: theme?.colors?.textPrimary }}
         >
           Recent Orders
         </AppText>
         <TouchableOpacity>
-          <AppText variant="caption" style={{ color: theme.colors.primary }}>
+          <AppText variant="caption" style={{ color: theme?.colors?.primary }}>
             View All →
           </AppText>
         </TouchableOpacity>
@@ -46,13 +46,13 @@ export default function RecentSupplierOrders({ orders }) {
               <View
                 style={[
                   styles.iconCircle,
-                  { backgroundColor: theme.colors.primaryLight },
+                  { backgroundColor: theme?.colors?.primaryLight },
                 ]}
               >
                 <Ionicons
                   name={iconName}
                   size={20}
-                  color={theme.colors.primary}
+                  color={theme?.colors?.primary}
                 />
               </View>
               <View>
@@ -60,14 +60,14 @@ export default function RecentSupplierOrders({ orders }) {
                   variant="bodyMd"
                   style={{
                     fontWeight: "bold",
-                    color: theme.colors.textPrimary,
+                    color: theme?.colors?.textPrimary,
                   }}
                 >
                   {order.buyerName}
                 </AppText>
                 <AppText
                   variant="caption"
-                  style={{ color: theme.colors.textSecondary }}
+                  style={{ color: theme?.colors?.textSecondary }}
                 >
                   Ord #{order.id} • {order.price.toLocaleString()} ETB
                 </AppText>

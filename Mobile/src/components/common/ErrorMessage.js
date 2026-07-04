@@ -13,7 +13,7 @@ const ErrorMessage = ({ message, onRetry, inline = false, style }) => {
 
   // Variant A: Inline banner error
   if (inline) {
-    const errorColor = theme.colors.error || "#FF3B30";
+    const errorColor = theme?.colors?.error || "#FF3B30";
     return (
       <View
         style={[
@@ -33,7 +33,7 @@ const ErrorMessage = ({ message, onRetry, inline = false, style }) => {
         />
         <AppText
           variant="bodySm"
-          style={{ color: theme.colors.textPrimary || "#212121", flex: 1 }}
+          style={{ color: theme?.colors?.textPrimary || "#212121", flex: 1 }}
         >
           {message}
         </AppText>
@@ -42,7 +42,7 @@ const ErrorMessage = ({ message, onRetry, inline = false, style }) => {
   }
 
   // Variant B: Full-screen display wrapper
-  const errorColor = theme.colors.error || "#FF3B30";
+  const errorColor = theme?.colors?.error || "#FF3B30";
   return (
     <View style={[styles.fullscreenContainer, style]}>
       <View
@@ -53,7 +53,7 @@ const ErrorMessage = ({ message, onRetry, inline = false, style }) => {
 
       <AppText
         variant="headingSm"
-        style={[styles.title, { color: theme.colors.textPrimary || "#212121" }]}
+        style={[styles.title, { color: theme?.colors?.textPrimary || "#212121" }]}
       >
         An Error Occurred
       </AppText>
@@ -63,7 +63,7 @@ const ErrorMessage = ({ message, onRetry, inline = false, style }) => {
         align="center"
         style={[
           styles.message,
-          { color: theme.colors.textSecondary || "#757575" },
+          { color: theme?.colors?.textSecondary || "#757575" },
         ]}
       >
         {message}

@@ -11,7 +11,7 @@ export default function NearbyFarmersList({ farmers }) {
     <View style={styles.section}>
       <AppText
         variant="headingSm"
-        style={{ color: theme.colors.textPrimary, marginBottom: 12 }}
+        style={{ color: theme?.colors?.textPrimary, marginBottom: 12 }}
       >
         Nearby Farmers
       </AppText>
@@ -23,7 +23,7 @@ export default function NearbyFarmersList({ farmers }) {
               variant="bodyMd"
               style={{
                 fontWeight: "bold",
-                color: theme.colors.textPrimary,
+                color: theme?.colors?.textPrimary,
                 marginTop: 8,
               }}
             >
@@ -31,7 +31,7 @@ export default function NearbyFarmersList({ farmers }) {
             </AppText>
             <AppText
               variant="caption"
-              style={{ color: theme.colors.textSecondary }}
+              style={{ color: theme?.colors?.textSecondary }}
             >
               {farmer.distance}
             </AppText>
@@ -39,7 +39,7 @@ export default function NearbyFarmersList({ farmers }) {
               <Ionicons name="star" size={12} color="#FFB800" />
               <AppText
                 variant="caption"
-                style={{ color: theme.colors.textPrimary }}
+                style={{ color: theme?.colors?.textPrimary }}
               >
                 {farmer.rating}
               </AppText>

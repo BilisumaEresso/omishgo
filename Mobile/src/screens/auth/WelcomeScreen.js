@@ -24,7 +24,7 @@ export default function WelcomeScreen({ navigation }) {
         <View
           style={[
             styles.darkOverlay,
-            { backgroundColor: theme.colors.background + "B3" },
+            { backgroundColor: (theme?.colors?.background || "#F9FBF9") + "B3" },
           ]}
         />
 
@@ -34,7 +34,7 @@ export default function WelcomeScreen({ navigation }) {
             <View
               style={[
                 styles.logoCard,
-                { backgroundColor: theme.colors.surface },
+                { backgroundColor: theme?.colors?.surface },
               ]}
             >
               <Image
@@ -46,7 +46,7 @@ export default function WelcomeScreen({ navigation }) {
 
             <AppText
               variant="headingLg"
-              color={theme.colors.primary}
+              color={theme?.colors?.primary}
               style={styles.welcomeText}
             >
               Welcome to OmishGo
@@ -54,7 +54,7 @@ export default function WelcomeScreen({ navigation }) {
 
             <AppText
               variant="bodyLg"
-              color={theme.colors.textSecondary}
+              color={theme?.colors?.textSecondary}
               style={styles.tagline}
             >
               Your gateway to the Ethiopian agricultural marketplace.

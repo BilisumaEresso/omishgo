@@ -12,7 +12,7 @@ export default function FeaturedProductsList({ products, onOrder }) {
       <View style={styles.emptyContainer}>
         <AppText
           variant="bodyMd"
-          style={{ color: theme.colors.textSecondary, textAlign: "center" }}
+          style={{ color: theme?.colors?.textSecondary, textAlign: "center" }}
         >
           No products match your search.
         </AppText>
@@ -23,7 +23,7 @@ export default function FeaturedProductsList({ products, onOrder }) {
     <View style={styles.section}>
       <AppText
         variant="headingSm"
-        style={{ color: theme.colors.textPrimary, marginBottom: 12 }}
+        style={{ color: theme?.colors?.textPrimary, marginBottom: 12 }}
       >
         Featured Products
       </AppText>
@@ -38,7 +38,7 @@ export default function FeaturedProductsList({ products, onOrder }) {
               <View
                 style={[
                   styles.premiumBadge,
-                  { backgroundColor: theme.colors.primary },
+                  { backgroundColor: theme?.colors?.primary },
                 ]}
               >
                 <AppText variant="caption" style={{ color: "#FFF" }}>
@@ -50,7 +50,7 @@ export default function FeaturedProductsList({ products, onOrder }) {
               <Ionicons
                 name="heart-outline"
                 size={20}
-                color={theme.colors.error}
+                color={theme?.colors?.error}
               />
             </TouchableOpacity>
           </View>
@@ -58,7 +58,7 @@ export default function FeaturedProductsList({ products, onOrder }) {
             <View>
               <AppText
                 variant="bodyMd"
-                style={{ fontWeight: "bold", color: theme.colors.textPrimary }}
+                style={{ fontWeight: "bold", color: theme?.colors?.textPrimary }}
               >
                 {product.name}
               </AppText>
@@ -66,11 +66,11 @@ export default function FeaturedProductsList({ products, onOrder }) {
                 <Ionicons
                   name="location-outline"
                   size={12}
-                  color={theme.colors.primary}
+                  color={theme?.colors?.primary}
                 />
                 <AppText
                   variant="caption"
-                  style={{ color: theme.colors.textSecondary }}
+                  style={{ color: theme?.colors?.textSecondary }}
                 >
                   {product.location}
                 </AppText>
@@ -78,7 +78,7 @@ export default function FeaturedProductsList({ products, onOrder }) {
             </View>
             <AppText
               variant="headingSm"
-              style={{ color: theme.colors.primary }}
+              style={{ color: theme?.colors?.primary }}
             >
               {product.price.toLocaleString()} ETB
             </AppText>
@@ -91,7 +91,7 @@ export default function FeaturedProductsList({ products, onOrder }) {
               />
               <AppText
                 variant="caption"
-                style={{ color: theme.colors.textPrimary }}
+                style={{ color: theme?.colors?.textPrimary }}
               >
                 {product.farmerName}
               </AppText>
@@ -99,7 +99,7 @@ export default function FeaturedProductsList({ products, onOrder }) {
             <TouchableOpacity
               style={[
                 styles.orderButton,
-                { backgroundColor: theme.colors.primary },
+                { backgroundColor: theme?.colors?.primary },
               ]}
               onPress={() => onOrder(product)}
             >

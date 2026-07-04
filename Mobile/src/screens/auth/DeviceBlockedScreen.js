@@ -55,14 +55,14 @@ const DeviceBlockedScreen = ({ navigation, route }) => {
         <MaterialCommunityIcons
           name="phone-lock"
           size={80}
-          color={theme.colors.error}
+          color={theme?.colors?.error}
           style={{ marginBottom: theme.spacing.xl }}
         />
 
         {/* Title */}
         <AppText
           variant="headingMd"
-          color={theme.colors.textPrimary}
+          color={theme?.colors?.textPrimary}
           style={{
             textAlign: "center",
             marginBottom: theme.spacing.md,
@@ -75,7 +75,7 @@ const DeviceBlockedScreen = ({ navigation, route }) => {
         {/* Message */}
         <AppText
           variant="bodyMd"
-          color={theme.colors.textSecondary}
+          color={theme?.colors?.textSecondary}
           style={{
             textAlign: "center",
             marginBottom: theme.spacing.xl,
@@ -90,7 +90,7 @@ const DeviceBlockedScreen = ({ navigation, route }) => {
         {error && (
           <AppText
             variant="caption"
-            color={theme.colors.error}
+            color={theme?.colors?.error}
             style={{
               textAlign: "center",
               marginBottom: theme.spacing.md,

@@ -113,7 +113,7 @@ const OTPVerificationScreen = ({ navigation, route }) => {
         {/* Title */}
         <AppText
           variant="headingMd"
-          color={theme.colors.textPrimary}
+          color={theme?.colors?.textPrimary}
           style={{
             marginBottom: theme.spacing.md,
             fontWeight: "600",
@@ -125,7 +125,7 @@ const OTPVerificationScreen = ({ navigation, route }) => {
         {/* Message */}
         <AppText
           variant="bodyMd"
-          color={theme.colors.textSecondary}
+          color={theme?.colors?.textSecondary}
           style={{
             marginBottom: theme.spacing.xl,
             lineHeight: 22,
@@ -134,7 +134,7 @@ const OTPVerificationScreen = ({ navigation, route }) => {
           We've sent a 6-digit code to{" "}
           <AppText
             variant="bodyMd"
-            style={{ fontWeight: "600", color: theme.colors.textPrimary }}
+            style={{ fontWeight: "600", color: theme?.colors?.textPrimary }}
           >
             {phone}
           </AppText>
@@ -145,7 +145,7 @@ const OTPVerificationScreen = ({ navigation, route }) => {
         {error && (
           <AppText
             variant="caption"
-            color={theme.colors.error}
+            color={theme?.colors?.error}
             style={{
               marginBottom: theme.spacing.md,
             }}
@@ -180,13 +180,13 @@ const OTPVerificationScreen = ({ navigation, route }) => {
             alignItems: "center",
           }}
         >
-          <AppText variant="caption" color={theme.colors.textSecondary}>
+          <AppText variant="caption" color={theme?.colors?.textSecondary}>
             Didn't receive the code?
           </AppText>
           {resendTimer > 0 ? (
             <AppText
               variant="caption"
-              color={theme.colors.textSecondary}
+              color={theme?.colors?.textSecondary}
               style={{ marginTop: theme.spacing.xs }}
             >
               Resend in {resendTimer}s

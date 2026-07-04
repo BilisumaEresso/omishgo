@@ -46,13 +46,13 @@ export default function AddProductModal({ visible, onClose, onSubmit }) {
     onClose();
   };
 
-  const primaryColor = theme.colors.primary || "#4CAF50";
-  const surfaceColor = theme.colors.surface || "#FFFFFF";
-  const borderColor = theme.colors.border || "#E0E0E0";
-  const textPrimary = theme.colors.textPrimary || "#212121";
-  const textSecondary = theme.colors.textSecondary || "#757575";
-  const errorColor = theme.colors.error || "#F44336";
-  const inputBg = theme.colors.inputBackground || "#FFFFFF";
+  const primaryColor = theme?.colors?.primary || "#4CAF50";
+  const surfaceColor = theme?.colors?.surface || "#FFFFFF";
+  const borderColor = theme?.colors?.border || "#E0E0E0";
+  const textPrimary = theme?.colors?.textPrimary || "#212121";
+  const textSecondary = theme?.colors?.textSecondary || "#757575";
+  const errorColor = theme?.colors?.error || "#F44336";
+  const inputBg = theme?.colors?.inputBackground || "#FFFFFF";
   const spacing = theme.spacing || { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 };
   const radius = theme.radius || { sm: 8, md: 12, lg: 16 };
 

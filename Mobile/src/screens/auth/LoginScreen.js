@@ -26,11 +26,11 @@ export default function LoginScreen({ navigation }) {
   const [errors, setErrors] = useState({});
   const [loginError, setLoginError] = useState("");
 
-  const primary = theme.colors.primary || "#4CAF50";
-  const textPrimary = theme.colors.textPrimary || "#212121";
-  const textSecondary = theme.colors.textSecondary || "#757575";
-  const backgroundColor = theme.colors.background || "#FFFFFF";
-  const errorColor = theme.colors.error || "#F44336";
+  const primary = theme?.colors?.primary || "#4CAF50";
+  const textPrimary = theme?.colors?.textPrimary || "#212121";
+  const textSecondary = theme?.colors?.textSecondary || "#757575";
+  const backgroundColor = theme?.colors?.background || "#FFFFFF";
+  const errorColor = theme?.colors?.error || "#F44336";
 
   // Clear field error when user types
   const handlePhoneChange = (text) => {

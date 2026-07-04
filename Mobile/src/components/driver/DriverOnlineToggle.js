@@ -13,12 +13,12 @@ export default function DriverOnlineToggle({ isOnline, onToggle }) {
           <Ionicons
             name="person-circle-outline"
             size={32}
-            color={theme.colors.primary}
+            color={theme?.colors?.primary}
           />
         </View>
         <AppText
           variant="headingLg"
-          style={{ color: theme.colors.textPrimary }}
+          style={{ color: theme?.colors?.textPrimary }}
         >
           OmishGo
         </AppText>
@@ -28,21 +28,21 @@ export default function DriverOnlineToggle({ isOnline, onToggle }) {
           value={isOnline}
           onValueChange={onToggle}
           trackColor={{
-            false: theme.colors.border,
-            true: theme.colors.primary,
+            false: theme?.colors?.border,
+            true: theme?.colors?.primary,
           }}
           thumbColor="#FFF"
         />
         <AppText
           variant="bodyMd"
-          style={{ color: theme.colors.textSecondary, marginLeft: 8 }}
+          style={{ color: theme?.colors?.textSecondary, marginLeft: 8 }}
         >
           {isOnline ? "Online" : "Offline"}
         </AppText>
       </View>
       <AppText
         variant="bodySm"
-        style={{ color: theme.colors.textSecondary, marginTop: 8 }}
+        style={{ color: theme?.colors?.textSecondary, marginTop: 8 }}
       >
         {isOnline
           ? "You're dispatch-ready. Ready for today's deliveries?"

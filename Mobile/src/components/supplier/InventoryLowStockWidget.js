@@ -14,28 +14,28 @@ export default function InventoryLowStockWidget({ alerts }) {
         style={[
           styles.halfCard,
           {
-            backgroundColor: theme.colors.surface,
-            borderColor: theme.colors.border,
+            backgroundColor: theme?.colors?.surface,
+            borderColor: theme?.colors?.border,
           },
         ]}
       >
         <View style={styles.cardHeader}>
           <AppText
             variant="bodyMd"
-            style={{ fontWeight: "bold", color: theme.colors.textPrimary }}
+            style={{ fontWeight: "bold", color: theme?.colors?.textPrimary }}
           >
             Inventory
           </AppText>
           <View
             style={[
               styles.iconBg,
-              { backgroundColor: theme.colors.primaryLight },
+              { backgroundColor: theme?.colors?.primaryLight },
             ]}
           >
             <Ionicons
               name="cube-outline"
               size={18}
-              color={theme.colors.primary}
+              color={theme?.colors?.primary}
             />
           </View>
         </View>
@@ -43,13 +43,13 @@ export default function InventoryLowStockWidget({ alerts }) {
           <View>
             <AppText
               variant="headingLg"
-              style={{ color: theme.colors.textPrimary }}
+              style={{ color: theme?.colors?.textPrimary }}
             >
               124
             </AppText>
             <AppText
               variant="caption"
-              style={{ color: theme.colors.textSecondary }}
+              style={{ color: theme?.colors?.textSecondary }}
             >
               Total Items
             </AppText>
@@ -57,13 +57,13 @@ export default function InventoryLowStockWidget({ alerts }) {
           <View>
             <AppText
               variant="headingLg"
-              style={{ color: theme.colors.primary }}
+              style={{ color: theme?.colors?.primary }}
             >
               89
             </AppText>
             <AppText
               variant="caption"
-              style={{ color: theme.colors.textSecondary }}
+              style={{ color: theme?.colors?.textSecondary }}
             >
               Active
             </AppText>
@@ -76,8 +76,8 @@ export default function InventoryLowStockWidget({ alerts }) {
         style={[
           styles.halfCard,
           {
-            backgroundColor: theme.colors.surface,
-            borderColor: theme.colors.error + "40",
+            backgroundColor: theme?.colors?.surface,
+            borderColor: theme?.colors?.error + "40",
             borderWidth: 1,
           },
         ]}
@@ -85,20 +85,20 @@ export default function InventoryLowStockWidget({ alerts }) {
         <View style={styles.cardHeader}>
           <AppText
             variant="bodyMd"
-            style={{ fontWeight: "bold", color: theme.colors.error }}
+            style={{ fontWeight: "bold", color: theme?.colors?.error }}
           >
             Low Stock
           </AppText>
           <View
             style={[
               styles.iconBg,
-              { backgroundColor: theme.colors.error + "10" },
+              { backgroundColor: theme?.colors?.error + "10" },
             ]}
           >
             <Ionicons
               name="alert-circle-outline"
               size={18}
-              color={theme.colors.error}
+              color={theme?.colors?.error}
             />
           </View>
         </View>
@@ -106,7 +106,7 @@ export default function InventoryLowStockWidget({ alerts }) {
           <View key={alert.id} style={styles.alertRow}>
             <AppText
               variant="caption"
-              style={{ flex: 1, color: theme.colors.textPrimary }}
+              style={{ flex: 1, color: theme?.colors?.textPrimary }}
             >
               {alert.item}
             </AppText>
@@ -116,8 +116,8 @@ export default function InventoryLowStockWidget({ alerts }) {
                 {
                   backgroundColor:
                     alert.status === "critical"
-                      ? theme.colors.error + "20"
-                      : theme.colors.warning + "20",
+                      ? theme?.colors?.error + "20"
+                      : theme?.colors?.warning + "20",
                 },
               ]}
             >
@@ -126,8 +126,8 @@ export default function InventoryLowStockWidget({ alerts }) {
                 style={{
                   color:
                     alert.status === "critical"
-                      ? theme.colors.error
-                      : theme.colors.warning,
+                      ? theme?.colors?.error
+                      : theme?.colors?.warning,
                   fontWeight: "bold",
                 }}
               >

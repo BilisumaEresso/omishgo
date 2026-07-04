@@ -27,12 +27,12 @@ export default function CategoryFilters({ categories, selected, onSelect }) {
           style={[
             styles.categoryItem,
             {
-              backgroundColor: theme.colors.surface,
-              borderColor: theme.colors.border,
+              backgroundColor: theme?.colors?.surface,
+              borderColor: theme?.colors?.border,
             },
             selected === cat && {
-              backgroundColor: theme.colors.primaryLight,
-              borderColor: theme.colors.primary,
+              backgroundColor: theme?.colors?.primaryLight,
+              borderColor: theme?.colors?.primary,
             },
           ]}
         >
@@ -41,8 +41,8 @@ export default function CategoryFilters({ categories, selected, onSelect }) {
             size={24}
             color={
               selected === cat
-                ? theme.colors.primary
-                : theme.colors.textSecondary
+                ? theme?.colors?.primary
+                : theme?.colors?.textSecondary
             }
           />
           <AppText
@@ -50,8 +50,8 @@ export default function CategoryFilters({ categories, selected, onSelect }) {
             style={{
               color:
                 selected === cat
-                  ? theme.colors.primary
-                  : theme.colors.textSecondary,
+                  ? theme?.colors?.primary
+                  : theme?.colors?.textSecondary,
               marginTop: 4,
             }}
           >

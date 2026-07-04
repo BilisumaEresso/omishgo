@@ -11,7 +11,7 @@ export default function SupplierQuickActions({ onAddSale }) {
       <TouchableOpacity
         style={[
           styles.buttonPrimary,
-          { backgroundColor: theme.colors.secondary || "#FF9800" },
+          { backgroundColor: theme?.colors?.secondary || "#FF9800" },
         ]}
         onPress={onAddSale}
       >
@@ -27,19 +27,19 @@ export default function SupplierQuickActions({ onAddSale }) {
         style={[
           styles.buttonSecondary,
           {
-            backgroundColor: theme.colors.surface,
-            borderColor: theme.colors.border,
+            backgroundColor: theme?.colors?.surface,
+            borderColor: theme?.colors?.border,
           },
         ]}
       >
         <Ionicons
           name="layers-outline"
           size={18}
-          color={theme.colors.primary}
+          color={theme?.colors?.primary}
         />
         <AppText
           variant="caption"
-          style={{ color: theme.colors.textPrimary, marginLeft: 6 }}
+          style={{ color: theme?.colors?.textPrimary, marginLeft: 6 }}
         >
           View Stock
         </AppText>
@@ -48,19 +48,19 @@ export default function SupplierQuickActions({ onAddSale }) {
         style={[
           styles.buttonSecondary,
           {
-            backgroundColor: theme.colors.surface,
-            borderColor: theme.colors.border,
+            backgroundColor: theme?.colors?.surface,
+            borderColor: theme?.colors?.border,
           },
         ]}
       >
         <Ionicons
           name="document-text-outline"
           size={18}
-          color={theme.colors.primary}
+          color={theme?.colors?.primary}
         />
         <AppText
           variant="caption"
-          style={{ color: theme.colors.textPrimary, marginLeft: 6 }}
+          style={{ color: theme?.colors?.textPrimary, marginLeft: 6 }}
         >
           Orders
         </AppText>

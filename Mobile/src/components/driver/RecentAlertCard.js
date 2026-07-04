@@ -11,7 +11,7 @@ export default function RecentAlertCard() {
     <View style={styles.section}>
       <AppText
         variant="headingSm"
-        style={{ color: theme.colors.textPrimary, marginBottom: 12 }}
+        style={{ color: theme?.colors?.textPrimary, marginBottom: 12 }}
       >
         Recent Updates
       </AppText>
@@ -23,7 +23,7 @@ export default function RecentAlertCard() {
       >
         <View style={styles.alertRow}>
           <View
-            style={[styles.alertIcon, { backgroundColor: theme.colors.error }]}
+            style={[styles.alertIcon, { backgroundColor: theme?.colors?.error }]}
           >
             <Ionicons name="alert-circle-outline" size={18} color="#FFF" />
           </View>

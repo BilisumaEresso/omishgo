@@ -11,11 +11,11 @@ export default function QuickActionsGrid({
   onTrainingPress,
 }) {
   const { theme } = useTheme();
-  const primaryColor = theme.colors.primary;
-  const surfaceColor = theme.colors.surface;
-  const borderColor = theme.colors.border;
-  const textPrimary = theme.colors.textPrimary;
-  const textSecondary = theme.colors.textSecondary;
+  const primaryColor = theme?.colors?.primary;
+  const surfaceColor = theme?.colors?.surface;
+  const borderColor = theme?.colors?.border;
+  const textPrimary = theme?.colors?.textPrimary;
+  const textSecondary = theme?.colors?.textSecondary;
 
   return (
     <View style={styles.grid}>

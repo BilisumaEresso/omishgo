@@ -22,14 +22,14 @@ const AppButton = ({
     switch (variant) {
       case "secondary":
         variantStyle = {
-          backgroundColor: theme.colors.secondary || "#FFA500",
+          backgroundColor: theme?.colors?.secondary || "#FFA500",
         };
         break;
       case "outline":
         variantStyle = {
           backgroundColor: "transparent",
           borderWidth: 1,
-          borderColor: theme.colors.primary || "#6B4EFF",
+          borderColor: theme?.colors?.primary || "#6B4EFF",
         };
         break;
       case "ghost":
@@ -39,12 +39,12 @@ const AppButton = ({
         break;
       case "danger":
         variantStyle = {
-          backgroundColor: theme.colors.error || "#FF3B30",
+          backgroundColor: theme?.colors?.error || "#FF3B30",
         };
         break;
       default:
         variantStyle = {
-          backgroundColor: theme.colors.primary || "#6B4EFF",
+          backgroundColor: theme?.colors?.primary || "#6B4EFF",
         };
     }
 
@@ -62,18 +62,18 @@ const AppButton = ({
 
   const getTextColor = () => {
     if (disabled) {
-      return theme.colors.textSecondary || "#666666";
+      return theme?.colors?.textSecondary || "#666666";
     }
 
     switch (variant) {
       case "outline":
       case "ghost":
-        return theme.colors.primary || "#6B4EFF";
+        return theme?.colors?.primary || "#6B4EFF";
       case "secondary":
       case "danger":
       default:
         // Use inverse text (white) for solid colored backgrounds
-        return theme.colors.textInverse || "#FFFFFF";
+        return theme?.colors?.textInverse || "#FFFFFF";
     }
   };
 

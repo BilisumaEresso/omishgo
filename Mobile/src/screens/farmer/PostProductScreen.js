@@ -28,9 +28,9 @@ export default function PostProductScreen({ navigation }) {
   const [zone, setZone] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const primary = theme.colors.primary || "#4CAF50";
-  const textPrimary = theme.colors.textPrimary || "#212121";
-  const bg = theme.colors.background || "#F8F9FA";
+  const primary = theme?.colors?.primary || "#4CAF50";
+  const textPrimary = theme?.colors?.textPrimary || "#212121";
+  const bg = theme?.colors?.background || "#F8F9FA";
 
   const handleSubmit = async () => {
     if (!cropType.trim()) {

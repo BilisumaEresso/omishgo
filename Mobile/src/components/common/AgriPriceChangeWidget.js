@@ -11,8 +11,8 @@ export default function AgriPriceChangeWidget({
   changeLabel = "Today's Change",
 }) {
   const { theme } = useTheme();
-  const textPrimary = theme.colors.textPrimary;
-  const textSecondary = theme.colors.textSecondary;
+  const textPrimary = theme?.colors?.textPrimary;
+  const textSecondary = theme?.colors?.textSecondary;
 
   const isPositive = changePercent > 0;
   const changeColor = isPositive ? "#4CAF50" : "#F44336";

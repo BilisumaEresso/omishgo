@@ -6,6 +6,7 @@ const driverTheme = {
   role: "driver",
 
   colors: {
+    ...baseTheme.colors,
     primary: "#7B61FF",
     primaryDark: "#5E35B1",
     primaryLight: "#B39DFF",

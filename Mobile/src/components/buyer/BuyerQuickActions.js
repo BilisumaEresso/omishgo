@@ -15,27 +15,27 @@ export default function BuyerQuickActions({
         style={[
           styles.searchBox,
           {
-            backgroundColor: theme.colors.surface,
-            borderColor: theme.colors.border,
+            backgroundColor: theme?.colors?.surface,
+            borderColor: theme?.colors?.border,
           },
         ]}
       >
         <Ionicons
           name="search-outline"
           size={20}
-          color={theme.colors.textSecondary}
+          color={theme?.colors?.textSecondary}
           style={styles.searchIcon}
         />
         <TextInput
           placeholder="Search tomato, teff, or onions..."
-          placeholderTextColor={theme.colors.textSecondary}
+          placeholderTextColor={theme?.colors?.textSecondary}
           value={searchQuery}
           onChangeText={onSearchChange}
-          style={[styles.searchInput, { color: theme.colors.textPrimary }]}
+          style={[styles.searchInput, { color: theme?.colors?.textPrimary }]}
         />
       </View>
       <TouchableOpacity
-        style={[styles.filterButton, { backgroundColor: theme.colors.primary }]}
+        style={[styles.filterButton, { backgroundColor: theme?.colors?.primary }]}
         onPress={onFilterPress}
       >
         <Ionicons name="options-outline" size={20} color="#FFF" />

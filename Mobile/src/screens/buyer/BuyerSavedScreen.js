@@ -1,6 +1,5 @@
 // Mobile/src/screens/buyer/BuyerSavedScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
   FlatList,
@@ -53,18 +52,17 @@ const MOCK_SAVED = [
   },
 ];
 
-const BuyerSavedScreen = () => {
+const BuyerSavedScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
-  const navigation = useNavigation();
   const [savedProducts, setSavedProducts] = useState(MOCK_SAVED);
 
-  const primary = theme.colors.primary || "#1565C0";
-  const textPrimary = theme.colors.textPrimary || "#0D1B2A";
-  const textSecondary = theme.colors.textSecondary || "#4A6080";
-  const textMuted = theme.colors.textMuted || "#8FA3BE";
-  const background = theme.colors.background || "#F5F8FF";
-  const surface = theme.colors.surface || "#FFFFFF";
-  const border = theme.colors.border || "#D0DEF5";
+  const primary = theme?.colors?.primary || "#1565C0";
+  const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
+  const textSecondary = theme?.colors?.textSecondary || "#4A6080";
+  const textMuted = theme?.colors?.textMuted || "#8FA3BE";
+  const background = theme?.colors?.background || "#F5F8FF";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const border = theme?.colors?.border || "#D0DEF5";
 
   const removeSaved = (id) => {
     setSavedProducts((prev) => prev.filter((item) => item.id !== id));
@@ -157,7 +155,13 @@ const BuyerSavedScreen = () => {
         ]}
       >
         <TouchableOpacity
-          onPress={() => navigation?.goBack()}
+          onPress={() => {
+            if (navigation?.canGoBack()) {
+              navigation.goBack();
+            } else if (onSwitchTab) {
+              onSwitchTab("Home");
+            }
+          }}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={styles.backButton}
         >
@@ -166,7 +170,7 @@ const BuyerSavedScreen = () => {
         <AppText style={[styles.headerTitle, { color: textPrimary }]}>
           Saved Listings
         </AppText>
-        <View style={styles.backButton} /> {/* spacer */}
+        <View style={styles.backButton} />
       </View>
 
       <FlatList

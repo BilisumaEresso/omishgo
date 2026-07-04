@@ -45,7 +45,7 @@ export default function SuccessScreen({ navigation, route }) {
         style={[
           styles.container,
           {
-            backgroundColor: theme.colors.background,
+            backgroundColor: theme?.colors?.background || "#F9FBF9",
           },
         ]}
       >
@@ -55,7 +55,7 @@ export default function SuccessScreen({ navigation, route }) {
             styles.ambientBlob,
             styles.blobTopRight,
             {
-              backgroundColor: theme.colors.primary,
+              backgroundColor: theme?.colors?.primary,
             },
           ]}
         />
@@ -65,7 +65,7 @@ export default function SuccessScreen({ navigation, route }) {
             styles.ambientBlob,
             styles.blobBottomLeft,
             {
-              backgroundColor: theme.colors.secondary || "#C9A74D",
+              backgroundColor: theme?.colors?.secondary || "#C9A74D",
             },
           ]}
         />
@@ -75,8 +75,8 @@ export default function SuccessScreen({ navigation, route }) {
             style={[
               styles.bentoCard,
               {
-                backgroundColor: theme.colors.surface,
-                borderColor: theme.colors.border,
+                backgroundColor: theme?.colors?.surface,
+                borderColor: theme?.colors?.border,
               },
             ]}
           >
@@ -90,7 +90,7 @@ export default function SuccessScreen({ navigation, route }) {
           <View style={styles.textDetails}>
             <AppText
               variant="headingLg"
-              color={theme.colors.primary}
+              color={theme?.colors?.primary}
               style={styles.headline}
             >
               Growth Achieved!
@@ -98,7 +98,7 @@ export default function SuccessScreen({ navigation, route }) {
 
             <AppText
               variant="bodyMd"
-              color={theme.colors.textSecondary}
+              color={theme?.colors?.textSecondary}
               style={styles.subtext}
             >
               Your account is ready. Let's start growing together.

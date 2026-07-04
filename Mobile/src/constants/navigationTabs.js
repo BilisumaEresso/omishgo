@@ -1,35 +1,18 @@
-// src/constants/navigationTabs.js
 import { ROLES } from "./roles";
 
 export const ROLE_TABS = {
-
   [ROLES.FARMER]: [
-    { label: "Home",   icon: "home",     route: "FarmerHome" },
-    { label: "Orders", icon: "cart",     route: "FarmerOrders" },
-    { label: "Products", icon: "leaf",   route: "FarmerProducts" },
-    { label: "Insights", icon: "bar-chart", route: "FarmerAnalytics" },
-    { label: "Profile", icon: "person",  route: "FarmerProfile" },
+    { label: "Orders",   icon: "receipt-outline",    activeIcon: "receipt",     route: "FarmerOrders" },
+    { label: "Products", icon: "leaf-outline",       activeIcon: "leaf",        route: "FarmerProducts" },
+    { label: "Home",     icon: "home-outline",       activeIcon: "home",        route: "FarmerHome" },
+    { label: "Insights", icon: "stats-chart-outline",activeIcon: "stats-chart", route: "FarmerAnalytics" },
+    { label: "Profile",  icon: "person-outline",     activeIcon: "person",      route: "FarmerProfile" },
   ],
   [ROLES.BUYER]: [
-    { label: "Home",      icon: "home",       route: "BuyerHome" },
-    { label: "Marketplace", icon: "storefront", route: "BuyerMarketplace" },
-    { label: "Orders",    icon: "cart",       route: "BuyerOrders" },
-    { label: "Saved",     icon: "bookmark",   route: "BuyerSaved" },
-    { label: "Profile",   icon: "person",     route: "BuyerProfile" },
+    { label: "Orders",      icon: "receipt-outline",    activeIcon: "receipt",    route: "BuyerOrders" },
+    { label: "Marketplace", icon: "storefront-outline", activeIcon: "storefront", route: "BuyerMarketplace" },
+    { label: "Home",        icon: "home-outline",       activeIcon: "home",       route: "BuyerHome" },
+    { label: "Saved",       icon: "bookmark-outline",   activeIcon: "bookmark",   route: "BuyerSaved" },
+    { label: "Profile",     icon: "person-outline",     activeIcon: "person",     route: "BuyerProfile" },
   ],
-
-  // [ROLES.SUPPLIER]: [
-  //   { label: "Home", icon: "home", route: "SupplierHome" },
-  //   { label: "Inventory", icon: "cube", route: "SupplierInventory" },
-  //   { label: "Orders", icon: "cart", route: "SupplierOrders" },
-  //   { label: "Reports", icon: "document-text", route: "SupplierReports" },
-  //   { label: "Profile", icon: "person", route: "SupplierProfile" },
-  // ],
-  // [ROLES.DRIVER]: [
-  //   { label: "Home", icon: "home", route: "DriverHome" },
-  //   { label: "Deliveries", icon: "bicycle", route: "DriverDeliveries" },
-  //   { label: "Routes", icon: "map", route: "DriverRoutes" },
-  //   { label: "History", icon: "time", route: "DriverHistory" },
-  //   { label: "Profile", icon: "person", route: "DriverProfile" },
-  // ],
 };

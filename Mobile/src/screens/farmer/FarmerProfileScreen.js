@@ -1,6 +1,5 @@
 // Mobile/src/screens/farmer/FarmerProfileScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import {
   Alert,
@@ -15,21 +14,20 @@ import AppText from "../../components/common/AppText";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
-const FarmerProfileScreen = () => {
+const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
-  const navigation = useNavigation();
   const { user, logout } = useAuthStore();
 
-  const primary = theme.colors.primary || "#2E7D32";
-  const primaryContainer = theme.colors.primaryContainer || "#E8F5E9";
-  const textPrimary = theme.colors.textPrimary || "#1A2E1A";
-  const textSecondary = theme.colors.textSecondary || "#4A6741";
-  const textMuted = theme.colors.textMuted || "#8FAF8A";
-  const background = theme.colors.background || "#F9FBF9";
-  const surface = theme.colors.surface || "#FFFFFF";
-  const border = theme.colors.border || "#D0E8CE";
-  const errorColor = theme.colors.error || "#C62828";
-  const successColor = theme.colors.success || "#2E7D32";
+  const primary = theme?.colors?.primary || "#2E7D32";
+  const primaryContainer = theme?.colors?.primaryContainer || "#E8F5E9";
+  const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
+  const textSecondary = theme?.colors?.textSecondary || "#4A6741";
+  const textMuted = theme?.colors?.textMuted || "#8FAF8A";
+  const background = theme?.colors?.background || "#F9FBF9";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const border = theme?.colors?.border || "#D0E8CE";
+  const errorColor = theme?.colors?.error || "#C62828";
+  const successColor = theme?.colors?.success || "#2E7D32";
 
   // Helper to map language code to readable name
   const getLanguageName = (code) => {
@@ -75,7 +73,13 @@ const FarmerProfileScreen = () => {
         ]}
       >
         <TouchableOpacity
-          onPress={() => navigation?.goBack()}
+          onPress={() => {
+            if (navigation?.canGoBack()) {
+              navigation.goBack();
+            } else if (onSwitchTab) {
+              onSwitchTab("Home");
+            }
+          }}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={styles.backButton}
         >
@@ -84,7 +88,7 @@ const FarmerProfileScreen = () => {
         <AppText style={[styles.headerTitle, { color: textPrimary }]}>
           My Profile
         </AppText>
-        <View style={styles.backButton} /> {/* spacer */}
+        <View style={styles.backButton} />
       </View>
 
       <ScrollView
@@ -357,7 +361,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: Platform.OS === "ios" ? 20 : 16,
     paddingTop: 10,
-    backgroundColor: background,
+    backgroundColor: "#F9FBF9",
   },
   logoutButton: {
     flexDirection: "row",

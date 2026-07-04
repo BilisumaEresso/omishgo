@@ -16,10 +16,10 @@ const AuthLayout = ({ title, subtitle, children }) => {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
 
-  const primaryColor = theme.colors.primary || "#4CAF50";
-  const textPrimary = theme.colors.textPrimary || "#212121";
-  const textSecondary = theme.colors.textSecondary || "#757575";
-  const backgroundColor = theme.colors.background || "#F8F9FA";
+  const primaryColor = theme?.colors?.primary || "#4CAF50";
+  const textPrimary = theme?.colors?.textPrimary || "#212121";
+  const textSecondary = theme?.colors?.textSecondary || "#757575";
+  const backgroundColor = theme?.colors?.background || "#F8F9FA";
 
   return (
     <KeyboardAvoidingView

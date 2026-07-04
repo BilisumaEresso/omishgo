@@ -14,25 +14,25 @@ export default function BuyerWeatherWidget() {
           <View
             style={[
               styles.iconCircle,
-              { backgroundColor: theme.colors.primaryLight },
+              { backgroundColor: theme?.colors?.primaryLight },
             ]}
           >
             <Ionicons
               name="partly-sunny"
               size={28}
-              color={theme.colors.primary}
+              color={theme?.colors?.primary}
             />
           </View>
           <View style={{ marginLeft: 12 }}>
             <AppText
               variant="caption"
-              style={{ color: theme.colors.textSecondary }}
+              style={{ color: theme?.colors?.textSecondary }}
             >
               Addis Ababa
             </AppText>
             <AppText
               variant="headingMd"
-              style={{ color: theme.colors.textPrimary }}
+              style={{ color: theme?.colors?.textPrimary }}
             >
               22°C
             </AppText>
@@ -42,13 +42,13 @@ export default function BuyerWeatherWidget() {
         <View>
           <AppText
             variant="caption"
-            style={{ color: theme.colors.textSecondary }}
+            style={{ color: theme?.colors?.textSecondary }}
           >
             Market Day
           </AppText>
           <AppText
             variant="headingSm"
-            style={{ color: theme.colors.textPrimary }}
+            style={{ color: theme?.colors?.textPrimary }}
           >
             Tuesday
           </AppText>
