@@ -1,11 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import {
-  View,
-  Pressable,
-  StyleSheet,
-  Animated,
-  Platform,
-} from "react-native";
+import { View, Pressable, StyleSheet, Animated, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AppText from "../common/AppText";
@@ -14,85 +8,82 @@ import { ROLE_TABS } from "../../constants/navigationTabs";
 import { ROLES } from "../../constants/roles";
 import * as NavigationBar from "expo-navigation-bar";
 
-const BAR_BG       = "#1A1C2E";   // dark navy — consistent across both roles
-const INACTIVE_CLR = "#6B7280";   // neutral grey — readable on dark
-const ACTIVE_CLR   = "#FFFFFF";   // active non-home tabs are WHITE on dark bg
-const HOME_SIZE    = 58;          // home circle diameter
-const HOME_LIFT    = 24;          // how many px the home circle rises above bar top
-const BAR_HEIGHT   = 68;          // taller than before — easier touch targets
+const BAR_BG = "#1A1C2E";
+const INACTIVE = "#6B7280";
+const HOME_SZ = 58;
+const HOME_LIFT = 22;
+const BAR_H = 66;
 
-// ── Icon pairs [outline, filled] for each tab label ──────────────────────
 const ICON_PAIR = {
-  Home:        ["home-outline",        "home"],
-  Orders:      ["receipt-outline",     "receipt"],
-  Products:    ["leaf-outline",        "leaf"],
-  Insights:    ["stats-chart-outline", "stats-chart"],
-  Profile:     ["person-outline",      "person"],
-  Marketplace: ["storefront-outline",  "storefront"],
-  Saved:       ["bookmark-outline",    "bookmark"],
-  _fallback:   ["apps-outline",        "apps"],
+  Home: ["home-outline", "home"],
+  Orders: ["receipt-outline", "receipt"],
+  Products: ["leaf-outline", "leaf"],
+  Insights: ["stats-chart-outline", "stats-chart"],
+  Profile: ["person-outline", "person"],
+  Marketplace: ["storefront-outline", "storefront"],
+  Saved: ["bookmark-outline", "bookmark"],
+  _default: ["apps-outline", "apps"],
 };
 
-// ── Short readable labels — farmer-friendly, all caps ────────────────────
-const LABEL = {
-  Home:        "HOME",
-  Orders:      "ORDERS",
-  Products:    "SELL",
-  Insights:    "MARKET",
-  Profile:     "PROFILE",
+const SHORT = {
+  Home: "HOME",
+  Orders: "ORDERS",
+  Products: "SELL",
+  Insights: "MARKET",
+  Profile: "PROFILE",
   Marketplace: "BROWSE",
-  Saved:       "SAVED",
+  Saved: "SAVED",
 };
 
 export default function BottomTabBar({ role, activeTab, onTabPress }) {
-  const { theme }   = useTheme();
-  const insets      = useSafeAreaInsets();
-  const tabs        = ROLE_TABS[role] || ROLE_TABS[ROLES.FARMER];
+  const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  const tabs = ROLE_TABS[role] || ROLE_TABS[ROLES.FARMER];
 
-  // Pull only the role-specific colors — rest of bar is hardcoded dark
-  const primary      = theme?.colors?.primary      || "#2E7D32";
+  const primary = theme?.colors?.primary || "#2E7D32";
   const primaryLight = theme?.colors?.primaryLight || "#66BB6A";
-  const primaryDark  = theme?.colors?.primaryDark  || "#1B5E20";
+  const primaryDark = theme?.colors?.primaryDark || "#1B5E20";
+  // Screen background color — used as the border around the Home circle so it
+  // looks like it's punching through the bar
+  const screenBg = theme?.colors?.background || "#F9FBF9";
 
-  // Per-tab scale springs
   const scales = useRef(tabs.map(() => new Animated.Value(1))).current;
   const spring = (i, to) =>
     Animated.spring(scales[i], {
       toValue: to,
       useNativeDriver: true,
-      speed: 160,
-      bounciness: 6,
+      speed: 180,
+      bounciness: 5,
     }).start();
 
   useEffect(() => {
     if (Platform.OS === "android") {
-      NavigationBar.setVisibilityAsync("hidden");
+      NavigationBar.setVisibilityAsync("hidden").catch(() => {});
       if (typeof NavigationBar.setBehaviorAsync === "function") {
-        NavigationBar.setBehaviorAsync("overlay-swipe");
+        NavigationBar.setBehaviorAsync("overlay-swipe").catch(() => {});
       }
     }
   }, []);
 
-  // Home is always at index 2 (center). Left = [0,1], Right = [3,4]
-  const homeIndex = 2;
-  const homeTab   = tabs[homeIndex];
-  const leftTabs  = tabs.slice(0, homeIndex);
-  const rightTabs = tabs.slice(homeIndex + 1);
+  const HOME_IDX = 2;
+  const homeTab = tabs[HOME_IDX];
+  const leftTabs = tabs.slice(0, HOME_IDX);
+  const rightTabs = tabs.slice(HOME_IDX + 1);
   const homeActive = activeTab === homeTab?.label;
 
-  // ── Render a regular (non-home) side tab ─────────────────────────────
-  const renderTab = (tab, absIndex) => {
-    const active  = activeTab === tab.label;
-    const [off, on] = ICON_PAIR[tab.label] || ICON_PAIR._fallback;
-    const iconClr  = active ? ACTIVE_CLR : INACTIVE_CLR;
-    const labelClr = active ? ACTIVE_CLR : INACTIVE_CLR;
+  const renderSide = (tab, absIdx) => {
+    const active = activeTab === tab.label;
+    const [off, on] = ICON_PAIR[tab.label] || ICON_PAIR._default;
+    const iconColor = active ? primaryLight : INACTIVE;
+    const labelColor = active ? primaryLight : INACTIVE;
+    const pillBg = active ? primary + "2E" : "transparent"; // ~18% opacity
 
     return (
       <Pressable
         key={tab.label}
         onPress={() => onTabPress?.(tab)}
-        onPressIn={() => spring(absIndex, 0.80)}
-        onPressOut={() => spring(absIndex, 1)}
+        onPressIn={() => spring(absIdx, 0.78)}
+        onPressOut={() => spring(absIdx, 1)}
         style={styles.sideTab}
         android_ripple={null}
         accessibilityRole="button"
@@ -102,33 +93,22 @@ export default function BottomTabBar({ role, activeTab, onTabPress }) {
         <Animated.View
           style={{
             alignItems: "center",
-            gap: 4,
-            transform: [{ scale: scales[absIndex] }],
+            transform: [{ scale: scales[absIdx] }],
           }}
         >
-          {/* Icon — with a subtle tinted bg when active */}
-          <View style={[
-            styles.iconWrap,
-            active && { backgroundColor: primary + "28" },
-          ]}>
-            <Ionicons
-              name={active ? on : off}
-              size={24}
-              color={iconClr}
-            />
+          <View style={[styles.iconPill, { backgroundColor: pillBg }]}>
+            <Ionicons name={active ? on : off} size={21} color={iconColor} />
           </View>
-
-          {/* Label */}
-          <AppText style={[
-            styles.sideLabel,
-            { color: labelClr, fontWeight: active ? "700" : "400" },
-          ]}>
-            {LABEL[tab.label] || tab.label.toUpperCase()}
+          <AppText
+            style={[
+              styles.sideLabel,
+              { color: labelColor, fontWeight: active ? "700" : "400" },
+            ]}
+          >
+            {SHORT[tab.label] || tab.label.toUpperCase()}
           </AppText>
-
-          {/* Active dot — role primary color */}
           {active && (
-            <View style={[styles.dot, { backgroundColor: primary }]} />
+            <View style={[styles.activeDot, { backgroundColor: primary }]} />
           )}
         </Animated.View>
       </Pressable>
@@ -136,79 +116,83 @@ export default function BottomTabBar({ role, activeTab, onTabPress }) {
   };
 
   return (
-    <View style={[styles.outerWrap, { paddingBottom: Math.max(insets.bottom, 8) }]}>
-
-      {/* ── Home circle — rises above the bar ── */}
+    <View style={[styles.wrap, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+      {/* Home circle — floats above bar center */}
       {homeTab && (
         <Pressable
           onPress={() => onTabPress?.(homeTab)}
-          onPressIn={() => spring(homeIndex, 0.87)}
-          onPressOut={() => spring(homeIndex, 1)}
-          style={styles.homeTouchArea}
+          onPressIn={() => spring(HOME_IDX, 0.86)}
+          onPressOut={() => spring(HOME_IDX, 1)}
+          style={[
+            styles.homeTouchArea,
+            { top: -(HOME_SZ / 2 + HOME_LIFT) + BAR_H / 2 },
+          ]}
           android_ripple={null}
           accessibilityRole="button"
           accessibilityLabel="Home"
           accessibilityState={{ selected: homeActive }}
         >
-          <Animated.View style={[
-            styles.homeCircle,
-            {
-              backgroundColor: homeActive ? primaryLight : primary,
-              shadowColor: primaryDark,
-              transform: [{ scale: scales[homeIndex] }],
-            },
-          ]}>
+          <Animated.View
+            style={[
+              styles.homeCircle,
+              {
+                backgroundColor: homeActive ? primary : primaryDark,
+                borderColor: screenBg,
+                shadowColor: primary,
+                transform: [{ scale: scales[HOME_IDX] }],
+              },
+            ]}
+          >
             <Ionicons
-              name={homeActive ? "home" : "home-outline"}
-              size={28}
-              color="#FFFFFF"
+              name="home"
+              size={26}
+              color={homeActive ? "#FFFFFF" : "rgba(255,255,255,0.55)"}
             />
           </Animated.View>
-          {/* Home label below circle, inside bar */}
-          <AppText style={[styles.homeLabel, { color: homeActive ? primaryLight : ACTIVE_CLR }]}>
+          <AppText
+            style={[
+              styles.homeLabel,
+              { color: homeActive ? primary : "#8892A4" },
+            ]}
+          >
             HOME
           </AppText>
         </Pressable>
       )}
 
-      {/* ── Dark pill bar ── */}
-      <View style={[styles.bar, { shadowColor: primaryDark }]}>
-        {/* Left 2 tabs */}
+      {/* Bar */}
+      <View style={styles.bar}>
         <View style={styles.side}>
-          {leftTabs.map((tab, i) => renderTab(tab, i))}
+          {leftTabs.map((t, i) => renderSide(t, i))}
         </View>
-
-        {/* Gap in the middle for the home circle */}
-        <View style={styles.homeGap} />
-
-        {/* Right 2 tabs */}
+        <View style={styles.gap} />
         <View style={styles.side}>
-          {rightTabs.map((tab, i) => renderTab(tab, i + homeIndex + 1))}
+          {rightTabs.map((t, i) => renderSide(t, i + HOME_IDX + 1))}
         </View>
       </View>
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  outerWrap: {
+  wrap: {
     alignSelf: "center",
-    width: "90%",
+    width: "91%",
     alignItems: "center",
   },
   bar: {
     width: "100%",
-    height: BAR_HEIGHT,
+    height: BAR_H,
     backgroundColor: BAR_BG,
-    borderRadius: BAR_HEIGHT / 2,
+    borderRadius: BAR_H / 2,
     flexDirection: "row",
     alignItems: "center",
     ...Platform.select({
       ios: {
+        shadowColor: "#000",
         shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.35,
-        shadowRadius: 18,
+        shadowOpacity: 0.28,
+        shadowRadius: 20,
       },
       android: { elevation: 22 },
     }),
@@ -220,9 +204,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-around",
   },
-  homeGap: {
-    width: HOME_SIZE + 16,
-  },
+  gap: { width: HOME_SZ + 16 },
   sideTab: {
     flex: 1,
     alignItems: "center",
@@ -230,53 +212,51 @@ const styles = StyleSheet.create({
     height: "100%",
     minWidth: 52,
   },
-  iconWrap: {
-    width: 44,
-    height: 36,
-    borderRadius: 18,
+  iconPill: {
+    width: 40,
+    height: 32,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
   },
   sideLabel: {
     fontSize: 10,
-    letterSpacing: 0.5,
+    letterSpacing: 0.7,
+    marginTop: 2,
     textAlign: "center",
   },
-  dot: {
+  activeDot: {
     width: 4,
     height: 4,
     borderRadius: 2,
-    marginTop: 2,
+    marginTop: 3,
   },
-  // Home circle
   homeTouchArea: {
     position: "absolute",
-    top: -(HOME_SIZE / 2 + HOME_LIFT - BAR_HEIGHT / 2),
     alignSelf: "center",
     alignItems: "center",
     zIndex: 20,
   },
   homeCircle: {
-    width: HOME_SIZE,
-    height: HOME_SIZE,
-    borderRadius: HOME_SIZE / 2,
+    width: HOME_SZ,
+    height: HOME_SZ,
+    borderRadius: HOME_SZ / 2,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 3,
-    borderColor: BAR_BG,
     ...Platform.select({
       ios: {
         shadowOffset: { width: 0, height: 5 },
-        shadowOpacity: 0.4,
-        shadowRadius: 10,
+        shadowOpacity: 0.38,
+        shadowRadius: 12,
       },
       android: { elevation: 16 },
     }),
   },
   homeLabel: {
     fontSize: 10,
-    letterSpacing: 0.6,
+    letterSpacing: 0.7,
     fontWeight: "700",
-    marginTop: HOME_SIZE / 2 + HOME_LIFT - BAR_HEIGHT / 2 + 8,
+    marginTop: 6,
   },
 });
