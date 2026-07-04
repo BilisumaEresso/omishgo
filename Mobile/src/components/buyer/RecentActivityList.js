@@ -11,7 +11,7 @@ export default function RecentActivityList({ activities }) {
     <View style={styles.section}>
       <AppText
         variant="headingSm"
-        style={{ color: theme.colors.textPrimary, marginBottom: 12 }}
+        style={{ color: theme?.colors?.textPrimary, marginBottom: 12 }}
       >
         Recent Activity
       </AppText>
@@ -25,25 +25,25 @@ export default function RecentActivityList({ activities }) {
                   : "chatbubble-outline"
               }
               size={24}
-              color={theme.colors.primary}
+              color={theme?.colors?.primary}
             />
           </View>
           <View style={{ flex: 1 }}>
             <AppText
               variant="bodyMd"
-              style={{ fontWeight: "bold", color: theme.colors.textPrimary }}
+              style={{ fontWeight: "bold", color: theme?.colors?.textPrimary }}
             >
               {activity.title}
             </AppText>
             <AppText
               variant="caption"
-              style={{ color: theme.colors.textSecondary }}
+              style={{ color: theme?.colors?.textSecondary }}
             >
               {activity.description}
             </AppText>
             <AppText
               variant="caption"
-              style={{ color: theme.colors.textMuted, marginTop: 4 }}
+              style={{ color: theme?.colors?.textMuted, marginTop: 4 }}
             >
               {activity.time}
             </AppText>

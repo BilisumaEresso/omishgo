@@ -24,9 +24,9 @@ const AppInput = ({
   const [secure, setSecure] = useState(secureTextEntry);
 
   const getBorderColor = () => {
-    if (error) return theme.colors.error || "#FF3B30";
-    if (focused) return theme.colors.primary || "#6B4EFF";
-    return theme.colors.border || "#333333";
+    if (error) return theme?.colors?.error || "#FF3B30";
+    if (focused) return theme?.colors?.primary || "#6B4EFF";
+    return theme?.colors?.border || "#333333";
   };
 
   return (
@@ -34,7 +34,7 @@ const AppInput = ({
       {label && (
         <AppText
           variant="label"
-          style={[styles.label, { color: theme.colors.textPrimary }]}
+          style={[styles.label, { color: theme?.colors?.textPrimary }]}
         >
           {label}
         </AppText>
@@ -44,7 +44,7 @@ const AppInput = ({
         style={[
           styles.inputContainer,
           {
-            backgroundColor: theme.colors.surface || "#1A1A1A",
+            backgroundColor: theme?.colors?.surface || "#1A1A1A",
             borderColor: getBorderColor(),
           },
         ]}
@@ -55,8 +55,8 @@ const AppInput = ({
             size={20}
             color={
               focused
-                ? theme.colors.primary || "#6B4EFF"
-                : theme.colors.textSecondary || "#888888"
+                ? theme?.colors?.primary || "#6B4EFF"
+                : theme?.colors?.textSecondary || "#888888"
             }
             style={styles.leftIcon}
           />
@@ -73,7 +73,7 @@ const AppInput = ({
           onBlur={() => setFocused(false)}
           style={[
             styles.input,
-            { color: theme.colors.textPrimary || "#FFFFFF" },
+            { color: theme?.colors?.textPrimary || "#FFFFFF" },
             inputStyle,
           ]}
           {...rest}
@@ -88,7 +88,7 @@ const AppInput = ({
             <Ionicons
               name={secure ? "eye-off-outline" : "eye-outline"}
               size={20}
-              color={theme.colors.textSecondary || "#888888"}
+              color={theme?.colors?.textSecondary || "#888888"}
             />
           </Pressable>
         ) : rightIcon ? (
@@ -96,7 +96,7 @@ const AppInput = ({
             <Ionicons
               name={rightIcon}
               size={20}
-              color={theme.colors.textSecondary || "#888888"}
+              color={theme?.colors?.textSecondary || "#888888"}
             />
           </View>
         ) : null}
@@ -105,7 +105,7 @@ const AppInput = ({
       {error && (
         <AppText
           variant="caption"
-          style={[styles.errorText, { color: theme.colors.error || "#FF3B30" }]}
+          style={[styles.errorText, { color: theme?.colors?.error || "#FF3B30" }]}
         >
           {error}
         </AppText>

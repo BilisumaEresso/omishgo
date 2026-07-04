@@ -1,6 +1,5 @@
 // Mobile/src/screens/farmer/FarmerProductsScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
   FlatList,
@@ -67,19 +66,18 @@ const MOCK_PRODUCTS = [
   },
 ];
 
-const FarmerProductsScreen = () => {
+const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
-  const navigation = useNavigation();
   const [products, setProducts] = useState(MOCK_PRODUCTS);
 
-  const primary = theme.colors.primary || "#2E7D32";
-  const textPrimary = theme.colors.textPrimary || "#1A2E1A";
-  const textSecondary = theme.colors.textSecondary || "#4A6741";
-  const textMuted = theme.colors.textMuted || "#8FAF8A";
-  const background = theme.colors.background || "#F9FBF9";
-  const surface = theme.colors.surface || "#FFFFFF";
-  const border = theme.colors.border || "#D0E8CE";
-  const errorColor = theme.colors.error || "#C62828";
+  const primary = theme?.colors?.primary || "#2E7D32";
+  const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
+  const textSecondary = theme?.colors?.textSecondary || "#4A6741";
+  const textMuted = theme?.colors?.textMuted || "#8FAF8A";
+  const background = theme?.colors?.background || "#F9FBF9";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const border = theme?.colors?.border || "#D0E8CE";
+  const errorColor = theme?.colors?.error || "#C62828";
 
   // Compute counts from current products state
   const countActive = products.filter((p) => p.status === "active").length;
@@ -206,7 +204,13 @@ const FarmerProductsScreen = () => {
         ]}
       >
         <TouchableOpacity
-          onPress={() => navigation?.goBack()}
+          onPress={() => {
+            if (navigation?.canGoBack()) {
+              navigation.goBack();
+            } else if (onSwitchTab) {
+              onSwitchTab("Home");
+            }
+          }}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={styles.backButton}
         >

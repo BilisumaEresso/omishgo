@@ -28,8 +28,8 @@ const ConvoRow = ({ convo, onPress, theme }) => {
       style={[
         styles.row,
         {
-          backgroundColor: theme.colors.surface || "#fff",
-          borderBottomColor: theme.colors.border || "#f0f0f0",
+          backgroundColor: theme?.colors?.surface || "#fff",
+          borderBottomColor: theme?.colors?.border || "#f0f0f0",
         },
       ]}
       activeOpacity={0.7}
@@ -38,7 +38,7 @@ const ConvoRow = ({ convo, onPress, theme }) => {
       <View
         style={[
           styles.avatar,
-          { backgroundColor: theme.colors.primary || "#2e7d32" },
+          { backgroundColor: theme?.colors?.primary || "#2e7d32" },
         ]}
       >
         <AppText style={styles.avatarText}>
@@ -53,7 +53,7 @@ const ConvoRow = ({ convo, onPress, theme }) => {
             variant="headingSm"
             style={[
               styles.partnerName,
-              { color: theme.colors.textPrimary || "#333" },
+              { color: theme?.colors?.textPrimary || "#333" },
               hasUnread && styles.bold,
             ]}
           >
@@ -61,7 +61,7 @@ const ConvoRow = ({ convo, onPress, theme }) => {
           </AppText>
           <AppText
             variant="label"
-            style={{ color: theme.colors.textSecondary || "#aaa" }}
+            style={{ color: theme?.colors?.textSecondary || "#aaa" }}
           >
             {formatRelativeTime(convo.lastMessageAt)}
           </AppText>
@@ -71,7 +71,7 @@ const ConvoRow = ({ convo, onPress, theme }) => {
             variant="bodyMd"
             style={[
               styles.preview,
-              { color: theme.colors.textSecondary || "#888" },
+              { color: theme?.colors?.textSecondary || "#888" },
               hasUnread && styles.previewUnread,
             ]}
             numberOfLines={1}
@@ -82,7 +82,7 @@ const ConvoRow = ({ convo, onPress, theme }) => {
             <View
               style={[
                 styles.badge,
-                { backgroundColor: theme.colors.primary || "#2e7d32" },
+                { backgroundColor: theme?.colors?.primary || "#2e7d32" },
               ]}
             >
               <AppText style={styles.badgeText}>{convo.unreadCount}</AppText>
@@ -153,7 +153,7 @@ export default function ConversationsScreen({ navigation }) {
         <View style={styles.center}>
           <ActivityIndicator
             size="large"
-            color={theme.colors.primary || "#2e7d32"}
+            color={theme?.colors?.primary || "#2e7d32"}
           />
         </View>
       </ScreenWrapper>
@@ -167,8 +167,8 @@ export default function ConversationsScreen({ navigation }) {
         style={[
           styles.header,
           {
-            backgroundColor: theme.colors.surface || "#fff",
-            borderBottomColor: theme.colors.border || "#e8e8e8",
+            backgroundColor: theme?.colors?.surface || "#fff",
+            borderBottomColor: theme?.colors?.border || "#e8e8e8",
             paddingTop:
               Platform.OS === "android"
                 ? (StatusBar.currentHeight || 24) + 10
@@ -185,7 +185,7 @@ export default function ConversationsScreen({ navigation }) {
           <AppText
             variant="headingMd"
             style={{
-              color: theme.colors.primary || "#2e7d32",
+              color: theme?.colors?.primary || "#2e7d32",
               fontSize: 22,
             }}
           >
@@ -201,7 +201,7 @@ export default function ConversationsScreen({ navigation }) {
         <View style={styles.center}>
           <AppText
             style={{
-              color: theme.colors.error || "red",
+              color: theme?.colors?.error || "red",
               textAlign: "center",
               marginBottom: 12,
             }}
@@ -226,7 +226,7 @@ export default function ConversationsScreen({ navigation }) {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={() => fetchConversations(true)}
-              colors={[theme.colors.primary || "#2e7d32"]}
+              colors={[theme?.colors?.primary || "#2e7d32"]}
             />
           }
           ListEmptyComponent={
@@ -235,7 +235,7 @@ export default function ConversationsScreen({ navigation }) {
               <AppText
                 variant="headingSm"
                 style={{
-                  color: theme.colors.textSecondary || "#888",
+                  color: theme?.colors?.textSecondary || "#888",
                   textAlign: "center",
                 }}
               >
@@ -244,7 +244,7 @@ export default function ConversationsScreen({ navigation }) {
               <AppText
                 variant="bodyMd"
                 style={{
-                  color: theme.colors.textSecondary || "#aaa",
+                  color: theme?.colors?.textSecondary || "#aaa",
                   textAlign: "center",
                   marginTop: 6,
                 }}

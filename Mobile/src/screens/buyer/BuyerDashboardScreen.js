@@ -1,24 +1,22 @@
 // src/screens/buyer/BuyerDashboardScreen.js
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import DashboardLayout from "../../components/layout/DashBoardLayout";
-import AppSidebar from "../../components/layout/AppSidebar";
-import FloatingActionButton from "../../components/layout/FloatingActionBotton";
-import SummaryCard from "../../components/SummaryCard"; // reuse the existing component
-import BuyerWeatherWidget from "../../components/buyer/BuyerWeatherWidget";
+import { useEffect, useState } from "react";
+import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import BuyerQuickActions from "../../components/buyer/BuyerQuickActions";
 import CategoryFilters from "../../components/buyer/CategoryFilters";
-import PriceTrendWidget from "../../components/buyer/PriceTrendWidget";
 import FeaturedProductsList from "../../components/buyer/FeaturedProductsList";
 import NearbyFarmersList from "../../components/buyer/NearbyFarmersList";
+import PriceTrendWidget from "../../components/buyer/PriceTrendWidget";
 import RecentActivityList from "../../components/buyer/RecentActivityList";
+import AgriPriceChangeWidget from "../../components/common/AgriPriceChangeWidget";
 import AppText from "../../components/common/AppText";
-import { useTheme } from "../../hooks/useTheme";
+import AppSidebar from "../../components/layout/AppSidebar";
+import DashboardLayout from "../../components/layout/DashBoardLayout";
+import FloatingActionButton from "../../components/layout/FloatingActionBotton";
+import SummaryCard from "../../components/SummaryCard"; // reuse the existing component
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
+import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
-import AgriPriceChangeWidget from "../../components/common/AgriPriceChangeWidget";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_GAP = 12;
@@ -113,7 +111,7 @@ const mockActivities = [
 
 const categories = ["All", "Tomato", "Teff", "Onion", "Garlic"];
 
-export default function BuyerDashboardScreen({ navigation }) {
+export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
   const { theme } = useTheme();
   const user = useAuthStore((state) => state.user);
 
@@ -129,8 +127,8 @@ export default function BuyerDashboardScreen({ navigation }) {
   const activeOrders = 2;
   const savedItems = 5;
 
-  const primaryColor = theme.colors.primary || "#2E7DFF";
-  const textPrimary = theme.colors.textPrimary || "#1C2430";
+  const primaryColor = theme?.colors?.primary || "#2E7DFF";
+  const textPrimary = theme?.colors?.textPrimary || "#1C2430";
 
   useEffect(() => {
     const fetchRealProducts = async () => {
@@ -175,9 +173,18 @@ export default function BuyerDashboardScreen({ navigation }) {
   };
 
   const handleSidebarItemPress = (item) => {
-    if (item.route === "Logout") {
-      navigation.reset({ index: 0, routes: [{ name: "Welcome" }] });
-    } else if (item.route) {
+    setSidebarVisible(false);
+    if (item.route === "Logout") return;
+    const TAB_ROUTES = {
+      BuyerMarketplace: "Marketplace",
+      BuyerOrders: "Orders",
+      BuyerSaved: "Saved",
+      Profile: "Profile",
+    };
+    const STACK_ROUTES = ["Conversations", "Chat", "ListingDetail"];
+    if (TAB_ROUTES[item.route]) {
+      onSwitchTab?.(TAB_ROUTES[item.route]);
+    } else if (STACK_ROUTES.includes(item.route)) {
       navigation.navigate(item.route);
     }
   };
@@ -197,8 +204,6 @@ export default function BuyerDashboardScreen({ navigation }) {
         title="Buyer Dashboard"
         subtitle={`Welcome, ${user?.name || ""}!`}
         role="buyer"
-        activeTab="Marketplace"
-        onTabPress={(tab) => console.log(tab)}
         scrollable={true}
         showMenu={true}
         onMenuPress={() => setSidebarVisible(true)}
@@ -215,21 +220,21 @@ export default function BuyerDashboardScreen({ navigation }) {
             label="Active Orders"
             value={activeOrders}
             color="#FF9800"
-            onPress={() => navigation.navigate("BuyerOrders")}
+            onPress={() => onSwitchTab?.("Orders")}
           />
           <SummaryCard
             icon="bookmark-outline"
             label="Saved Items"
             value={savedItems}
             color="#4CAF50"
-            onPress={() => navigation.navigate("BuyerSaved")}
+            onPress={() => onSwitchTab?.("Saved")}
           />
           <SummaryCard
             icon="storefront-outline"
             label="Products"
             value={products.length}
             color="#2196F3"
-            onPress={() => navigation.navigate("Browse")}
+            onPress={() => onSwitchTab?.("Marketplace")}
           />
         </View>
 
@@ -251,7 +256,7 @@ export default function BuyerDashboardScreen({ navigation }) {
 
         {/* Featured Products */}
         <View style={styles.sectionHeader}>
-          <TouchableOpacity onPress={() => navigation.navigate("Browse")}>
+          <TouchableOpacity onPress={() => onSwitchTab?.("Marketplace")}>
             <AppText style={{ color: primaryColor, fontWeight: "600" }}>
               See All
             </AppText>
@@ -273,7 +278,7 @@ export default function BuyerDashboardScreen({ navigation }) {
       {/* Floating Cart Button */}
       {cartCount > 0 && (
         <FloatingActionButton
-          onPress={() => navigation.navigate("BuyerOrders")}
+          onPress={() => onSwitchTab?.("Orders")}
           icon="cart"
           bottom={90}
         />

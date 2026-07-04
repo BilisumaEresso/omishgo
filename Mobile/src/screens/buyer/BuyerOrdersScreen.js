@@ -1,6 +1,5 @@
 // Mobile/src/screens/buyer/BuyerOrdersScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
   FlatList,
@@ -70,17 +69,16 @@ const MOCK_ORDERS = [
 
 const FILTER_TABS = ["All", "Active", "Completed"];
 
-const BuyerOrdersScreen = () => {
+const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
-  const navigation = useNavigation();
   const [activeFilter, setActiveFilter] = useState("All");
 
-  const primary = theme.colors.primary || "#1565C0";
-  const textPrimary = theme.colors.textPrimary || "#0D1B2A";
-  const textSecondary = theme.colors.textSecondary || "#4A6080";
-  const background = theme.colors.background || "#F5F8FF";
-  const surface = theme.colors.surface || "#FFFFFF";
-  const border = theme.colors.border || "#D0DEF5";
+  const primary = theme?.colors?.primary || "#1565C0";
+  const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
+  const textSecondary = theme?.colors?.textSecondary || "#4A6080";
+  const background = theme?.colors?.background || "#F5F8FF";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const border = theme?.colors?.border || "#D0DEF5";
 
   // Status badge colors
   const getStatusColor = (status) => {
@@ -191,7 +189,13 @@ const BuyerOrdersScreen = () => {
         ]}
       >
         <TouchableOpacity
-          onPress={() => navigation?.goBack()}
+          onPress={() => {
+            if (navigation?.canGoBack()) {
+              navigation.goBack();
+            } else if (onSwitchTab) {
+              onSwitchTab("Home");
+            }
+          }}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={styles.backButton}
         >
@@ -200,7 +204,7 @@ const BuyerOrdersScreen = () => {
         <AppText style={[styles.headerTitle, { color: textPrimary }]}>
           My Orders
         </AppText>
-        <View style={styles.backButton} /> {/* spacer */}
+        <View style={styles.backButton} />
       </View>
 
       {/* Filter tabs */}

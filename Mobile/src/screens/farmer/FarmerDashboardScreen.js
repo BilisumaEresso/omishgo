@@ -138,13 +138,13 @@ const useAnimatedNumber = (target, duration = 800) => {
 };
 
 // ---------- main screen ----------
-export default function FarmerDashboardScreen({ navigation, route }) {
+export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
   const { theme } = useTheme();
   const user = useAuthStore((state) => state.user);
-  const primaryColor = theme.colors.primary || "#4CAF50";
-  const textPrimary = theme.colors.textPrimary || "#333";
-  const textSecondary = theme.colors.textSecondary || "#666";
-  const cardBg = theme.colors.card || "#fff";
+  const primaryColor = theme?.colors?.primary || "#4CAF50";
+  const textPrimary = theme?.colors?.textPrimary || "#333";
+  const textSecondary = theme?.colors?.textSecondary || "#666";
+  const cardBg = theme?.colors?.card || "#fff";
 
   const [products, setProducts] = useState(mockProducts);
   const [orders, setOrders] = useState(mockOrders);
@@ -173,15 +173,6 @@ export default function FarmerDashboardScreen({ navigation, route }) {
       : hours < 17
         ? "Good afternoon"
         : "Good evening";
-
-  // Success message from route params
-  useEffect(() => {
-    if (route?.params?.successMessage) {
-      setSuccessMsg(route.params.successMessage);
-      const timer = setTimeout(() => setSuccessMsg(""), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [route?.params?.successMessage]);
 
   const fetchProducts = async () => {
     try {
@@ -254,9 +245,18 @@ export default function FarmerDashboardScreen({ navigation, route }) {
   };
 
   const handleSidebarItemPress = (item) => {
-    if (item.route === "Logout") {
-      navigation.reset({ index: 0, routes: [{ name: "Welcome" }] });
-    } else if (item.route) {
+    setSidebarVisible(false);
+    if (item.route === "Logout") return;
+    const TAB_ROUTES = {
+      FarmerProducts: "Products",
+      FarmerOrders: "Orders",
+      FarmerAnalytics: "Insights",
+      Profile: "Profile",
+    };
+    const STACK_ROUTES = ["PostProduct", "Conversations", "Chat"];
+    if (TAB_ROUTES[item.route]) {
+      onSwitchTab?.(TAB_ROUTES[item.route]);
+    } else if (STACK_ROUTES.includes(item.route)) {
       navigation.navigate(item.route);
     }
   };
@@ -267,8 +267,6 @@ export default function FarmerDashboardScreen({ navigation, route }) {
         title="Farmer Dashboard"
         subtitle={`${greeting}, ${user?.name || ""}!`}
         role="farmer"
-        activeTab="Home"
-        onTabPress={(tab) => console.log(tab)}
         scrollable={true}
         showMenu={true}
         onMenuPress={() => setSidebarVisible(true)}
@@ -285,14 +283,14 @@ export default function FarmerDashboardScreen({ navigation, route }) {
             label="Today's Sales"
             value={todaySales}
             color="#FF9800"
-            onPress={() => safeNavigate("FarmerOrders")}
+            onPress={() => onSwitchTab?.("Orders")}
           />
           <SummaryCard
             icon="time-outline"
             label="Active Orders"
             value={activeOrders}
             color="#2196F3"
-            onPress={() => safeNavigate("FarmerOrders")}
+            onPress={() => onSwitchTab?.("Orders")}
           />
           <SummaryCard
             icon="wallet-outline"
@@ -300,16 +298,14 @@ export default function FarmerDashboardScreen({ navigation, route }) {
             value={revenue}
             prefix="ETB "
             color="#4CAF50"
-            onPress={() => safeNavigate("FarmerFinance")}
+            onPress={() => {}}
           />
         </View>
 
         {/* ---- Agri Price Change (tappable) ---- */}
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() =>
-            safeNavigate("MarketDetails", { crop: biggestMover.crop })
-          }
+          onPress={() => {}}
         >
           <AgriPriceChangeWidget
             productName={biggestMover.crop}
@@ -323,8 +319,8 @@ export default function FarmerDashboardScreen({ navigation, route }) {
         <QuickActionsGrid
           productCount={products.length}
           onAddPress={() => navigation.navigate("PostProduct")}
-          onOrdersPress={() => safeNavigate("FarmerOrders")}
-          onTrainingPress={() => safeNavigate("FarmerTraining")}
+          onOrdersPress={() => onSwitchTab?.("Orders")}
+          onTrainingPress={() => {}}
         />
 
         {/* Messages shortcut */}
@@ -341,7 +337,7 @@ export default function FarmerDashboardScreen({ navigation, route }) {
           <Text style={[styles.sectionTitle, { color: textPrimary }]}>
             Market Trends
           </Text>
-          <TouchableOpacity onPress={() => safeNavigate("MarketTrendsFull")}>
+          <TouchableOpacity onPress={() => {}}>
             <Text style={[styles.seeAll, { color: primaryColor }]}>
               See All
             </Text>
@@ -357,7 +353,7 @@ export default function FarmerDashboardScreen({ navigation, route }) {
           <Text style={[styles.sectionTitle, { color: textPrimary }]}>
             Recent Orders
           </Text>
-          <TouchableOpacity onPress={() => safeNavigate("FarmerOrders")}>
+          <TouchableOpacity onPress={() => onSwitchTab?.("Orders")}>
             <Text style={[styles.seeAll, { color: primaryColor }]}>
               View All
             </Text>

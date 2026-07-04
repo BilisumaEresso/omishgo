@@ -108,7 +108,7 @@ export default function RoleSelection({ navigation }) {
 
         <AppText
           variant="bodyMd"
-          color={theme.colors.textSecondary}
+          color={theme?.colors?.textSecondary}
           style={styles.subtext}
         >
           Select how you want to use OmishGo.
@@ -122,8 +122,8 @@ export default function RoleSelection({ navigation }) {
               style={[
                 styles.card,
                 selectedRole === item.id && {
-                  borderColor: theme.colors.primary,
-                  backgroundColor: theme.colors.primary + "10",
+                  borderColor: theme?.colors?.primary,
+                  backgroundColor: theme?.colors?.primary + "10",
                 },
               ]}
             >
@@ -136,7 +136,7 @@ export default function RoleSelection({ navigation }) {
                   {item.title}
                 </AppText>
 
-                <AppText variant="bodySm" color={theme.colors.textSecondary}>
+                <AppText variant="bodySm" color={theme?.colors?.textSecondary}>
                   {item.desc}
                 </AppText>
               </View>

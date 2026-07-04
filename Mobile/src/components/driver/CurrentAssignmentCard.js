@@ -16,13 +16,13 @@ const MAP_IMAGE =
 export default function CurrentAssignmentCard({ assignmentState, onComplete }) {
   const { theme } = useTheme();
   const isCompleted = assignmentState === "Completed";
-  const statusColor = isCompleted ? theme.colors.success : theme.colors.primary;
+  const statusColor = isCompleted ? theme?.colors?.success : theme?.colors?.primary;
 
   return (
     <View style={styles.section}>
       <AppText
         variant="headingSm"
-        style={{ color: theme.colors.textPrimary, marginBottom: 12 }}
+        style={{ color: theme?.colors?.textPrimary, marginBottom: 12 }}
       >
         Current Assignment
       </AppText>
@@ -31,7 +31,7 @@ export default function CurrentAssignmentCard({ assignmentState, onComplete }) {
         <View
           style={[
             styles.statusBadge,
-            { backgroundColor: theme.colors.surface, borderColor: statusColor },
+            { backgroundColor: theme?.colors?.surface, borderColor: statusColor },
           ]}
         >
           <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
@@ -57,25 +57,25 @@ export default function CurrentAssignmentCard({ assignmentState, onComplete }) {
           <View
             style={[
               styles.orderIcon,
-              { backgroundColor: theme.colors.primaryLight },
+              { backgroundColor: theme?.colors?.primaryLight },
             ]}
           >
             <Ionicons
               name="navigate-outline"
               size={20}
-              color={theme.colors.primary}
+              color={theme?.colors?.primary}
             />
           </View>
           <View>
             <AppText
               variant="caption"
-              style={{ color: theme.colors.textSecondary }}
+              style={{ color: theme?.colors?.textSecondary }}
             >
               Order ID
             </AppText>
             <AppText
               variant="bodyMd"
-              style={{ fontWeight: "bold", color: theme.colors.textPrimary }}
+              style={{ fontWeight: "bold", color: theme?.colors?.textPrimary }}
             >
               #TR-8492
             </AppText>
@@ -86,13 +86,13 @@ export default function CurrentAssignmentCard({ assignmentState, onComplete }) {
         <View>
           <AppText
             variant="caption"
-            style={{ color: theme.colors.textSecondary }}
+            style={{ color: theme?.colors?.textSecondary }}
           >
             Cargo Details
           </AppText>
           <AppText
             variant="headingSm"
-            style={{ color: theme.colors.textPrimary }}
+            style={{ color: theme?.colors?.textPrimary }}
           >
             15 Quintals Premium Teff
           </AppText>
@@ -105,19 +105,19 @@ export default function CurrentAssignmentCard({ assignmentState, onComplete }) {
             <View
               style={[
                 styles.timelineDot,
-                { backgroundColor: theme.colors.primary },
+                { backgroundColor: theme?.colors?.primary },
               ]}
             />
             <View>
               <AppText
                 variant="bodyMd"
-                style={{ fontWeight: "bold", color: theme.colors.textPrimary }}
+                style={{ fontWeight: "bold", color: theme?.colors?.textPrimary }}
               >
                 Bishoftu
               </AppText>
               <AppText
                 variant="caption"
-                style={{ color: theme.colors.textSecondary }}
+                style={{ color: theme?.colors?.textSecondary }}
               >
                 Warehouse A Regional loading doc
               </AppText>
@@ -127,19 +127,19 @@ export default function CurrentAssignmentCard({ assignmentState, onComplete }) {
             <View
               style={[
                 styles.timelineDotOutline,
-                { borderColor: theme.colors.primary },
+                { borderColor: theme?.colors?.primary },
               ]}
             />
             <View>
               <AppText
                 variant="bodyMd"
-                style={{ fontWeight: "bold", color: theme.colors.textPrimary }}
+                style={{ fontWeight: "bold", color: theme?.colors?.textPrimary }}
               >
                 Addis Ababa
               </AppText>
               <AppText
                 variant="caption"
-                style={{ color: theme.colors.textSecondary }}
+                style={{ color: theme?.colors?.textSecondary }}
               >
                 Mercato Wholesale Hub gate 4
               </AppText>
@@ -153,19 +153,19 @@ export default function CurrentAssignmentCard({ assignmentState, onComplete }) {
             style={[
               styles.actionButton,
               {
-                backgroundColor: theme.colors.surface,
-                borderColor: theme.colors.border,
+                backgroundColor: theme?.colors?.surface,
+                borderColor: theme?.colors?.border,
               },
             ]}
           >
             <Ionicons
               name="map-outline"
               size={16}
-              color={theme.colors.primary}
+              color={theme?.colors?.primary}
             />
             <AppText
               variant="caption"
-              style={{ color: theme.colors.textPrimary, marginLeft: 6 }}
+              style={{ color: theme?.colors?.textPrimary, marginLeft: 6 }}
             >
               View Route
             </AppText>
@@ -174,19 +174,19 @@ export default function CurrentAssignmentCard({ assignmentState, onComplete }) {
             style={[
               styles.actionButton,
               {
-                backgroundColor: theme.colors.surface,
-                borderColor: theme.colors.border,
+                backgroundColor: theme?.colors?.surface,
+                borderColor: theme?.colors?.border,
               },
             ]}
           >
             <Ionicons
               name="call-outline"
               size={16}
-              color={theme.colors.primary}
+              color={theme?.colors?.primary}
             />
             <AppText
               variant="caption"
-              style={{ color: theme.colors.textPrimary, marginLeft: 6 }}
+              style={{ color: theme?.colors?.textPrimary, marginLeft: 6 }}
             >
               Contact
             </AppText>
@@ -199,8 +199,8 @@ export default function CurrentAssignmentCard({ assignmentState, onComplete }) {
             styles.completeButton,
             {
               backgroundColor: isCompleted
-                ? theme.colors.success
-                : theme.colors.primary,
+                ? theme?.colors?.success
+                : theme?.colors?.primary,
             },
           ]}
           onPress={onComplete}

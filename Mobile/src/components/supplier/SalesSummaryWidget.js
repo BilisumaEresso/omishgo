@@ -20,19 +20,19 @@ export default function SalesSummaryWidget({ salesSum, onAddSale }) {
     <AppCard style={styles.card}>
       <AppText
         variant="bodyMd"
-        style={{ fontWeight: "bold", color: theme.colors.textPrimary }}
+        style={{ fontWeight: "bold", color: theme?.colors?.textPrimary }}
       >
         Sales Summary
       </AppText>
       <AppText
         variant="caption"
-        style={{ color: theme.colors.textSecondary, marginBottom: 4 }}
+        style={{ color: theme?.colors?.textSecondary, marginBottom: 4 }}
       >
         Total Sales this Week
       </AppText>
       <AppText
         variant="headingLg"
-        style={{ color: theme.colors.primary, marginBottom: 12 }}
+        style={{ color: theme?.colors?.primary, marginBottom: 12 }}
       >
         {salesSum.toLocaleString()} ETB
       </AppText>
@@ -48,12 +48,12 @@ export default function SalesSummaryWidget({ salesSum, onAddSale }) {
               <Ionicons
                 name="trending-up"
                 size={12}
-                color={theme.colors.primary}
+                color={theme?.colors?.primary}
               />
               <AppText
                 variant="caption"
                 style={{
-                  color: theme.colors.primary,
+                  color: theme?.colors?.primary,
                   fontWeight: "bold",
                   marginLeft: 4,
                 }}

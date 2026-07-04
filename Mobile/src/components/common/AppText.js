@@ -40,7 +40,7 @@ const AppText = ({
   // 3. Font family from theme (if defined)
   const fontFamily = themeTypography.fontFamily || undefined;
 
-  // 4. Text color: use theme.colors.textPrimary by default (NOT undefined 'text')
+  // 4. Text color: use theme?.colors?.textPrimary by default (NOT undefined 'text')
   const defaultColor = theme.colors?.textPrimary || "#212121";
 
   return (

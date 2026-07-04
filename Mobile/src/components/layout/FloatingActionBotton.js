@@ -33,9 +33,9 @@ const FloatingActionButton = ({
     }).start();
   };
 
-  const primaryColor = theme.colors.primary || "#4CAF50";
-  const shadowColor = theme.colors.shadow || "#000";
-  const iconColor = theme.colors.textInverse || "#FFFFFF";
+  const primaryColor = theme?.colors?.primary || "#4CAF50";
+  const shadowColor = theme?.colors?.shadow || "#000";
+  const iconColor = theme?.colors?.textInverse || "#FFFFFF";
 
   return (
     <Animated.View

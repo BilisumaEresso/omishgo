@@ -12,8 +12,8 @@ export default function DriverStatsCards({ earnings, tasksCount }) {
         style={[
           styles.card,
           {
-            backgroundColor: theme.colors.surface,
-            borderColor: theme.colors.border,
+            backgroundColor: theme?.colors?.surface,
+            borderColor: theme?.colors?.border,
           },
         ]}
       >
@@ -21,18 +21,18 @@ export default function DriverStatsCards({ earnings, tasksCount }) {
           <Ionicons
             name="clipboard-outline"
             size={20}
-            color={theme.colors.primary}
+            color={theme?.colors?.primary}
           />
         </View>
         <AppText
           variant="headingLg"
-          style={{ color: theme.colors.textPrimary }}
+          style={{ color: theme?.colors?.textPrimary }}
         >
           {tasksCount}
         </AppText>
         <AppText
           variant="caption"
-          style={{ color: theme.colors.textSecondary }}
+          style={{ color: theme?.colors?.textSecondary }}
         >
           Active Tasks
         </AppText>
@@ -42,8 +42,8 @@ export default function DriverStatsCards({ earnings, tasksCount }) {
         style={[
           styles.card,
           {
-            backgroundColor: theme.colors.primary,
-            borderColor: theme.colors.primaryDark,
+            backgroundColor: theme?.colors?.primary,
+            borderColor: theme?.colors?.primaryDark,
           },
         ]}
       >

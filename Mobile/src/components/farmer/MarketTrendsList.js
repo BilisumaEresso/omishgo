@@ -6,11 +6,11 @@ import { useTheme } from "../../hooks/useTheme";
 
 export default function MarketTrendsList({ trends, onSellPress }) {
   const { theme } = useTheme();
-  const textPrimary = theme.colors.textPrimary;
-  const textSecondary = theme.colors.textSecondary;
-  const successColor = theme.colors.success;
-  const errorColor = theme.colors.error;
-  const primaryColor = theme.colors.primary;
+  const textPrimary = theme?.colors?.textPrimary;
+  const textSecondary = theme?.colors?.textSecondary;
+  const successColor = theme?.colors?.success;
+  const errorColor = theme?.colors?.error;
+  const primaryColor = theme?.colors?.primary;
 
   return (
     <View style={styles.section}>

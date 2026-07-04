@@ -33,11 +33,11 @@ export default function RegisterScreen({ navigation }) {
   const [errors, setErrors] = useState({});
   const [registerError, setRegisterError] = useState("");
 
-  const primary = theme.colors.primary || "#4CAF50";
-  const textPrimary = theme.colors.textPrimary || "#212121";
-  const textSecondary = theme.colors.textSecondary || "#757575";
-  const backgroundColor = theme.colors.background || "#FFFFFF";
-  const errorColor = theme.colors.error || "#F44336";
+  const primary = theme?.colors?.primary || "#4CAF50";
+  const textPrimary = theme?.colors?.textPrimary || "#212121";
+  const textSecondary = theme?.colors?.textSecondary || "#757575";
+  const backgroundColor = theme?.colors?.background || "#FFFFFF";
+  const errorColor = theme?.colors?.error || "#F44336";
 
   // Simple scale animation based on scroll
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -232,7 +232,7 @@ export default function RegisterScreen({ navigation }) {
                   styles.roleBtn,
                   {
                     borderColor:
-                      role === "farmer" ? primary : theme.colors.border,
+                      role === "farmer" ? primary : theme?.colors?.border,
                     backgroundColor:
                       role === "farmer" ? primary + "15" : "transparent",
                   },
@@ -259,7 +259,7 @@ export default function RegisterScreen({ navigation }) {
                   styles.roleBtn,
                   {
                     borderColor:
-                      role === "buyer" ? primary : theme.colors.border,
+                      role === "buyer" ? primary : theme?.colors?.border,
                     backgroundColor:
                       role === "buyer" ? primary + "15" : "transparent",
                   },

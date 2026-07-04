@@ -10,7 +10,7 @@ export const LoadingIndicator = ({
   style
 }) => {
   const { theme } = useTheme();
-  const finalColor = color || theme.colors.primary || "#6B4EFF";
+  const finalColor = color || theme?.colors?.primary || "#6B4EFF";
 
   // Variant A: Fixed full-bleed overlay intercepting interactions during a submission
   if (overlay) {
@@ -18,12 +18,12 @@ export const LoadingIndicator = ({
       <View
         style={[
           styles.overlay,
-          { backgroundColor: theme.colors.background ? `${theme.colors.background}CC` : "rgba(0,0,0,0.5)" },
+          { backgroundColor: theme?.colors?.background ? `${theme?.colors?.background}CC` : "rgba(0,0,0,0.5)" },
           style
         ]}
         pointerEvents="auto"
       >
-        <View style={[styles.indicatorBox, { backgroundColor: theme.colors.surface || "#1A1A1A" }]}>
+        <View style={[styles.indicatorBox, { backgroundColor: theme?.colors?.surface || "#1A1A1A" }]}>
           <ActivityIndicator size={size} color={finalColor} />
         </View>
       </View>

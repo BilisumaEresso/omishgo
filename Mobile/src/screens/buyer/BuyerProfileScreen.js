@@ -1,35 +1,32 @@
 // Mobile/src/screens/buyer/BuyerProfileScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import React from "react";
 import {
-  Alert,
-  Platform,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  TouchableOpacity,
-  View,
+    Alert,
+    Platform,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import AppText from "../../components/common/AppText";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
-const BuyerProfileScreen = () => {
+const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
-  const navigation = useNavigation();
   const { user, logout } = useAuthStore();
 
-  const primary = theme.colors.primary || "#1565C0";
-  const primaryContainer = theme.colors.primaryContainer || "#E3F2FD";
-  const textPrimary = theme.colors.textPrimary || "#0D1B2A";
-  const textSecondary = theme.colors.textSecondary || "#4A6080";
-  const textMuted = theme.colors.textMuted || "#8FA3BE";
-  const background = theme.colors.background || "#F5F8FF";
-  const surface = theme.colors.surface || "#FFFFFF";
-  const border = theme.colors.border || "#D0DEF5";
-  const errorColor = theme.colors.error || "#C62828";
-  const successColor = theme.colors.success || "#2E7D32";
+  const primary = theme?.colors?.primary || "#1565C0";
+  const primaryContainer = theme?.colors?.primaryContainer || "#E3F2FD";
+  const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
+  const textSecondary = theme?.colors?.textSecondary || "#4A6080";
+  const textMuted = theme?.colors?.textMuted || "#8FA3BE";
+  const background = theme?.colors?.background || "#F5F8FF";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const border = theme?.colors?.border || "#D0DEF5";
+  const errorColor = theme?.colors?.error || "#C62828";
+  const successColor = theme?.colors?.success || "#2E7D32";
 
   const getLanguageName = (code) => {
     switch (code) {
@@ -73,7 +70,13 @@ const BuyerProfileScreen = () => {
         ]}
       >
         <TouchableOpacity
-          onPress={() => navigation?.goBack()}
+          onPress={() => {
+            if (navigation?.canGoBack()) {
+              navigation.goBack();
+            } else if (onSwitchTab) {
+              onSwitchTab("Home");
+            }
+          }}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={styles.backButton}
         >
@@ -209,7 +212,7 @@ const BuyerProfileScreen = () => {
       </ScrollView>
 
       {/* Logout Button */}
-      <View style={styles.logoutContainer}>
+      <View style={[styles.logoutContainer, { backgroundColor: background }]}>
         <TouchableOpacity
           style={[styles.logoutButton, { backgroundColor: errorColor }]}
           onPress={handleLogout}
@@ -354,7 +357,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: Platform.OS === "ios" ? 20 : 16,
     paddingTop: 10,
-    backgroundColor: background,
   },
   logoutButton: {
     flexDirection: "row",

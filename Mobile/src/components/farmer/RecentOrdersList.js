@@ -29,9 +29,9 @@ function StatusBadge({ status }) {
 
 export default function RecentOrdersList({ orders }) {
   const { theme } = useTheme();
-  const primaryColor = theme.colors.primary;
-  const textPrimary = theme.colors.textPrimary;
-  const textSecondary = theme.colors.textSecondary;
+  const primaryColor = theme?.colors?.primary;
+  const textPrimary = theme?.colors?.textPrimary;
+  const textSecondary = theme?.colors?.textSecondary;
 
   return (
     <View style={styles.section}>
@@ -52,7 +52,7 @@ export default function RecentOrdersList({ orders }) {
               <View
                 style={[
                   styles.icon,
-                  { backgroundColor: theme.colors.primaryLight || "#F3E5F5" },
+                  { backgroundColor: theme?.colors?.primaryLight || "#F3E5F5" },
                 ]}
               >
                 <Ionicons

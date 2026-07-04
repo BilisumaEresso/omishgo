@@ -9,8 +9,8 @@ const AppCard = ({ children, style, onPress, disabled = false }) => {
   const cardStyles = [
     styles.card,
     {
-      backgroundColor: theme.colors.surface || "#FFFFFF",
-      borderColor: theme.colors.border || "#F0F0F0",
+      backgroundColor: theme?.colors?.surface || "#FFFFFF",
+      borderColor: theme?.colors?.border || "#F0F0F0",
       borderWidth: 1, // simplified: always 1px if border color exists
     },
     style,

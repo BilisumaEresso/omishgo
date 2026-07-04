@@ -1,11 +1,11 @@
 // src/components/common/ScreenWrapper.js
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    View,
-    StatusBar,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  View,
 } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 
@@ -20,24 +20,33 @@ const ScreenWrapper = ({
   const { theme } = useTheme();
 
   const basePadding = padding ? 16 : 0;
-  const backgroundColor = theme.colors.background;
+  const backgroundColor = theme?.colors?.background || "#F5F5F5";
 
   const inner = scrollable ? (
     <ScrollView
       style={[styles.flex, style]}
-      contentContainerStyle={[{ flexGrow: 1, padding: basePadding }, contentContainerStyle]}
+      contentContainerStyle={[
+        { flexGrow: 1, padding: basePadding },
+        contentContainerStyle,
+      ]}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
     >
       {children}
     </ScrollView>
   ) : (
-    <View style={[styles.flex, { padding: basePadding }, style]}>{children}</View>
+    <View style={[styles.flex, { padding: basePadding }, style]}>
+      {children}
+    </View>
   );
 
   return (
-    <View style={[styles.root, { backgroundColor }]}> 
-      <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
+    <View style={[styles.root, { backgroundColor }]}>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === "ios" ? "padding" : undefined}

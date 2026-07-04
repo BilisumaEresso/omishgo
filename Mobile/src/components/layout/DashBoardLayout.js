@@ -26,9 +26,9 @@ const DashboardLayout = ({
   ...headerProps
 }) => {
   const { theme } = useTheme();
-  const primaryColor = theme.colors.primary || "#4CAF50";
-  const backgroundColor = theme.colors.background || "#F8F9FA";
-  const successColor = theme.colors.success || "#2e7d32";
+  const primaryColor = theme?.colors?.primary || "#4CAF50";
+  const backgroundColor = theme?.colors?.background || "#F8F9FA";
+  const successColor = theme?.colors?.success || "#2e7d32";
 
   return (
     <View style={[styles.flex, { backgroundColor }]}>

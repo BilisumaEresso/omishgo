@@ -110,13 +110,13 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
   const menuItems = role ? ROLE_MENU_ITEMS[role] || [] : [];
 
   // Theme shortcuts
-  const textPrimary = theme.colors.textPrimary || "#212121";
-  const textSecondary = theme.colors.textSecondary || "#757575";
-  const borderColor = theme.colors.border || "#E0E0E0";
-  const backgroundColor = theme.colors.surface || "#FFFFFF";
-  const pressedBg = theme.colors.backgroundSecondary || "#EEEEEE";
-  const errorColor = theme.colors.error || "#F44336";
-  const primaryColor = theme.colors.primary || "#4CAF50";
+  const textPrimary = theme?.colors?.textPrimary || "#212121";
+  const textSecondary = theme?.colors?.textSecondary || "#757575";
+  const borderColor = theme?.colors?.border || "#E0E0E0";
+  const backgroundColor = theme?.colors?.surface || "#FFFFFF";
+  const pressedBg = theme?.colors?.backgroundSecondary || "#EEEEEE";
+  const errorColor = theme?.colors?.error || "#F44336";
+  const primaryColor = theme?.colors?.primary || "#4CAF50";
   const spacing = theme.spacing || { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 };
   const radius = theme.radius || { sm: 8, md: 12 };
 

@@ -6,6 +6,7 @@ const supplierTheme = {
   role: "supplier",
 
   colors: {
+    ...baseTheme.colors,
     primary: "#FF9800",
     primaryDark: "#EF6C00",
     primaryLight: "#FFB74D",
