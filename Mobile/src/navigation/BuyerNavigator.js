@@ -15,11 +15,11 @@ import ConversationsScreen from "../screens/shared/ConversationsScreen";
 const Stack = createNativeStackNavigator();
 
 const TAB_SCREENS = {
-  Orders:      BuyerOrdersScreen,
+  Orders: BuyerOrdersScreen,
   Marketplace: BrowseScreen,
-  Home:        BuyerDashboardScreen,
-  Saved:       BuyerSavedScreen,
-  Profile:     BuyerProfileScreen,
+  Home: BuyerDashboardScreen,
+  Saved: BuyerSavedScreen,
+  Profile: BuyerProfileScreen,
 };
 
 const BuyerTabShell = ({ navigation }) => {
@@ -30,7 +30,7 @@ const BuyerTabShell = ({ navigation }) => {
       <View style={{ flex: 1 }}>
         <ActiveScreen navigation={navigation} onSwitchTab={setActiveTab} />
       </View>
-      <View style={{ paddingTop: 36, backgroundColor: "transparent" }}>
+      <View style={{ paddingTop: 34, backgroundColor: "transparent" }}>
         <BottomTabBar
           role={ROLES.BUYER}
           activeTab={activeTab}
