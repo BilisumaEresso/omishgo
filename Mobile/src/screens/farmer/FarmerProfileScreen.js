@@ -1,23 +1,26 @@
 // Mobile/src/screens/farmer/FarmerProfileScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import { useState } from "react";
 import {
   Alert,
   Platform,
   ScrollView,
-  StatusBar,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
 import AppText from "../../components/common/AppText";
+import AppHeader from "../../components/layout/AppHeader";
+import AppSidebar from "../../components/layout/AppSidebar";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
 const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
   const { user, logout } = useAuthStore();
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
+  // Theme colors
   const primary = theme?.colors?.primary || "#2E7D32";
   const primaryContainer = theme?.colors?.primaryContainer || "#E8F5E9";
   const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
@@ -29,7 +32,6 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
   const errorColor = theme?.colors?.error || "#C62828";
   const successColor = theme?.colors?.success || "#2E7D32";
 
-  // Helper to map language code to readable name
   const getLanguageName = (code) => {
     switch (code) {
       case "am":
@@ -49,7 +51,6 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
     ]);
   };
 
-  // Real user data with fallbacks
   const userName = user?.name || "Farmer";
   const phone = user?.phone || "+251 900 000000";
   const location = user?.location || { region: "Addis Ababa", zone: "Bole" };
@@ -58,47 +59,23 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
 
   return (
     <View style={[styles.screen, { backgroundColor: background }]}>
-      {/* Inline Header */}
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: surface,
-            borderBottomColor: border,
-            paddingTop:
-              Platform.OS === "android"
-                ? (StatusBar.currentHeight || 24) + 12
-                : 54,
-          },
-        ]}
-      >
-        <TouchableOpacity
-          onPress={() => {
-            if (navigation?.canGoBack()) {
-              navigation.goBack();
-            } else if (onSwitchTab) {
-              onSwitchTab("Home");
-            }
-          }}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={styles.backButton}
-        >
-          <Ionicons name="arrow-back" size={24} color={primary} />
-        </TouchableOpacity>
-        <AppText style={[styles.headerTitle, { color: textPrimary }]}>
-          My Profile
-        </AppText>
-        <View style={styles.backButton} />
-      </View>
+      <AppHeader
+        title="My Profile"
+        showMenu={true}
+        showNotification={true}
+        notificationCount={0}
+        onMenuPress={() => setSidebarVisible(true)}
+        onNotificationPress={() => navigation.navigate("Notifications")}
+      />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile Hero Section */}
+        {/* Profile Hero */}
         <View style={styles.heroSection}>
           <View style={[styles.avatar, { backgroundColor: primary }]}>
-            <Ionicons name="person" size={40} color="#FFFFFF" />
+            <Ionicons name="person" size={40} color={surface} />
           </View>
           <AppText style={[styles.name, { color: textPrimary }]}>
             {userName}
@@ -115,7 +92,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
           </AppText>
         </View>
 
-        {/* Stats Row */}
+        {/* Stats */}
         <View style={styles.statsRow}>
           <View style={[styles.statCard, { backgroundColor: surface }]}>
             <AppText style={[styles.statValue, { color: textPrimary }]}>
@@ -143,12 +120,10 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
           </View>
         </View>
 
-        {/* Account Info Section */}
+        {/* Account Info */}
         <AppText style={[styles.sectionTitle, { color: textPrimary }]}>
           Account Info
         </AppText>
-
-        {/* Info Rows */}
         <View style={[styles.infoCard, { backgroundColor: surface }]}>
           <View style={styles.infoRow}>
             <Ionicons name="location-outline" size={20} color={textSecondary} />
@@ -216,7 +191,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
       </ScrollView>
 
       {/* Logout Button */}
-      <View style={styles.logoutContainer}>
+      <View style={[styles.logoutContainer, { backgroundColor: background }]}>
         <TouchableOpacity
           style={[styles.logoutButton, { backgroundColor: errorColor }]}
           onPress={handleLogout}
@@ -225,12 +200,40 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
           <Ionicons
             name="log-out-outline"
             size={20}
-            color="#FFFFFF"
+            color={surface}
             style={{ marginRight: 8 }}
           />
-          <AppText style={styles.logoutText}>Logout</AppText>
+          <AppText style={[styles.logoutText, { color: surface }]}>
+            Logout
+          </AppText>
         </TouchableOpacity>
       </View>
+
+      <AppSidebar
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+        onItemPress={(item) => {
+          setSidebarVisible(false);
+          if (item.route === "Conversations")
+            navigation.navigate("Conversations");
+          else if (item.route === "Chat") navigation.navigate("Chat");
+          else if (item.route === "PostProduct")
+            navigation.navigate("PostProduct");
+          else if (item.route === "Home") onSwitchTab?.("Home");
+          else if (onSwitchTab) {
+            const TAB_MAP = {
+              FarmerProducts: "Products",
+              FarmerOrders: "Orders",
+              FarmerAnalytics: "Insights",
+              Profile: "Profile",
+              BuyerMarketplace: "Marketplace",
+              BuyerOrders: "Orders",
+              BuyerSaved: "Saved",
+            };
+            if (TAB_MAP[item.route]) onSwitchTab(TAB_MAP[item.route]);
+          }
+        }}
+      />
     </View>
   );
 };
@@ -238,25 +241,6 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingBottom: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    textAlign: "center",
   },
   scrollContent: {
     paddingBottom: 20,
@@ -361,7 +345,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: Platform.OS === "ios" ? 20 : 16,
     paddingTop: 10,
-    backgroundColor: "#F9FBF9",
   },
   logoutButton: {
     flexDirection: "row",
@@ -371,7 +354,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   logoutText: {
-    color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "700",
   },

@@ -1,16 +1,16 @@
 // Mobile/src/screens/buyer/BuyerOrdersScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   FlatList,
-  Platform,
   ScrollView,
-  StatusBar,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
 import AppText from "../../components/common/AppText";
+import AppHeader from "../../components/layout/AppHeader";
+import AppSidebar from "../../components/layout/AppSidebar";
 import { useTheme } from "../../hooks/useTheme";
 
 // --- Mock Data ---
@@ -72,23 +72,28 @@ const FILTER_TABS = ["All", "Active", "Completed"];
 const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
   const [activeFilter, setActiveFilter] = useState("All");
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
+  // Extract theme colors with fallbacks
   const primary = theme?.colors?.primary || "#1565C0";
   const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
   const textSecondary = theme?.colors?.textSecondary || "#4A6080";
   const background = theme?.colors?.background || "#F5F8FF";
   const surface = theme?.colors?.surface || "#FFFFFF";
   const border = theme?.colors?.border || "#D0DEF5";
+  const success = theme?.colors?.success || "#2E7D32";
+  const info = theme?.colors?.info || "#1565C0";
+  const textMuted = theme?.colors?.textMuted || "#8FA3BE";
 
-  // Status badge colors
+  // Status badge colors - using theme with transparency
   const getStatusColor = (status) => {
     switch (status) {
       case "Active":
-        return { bg: "#E3F2FD", text: "#0D47A1" };
+        return { bg: info + "18", text: info };
       case "Completed":
-        return { bg: "#E8F5E9", text: "#1B5E20" };
+        return { bg: success + "18", text: success };
       default:
-        return { bg: "#F5F5F5", text: "#757575" };
+        return { bg: textMuted + "18", text: textMuted };
     }
   };
 
@@ -102,70 +107,87 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
     const isActive = item.status === "Active";
 
     return (
-      <View style={[styles.card, { backgroundColor: surface }]}>
-        <View style={styles.cardRow}>
-          {/* Crop info */}
-          <View style={{ flex: 1 }}>
-            <AppText style={[styles.cropName, { color: textPrimary }]}>
-              {item.cropType}{" "}
-              <AppText
-                style={{
-                  fontWeight: "400",
-                  fontSize: 14,
-                  color: textSecondary,
-                }}
-              >
-                ({item.quantity} {item.unit})
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() =>
+          navigation?.navigate("OrderDetail", { order: item, role: "buyer" })
+        }
+      >
+        <View style={[styles.card, { backgroundColor: surface }]}>
+          <View style={styles.cardRow}>
+            {/* Crop info */}
+            <View style={{ flex: 1 }}>
+              <AppText style={[styles.cropName, { color: textPrimary }]}>
+                {item.cropType}{" "}
+                <AppText
+                  style={{
+                    fontWeight: "400",
+                    fontSize: 14,
+                    color: textSecondary,
+                  }}
+                >
+                  ({item.quantity} {item.unit})
+                </AppText>
               </AppText>
-            </AppText>
-            <AppText style={[styles.subText, { color: textSecondary }]}>
-              {item.farmerName} • {item.orderedDate}
-            </AppText>
-          </View>
-
-          {/* Price and badge */}
-          <View style={{ alignItems: "flex-end" }}>
-            <AppText style={[styles.price, { color: primary }]}>
-              KSh {item.totalPrice.toLocaleString()}
-            </AppText>
-            <View style={[styles.badge, { backgroundColor: statusColors.bg }]}>
-              <AppText style={[styles.badgeText, { color: statusColors.text }]}>
-                {item.status}
+              <AppText style={[styles.subText, { color: textSecondary }]}>
+                {item.farmerName} • {item.orderedDate}
               </AppText>
             </View>
-          </View>
-        </View>
 
-        {/* Message button for active orders */}
-        {isActive && (
-          <TouchableOpacity
-            style={[styles.messageButton, { borderColor: primary }]}
-            onPress={() =>
-              navigation?.navigate("Chat", {
-                userId: "mock",
-                userName: item.farmerName,
-              })
-            }
-            activeOpacity={0.7}
-          >
-            <Ionicons
-              name="chatbubble-outline"
-              size={14}
-              color={primary}
-              style={{ marginRight: 6 }}
-            />
-            <AppText style={[styles.messageButtonText, { color: primary }]}>
-              Message Farmer
-            </AppText>
-          </TouchableOpacity>
-        )}
-      </View>
+            {/* Price and badge */}
+            <View style={{ alignItems: "flex-end" }}>
+              <AppText style={[styles.price, { color: primary }]}>
+                KSh {item.totalPrice.toLocaleString()}
+              </AppText>
+              <View
+                style={[styles.badge, { backgroundColor: statusColors.bg }]}
+              >
+                <AppText
+                  style={[styles.badgeText, { color: statusColors.text }]}
+                >
+                  {item.status}
+                </AppText>
+              </View>
+            </View>
+          </View>
+
+          {/* Message button for active orders */}
+          {isActive && (
+            <TouchableOpacity
+              style={[styles.messageButton, { borderColor: primary }]}
+              onPress={() =>
+                navigation?.navigate("Chat", {
+                  userId: "mock",
+                  userName: item.farmerName,
+                })
+              }
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="chatbubble-outline"
+                size={14}
+                color={primary}
+                style={{ marginRight: 6 }}
+              />
+              <AppText style={[styles.messageButtonText, { color: primary }]}>
+                Message Farmer
+              </AppText>
+            </TouchableOpacity>
+          )}
+        </View>
+      </TouchableOpacity>
     );
   };
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <AppText style={styles.emptyEmoji}>📦</AppText>
+      {/* Replaced emoji with Ionicons */}
+      <Ionicons
+        name="cube-outline"
+        size={48}
+        color={textSecondary}
+        style={{ marginBottom: 12 }}
+      />
       <AppText style={[styles.emptyText, { color: textSecondary }]}>
         No orders yet
       </AppText>
@@ -174,38 +196,14 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
 
   return (
     <View style={[styles.screen, { backgroundColor: background }]}>
-      {/* Inline header */}
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: surface,
-            borderBottomColor: border,
-            paddingTop:
-              Platform.OS === "android"
-                ? (StatusBar.currentHeight || 24) + 12
-                : 54,
-          },
-        ]}
-      >
-        <TouchableOpacity
-          onPress={() => {
-            if (navigation?.canGoBack()) {
-              navigation.goBack();
-            } else if (onSwitchTab) {
-              onSwitchTab("Home");
-            }
-          }}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={styles.backButton}
-        >
-          <Ionicons name="arrow-back" size={24} color={primary} />
-        </TouchableOpacity>
-        <AppText style={[styles.headerTitle, { color: textPrimary }]}>
-          My Orders
-        </AppText>
-        <View style={styles.backButton} />
-      </View>
+      <AppHeader
+        title="My Orders"
+        showMenu={true}
+        showNotification={true}
+        notificationCount={0}
+        onMenuPress={() => setSidebarVisible(true)}
+        onNotificationPress={() => navigation.navigate("Notifications")}
+      />
 
       {/* Filter tabs */}
       <View style={styles.filterContainer}>
@@ -232,7 +230,7 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
                   style={[
                     styles.filterText,
                     {
-                      color: isActive ? "#FFFFFF" : textSecondary,
+                      color: isActive ? surface : textSecondary,
                     },
                   ]}
                 >
@@ -253,6 +251,32 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
+
+      <AppSidebar
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+        onItemPress={(item) => {
+          setSidebarVisible(false);
+          if (item.route === "Conversations")
+            navigation.navigate("Conversations");
+          else if (item.route === "Chat") navigation.navigate("Chat");
+          else if (item.route === "PostProduct")
+            navigation.navigate("PostProduct");
+          else if (item.route === "Home") onSwitchTab?.("Home");
+          else if (onSwitchTab) {
+            const TAB_MAP = {
+              FarmerProducts: "Products",
+              FarmerOrders: "Orders",
+              FarmerAnalytics: "Insights",
+              Profile: "Profile",
+              BuyerMarketplace: "Marketplace",
+              BuyerOrders: "Orders",
+              BuyerSaved: "Saved",
+            };
+            if (TAB_MAP[item.route]) onSwitchTab(TAB_MAP[item.route]);
+          }
+        }}
+      />
     </View>
   );
 };
@@ -260,25 +284,6 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingBottom: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    textAlign: "center",
   },
   filterContainer: {
     paddingVertical: 12,
@@ -299,6 +304,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   listContent: {
+    paddingTop: 8,
     paddingBottom: 20,
     flexGrow: 1,
   },
@@ -358,10 +364,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingBottom: 60,
-  },
-  emptyEmoji: {
-    fontSize: 48,
-    marginBottom: 12,
   },
   emptyText: {
     fontSize: 16,

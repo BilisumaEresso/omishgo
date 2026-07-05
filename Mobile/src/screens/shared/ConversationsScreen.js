@@ -1,25 +1,31 @@
 // Mobile/src/screens/shared/ConversationsScreen.js
-import React, { useState, useEffect, useCallback } from "react";
-import {
-  View,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator,
-  RefreshControl,
-  StatusBar,
-  Platform,
-} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import ScreenWrapper from "../../components/common/ScreenWrapper";
-import AppText from "../../components/common/AppText";
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import AppButton from "../../components/common/AppButton";
+import AppText from "../../components/common/AppText";
+import AppHeader from "../../components/layout/AppHeader";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 
 // ─── Conversation row ─────────────────────────────────────────────────────────
 const ConvoRow = ({ convo, onPress, theme }) => {
+  // Extract theme colors
+  const primary = theme?.colors?.primary || "#2E7D32";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const border = theme?.colors?.border || "#E0E0E0";
+  const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
+  const textSecondary = theme?.colors?.textSecondary || "#4A6741";
+
   const hasUnread = convo.unreadCount > 0;
 
   return (
@@ -28,20 +34,15 @@ const ConvoRow = ({ convo, onPress, theme }) => {
       style={[
         styles.row,
         {
-          backgroundColor: theme?.colors?.surface || "#fff",
-          borderBottomColor: theme?.colors?.border || "#f0f0f0",
+          backgroundColor: surface,
+          borderBottomColor: border,
         },
       ]}
       activeOpacity={0.7}
     >
       {/* Avatar */}
-      <View
-        style={[
-          styles.avatar,
-          { backgroundColor: theme?.colors?.primary || "#2e7d32" },
-        ]}
-      >
-        <AppText style={styles.avatarText}>
+      <View style={[styles.avatar, { backgroundColor: primary }]}>
+        <AppText style={[styles.avatarText, { color: surface }]}>
           {(convo.partnerName || "?")[0].toUpperCase()}
         </AppText>
       </View>
@@ -53,16 +54,13 @@ const ConvoRow = ({ convo, onPress, theme }) => {
             variant="headingSm"
             style={[
               styles.partnerName,
-              { color: theme?.colors?.textPrimary || "#333" },
+              { color: textPrimary },
               hasUnread && styles.bold,
             ]}
           >
             {convo.partnerName || "Unknown"}
           </AppText>
-          <AppText
-            variant="label"
-            style={{ color: theme?.colors?.textSecondary || "#aaa" }}
-          >
+          <AppText variant="label" style={{ color: textSecondary }}>
             {formatRelativeTime(convo.lastMessageAt)}
           </AppText>
         </View>
@@ -71,7 +69,7 @@ const ConvoRow = ({ convo, onPress, theme }) => {
             variant="bodyMd"
             style={[
               styles.preview,
-              { color: theme?.colors?.textSecondary || "#888" },
+              { color: textSecondary },
               hasUnread && styles.previewUnread,
             ]}
             numberOfLines={1}
@@ -79,13 +77,10 @@ const ConvoRow = ({ convo, onPress, theme }) => {
             {convo.lastMessage || "…"}
           </AppText>
           {hasUnread && (
-            <View
-              style={[
-                styles.badge,
-                { backgroundColor: theme?.colors?.primary || "#2e7d32" },
-              ]}
-            >
-              <AppText style={styles.badgeText}>{convo.unreadCount}</AppText>
+            <View style={[styles.badge, { backgroundColor: primary }]}>
+              <AppText style={[styles.badgeText, { color: surface }]}>
+                {convo.unreadCount}
+              </AppText>
             </View>
           )}
         </View>
@@ -109,6 +104,15 @@ const formatRelativeTime = (iso) => {
 export default function ConversationsScreen({ navigation }) {
   const { t } = useTranslation();
   const { theme } = useTheme();
+
+  // Extract theme colors
+  const primary = theme?.colors?.primary || "#2E7D32";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const background = theme?.colors?.background || "#F5F5F5";
+  const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
+  const textSecondary = theme?.colors?.textSecondary || "#4A6741";
+  const textMuted = theme?.colors?.textMuted || "#8FAF8A";
+  const errorColor = theme?.colors?.error || "#F44336";
 
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -146,65 +150,34 @@ export default function ConversationsScreen({ navigation }) {
     });
   };
 
-  // ── Render states ──
+  // ── Loading state ──
   if (loading) {
     return (
-      <ScreenWrapper>
+      <View style={[styles.screen, { backgroundColor: background }]}>
+        <AppHeader
+          title={t("messaging.conversations") || "Messages"}
+          showBack={true}
+          onBackPress={() => navigation.goBack()}
+        />
         <View style={styles.center}>
-          <ActivityIndicator
-            size="large"
-            color={theme?.colors?.primary || "#2e7d32"}
-          />
+          <ActivityIndicator size="large" color={primary} />
         </View>
-      </ScreenWrapper>
+      </View>
     );
   }
 
   return (
-    <ScreenWrapper padding={false}>
-      {/* Updated header */}
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: theme?.colors?.surface || "#fff",
-            borderBottomColor: theme?.colors?.border || "#e8e8e8",
-            paddingTop:
-              Platform.OS === "android"
-                ? (StatusBar.currentHeight || 24) + 10
-                : 10,
-            paddingHorizontal: 16,
-            paddingBottom: 14,
-          },
-        ]}
-      >
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backBtn}
-        >
-          <AppText
-            variant="headingMd"
-            style={{
-              color: theme?.colors?.primary || "#2e7d32",
-              fontSize: 22,
-            }}
-          >
-            ←
-          </AppText>
-        </TouchableOpacity>
-        <AppText variant="headingMd">
-          {t("messaging.conversations") || "Messages"}
-        </AppText>
-      </View>
+    <View style={[styles.screen, { backgroundColor: background }]}>
+      <AppHeader
+        title={t("messaging.conversations") || "Messages"}
+        showBack={true}
+        onBackPress={() => navigation.goBack()}
+      />
 
       {error ? (
         <View style={styles.center}>
           <AppText
-            style={{
-              color: theme?.colors?.error || "red",
-              textAlign: "center",
-              marginBottom: 12,
-            }}
+            style={{ color: errorColor, textAlign: "center", marginBottom: 12 }}
           >
             {error}
           </AppText>
@@ -226,28 +199,30 @@ export default function ConversationsScreen({ navigation }) {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={() => fetchConversations(true)}
-              colors={[theme?.colors?.primary || "#2e7d32"]}
+              colors={[primary]}
             />
           }
           ListEmptyComponent={
             <View style={styles.center}>
-              <AppText style={{ fontSize: 48, marginBottom: 12 }}>💬</AppText>
+              {/* Replaced emoji with Ionicons */}
+              <Ionicons
+                name="chatbubbles-outline"
+                size={48}
+                color={textSecondary}
+              />
               <AppText
                 variant="headingSm"
                 style={{
-                  color: theme?.colors?.textSecondary || "#888",
+                  color: textSecondary,
                   textAlign: "center",
+                  marginTop: 12,
                 }}
               >
                 {t("messaging.noConversations") || "No conversations yet"}
               </AppText>
               <AppText
                 variant="bodyMd"
-                style={{
-                  color: theme?.colors?.textSecondary || "#aaa",
-                  textAlign: "center",
-                  marginTop: 6,
-                }}
+                style={{ color: textMuted, textAlign: "center", marginTop: 6 }}
               >
                 {t("messaging.startConvoHint") ||
                   "Browse a listing and message a farmer to start."}
@@ -256,18 +231,14 @@ export default function ConversationsScreen({ navigation }) {
           }
         />
       )}
-    </ScreenWrapper>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderBottomWidth: 1,
-    gap: 10,
+  screen: {
+    flex: 1,
   },
-  backBtn: { padding: 4 },
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -283,7 +254,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarText: { color: "#fff", fontWeight: "700", fontSize: 18 },
+  avatarText: { fontWeight: "700", fontSize: 18 },
   rowContent: { flex: 1, gap: 3 },
   rowTop: {
     flexDirection: "row",
@@ -298,7 +269,7 @@ const styles = StyleSheet.create({
   partnerName: { flex: 1 },
   bold: { fontWeight: "700" },
   preview: { flex: 1, marginRight: 8 },
-  previewUnread: { fontWeight: "600", color: "#333" },
+  previewUnread: { fontWeight: "600" },
   badge: {
     minWidth: 20,
     height: 20,
@@ -307,7 +278,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 5,
   },
-  badgeText: { color: "#fff", fontSize: 11, fontWeight: "700" },
+  badgeText: { fontSize: 11, fontWeight: "700" },
   center: {
     flex: 1,
     justifyContent: "center",

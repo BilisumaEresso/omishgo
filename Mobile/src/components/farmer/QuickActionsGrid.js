@@ -1,13 +1,13 @@
-import React from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import AppText from "../common/AppText";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
+import AppText from "../common/AppText";
 
 export default function QuickActionsGrid({
   productCount,
   onAddPress,
   onOrdersPress,
+  onProductsPress,
   onTrainingPress,
 }) {
   const { theme } = useTheme();
@@ -32,11 +32,13 @@ export default function QuickActionsGrid({
       </TouchableOpacity>
 
       {/* My Products */}
-      <View
+      <TouchableOpacity
         style={[
           styles.item,
           { backgroundColor: surfaceColor, borderWidth: 1, borderColor },
         ]}
+        onPress={onProductsPress}
+        activeOpacity={0.7}
       >
         <Ionicons name="cube-outline" size={32} color={primaryColor} />
         <AppText
@@ -45,7 +47,7 @@ export default function QuickActionsGrid({
         >
           My Products ({productCount})
         </AppText>
-      </View>
+      </TouchableOpacity>
 
       {/* Orders */}
       <TouchableOpacity

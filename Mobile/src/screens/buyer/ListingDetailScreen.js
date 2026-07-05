@@ -29,35 +29,31 @@ const timeAgo = (dateStr) => {
 };
 
 // ─── Info Row ─────────────────────────────────────────────────────────────────
-const InfoRow = ({ iconName, label, value, theme }) => (
-  <View
-    style={[
-      styles.infoRow,
-      { borderBottomColor: theme?.colors?.border || "#f0f0f0" },
-    ]}
-  >
-    <Ionicons
-      name={iconName}
-      size={20}
-      color={theme?.colors?.primary || "#2e7d32"}
-      style={{ marginTop: 2 }}
-    />
-    <View style={styles.infoContent}>
-      <AppText
-        variant="label"
-        style={{ color: theme?.colors?.textSecondary || "#888" }}
-      >
-        {label}
-      </AppText>
-      <AppText
-        variant="bodyMd"
-        style={{ color: theme?.colors?.textPrimary || "#333" }}
-      >
-        {value || "—"}
-      </AppText>
+const InfoRow = ({ iconName, label, value, theme }) => {
+  const primary = theme?.colors?.primary || "#1565C0";
+  const textSecondary = theme?.colors?.textSecondary || "#4A6080";
+  const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
+  const border = theme?.colors?.border || "#D0DEF5";
+
+  return (
+    <View style={[styles.infoRow, { borderBottomColor: border }]}>
+      <Ionicons
+        name={iconName}
+        size={20}
+        color={primary}
+        style={{ marginTop: 2 }}
+      />
+      <View style={styles.infoContent}>
+        <AppText variant="label" style={{ color: textSecondary }}>
+          {label}
+        </AppText>
+        <AppText variant="bodyMd" style={{ color: textPrimary }}>
+          {value || "—"}
+        </AppText>
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 export default function ListingDetailScreen({ route, navigation }) {
   const { t } = useTranslation();
@@ -66,10 +62,22 @@ export default function ListingDetailScreen({ route, navigation }) {
   const { product } = route.params || {};
   const [isSaved, setIsSaved] = useState(false);
 
+  // Extract theme colors with buyer fallbacks
+  const primary = theme?.colors?.primary || "#1565C0";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
+  const textSecondary = theme?.colors?.textSecondary || "#4A6080";
+  const textMuted = theme?.colors?.textMuted || "#8FA3BE";
+  const border = theme?.colors?.border || "#D0DEF5";
+  const background = theme?.colors?.background || "#F5F8FF";
+  const success = theme?.colors?.success || "#2E7D32";
+  const warning = theme?.colors?.warning || "#EF6C00";
+  const error = theme?.colors?.error || "#C62828";
+
   if (!product) {
     return (
-      <View style={styles.fallbackContainer}>
-        <AppText variant="headingSm">
+      <View style={[styles.fallbackContainer, { backgroundColor: background }]}>
+        <AppText variant="headingSm" style={{ color: textPrimary }}>
           {t("browse.notFound") || "Listing not found"}
         </AppText>
         <AppButton
@@ -120,15 +128,39 @@ export default function ListingDetailScreen({ route, navigation }) {
     );
   };
 
+  // Status color based on theme
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "sold":
+        return error;
+      case "draft":
+        return textMuted;
+      default:
+        return success; // active
+    }
+  };
+
+  // Demand color based on theme
+  const getDemandColor = (level) => {
+    switch (level) {
+      case "High":
+        return success;
+      case "Medium":
+        return warning;
+      default:
+        return textMuted;
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: background }]}>
       {/* Fixed Header */}
       <View
         style={[
           styles.header,
           {
-            backgroundColor: theme?.colors?.surface || "#fff",
-            borderBottomColor: theme?.colors?.border || "#eee",
+            backgroundColor: surface,
+            borderBottomColor: border,
             paddingTop:
               Platform.OS === "android"
                 ? (StatusBar.currentHeight || 24) + 12
@@ -140,11 +172,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           onPress={() => navigation.goBack()}
           style={styles.backBtn}
         >
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={theme?.colors?.primary || "#2e7d32"}
-          />
+          <Ionicons name="arrow-back" size={24} color={primary} />
         </TouchableOpacity>
         <AppText
           variant="headingMd"
@@ -152,7 +180,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           style={{
             flex: 1,
             textAlign: "center",
-            color: theme?.colors?.textPrimary,
+            color: textPrimary,
             marginHorizontal: 10,
           }}
         >
@@ -166,7 +194,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           <Ionicons
             name={isSaved ? "bookmark" : "bookmark-outline"}
             size={24}
-            color={theme?.colors?.primary || "#2e7d32"}
+            color={primary}
           />
         </TouchableOpacity>
       </View>
@@ -180,92 +208,85 @@ export default function ListingDetailScreen({ route, navigation }) {
         {/* Crop title & status */}
         <AppText
           variant="headingLg"
-          style={[styles.cropTitle, { color: theme?.colors?.textPrimary }]}
+          style={[styles.cropTitle, { color: textPrimary }]}
         >
           {product.cropType}
         </AppText>
         <View
           style={[
             styles.badge,
-            { backgroundColor: statusColor(product.status) },
+            { backgroundColor: getStatusColor(product.status) },
           ]}
         >
-          <AppText variant="label" style={{ color: "#fff" }}>
+          <AppText variant="label" style={{ color: surface }}>
             {product.status?.toUpperCase() || "ACTIVE"}
           </AppText>
         </View>
 
         {/* Price banner */}
-        <View
-          style={[
-            styles.priceBanner,
-            { backgroundColor: theme?.colors?.primary || "#2e7d32" },
-          ]}
-        >
+        <View style={[styles.priceBanner, { backgroundColor: primary }]}>
           <AppText
             variant="headingMd"
-            style={{ color: "#fff", fontWeight: "700" }}
+            style={{ color: surface, fontWeight: "700" }}
           >
             {product.price} ETB
           </AppText>
-          <AppText style={{ color: "#fff", fontSize: 14, marginTop: 2 }}>
+          <AppText style={{ color: surface, fontSize: 14, marginTop: 2 }}>
             per {unit} · {product.quantity} {unit} available
           </AppText>
         </View>
 
-        {/* Market insights card */}
+        {/* Market insights card - emoji replaced with icon */}
         <View
           style={[
             styles.insightsCard,
-            {
-              backgroundColor: theme?.colors?.surface,
-              borderColor: theme?.colors?.border,
-            },
+            { backgroundColor: surface, borderColor: border },
           ]}
         >
-          <AppText
-            variant="headingSm"
-            style={{ color: theme?.colors?.textPrimary, marginBottom: 8 }}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 8,
+            }}
           >
-            📊 Market Insights
-          </AppText>
+            <Ionicons
+              name="stats-chart-outline"
+              size={20}
+              color={primary}
+              style={{ marginRight: 6 }}
+            />
+            <AppText variant="headingSm" style={{ color: textPrimary }}>
+              Market Insights
+            </AppText>
+          </View>
           <View style={styles.insightsRow}>
             <View style={styles.insightItem}>
-              <AppText
-                variant="label"
-                style={{ color: theme?.colors?.textSecondary }}
-              >
+              <AppText variant="label" style={{ color: textSecondary }}>
                 Avg Price
               </AppText>
-              <AppText
-                style={{ color: theme?.colors?.primary, fontWeight: "700" }}
-              >
+              <AppText style={{ color: primary, fontWeight: "700" }}>
                 {avgMarketPrice} ETB/{unit}
               </AppText>
             </View>
             <View style={styles.insightItem}>
-              <AppText
-                variant="label"
-                style={{ color: theme?.colors?.textSecondary }}
-              >
+              <AppText variant="label" style={{ color: textSecondary }}>
                 Demand
               </AppText>
               <AppText
-                style={{ color: demandColor(demandLevel), fontWeight: "700" }}
+                style={{
+                  color: getDemandColor(demandLevel),
+                  fontWeight: "700",
+                }}
               >
                 {demandLevel}
               </AppText>
             </View>
             <View style={styles.insightItem}>
-              <AppText
-                variant="label"
-                style={{ color: theme?.colors?.textSecondary }}
-              >
+              <AppText variant="label" style={{ color: textSecondary }}>
                 Listed
               </AppText>
-              <AppText style={{ color: theme?.colors?.textPrimary }}>
-                {listedTime}
-              </AppText>
+              <AppText style={{ color: textPrimary }}>{listedTime}</AppText>
             </View>
           </View>
         </View>
@@ -274,10 +295,7 @@ export default function ListingDetailScreen({ route, navigation }) {
         <View
           style={[
             styles.detailCard,
-            {
-              backgroundColor: theme?.colors?.surface,
-              borderColor: theme?.colors?.border,
-            },
+            { backgroundColor: surface, borderColor: border },
           ]}
         >
           <InfoRow
@@ -324,15 +342,12 @@ export default function ListingDetailScreen({ route, navigation }) {
         <View
           style={[
             styles.farmerCard,
-            {
-              backgroundColor: theme?.colors?.surface,
-              borderColor: theme?.colors?.border,
-            },
+            { backgroundColor: surface, borderColor: border },
           ]}
         >
           <AppText
             variant="headingSm"
-            style={[styles.sectionTitle, { color: theme?.colors?.textPrimary }]}
+            style={[styles.sectionTitle, { color: textPrimary }]}
           >
             {t("browse.farmerTitle") || "Farmer"}
           </AppText>
@@ -360,7 +375,7 @@ export default function ListingDetailScreen({ route, navigation }) {
             style={styles.actionBtn}
           />
           <AppButton
-            title={`📞  ${t("browse.callBtn") || "Call Farmer"}`}
+            title={t("browse.callBtn") || "Call Farmer"}
             variant="outline"
             fullWidth
             onPress={handleCallFarmer}
@@ -373,32 +388,9 @@ export default function ListingDetailScreen({ route, navigation }) {
   );
 }
 
-const statusColor = (status) => {
-  switch (status) {
-    case "sold":
-      return "#c62828";
-    case "draft":
-      return "#888";
-    default:
-      return "#2e7d32";
-  }
-};
-
-const demandColor = (level) => {
-  switch (level) {
-    case "High":
-      return "#2e7d32";
-    case "Medium":
-      return "#f57f17";
-    default:
-      return "#666";
-  }
-};
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   fallbackContainer: {
     flex: 1,
@@ -412,7 +404,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    backgroundColor: "#fff",
   },
   backBtn: {
     width: 40,

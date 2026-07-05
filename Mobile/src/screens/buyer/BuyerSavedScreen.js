@@ -1,15 +1,10 @@
 // Mobile/src/screens/buyer/BuyerSavedScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
-import {
-  FlatList,
-  Platform,
-  StatusBar,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { useState } from "react";
+import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../../components/common/AppText";
+import AppHeader from "../../components/layout/AppHeader";
+import AppSidebar from "../../components/layout/AppSidebar";
 import { useTheme } from "../../hooks/useTheme";
 
 // --- Mock Data ---
@@ -55,6 +50,7 @@ const MOCK_SAVED = [
 const BuyerSavedScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
   const [savedProducts, setSavedProducts] = useState(MOCK_SAVED);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   const primary = theme?.colors?.primary || "#1565C0";
   const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
@@ -122,7 +118,13 @@ const BuyerSavedScreen = ({ navigation, onSwitchTab }) => {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <AppText style={styles.emptyEmoji}>🔖</AppText>
+      {/* Replaced emoji with Ionicons */}
+      <Ionicons
+        name="bookmark-outline"
+        size={48}
+        color={textMuted}
+        style={{ marginBottom: 12 }}
+      />
       <AppText style={[styles.emptyTitle, { color: textPrimary }]}>
         No saved listings
       </AppText>
@@ -131,7 +133,7 @@ const BuyerSavedScreen = ({ navigation, onSwitchTab }) => {
       </AppText>
       <TouchableOpacity
         style={[styles.browseButton, { backgroundColor: primary }]}
-        onPress={() => navigation?.goBack()}
+        onPress={() => onSwitchTab?.("Marketplace")}
       >
         <AppText style={styles.browseButtonText}>Go to Marketplace</AppText>
       </TouchableOpacity>
@@ -140,38 +142,14 @@ const BuyerSavedScreen = ({ navigation, onSwitchTab }) => {
 
   return (
     <View style={[styles.screen, { backgroundColor: background }]}>
-      {/* Inline Header */}
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: surface,
-            borderBottomColor: border,
-            paddingTop:
-              Platform.OS === "android"
-                ? (StatusBar.currentHeight || 24) + 12
-                : 54,
-          },
-        ]}
-      >
-        <TouchableOpacity
-          onPress={() => {
-            if (navigation?.canGoBack()) {
-              navigation.goBack();
-            } else if (onSwitchTab) {
-              onSwitchTab("Home");
-            }
-          }}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={styles.backButton}
-        >
-          <Ionicons name="arrow-back" size={24} color={primary} />
-        </TouchableOpacity>
-        <AppText style={[styles.headerTitle, { color: textPrimary }]}>
-          Saved Listings
-        </AppText>
-        <View style={styles.backButton} />
-      </View>
+      <AppHeader
+        title="Saved Listings"
+        showMenu={true}
+        showNotification={true}
+        notificationCount={0}
+        onMenuPress={() => setSidebarVisible(true)}
+        onNotificationPress={() => navigation.navigate("Notifications")}
+      />
 
       <FlatList
         data={savedProducts}
@@ -181,6 +159,29 @@ const BuyerSavedScreen = ({ navigation, onSwitchTab }) => {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
+
+      <AppSidebar
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+        onItemPress={(item) => {
+          setSidebarVisible(false);
+          if (item.route === "Conversations")
+            navigation.navigate("Conversations");
+          else if (item.route === "Chat") navigation.navigate("Chat");
+          else if (item.route === "PostProduct")
+            navigation.navigate("PostProduct");
+          else if (item.route === "Home") onSwitchTab?.("Home");
+          else if (onSwitchTab) {
+            const MAP = {
+              BuyerMarketplace: "Marketplace",
+              BuyerOrders: "Orders",
+              BuyerSaved: "Saved",
+              Profile: "Profile",
+            };
+            if (MAP[item.route]) onSwitchTab(MAP[item.route]);
+          }
+        }}
+      />
     </View>
   );
 };
@@ -188,25 +189,6 @@ const BuyerSavedScreen = ({ navigation, onSwitchTab }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingBottom: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    textAlign: "center",
   },
   listContent: {
     paddingBottom: 20,
@@ -268,10 +250,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingBottom: 60,
-  },
-  emptyEmoji: {
-    fontSize: 48,
-    marginBottom: 12,
   },
   emptyTitle: {
     fontSize: 17,

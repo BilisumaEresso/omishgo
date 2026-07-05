@@ -11,6 +11,8 @@ import FarmerProfileScreen from "../screens/farmer/FarmerProfileScreen";
 import PostProductScreen from "../screens/farmer/PostProductScreen";
 import ChatScreen from "../screens/shared/ChatScreen";
 import ConversationsScreen from "../screens/shared/ConversationsScreen";
+import NotificationsScreen from "../screens/shared/NotificationsScreen";
+import OrderDetailScreen from "../screens/shared/OrderDetailScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +47,9 @@ const FarmerNavigator = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="FarmerTabs" component={FarmerTabShell} />
     <Stack.Screen name="PostProduct" component={PostProductScreen} />
+    <Stack.Screen name="Notifications" component={NotificationsScreen} />
+    <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
+    <Stack.Screen name="EditProduct" component={PostProductScreen} />
     <Stack.Screen name="Conversations" component={ConversationsScreen} />
     <Stack.Screen name="Chat" component={ChatScreen} />
   </Stack.Navigator>

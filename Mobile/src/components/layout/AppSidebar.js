@@ -1,48 +1,61 @@
 // src/components/layout/AppSidebar.js
-import React, { useEffect, useRef, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Pressable,
-  Modal,
   Animated,
   Dimensions,
-  StyleSheet,
-  SafeAreaView,
+  Modal,
   Platform,
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import AppText from "../common/AppText";
-import { useTheme } from "../../hooks/useTheme";
 import { ROLES } from "../../constants/roles";
+import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
+import AppText from "../common/AppText";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.75, 320); // capped at 320 for tablets
 
 const ROLE_MENU_ITEMS = {
   [ROLES.FARMER]: [
-    { label: "Products", icon: "leaf", route: "FarmerProducts" },
-    { label: "Orders", icon: "cart", route: "FarmerOrders" },
-    { label: "Analytics", icon: "bar-chart", route: "FarmerAnalytics" },
+    { label: "Home", icon: "home-outline", route: "Home" },
+    { label: "My Products", icon: "leaf-outline", route: "FarmerProducts" },
+    { label: "My Orders", icon: "receipt-outline", route: "FarmerOrders" },
+    { label: "Post Product", icon: "add-circle-outline", route: "PostProduct" },
+    { label: "Messages", icon: "chatbubbles-outline", route: "Conversations" },
+    {
+      label: "Market Insights",
+      icon: "stats-chart-outline",
+      route: "FarmerAnalytics",
+    },
   ],
   [ROLES.BUYER]: [
-    { label: "Marketplace", icon: "storefront", route: "BuyerMarketplace" },
-    { label: "Orders", icon: "cart", route: "BuyerOrders" },
-    { label: "Saved", icon: "bookmark", route: "BuyerSaved" },
+    { label: "Home", icon: "home-outline", route: "Home" },
+    {
+      label: "Marketplace",
+      icon: "storefront-outline",
+      route: "BuyerMarketplace",
+    },
+    { label: "My Orders", icon: "receipt-outline", route: "BuyerOrders" },
+    { label: "Saved", icon: "bookmark-outline", route: "BuyerSaved" },
+    { label: "Messages", icon: "chatbubbles-outline", route: "Conversations" },
   ],
   [ROLES.SUPPLIER]: [
-    { label: "Inventory", icon: "cube", route: "SupplierInventory" },
-    { label: "Orders", icon: "cart", route: "SupplierOrders" },
-    { label: "Reports", icon: "document-text", route: "SupplierReports" },
+    { label: "Home", icon: "home-outline", route: "Home" },
+    { label: "Inventory", icon: "cube-outline", route: "SupplierInventory" },
+    { label: "Orders", icon: "receipt-outline", route: "SupplierOrders" },
   ],
   [ROLES.DRIVER]: [
-    { label: "Deliveries", icon: "bicycle", route: "DriverDeliveries" },
-    { label: "History", icon: "time", route: "DriverHistory" },
+    { label: "Home", icon: "home-outline", route: "Home" },
+    { label: "Deliveries", icon: "bicycle-outline", route: "DriverDeliveries" },
   ],
 };
 
 const COMMON_ITEMS = [
-  { label: "Settings", icon: "settings-outline", route: "Settings" },
+  { label: "My Profile", icon: "person-outline", route: "Profile" },
   { label: "Help", icon: "help-circle-outline", route: "Help" },
 ];
 
@@ -107,7 +120,8 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
     });
   };
 
-  const menuItems = role ? ROLE_MENU_ITEMS[role] || [] : [];
+  const resolvedRole = role || user?.role;
+  const menuItems = resolvedRole ? ROLE_MENU_ITEMS[resolvedRole] || [] : [];
 
   // Theme shortcuts
   const textPrimary = theme?.colors?.textPrimary || "#212121";

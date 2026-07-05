@@ -1,21 +1,24 @@
 // Mobile/src/screens/buyer/BuyerProfileScreen.js
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
-    Alert,
-    Platform,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  Alert,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import AppText from "../../components/common/AppText";
+import AppHeader from "../../components/layout/AppHeader";
+import AppSidebar from "../../components/layout/AppSidebar";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
 const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
   const { user, logout } = useAuthStore();
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   const primary = theme?.colors?.primary || "#1565C0";
   const primaryContainer = theme?.colors?.primaryContainer || "#E3F2FD";
@@ -55,38 +58,14 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
 
   return (
     <View style={[styles.screen, { backgroundColor: background }]}>
-      {/* Inline Header */}
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: surface,
-            borderBottomColor: border,
-            paddingTop:
-              Platform.OS === "android"
-                ? (StatusBar.currentHeight || 24) + 12
-                : 54,
-          },
-        ]}
-      >
-        <TouchableOpacity
-          onPress={() => {
-            if (navigation?.canGoBack()) {
-              navigation.goBack();
-            } else if (onSwitchTab) {
-              onSwitchTab("Home");
-            }
-          }}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={styles.backButton}
-        >
-          <Ionicons name="arrow-back" size={24} color={primary} />
-        </TouchableOpacity>
-        <AppText style={[styles.headerTitle, { color: textPrimary }]}>
-          My Profile
-        </AppText>
-        <View style={styles.backButton} />
-      </View>
+      <AppHeader
+        title="My Profile"
+        showMenu={true}
+        showNotification={true}
+        notificationCount={0}
+        onMenuPress={() => setSidebarVisible(true)}
+        onNotificationPress={() => navigation.navigate("Notifications")}
+      />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -95,7 +74,7 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
         {/* Profile Hero Section */}
         <View style={styles.heroSection}>
           <View style={[styles.avatar, { backgroundColor: primary }]}>
-            <Ionicons name="person" size={40} color="#FFFFFF" />
+            <Ionicons name="person" size={40} color={surface} />
           </View>
           <AppText style={[styles.name, { color: textPrimary }]}>
             {userName}
@@ -221,12 +200,37 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
           <Ionicons
             name="log-out-outline"
             size={20}
-            color="#FFFFFF"
+            color={surface}
             style={{ marginRight: 8 }}
           />
-          <AppText style={styles.logoutText}>Logout</AppText>
+          <AppText style={[styles.logoutText, { color: surface }]}>
+            Logout
+          </AppText>
         </TouchableOpacity>
       </View>
+
+      <AppSidebar
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+        onItemPress={(item) => {
+          setSidebarVisible(false);
+          if (item.route === "Conversations")
+            navigation.navigate("Conversations");
+          else if (item.route === "Chat") navigation.navigate("Chat");
+          else if (item.route === "PostProduct")
+            navigation.navigate("PostProduct");
+          else if (item.route === "Home") onSwitchTab?.("Home");
+          else if (onSwitchTab) {
+            const TAB_MAP = {
+              BuyerMarketplace: "Marketplace",
+              BuyerOrders: "Orders",
+              BuyerSaved: "Saved",
+              Profile: "Profile",
+            };
+            if (TAB_MAP[item.route]) onSwitchTab(TAB_MAP[item.route]);
+          }
+        }}
+      />
     </View>
   );
 };
@@ -234,25 +238,6 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingBottom: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    textAlign: "center",
   },
   scrollContent: {
     paddingBottom: 20,
@@ -366,7 +351,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   logoutText: {
-    color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "700",
   },

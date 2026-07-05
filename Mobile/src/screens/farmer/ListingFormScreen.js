@@ -1,25 +1,46 @@
+// Mobile/src/screens/farmer/PostProductScreen.js (or ListingFormScreen.js)
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Alert } from "react-native";
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
-// Assuming an api service exists. In MVP, you might just use fetch or axios directly.
-// For now, I'll mock the api call structure as it would be used in the MVP.
+import AppText from "../../components/common/AppText";
+import AppHeader from "../../components/layout/AppHeader";
+import { useTheme } from "../../hooks/useTheme";
 
 const ListingFormScreen = ({ navigation }) => {
   const { t } = useTranslation();
-  
+  const { theme } = useTheme();
+
+  // Theme colors
+  const primary = theme?.colors?.primary || "#2E7D32";
+  const background = theme?.colors?.background || "#F9FBF9";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
+  const textSecondary = theme?.colors?.textSecondary || "#4A6741";
+  const border = theme?.colors?.border || "#D0E8CE";
+  const warning = theme?.colors?.warning || "#F57F17";
+  const info = theme?.colors?.info || "#0277BD";
+  const error = theme?.colors?.error || "#C62828";
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [unit, setUnit] = useState("");
   const [quantity, setQuantity] = useState("");
-  
+
   const [isOffline, setIsOffline] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener(state => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
       setIsOffline(!state.isConnected);
       if (state.isConnected) {
         syncDrafts();
@@ -70,7 +91,11 @@ const ListingFormScreen = ({ navigation }) => {
         console.log("Synced draft to backend:", draft);
         await clearDraft();
         Alert.alert("Success", "Offline draft synced successfully!");
-        setTitle(""); setDescription(""); setPrice(""); setUnit(""); setQuantity("");
+        setTitle("");
+        setDescription("");
+        setPrice("");
+        setUnit("");
+        setQuantity("");
       }
     } catch (e) {
       console.log("Sync failed", e);
@@ -95,7 +120,6 @@ const ListingFormScreen = ({ navigation }) => {
     }
 
     try {
-      // Call actual backend API here
       // await api.post("/products", productData);
       console.log("Submitted product:", productData);
       await clearDraft();
@@ -107,60 +131,165 @@ const ListingFormScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { backgroundColor: background }]}>
+      <AppHeader
+        title={t("product.createTitle") || "Post Product"}
+        showBack={true}
+        onBackPress={() => navigation.goBack()}
+        showNotification={true}
+        notificationCount={0}
+        onNotificationPress={() => navigation.navigate("Notifications")}
+      />
+
       {isOffline && (
-        <View style={styles.offlineBanner}>
-          <Text style={styles.offlineText}>{t("product.draftBanner")}</Text>
+        <View style={[styles.offlineBanner, { backgroundColor: warning }]}>
+          <AppText style={styles.bannerText}>
+            {t("product.draftBanner")}
+          </AppText>
         </View>
       )}
       {isSyncing && (
-        <View style={styles.syncBanner}>
-          <Text style={styles.syncText}>{t("product.syncing")}</Text>
+        <View style={[styles.syncBanner, { backgroundColor: info }]}>
+          <AppText style={styles.bannerText}>{t("product.syncing")}</AppText>
         </View>
       )}
 
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>{t("product.createTitle")}</Text>
+        <AppText style={[styles.heading, { color: textPrimary }]}>
+          {t("product.createTitle")}
+        </AppText>
 
         <View style={styles.form}>
-          <Text style={styles.label}>{t("product.titleLabel")}</Text>
-          <TextInput style={styles.input} placeholder={t("product.titlePlaceholder")} value={title} onChangeText={setTitle} />
+          <AppText style={[styles.label, { color: textSecondary }]}>
+            {t("product.titleLabel")}
+          </AppText>
+          <TextInput
+            style={[styles.input, { borderColor: border, color: textPrimary }]}
+            placeholder={t("product.titlePlaceholder")}
+            placeholderTextColor={textSecondary}
+            value={title}
+            onChangeText={setTitle}
+          />
 
-          <Text style={styles.label}>{t("product.descLabel")}</Text>
-          <TextInput style={[styles.input, styles.textArea]} placeholder={t("product.descPlaceholder")} multiline value={description} onChangeText={setDescription} />
+          <AppText style={[styles.label, { color: textSecondary }]}>
+            {t("product.descLabel")}
+          </AppText>
+          <TextInput
+            style={[
+              styles.input,
+              styles.textArea,
+              { borderColor: border, color: textPrimary },
+            ]}
+            placeholder={t("product.descPlaceholder")}
+            placeholderTextColor={textSecondary}
+            multiline
+            value={description}
+            onChangeText={setDescription}
+          />
 
-          <Text style={styles.label}>{t("product.priceLabel")}</Text>
-          <TextInput style={styles.input} placeholder={t("product.pricePlaceholder")} keyboardType="numeric" value={price} onChangeText={setPrice} />
+          <AppText style={[styles.label, { color: textSecondary }]}>
+            {t("product.priceLabel")}
+          </AppText>
+          <TextInput
+            style={[styles.input, { borderColor: border, color: textPrimary }]}
+            placeholder={t("product.pricePlaceholder")}
+            placeholderTextColor={textSecondary}
+            keyboardType="numeric"
+            value={price}
+            onChangeText={setPrice}
+          />
 
-          <Text style={styles.label}>{t("product.unitLabel")}</Text>
-          <TextInput style={styles.input} placeholder={t("product.unitPlaceholder")} value={unit} onChangeText={setUnit} />
+          <AppText style={[styles.label, { color: textSecondary }]}>
+            {t("product.unitLabel")}
+          </AppText>
+          <TextInput
+            style={[styles.input, { borderColor: border, color: textPrimary }]}
+            placeholder={t("product.unitPlaceholder")}
+            placeholderTextColor={textSecondary}
+            value={unit}
+            onChangeText={setUnit}
+          />
 
-          <Text style={styles.label}>{t("product.quantityLabel")}</Text>
-          <TextInput style={styles.input} placeholder={t("product.quantityPlaceholder")} keyboardType="numeric" value={quantity} onChangeText={setQuantity} />
+          <AppText style={[styles.label, { color: textSecondary }]}>
+            {t("product.quantityLabel")}
+          </AppText>
+          <TextInput
+            style={[styles.input, { borderColor: border, color: textPrimary }]}
+            placeholder={t("product.quantityPlaceholder")}
+            placeholderTextColor={textSecondary}
+            keyboardType="numeric"
+            value={quantity}
+            onChangeText={setQuantity}
+          />
 
-          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-            <Text style={styles.buttonText}>{t("common.submit")}</Text>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: primary }]}
+            onPress={handleSubmit}
+            activeOpacity={0.8}
+          >
+            <AppText style={[styles.buttonText, { color: surface }]}>
+              {t("common.submit")}
+            </AppText>
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  offlineBanner: { backgroundColor: "#ff9800", padding: 10, alignItems: "center" },
-  offlineText: { color: "#fff", fontWeight: "bold" },
-  syncBanner: { backgroundColor: "#2196f3", padding: 10, alignItems: "center" },
-  syncText: { color: "#fff", fontWeight: "bold" },
-  content: { padding: 24 },
-  title: { fontSize: 24, fontWeight: "bold", color: "#333", marginBottom: 24 },
-  form: { gap: 16 },
-  label: { fontSize: 14, fontWeight: "600", color: "#444", marginBottom: -8 },
-  input: { borderWidth: 1, borderColor: "#ddd", padding: 14, borderRadius: 8, fontSize: 16 },
-  textArea: { height: 100, textAlignVertical: "top" },
-  button: { backgroundColor: "#2e7d32", padding: 16, borderRadius: 8, alignItems: "center", marginTop: 16 },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" }
+  container: {
+    flex: 1,
+  },
+  offlineBanner: {
+    padding: 10,
+    alignItems: "center",
+  },
+  syncBanner: {
+    padding: 10,
+    alignItems: "center",
+  },
+  bannerText: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+  },
+  content: {
+    padding: 24,
+    paddingTop: 8,
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: "700",
+    marginBottom: 24,
+  },
+  form: {
+    gap: 16,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: -8,
+  },
+  input: {
+    borderWidth: 1,
+    padding: 14,
+    borderRadius: 8,
+    fontSize: 16,
+  },
+  textArea: {
+    height: 100,
+    textAlignVertical: "top",
+  },
+  button: {
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 16,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "700",
+  },
 });
 
 export default ListingFormScreen;

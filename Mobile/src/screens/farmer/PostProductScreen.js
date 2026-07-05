@@ -1,12 +1,13 @@
 // src/screens/farmer/PostProductScreen.js
 import { useState } from "react";
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  View,
 } from "react-native";
 import AppButton from "../../components/common/AppButton";
 import AppInput from "../../components/common/AppInput";
@@ -28,9 +29,11 @@ export default function PostProductScreen({ navigation }) {
   const [zone, setZone] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const primary = theme?.colors?.primary || "#4CAF50";
-  const textPrimary = theme?.colors?.textPrimary || "#212121";
-  const bg = theme?.colors?.background || "#F8F9FA";
+  // Extract theme colors
+  const primary = theme?.colors?.primary || "#2E7D32";
+  const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
+  const textSecondary = theme?.colors?.textSecondary || "#4A6741";
+  const background = theme?.colors?.background || "#F9FBF9";
 
   const handleSubmit = async () => {
     if (!cropType.trim()) {
@@ -81,15 +84,16 @@ export default function PostProductScreen({ navigation }) {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: bg }]}>
-      {/* Fixed header with back arrow */}
+    <View style={[styles.container, { backgroundColor: background }]}>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
       <AppHeader
         title="Post Product"
         showBack={true}
         onBackPress={() => navigation.goBack()}
-        showMenu={false}
-        showNotification={false}
-        showSearch={false}
       />
 
       <KeyboardAvoidingView
@@ -102,8 +106,9 @@ export default function PostProductScreen({ navigation }) {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Form starts here – the header already shows the title */}
-          <AppText style={styles.label}>Crop Type</AppText>
+          <AppText style={[styles.label, { color: textSecondary }]}>
+            Crop Type
+          </AppText>
           <AppInput
             placeholder="e.g. Teff, Wheat, Onion"
             value={cropType}
@@ -114,7 +119,9 @@ export default function PostProductScreen({ navigation }) {
 
           <View style={styles.row}>
             <View style={styles.flex2}>
-              <AppText style={styles.label}>Quantity</AppText>
+              <AppText style={[styles.label, { color: textSecondary }]}>
+                Quantity
+              </AppText>
               <AppInput
                 placeholder="0"
                 value={quantity}
@@ -123,7 +130,9 @@ export default function PostProductScreen({ navigation }) {
               />
             </View>
             <View style={styles.flex1}>
-              <AppText style={styles.label}>Unit</AppText>
+              <AppText style={[styles.label, { color: textSecondary }]}>
+                Unit
+              </AppText>
               <AppInput
                 placeholder="kg"
                 value={unit}
@@ -133,7 +142,9 @@ export default function PostProductScreen({ navigation }) {
             </View>
           </View>
 
-          <AppText style={styles.label}>Price (ETB)</AppText>
+          <AppText style={[styles.label, { color: textSecondary }]}>
+            Price (ETB)
+          </AppText>
           <AppInput
             placeholder="0"
             value={price}
@@ -142,7 +153,9 @@ export default function PostProductScreen({ navigation }) {
             leftIcon="pricetag-outline"
           />
 
-          <AppText style={styles.label}>Description (optional)</AppText>
+          <AppText style={[styles.label, { color: textSecondary }]}>
+            Description (optional)
+          </AppText>
           <AppInput
             placeholder="Quality, harvest date, other details..."
             value={description}
@@ -159,14 +172,18 @@ export default function PostProductScreen({ navigation }) {
             >
               Location
             </AppText>
-            <AppText style={styles.label}>Region</AppText>
+            <AppText style={[styles.label, { color: textSecondary }]}>
+              Region
+            </AppText>
             <AppInput
               placeholder="e.g. Oromia"
               value={region}
               onChangeText={setRegion}
               leftIcon="location-outline"
             />
-            <AppText style={styles.label}>Zone</AppText>
+            <AppText style={[styles.label, { color: textSecondary }]}>
+              Zone
+            </AppText>
             <AppInput
               placeholder="e.g. Jimma"
               value={zone}
@@ -198,14 +215,14 @@ const styles = StyleSheet.create({
   scroll: {
     paddingHorizontal: 20,
     paddingBottom: 40,
-    paddingTop: 8, // small space below header
+    paddingTop: 8,
   },
   label: {
     fontSize: 14,
-    color: "#757575",
     marginBottom: 4,
     marginTop: 16,
     fontWeight: "500",
+    // color is applied inline via theme
   },
   row: {
     flexDirection: "row",
