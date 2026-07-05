@@ -1,11 +1,11 @@
 // src/components/layout/DashboardLayout.js
 import {
-    RefreshControl,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 import AppHeader from "./AppHeader";
@@ -23,6 +23,8 @@ const DashboardLayout = ({
   onDismissNotification,
   contentPaddingHorizontal = 16,
   contentPaddingVertical = 12,
+  onNotificationPress,
+  notificationCount = 0,
   ...headerProps
 }) => {
   const { theme } = useTheme();
@@ -36,6 +38,9 @@ const DashboardLayout = ({
         <AppHeader
           title={title}
           subtitle={subtitle}
+          showNotification={true}
+          onNotificationPress={onNotificationPress}
+          notificationCount={notificationCount}
           {...headerProps} // notificationCount, showBack, etc. passed through
         />
       )}

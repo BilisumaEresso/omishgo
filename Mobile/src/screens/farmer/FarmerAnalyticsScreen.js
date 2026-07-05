@@ -1,20 +1,16 @@
 // Mobile/src/screens/farmer/FarmerAnalyticsScreen.js
-import { Ionicons } from "@expo/vector-icons";
-import React from "react";
-import {
-  Platform,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { useState } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
 import AppText from "../../components/common/AppText";
+import AppHeader from "../../components/layout/AppHeader";
+import AppSidebar from "../../components/layout/AppSidebar";
 import { useTheme } from "../../hooks/useTheme";
 
 const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
+  // Extract theme colors with fallbacks
   const primary = theme?.colors?.primary || "#2E7D32";
   const primaryContainer = theme?.colors?.primaryContainer || "#E8F5E9";
   const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
@@ -25,7 +21,6 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
   const border = theme?.colors?.border || "#D0E8CE";
   const successColor = theme?.colors?.success || "#2E7D32";
   const errorColor = theme?.colors?.error || "#C62828";
-  const warningColor = theme?.colors?.warning || "#F57F17";
 
   // This Week Stats
   const weeklyStats = [
@@ -43,7 +38,7 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
     { name: "Pepper", percent: 41 },
   ];
 
-  // Market Prices Today (price in ETB/q, trend arrow)
+  // Market Prices Today
   const marketPrices = [
     { name: "Teff", price: "5,200", trend: "up" },
     { name: "Onion", price: "4,500", trend: "up" },
@@ -65,38 +60,14 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
 
   return (
     <View style={[styles.screen, { backgroundColor: background }]}>
-      {/* Inline Header */}
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: surface,
-            borderBottomColor: border,
-            paddingTop:
-              Platform.OS === "android"
-                ? (StatusBar.currentHeight || 24) + 12
-                : 54,
-          },
-        ]}
-      >
-        <TouchableOpacity
-          onPress={() => {
-            if (navigation?.canGoBack()) {
-              navigation.goBack();
-            } else if (onSwitchTab) {
-              onSwitchTab("Home");
-            }
-          }}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={styles.backButton}
-        >
-          <Ionicons name="arrow-back" size={24} color={primary} />
-        </TouchableOpacity>
-        <AppText style={[styles.headerTitle, { color: textPrimary }]}>
-          Insights
-        </AppText>
-        <View style={styles.backButton} />
-      </View>
+      <AppHeader
+        title="Market Insights"
+        showMenu={true}
+        showNotification={true}
+        notificationCount={0}
+        onMenuPress={() => setSidebarVisible(true)}
+        onNotificationPress={() => navigation.navigate("Notifications")}
+      />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -122,7 +93,7 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
           ))}
         </View>
 
-        {/* Top Crops by Demand Section */}
+        {/* Top Crops by Demand */}
         <AppText
           style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}
         >
@@ -134,13 +105,13 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
               <AppText style={[styles.cropName, { color: textPrimary }]}>
                 {crop.name}
               </AppText>
-              <View style={styles.barContainer}>
+              <View style={[styles.barContainer, { backgroundColor: border }]}>
                 <View
                   style={[
                     styles.bar,
                     {
                       backgroundColor: primary,
-                      width: `${crop.percent}%`, // using percentage string for flexibility
+                      width: `${crop.percent}%`,
                     },
                   ]}
                 />
@@ -152,7 +123,7 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
           ))}
         </View>
 
-        {/* Market Prices Today Section */}
+        {/* Market Prices Today */}
         <AppText
           style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}
         >
@@ -191,10 +162,36 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
         </View>
 
         {/* Footer Note */}
-        <AppText style={styles.footerNote}>
+        <AppText style={[styles.footerNote, { color: textMuted }]}>
           Prices sourced from local market data
         </AppText>
       </ScrollView>
+
+      <AppSidebar
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+        onItemPress={(item) => {
+          setSidebarVisible(false);
+          if (item.route === "Conversations")
+            navigation.navigate("Conversations");
+          else if (item.route === "Chat") navigation.navigate("Chat");
+          else if (item.route === "PostProduct")
+            navigation.navigate("PostProduct");
+          else if (item.route === "Home") onSwitchTab?.("Home");
+          else if (onSwitchTab) {
+            const TAB_MAP = {
+              FarmerProducts: "Products",
+              FarmerOrders: "Orders",
+              FarmerAnalytics: "Insights",
+              Profile: "Profile",
+              BuyerMarketplace: "Marketplace",
+              BuyerOrders: "Orders",
+              BuyerSaved: "Saved",
+            };
+            if (TAB_MAP[item.route]) onSwitchTab(TAB_MAP[item.route]);
+          }
+        }}
+      />
     </View>
   );
 };
@@ -203,26 +200,8 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingBottom: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    textAlign: "center",
-  },
   scrollContent: {
+    paddingTop: 16, // <-- breathing room below the header
     paddingBottom: 40,
     paddingHorizontal: 16,
   },
@@ -269,7 +248,6 @@ const styles = StyleSheet.create({
   barContainer: {
     flex: 1,
     height: 10,
-    backgroundColor: "#E0E0E0",
     borderRadius: 5,
     marginHorizontal: 10,
     overflow: "hidden",
@@ -318,7 +296,6 @@ const styles = StyleSheet.create({
   },
   footerNote: {
     fontSize: 12,
-    color: "#A0A0A0",
     textAlign: "center",
     marginTop: 8,
   },

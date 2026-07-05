@@ -21,12 +21,6 @@ export default function FeaturedProductsList({ products, onOrder }) {
   }
   return (
     <View style={styles.section}>
-      <AppText
-        variant="headingSm"
-        style={{ color: theme?.colors?.textPrimary, marginBottom: 12 }}
-      >
-        Featured Products
-      </AppText>
       {products.map((product) => (
         <AppCard key={product.id} style={styles.productCard}>
           <View style={styles.imageContainer}>

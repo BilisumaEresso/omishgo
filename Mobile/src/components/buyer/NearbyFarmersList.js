@@ -9,12 +9,6 @@ export default function NearbyFarmersList({ farmers }) {
   const { theme } = useTheme();
   return (
     <View style={styles.section}>
-      <AppText
-        variant="headingSm"
-        style={{ color: theme?.colors?.textPrimary, marginBottom: 12 }}
-      >
-        Nearby Farmers
-      </AppText>
       <View style={styles.grid}>
         {farmers.map((farmer) => (
           <AppCard key={farmer.id} style={styles.card}>

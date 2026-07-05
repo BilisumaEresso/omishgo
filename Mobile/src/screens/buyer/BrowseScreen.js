@@ -1,22 +1,21 @@
 // Mobile/src/screens/buyer/BrowseScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
-  View,
-  FlatList,
-  StyleSheet,
   ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
   TextInput,
   TouchableOpacity,
-  RefreshControl,
-  StatusBar,
-  Platform,
-  ScrollView,
+  View,
 } from "react-native";
-import { useTranslation } from "react-i18next";
-import ScreenWrapper from "../../components/common/ScreenWrapper";
-import AppText from "../../components/common/AppText";
 import AppButton from "../../components/common/AppButton";
+import AppText from "../../components/common/AppText";
+import AppHeader from "../../components/layout/AppHeader";
+import AppSidebar from "../../components/layout/AppSidebar";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
@@ -25,18 +24,26 @@ import { useTheme } from "../../hooks/useTheme";
 const CATEGORY_FILTERS = ["All", "Grains", "Vegetables", "Fruits"];
 const SORT_OPTIONS = ["Default", "Price ↑", "Price ↓"];
 
-// ─── Product Card (improved) ──────────────────────────────────────────────────
+// ─── Product Card ─────────────────────────────────────────────────────────────
 const ProductCard = ({ product, onView, theme, isSaved, onToggleSave }) => {
   const farmer = product.farmerId || {};
   const loc = product.location || {};
+
+  // Extract theme colors
+  const primary = theme?.colors?.primary || "#1565C0";
+  const primaryCont = theme?.colors?.primaryContainer || "#E3F2FD";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
+  const textSecondary = theme?.colors?.textSecondary || "#4A6080";
+  const border = theme?.colors?.border || "#D0DEF5";
 
   return (
     <View
       style={[
         styles.card,
         {
-          backgroundColor: theme?.colors?.surface || "#fff",
-          borderColor: theme?.colors?.border || "#eee",
+          backgroundColor: surface,
+          borderColor: border,
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 1 },
           shadowOpacity: 0.05,
@@ -47,10 +54,7 @@ const ProductCard = ({ product, onView, theme, isSaved, onToggleSave }) => {
     >
       {/* Top row: crop type + bookmark + price */}
       <View style={styles.cardHeader}>
-        <AppText
-          variant="headingSm"
-          style={{ color: theme?.colors?.textPrimary, flex: 1 }}
-        >
+        <AppText variant="headingSm" style={{ color: textPrimary, flex: 1 }}>
           {product.cropType}
         </AppText>
         <TouchableOpacity
@@ -61,40 +65,25 @@ const ProductCard = ({ product, onView, theme, isSaved, onToggleSave }) => {
           <Ionicons
             name={isSaved ? "bookmark" : "bookmark-outline"}
             size={22}
-            color={theme?.colors?.primary || "#2e7d32"}
+            color={primary}
           />
         </TouchableOpacity>
-        <AppText
-          variant="headingSm"
-          style={[styles.price, { color: theme?.colors?.primary || "#2e7d32" }]}
-        >
+        <AppText variant="headingSm" style={[styles.price, { color: primary }]}>
           {product.price} ETB / {product.unit || "kg"}
         </AppText>
       </View>
 
       {/* Quantity + category badge */}
       <View style={styles.quantityRow}>
-        <AppText
-          variant="bodyMd"
-          style={{ color: theme?.colors?.textSecondary || "#666" }}
-        >
+        <AppText variant="bodyMd" style={{ color: textSecondary }}>
           {product.quantity} {product.unit || "kg"}
         </AppText>
         {product.category ? (
           <View
-            style={[
-              styles.categoryBadge,
-              {
-                backgroundColor: theme?.colors?.primaryContainer || "#E8F5E9",
-              },
-            ]}
+            style={[styles.categoryBadge, { backgroundColor: primaryCont }]}
           >
             <AppText
-              style={{
-                color: theme?.colors?.primary || "#2e7d32",
-                fontSize: 12,
-                fontWeight: "600",
-              }}
+              style={{ color: primary, fontSize: 12, fontWeight: "600" }}
             >
               {product.category}
             </AppText>
@@ -102,30 +91,34 @@ const ProductCard = ({ product, onView, theme, isSaved, onToggleSave }) => {
         ) : null}
       </View>
 
-      {/* Location */}
+      {/* Location – icon replaces emoji */}
       {loc.region || loc.zone ? (
-        <AppText
-          variant="bodySm"
-          style={[
-            styles.location,
-            { color: theme?.colors?.textSecondary || "#888" },
-          ]}
-        >
-          📍 {[loc.region, loc.zone].filter(Boolean).join(", ")}
-        </AppText>
+        <View style={styles.locationRow}>
+          <Ionicons
+            name="location-outline"
+            size={14}
+            color={textSecondary}
+            style={{ marginRight: 4 }}
+          />
+          <AppText variant="bodySm" style={{ color: textSecondary }}>
+            {[loc.region, loc.zone].filter(Boolean).join(", ")}
+          </AppText>
+        </View>
       ) : null}
 
-      {/* Farmer name */}
+      {/* Farmer name – icon replaces emoji */}
       {farmer.name ? (
-        <AppText
-          variant="bodySm"
-          style={{
-            color: theme?.colors?.textSecondary || "#888",
-            marginTop: 2,
-          }}
-        >
-          🌾 {farmer.name}
-        </AppText>
+        <View style={styles.farmerRow}>
+          <Ionicons
+            name="person-outline"
+            size={14}
+            color={textSecondary}
+            style={{ marginRight: 4 }}
+          />
+          <AppText variant="bodySm" style={{ color: textSecondary }}>
+            {farmer.name}
+          </AppText>
+        </View>
       ) : null}
 
       {/* View button – full width */}
@@ -154,7 +147,8 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [sortOrder, setSortOrder] = useState("Default");
-  const [savedIds, setSavedIds] = useState([]); // array of product IDs
+  const [savedIds, setSavedIds] = useState([]);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   // Fetch products from API
   const fetchProducts = useCallback(async (isRefresh = false) => {
@@ -182,7 +176,6 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
   }, [fetchProducts]);
 
   // ── Derived data ─────────────────────────────────────────────────────────
-  // Filter by search text
   const filteredBySearch = useMemo(() => {
     if (!search.trim()) return allProducts;
     return allProducts.filter((p) =>
@@ -190,7 +183,6 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
     );
   }, [allProducts, search]);
 
-  // Filter by category
   const filteredByCategory = useMemo(() => {
     if (categoryFilter === "All") return filteredBySearch;
     return filteredBySearch.filter(
@@ -198,19 +190,13 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
     );
   }, [filteredBySearch, categoryFilter]);
 
-  // Apply sorting
   const sortedProducts = useMemo(() => {
     const list = [...filteredByCategory];
-    if (sortOrder === "Price ↑") {
-      return list.sort((a, b) => a.price - b.price);
-    }
-    if (sortOrder === "Price ↓") {
-      return list.sort((a, b) => b.price - a.price);
-    }
-    return list; // Default
+    if (sortOrder === "Price ↑") return list.sort((a, b) => a.price - b.price);
+    if (sortOrder === "Price ↓") return list.sort((a, b) => b.price - a.price);
+    return list;
   }, [filteredByCategory, sortOrder]);
 
-  // Insights calculations (using allProducts, not filtered)
   const insights = useMemo(() => {
     const total = allProducts.length;
     const avgPrice =
@@ -227,7 +213,6 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
     return { total, avgPrice, uniqueFarmers };
   }, [allProducts]);
 
-  // Save toggle handler
   const toggleSave = (productId) => {
     setSavedIds((prev) =>
       prev.includes(productId)
@@ -239,92 +224,56 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
   const handleView = (product) =>
     navigation.navigate("ListingDetail", { product });
 
-  // ── Render states ─────────────────────────────────────────────────────────
+  // Extract theme colors for the screen
+  const primary = theme?.colors?.primary || "#1565C0";
+  const primaryCont = theme?.colors?.primaryContainer || "#E3F2FD";
+  const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
+  const textSecondary = theme?.colors?.textSecondary || "#4A6080";
+  const background = theme?.colors?.background || "#F5F8FF";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const border = theme?.colors?.border || "#D0DEF5";
+  const errorColor = theme?.colors?.error || "#C62828";
+
+  // ── Loading state ──
   if (loading) {
     return (
-      <ScreenWrapper>
-        <View style={styles.center}>
-          <ActivityIndicator
-            size="large"
-            color={theme?.colors?.primary || "#2e7d32"}
-          />
-          <AppText variant="bodyMd" style={styles.centerText}>
-            {t("common.loading") || "Loading..."}
-          </AppText>
-        </View>
-      </ScreenWrapper>
+      <View style={[styles.center, { flex: 1, backgroundColor: background }]}>
+        <ActivityIndicator size="large" color={primary} />
+        <AppText
+          variant="bodyMd"
+          style={[styles.centerText, { color: textSecondary }]}
+        >
+          {t("common.loading") || "Loading..."}
+        </AppText>
+      </View>
     );
   }
 
   return (
-    <ScreenWrapper padding={false}>
-      {/* Updated header */}
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: theme?.colors?.surface || "#fff",
-            borderBottomColor: theme?.colors?.border || "#eee",
-            paddingTop:
-              Platform.OS === "android"
-                ? (StatusBar.currentHeight || 24) + 12
-                : 54,
-          },
-        ]}
-      >
-        <TouchableOpacity
-          onPress={() => {
-            if (navigation?.canGoBack()) {
-              navigation.goBack();
-            } else if (onSwitchTab) {
-              onSwitchTab("Home");
-            }
-          }}
-          style={styles.backButton}
-        >
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={theme?.colors?.primary || "#2e7d32"}
-          />
-        </TouchableOpacity>
-        <AppText
-          variant="headingMd"
-          style={{
-            flex: 1,
-            textAlign: "center",
-            color: theme?.colors?.textPrimary,
-          }}
-        >
-          {t("browse.title") || "Browse Products"}
-        </AppText>
-        <View style={{ width: 40 }} />
-      </View>
+    <View style={{ flex: 1, backgroundColor: background }}>
+      <AppHeader
+        title="Marketplace"
+        showMenu={true}
+        showNotification={true}
+        notificationCount={0}
+        onMenuPress={() => setSidebarVisible(true)}
+        onNotificationPress={() => navigation.navigate("Notifications")}
+      />
 
       {/* Search bar */}
       <View
         style={[
           styles.searchBar,
-          {
-            backgroundColor: theme?.colors?.surface || "#fff",
-            borderColor: theme?.colors?.border || "#ddd",
-          },
+          { backgroundColor: surface, borderColor: border },
         ]}
       >
-        <Ionicons
-          name="search"
-          size={20}
-          color={theme?.colors?.textSecondary || "#999"}
-        />
+        <Ionicons name="search" size={20} color={textSecondary} />
         <TextInput
-          style={[
-            styles.searchInput,
-            { color: theme?.colors?.textPrimary || "#333" },
-          ]}
+          style={[styles.searchInput, { color: textPrimary }]}
           placeholder={
             t("browse.searchPlaceholder") || "Search by crop type..."
           }
-          placeholderTextColor={theme?.colors?.textSecondary || "#999"}
+          placeholderTextColor={textSecondary}
           value={search}
           onChangeText={setSearch}
           returnKeyType="search"
@@ -334,81 +283,23 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
 
       {/* Insights banner */}
       <View style={styles.insightsRow}>
-        <View
-          style={[
-            styles.insightCard,
-            {
-              backgroundColor: theme?.colors?.primaryContainer || "#E8F5E9",
-            },
-          ]}
-        >
-          <AppText
-            style={[
-              styles.insightValue,
-              { color: theme?.colors?.primary || "#2e7d32" },
-            ]}
+        {[
+          { label: "Products", value: insights.total },
+          { label: "Avg Price", value: `${insights.avgPrice} ETB` },
+          { label: "Farmers", value: insights.uniqueFarmers },
+        ].map((item, index) => (
+          <View
+            key={index}
+            style={[styles.insightCard, { backgroundColor: primaryCont }]}
           >
-            {insights.total}
-          </AppText>
-          <AppText
-            style={[
-              styles.insightLabel,
-              { color: theme?.colors?.textSecondary || "#666" },
-            ]}
-          >
-            Products
-          </AppText>
-        </View>
-        <View
-          style={[
-            styles.insightCard,
-            {
-              backgroundColor: theme?.colors?.primaryContainer || "#E8F5E9",
-            },
-          ]}
-        >
-          <AppText
-            style={[
-              styles.insightValue,
-              { color: theme?.colors?.primary || "#2e7d32" },
-            ]}
-          >
-            {insights.avgPrice} ETB
-          </AppText>
-          <AppText
-            style={[
-              styles.insightLabel,
-              { color: theme?.colors?.textSecondary || "#666" },
-            ]}
-          >
-            Avg Price
-          </AppText>
-        </View>
-        <View
-          style={[
-            styles.insightCard,
-            {
-              backgroundColor: theme?.colors?.primaryContainer || "#E8F5E9",
-            },
-          ]}
-        >
-          <AppText
-            style={[
-              styles.insightValue,
-              { color: theme?.colors?.primary || "#2e7d32" },
-            ]}
-          >
-            {insights.uniqueFarmers}
-          </AppText>
-          <AppText
-            style={[
-              styles.insightLabel,
-              { color: theme?.colors?.textSecondary || "#666" },
-            ]}
-          >
-            Farmers
-          </AppText>
-        </View>
+            <AppText style={[styles.insightValue, { color: primary }]}>
+              {item.value}
+            </AppText>
+            <AppText style={[styles.insightLabel, { color: textSecondary }]}>
+              {item.label}
+            </AppText>
+          </View>
+        ))}
       </View>
 
       {/* Category filter tabs */}
@@ -427,20 +318,14 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
               style={[
                 styles.filterTab,
                 {
-                  backgroundColor: isActive
-                    ? theme?.colors?.primary || "#2e7d32"
-                    : "transparent",
-                  borderColor: isActive
-                    ? theme?.colors?.primary || "#2e7d32"
-                    : theme?.colors?.border || "#eee",
+                  backgroundColor: isActive ? primary : "transparent",
+                  borderColor: isActive ? primary : border,
                 },
               ]}
             >
               <AppText
                 style={{
-                  color: isActive
-                    ? "#fff"
-                    : theme?.colors?.textSecondary || "#666",
+                  color: isActive ? surface : textSecondary,
                   fontSize: 13,
                   fontWeight: "600",
                 }}
@@ -454,7 +339,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
 
       {/* Sort row */}
       <View style={styles.sortRow}>
-        <AppText style={{ color: theme?.colors?.textSecondary, fontSize: 13 }}>
+        <AppText style={{ color: textSecondary, fontSize: 13 }}>
           Sort by:
         </AppText>
         {SORT_OPTIONS.map((opt) => {
@@ -466,20 +351,14 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
               style={[
                 styles.sortPill,
                 {
-                  backgroundColor: isActive
-                    ? (theme?.colors?.primary || "#2e7d32") + "18"
-                    : "transparent",
-                  borderColor: isActive
-                    ? theme?.colors?.primary || "#2e7d32"
-                    : "transparent",
+                  backgroundColor: isActive ? primary + "18" : "transparent",
+                  borderColor: isActive ? primary : "transparent",
                 },
               ]}
             >
               <AppText
                 style={{
-                  color: isActive
-                    ? theme?.colors?.primary || "#2e7d32"
-                    : theme?.colors?.textSecondary,
+                  color: isActive ? primary : textSecondary,
                   fontSize: 13,
                   fontWeight: isActive ? "700" : "400",
                 }}
@@ -493,10 +372,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
 
       {error ? (
         <View style={styles.center}>
-          <AppText
-            variant="bodyMd"
-            style={{ color: theme?.colors?.error || "red" }}
-          >
+          <AppText variant="bodyMd" style={{ color: errorColor }}>
             {error}
           </AppText>
           <AppButton
@@ -524,13 +400,17 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={() => fetchProducts(true)}
-              colors={[theme?.colors?.primary || "#2e7d32"]}
+              colors={[primary]}
             />
           }
           ListEmptyComponent={
             <View style={styles.center}>
-              <AppText style={styles.emptyIcon}>🌾</AppText>
-              <AppText variant="headingSm" style={styles.centerText}>
+              {/* Replaced emoji with Ionicons */}
+              <Ionicons name="leaf-outline" size={48} color={textSecondary} />
+              <AppText
+                variant="headingSm"
+                style={[styles.centerText, { color: textSecondary }]}
+              >
                 {search || categoryFilter !== "All"
                   ? t("browse.noMatch") || "No listings match your filters"
                   : t("browse.empty") || "No listings available right now"}
@@ -539,25 +419,32 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
           }
         />
       )}
-    </ScreenWrapper>
+
+      <AppSidebar
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+        onItemPress={(item) => {
+          setSidebarVisible(false);
+          if (item.route === "Conversations")
+            navigation.navigate("Conversations");
+          else if (item.route === "Home") onSwitchTab?.("Home");
+          else if (onSwitchTab) {
+            const MAP = {
+              BuyerMarketplace: "Marketplace",
+              BuyerOrders: "Orders",
+              BuyerSaved: "Saved",
+              Profile: "Profile",
+            };
+            if (MAP[item.route]) onSwitchTab(MAP[item.route]);
+          }
+        }}
+      />
+    </View>
   );
 }
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
@@ -570,8 +457,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   searchInput: { flex: 1, fontSize: 15 },
-
-  // Insights
   insightsRow: {
     flexDirection: "row",
     marginHorizontal: 16,
@@ -587,17 +472,8 @@ const styles = StyleSheet.create({
   },
   insightValue: { fontSize: 16, fontWeight: "700" },
   insightLabel: { fontSize: 12, marginTop: 2 },
-
-  // Filters
-  filterScroll: {
-    marginTop: 8,
-    paddingLeft: 16,
-    marginBottom: 4,
-  },
-  filterScrollContent: {
-    paddingRight: 16,
-    alignItems: "center",
-  },
+  filterScroll: { marginTop: 8, paddingLeft: 16, marginBottom: 4 },
+  filterScrollContent: { paddingRight: 16, alignItems: "center" },
   filterTab: {
     paddingHorizontal: 14,
     paddingVertical: 6,
@@ -605,8 +481,6 @@ const styles = StyleSheet.create({
     marginRight: 8,
     borderWidth: 1,
   },
-
-  // Sorting
   sortRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -620,10 +494,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
   },
-
   list: { paddingHorizontal: 16, paddingBottom: 32 },
-
-  // Product card
   card: {
     borderWidth: 1,
     borderRadius: 14,
@@ -648,14 +519,22 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 8,
   },
-  location: { marginTop: 4 },
+  locationRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  farmerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 2,
+  },
   viewBtn: {
     marginTop: 12,
     alignSelf: "stretch",
     borderRadius: 10,
     paddingVertical: 10,
   },
-
   center: {
     flex: 1,
     justifyContent: "center",
@@ -663,6 +542,5 @@ const styles = StyleSheet.create({
     padding: 32,
     gap: 8,
   },
-  centerText: { textAlign: "center", color: "#666" },
-  emptyIcon: { fontSize: 48 },
+  centerText: { textAlign: "center" },
 });

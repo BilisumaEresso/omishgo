@@ -11,6 +11,8 @@ import BuyerSavedScreen from "../screens/buyer/BuyerSavedScreen";
 import ListingDetailScreen from "../screens/buyer/ListingDetailScreen";
 import ChatScreen from "../screens/shared/ChatScreen";
 import ConversationsScreen from "../screens/shared/ConversationsScreen";
+import NotificationsScreen from "../screens/shared/NotificationsScreen";
+import OrderDetailScreen from "../screens/shared/OrderDetailScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +47,8 @@ const BuyerNavigator = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="BuyerTabs" component={BuyerTabShell} />
     <Stack.Screen name="ListingDetail" component={ListingDetailScreen} />
+    <Stack.Screen name="Notifications" component={NotificationsScreen} />
+    <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
     <Stack.Screen name="Conversations" component={ConversationsScreen} />
     <Stack.Screen name="Chat" component={ChatScreen} />
   </Stack.Navigator>
