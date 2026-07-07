@@ -6,32 +6,72 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Image,
+  TouchableOpacity,
+  StatusBar,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AppText from "../common/AppText";
 import { useTheme } from "../../hooks/useTheme";
 
-const AuthLayout = ({ title, subtitle, children }) => {
+const AuthLayout = ({
+  title,
+  subtitle,
+  children,
+  logoSource,
+  showBack = false,
+  onBackPress,
+}) => {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
 
-  const primaryColor = theme?.colors?.primary || "#4CAF50";
+  const primary = theme?.colors?.primary || "#2E7D32";
   const textPrimary = theme?.colors?.textPrimary || "#212121";
   const textSecondary = theme?.colors?.textSecondary || "#757575";
-  const backgroundColor = theme?.colors?.background || "#F8F9FA";
+  const background = theme?.colors?.background || "#F8F9FA";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const border = theme?.colors?.border || "#E0E0E0";
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={[styles.container, { backgroundColor }]}
+      style={[styles.container, { backgroundColor: background }]}
     >
+      {/* Back header (only for Register) */}
+      {showBack && (
+        <View
+          style={[
+            styles.header,
+            {
+              backgroundColor: surface,
+              borderBottomColor: border,
+              paddingTop:
+                Platform.OS === "android"
+                  ? (StatusBar.currentHeight || 24) + 12
+                  : insets.top + 12,
+            },
+          ]}
+        >
+          <TouchableOpacity
+            onPress={onBackPress}
+            style={styles.backBtn}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Ionicons name="arrow-back" size={24} color={primary} />
+          </TouchableOpacity>
+          <AppText variant="headingMd" style={{ color: textPrimary }}>
+            {title || ""}
+          </AppText>
+          <View style={{ width: 40 }} />
+        </View>
+      )}
+
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          // compensate for safe areas so content is centered in the safe portion
           {
-            paddingTop: insets.top + 32,
+            paddingTop: showBack ? 24 : insets.top + 48,
             paddingBottom: insets.bottom + 32,
             paddingHorizontal: 24,
           },
@@ -39,23 +79,34 @@ const AuthLayout = ({ title, subtitle, children }) => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Brand logo */}
+        {/* Logo / Brand emblem */}
         <View style={styles.logoWrapper}>
-          <View style={[styles.brandEmblem, { borderColor: primaryColor }]}>
-            <Ionicons name="leaf" size={36} color={primaryColor} />
-          </View>
-          <AppText
-            variant="headingMd"
-            style={[styles.brandText, { color: textPrimary }]}
-          >
-            Omish
-            <AppText style={{ color: primaryColor, fontWeight: "800" }}>
-              Go
-            </AppText>
-          </AppText>
+          {logoSource ? (
+            <Image
+              source={logoSource}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+          ) : (
+            <>
+              <View style={[styles.brandEmblem, { borderColor: primary }]}>
+                <Ionicons name="leaf" size={36} color={primary} />
+              </View>
+              <AppText
+                variant="headingMd"
+                style={[styles.brandText, { color: textPrimary }]}
+              >
+                Omish
+                <AppText style={{ color: primary, fontWeight: "800" }}>
+                  Go
+                </AppText>
+              </AppText>
+            </>
+          )}
         </View>
 
-        {title && (
+        {/* Title and subtitle – only show if header is hidden (otherwise title is in header) */}
+        {!showBack && title && (
           <AppText
             variant="headingLg"
             style={[styles.title, { color: textPrimary }]}
@@ -64,7 +115,7 @@ const AuthLayout = ({ title, subtitle, children }) => {
           </AppText>
         )}
 
-        {subtitle && (
+        {!showBack && subtitle && (
           <AppText
             variant="bodyMd"
             style={[styles.subtitle, { color: textSecondary }]}
@@ -82,6 +133,20 @@ const AuthLayout = ({ title, subtitle, children }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 8,
   },
   scrollContent: {
     flexGrow: 1,
@@ -105,6 +170,10 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 0.5,
     fontSize: 26,
+  },
+  logoImage: {
+    width: 180,
+    height: 180,
   },
   title: {
     textAlign: "center",
