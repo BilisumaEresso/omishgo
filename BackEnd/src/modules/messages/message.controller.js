@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
+import ApiError from "../../utils/ApiError.js";
 import asyncHandler from "../../utils/asyncHandler.js";
 import sendResponse from "../../utils/sendResponse.js";
-import ApiError from "../../utils/ApiError.js";
-import Message from "./message.model.js";
+import Notification from "../notification/notification.model.js";
 import User from "../user/user.model.js";
-import { createNotification } from "../notification/notification.model.js";
+import Message from "./message.model.js";
 
 /**
  * @desc    Get thread between current user and another user
@@ -35,7 +35,7 @@ export const getThread = asyncHandler(async (req, res) => {
   // Mark any unread messages sent TO current user as read
   await Message.updateMany(
     { senderId: other, receiverId: me, isRead: false },
-    { $set: { isRead: true } }
+    { $set: { isRead: true } },
   );
 
   return sendResponse(res, {
@@ -78,14 +78,16 @@ export const sendMessage = asyncHandler(async (req, res) => {
   await message.populate("senderId", "name phone");
   await message.populate("receiverId", "name phone");
 
-  // Notify the receiver — fire-and-forget, never fails the request
-  const senderName = message.senderId?.name || "Someone";
-  createNotification(
-    receiverId,
-    "new_message",
-    `${senderName} sent you a message`,
-    message._id
-  );
+  // Trigger notification for recipient
+  try {
+    await Notification.create({
+      userId: receiverId,
+      type: "new_message",
+      message: "You have a new message",
+      relatedId: message._id.toString(),
+      isRead: false,
+    });
+  } catch (_) {}
 
   return sendResponse(res, {
     statusCode: 201,

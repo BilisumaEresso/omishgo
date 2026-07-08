@@ -1,6 +1,6 @@
 // src/screens/SplashScreen.js
-import React, { useEffect, useRef } from "react";
-import { View, StyleSheet, Image, Animated, StatusBar } from "react-native";
+import { useEffect, useRef } from "react";
+import { Animated, Image, StatusBar, StyleSheet, View } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 

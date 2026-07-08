@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from "react";
-import { View, Pressable, Animated } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import React, { useEffect, useRef } from "react";
+import { Animated, Pressable, View } from "react-native";
 import AppButton from "../../components/common/AppButton";
 import AppInput from "../../components/common/AppInput";
 import AppText from "../../components/common/AppText";

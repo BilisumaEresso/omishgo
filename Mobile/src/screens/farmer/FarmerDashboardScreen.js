@@ -1,16 +1,9 @@
 // src/screens/farmer/FarmerDashboardScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useRef, useState } from "react";
-import {
-  Animated,
-  Dimensions,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import AppText from "../../components/common/AppText";
+import { useEffect, useState } from "react";
+import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import AgriPriceChangeWidget from "../../components/common/AgriPriceChangeWidget";
-import AppButton from "../../components/common/AppButton";
+import AppText from "../../components/common/AppText";
 import AddProductModal from "../../components/farmer/AddProductModal";
 import MarketTrendsList from "../../components/farmer/MarketTrendsList";
 import QuickActionsGrid from "../../components/farmer/QuickActionsGrid";
@@ -238,7 +231,7 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
       Profile: "Profile",
       Home: "Home",
     };
-    const STACK_ROUTES = ["PostProduct", "Conversations", "Chat"];
+    const STACK_ROUTES = ["PostProduct", "Conversations", "Chat", "Help"];
     if (item.route === "Home") {
       onSwitchTab?.("Home");
     } else if (TAB_MAP[item.route]) {

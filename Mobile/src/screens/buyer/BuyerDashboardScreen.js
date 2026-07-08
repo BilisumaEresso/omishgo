@@ -218,7 +218,7 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
       Profile: "Profile",
       Home: "Home",
     };
-    const STACK_ROUTES = ["Conversations", "Chat", "ListingDetail"];
+    const STACK_ROUTES = ["Conversations", "Chat", "ListingDetail", "Help"];
     if (item.route === "Home") {
       onSwitchTab?.("Home");
     } else if (TAB_MAP[item.route]) {

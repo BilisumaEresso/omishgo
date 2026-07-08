@@ -1,11 +1,11 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import React, { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useState } from "react";
+import SplashScreen from "../screens/auth/SplashScreen.js";
 import { useAuthStore } from "../store/auth.store.js";
 import AppNavigator from "./AppNavigator.js";
 import AuthNavigator from "./AuthNavigator.js";
-import SplashScreen from "../screens/auth/SplashScreen.js";
 
 const Stack = createNativeStackNavigator();
 

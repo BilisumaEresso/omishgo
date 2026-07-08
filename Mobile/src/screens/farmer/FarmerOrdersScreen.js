@@ -136,7 +136,7 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
                   marginBottom: 4,
                 }}
               >
-                <AppText style={{ fontSize: 20, marginRight: 6 }}>🌾</AppText>
+                <AppText style={{ fontSize: 20, marginRight: 6 }}></AppText>
                 <AppText style={[styles.cropName, { color: textPrimary }]}>
                   {item.cropType}
                 </AppText>

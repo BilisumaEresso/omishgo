@@ -1,20 +1,20 @@
 // src/screens/auth/RegisterScreen.js
-import React, { useState, useRef } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useRef, useState } from "react";
 import {
-  View,
-  StyleSheet,
+  Animated,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  TouchableOpacity,
-  Image,
-  Animated,
   StatusBar,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import AppText from "../../components/common/AppText";
-import AppInput from "../../components/common/AppInput";
 import AppButton from "../../components/common/AppButton";
+import AppInput from "../../components/common/AppInput";
+import AppText from "../../components/common/AppText";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 

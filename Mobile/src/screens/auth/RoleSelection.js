@@ -74,9 +74,7 @@ export default function RoleSelection({ navigation }) {
           routes: [
             {
               name:
-                selectedRole === ROLES.BUYER
-                  ? "BuyerTabs"
-                  : "DriverDashboard",
+                selectedRole === ROLES.BUYER ? "BuyerTabs" : "DriverDashboard",
             },
           ],
         });

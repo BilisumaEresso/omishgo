@@ -1,6 +1,5 @@
 import api from "../config/api.js";
 import { API_ENDPOINTS } from "../constants/api.js";
-import { getDeviceId } from "../utils/deviceId.js";
 import storage from "./storage.service.js";
 
 const authService = {

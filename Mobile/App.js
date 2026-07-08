@@ -1,7 +1,7 @@
+import * as NavigationBar from "expo-navigation-bar";
 import { setStatusBarStyle, StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import * as NavigationBar from "expo-navigation-bar";
 import { NavigationProvider } from "./src/context/NavigationContext.js";
 import { ThemeProvider } from "./src/context/ThemeContext.js";
 import "./src/locales/i18n.js";

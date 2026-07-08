@@ -36,4 +36,16 @@ export const API_ENDPOINTS = {
     send: "/api/v1/messages",
     conversations: "/api/v1/messages/conversations",
   },
+  notifications: {
+    list: "/api/v1/notifications",
+    markRead: (id) => `/api/v1/notifications/${id}/read`,
+    markAllRead: "/api/v1/notifications/read-all",
+  },
+  market: {
+    price: (cropType) =>
+      `/api/v1/products/market-price?cropType=${encodeURIComponent(cropType)}`,
+  },
+  help: {
+    faqs: "/api/v1/help/faqs",
+  },
 };

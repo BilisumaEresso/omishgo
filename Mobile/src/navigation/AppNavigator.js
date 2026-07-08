@@ -1,9 +1,8 @@
-import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { View, Text, StyleSheet } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { useAuthStore } from "../store/auth.store.js";
-import FarmerNavigator from "./FarmerNavigator.js";
 import BuyerNavigator from "./BuyerNavigator.js";
+import FarmerNavigator from "./FarmerNavigator.js";
 
 const Stack = createNativeStackNavigator();
 

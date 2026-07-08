@@ -1,6 +1,6 @@
+import ApiError from "../../utils/ApiError.js";
 import asyncHandler from "../../utils/asyncHandler.js";
 import sendResponse from "../../utils/sendResponse.js";
-import ApiError from "../../utils/ApiError.js";
 import Product from "./product.model.js";
 
 /**
@@ -42,7 +42,7 @@ export const getProducts = asyncHandler(async (req, res) => {
 export const getProductById = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id).populate(
     "farmerId",
-    "name phone location"
+    "name phone location",
   );
 
   if (!product) {
@@ -62,7 +62,16 @@ export const getProductById = asyncHandler(async (req, res) => {
  * @access  Private (Farmer only)
  */
 export const createProduct = asyncHandler(async (req, res) => {
-  const { cropType, quantity, unit, price, description, photos, location, status } = req.body;
+  const {
+    cropType,
+    quantity,
+    unit,
+    price,
+    description,
+    photos,
+    location,
+    status,
+  } = req.body;
 
   if (!cropType || price === undefined || quantity === undefined) {
     throw new ApiError(400, "cropType, price, and quantity are required");
@@ -72,7 +81,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     farmerId: req.user._id,
     cropType,
     quantity,
-    unit,           // defaults to "kg" in schema
+    unit, // defaults to "kg" in schema
     price,
     description,
     photos: photos || [],
@@ -110,7 +119,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
   const updatedProduct = await Product.findByIdAndUpdate(
     req.params.id,
     { $set: req.body },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   ).populate("farmerId", "name phone location");
 
   return sendResponse(res, {
@@ -143,5 +152,46 @@ export const deleteProduct = asyncHandler(async (req, res) => {
     statusCode: 200,
     message: "Product deleted successfully",
     data: null,
+  });
+});
+
+/**
+ * @desc    Get average market price for a crop type
+ * @route   GET /api/v1/products/market-price?cropType=Teff
+ * @access  Public
+ */
+export const getMarketPrice = asyncHandler(async (req, res) => {
+  const { cropType } = req.query;
+  if (!cropType) throw new ApiError(400, "cropType is required");
+
+  const results = await Product.aggregate([
+    {
+      $match: {
+        status: "active",
+        cropType: { $regex: cropType, $options: "i" },
+      },
+    },
+    {
+      $group: {
+        _id: "$cropType",
+        avgPrice: { $avg: "$price" },
+        minPrice: { $min: "$price" },
+        maxPrice: { $max: "$price" },
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+
+  const data = results[0] || {
+    avgPrice: null,
+    minPrice: null,
+    maxPrice: null,
+    count: 0,
+  };
+
+  return sendResponse(res, {
+    statusCode: 200,
+    message: "Market price retrieved",
+    data: { cropType, ...data },
   });
 });
