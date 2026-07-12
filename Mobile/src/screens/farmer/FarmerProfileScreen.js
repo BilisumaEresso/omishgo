@@ -1,5 +1,7 @@
 // Mobile/src/screens/farmer/FarmerProfileScreen.js
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Platform,
@@ -11,13 +13,23 @@ import {
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
 import { useSidebar } from "../../context/SidebarContext";
+import api from "../../config/api";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
+const LANGUAGES = [
+  { code: "en", label: "English", native: "English" },
+  { code: "am", label: "አማርኛ", native: "Amharic" },
+  { code: "om", label: "Afaan Oromoo", native: "Afan Oromo" },
+];
+
 const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
-  const { user, logout } = useAuthStore();
+  const { user, logout, setLanguage } = useAuthStore();
   const { openSidebar } = useSidebar();
+  const { i18n } = useTranslation();
+  const [languageOpen, setLanguageOpen] = useState(false);
+  const [updatingLang, setUpdatingLang] = useState(false);
 
   // Theme colors
   const primary = theme?.colors?.primary || "#2E7D32";
@@ -31,17 +43,9 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
   const errorColor = theme?.colors?.error || "#C62828";
   const successColor = theme?.colors?.success || "#2E7D32";
 
-  const getLanguageName = (code) => {
-    switch (code) {
-      case "am":
-        return "Amharic";
-      case "om":
-        return "Afan Oromo";
-      case "en":
-      default:
-        return "English";
-    }
-  };
+  const currentLang = i18n.language || "en";
+  const currentLangLabel =
+    LANGUAGES.find((l) => l.code === currentLang)?.native || "English";
 
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
@@ -50,10 +54,27 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
     ]);
   };
 
+  const handleChangeLanguage = async (code) => {
+    if (code === currentLang || updatingLang) return;
+    setUpdatingLang(true);
+    try {
+      await i18n.changeLanguage(code);
+      if (setLanguage) setLanguage(code);
+      // Silently update backend
+      api
+        .patch("/api/v1/auth/me/language", { preferredLang: code })
+        .catch(() => {});
+    } catch (err) {
+      console.warn("Language change failed:", err);
+    } finally {
+      setUpdatingLang(false);
+      setLanguageOpen(false);
+    }
+  };
+
   const userName = user?.name || "Farmer";
   const phone = user?.phone || "+251 900 000000";
   const location = user?.location || { region: "Addis Ababa", zone: "Bole" };
-  const preferredLang = user?.preferredLang || "en";
   const isVerified = user?.isVerified ?? true;
 
   return (
@@ -153,22 +174,8 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
           <View style={[styles.divider, { backgroundColor: border }]} />
 
           <View style={styles.infoRow}>
-            <Ionicons name="globe-outline" size={20} color={textSecondary} />
-            <View style={styles.infoTextContainer}>
-              <AppText style={[styles.infoLabel, { color: textMuted }]}>
-                Language
-              </AppText>
-              <AppText style={[styles.infoValue, { color: textPrimary }]}>
-                {getLanguageName(preferredLang)}
-              </AppText>
-            </View>
-          </View>
-
-          <View style={[styles.divider, { backgroundColor: border }]} />
-
-          <View style={styles.infoRow}>
             <Ionicons
-              name={isVerified ? "checkmark-circle" : "close-circle"}
+              name="shield-checkmark-outline"
               size={20}
               color={isVerified ? successColor : textMuted}
             />
@@ -187,37 +194,95 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
             </View>
           </View>
         </View>
-      </ScrollView>
 
-      {/* Logout Button */}
-      <View style={[styles.logoutContainer, { backgroundColor: background }]}>
-        <TouchableOpacity
-          style={[styles.logoutButton, { backgroundColor: errorColor }]}
-          onPress={handleLogout}
-          activeOpacity={0.8}
+        {/* Language Section – dropdown style */}
+        <AppText
+          style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}
         >
-          <Ionicons
-            name="log-out-outline"
-            size={20}
-            color={surface}
-            style={{ marginRight: 8 }}
-          />
-          <AppText style={[styles.logoutText, { color: surface }]}>
-            Logout
-          </AppText>
-        </TouchableOpacity>
-      </View>
+          Language
+        </AppText>
+        <View style={[styles.infoCard, { backgroundColor: surface }]}>
+          <TouchableOpacity
+            onPress={() => setLanguageOpen(!languageOpen)}
+            style={styles.languageToggle}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Ionicons
+                name="globe-outline"
+                size={20}
+                color={textSecondary}
+                style={{ marginRight: 12 }}
+              />
+              <AppText
+                style={{ color: textPrimary, fontSize: 15, fontWeight: "500" }}
+              >
+                {currentLangLabel}
+              </AppText>
+            </View>
+            <Ionicons
+              name={languageOpen ? "chevron-up" : "chevron-down"}
+              size={18}
+              color={textSecondary}
+            />
+          </TouchableOpacity>
+          {languageOpen && (
+            <View style={styles.languageList}>
+              {LANGUAGES.map((lang) => (
+                <TouchableOpacity
+                  key={lang.code}
+                  onPress={() => handleChangeLanguage(lang.code)}
+                  style={[
+                    styles.languageOption,
+                    currentLang === lang.code && {
+                      backgroundColor: primary + "15",
+                    },
+                  ]}
+                  disabled={updatingLang}
+                >
+                  <AppText
+                    style={{
+                      color: currentLang === lang.code ? primary : textPrimary,
+                      fontSize: 14,
+                      fontWeight: currentLang === lang.code ? "600" : "400",
+                    }}
+                  >
+                    {lang.native} ({lang.label})
+                  </AppText>
+                  {currentLang === lang.code && (
+                    <Ionicons name="checkmark" size={18} color={primary} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* Logout Button */}
+        <View style={[styles.logoutContainer, { backgroundColor: background }]}>
+          <TouchableOpacity
+            style={[styles.logoutButton, { backgroundColor: errorColor }]}
+            onPress={handleLogout}
+            activeOpacity={0.8}
+          >
+            <Ionicons
+              name="log-out-outline"
+              size={20}
+              color={surface}
+              style={{ marginRight: 8 }}
+            />
+            <AppText style={[styles.logoutText, { color: surface }]}>
+              Logout
+            </AppText>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 20,
-  },
+  screen: { flex: 1 },
+  scrollContent: { paddingBottom: 20 },
   heroSection: {
     alignItems: "center",
     paddingVertical: 28,
@@ -231,25 +296,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 12,
   },
-  name: {
-    fontSize: 20,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
+  name: { fontSize: 20, fontWeight: "700", marginBottom: 8 },
   rolePill: {
     paddingHorizontal: 16,
     paddingVertical: 4,
     borderRadius: 12,
     marginBottom: 8,
   },
-  roleText: {
-    fontSize: 12,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-  },
-  phoneNumber: {
-    fontSize: 15,
-  },
+  roleText: { fontSize: 12, fontWeight: "700", letterSpacing: 0.5 },
+  phoneNumber: { fontSize: 15 },
   statsRow: {
     flexDirection: "row",
     paddingHorizontal: 16,
@@ -267,14 +322,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  statValue: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 13,
-  },
+  statValue: { fontSize: 18, fontWeight: "700", marginBottom: 4 },
+  statLabel: { fontSize: 13 },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "700",
@@ -298,21 +347,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 12,
   },
-  infoTextContainer: {
-    marginLeft: 12,
-    flex: 1,
+  infoTextContainer: { marginLeft: 12, flex: 1 },
+  infoLabel: { fontSize: 12, marginBottom: 2 },
+  infoValue: { fontSize: 15, fontWeight: "500" },
+  divider: { height: 1, marginHorizontal: 12 },
+  // Language dropdown styles
+  languageToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 12,
+    paddingVertical: 14,
   },
-  infoLabel: {
-    fontSize: 12,
-    marginBottom: 2,
+  languageList: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: "#D0E8CE", // farmer border color
+    paddingVertical: 4,
   },
-  infoValue: {
-    fontSize: 15,
-    fontWeight: "500",
-  },
-  divider: {
-    height: 1,
-    marginHorizontal: 12,
+  languageOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    marginHorizontal: 8,
+    borderRadius: 8,
   },
   logoutContainer: {
     paddingHorizontal: 16,
@@ -326,10 +385,7 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 12,
   },
-  logoutText: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
+  logoutText: { fontSize: 16, fontWeight: "700" },
 });
 
 export default FarmerProfileScreen;
