@@ -1,5 +1,5 @@
-import request from "supertest";
 import mongoose from "mongoose";
+import request from "supertest";
 import app from "../src/app.js";
 import User from "../src/modules/user/user.model.js";
 
@@ -7,7 +7,9 @@ import User from "../src/modules/user/user.model.js";
 beforeAll(async () => {
   // If not already connected
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/omishgo_test");
+    await mongoose.connect(
+      process.env.MONGO_URI || "mongodb://127.0.0.1:27017/omishgo_test",
+    );
   }
 });
 
@@ -26,26 +28,31 @@ describe("Auth API", () => {
     phone: "0911223344",
     pin: "1234",
     role: "farmer",
-    location: { region: "Oromia", zone: "Jimma", kebele: "01" },
-    preferredLang: "om"
+    location: { region: "Oromia", zone: "Jimma", wereda: "01" },
+    preferredLang: "om",
   };
 
   it("should register a farmer without an email", async () => {
     const res = await request(app)
       .post("/api/v1/auth/register")
       .send(validFarmer);
-    
+
     expect(res.status).toBe(201);
     expect(res.body.data.user).toHaveProperty("phone", "0911223344");
     expect(res.body.data.user).not.toHaveProperty("pinHash");
   });
 
   it("should register a buyer with an optional email", async () => {
-    const validBuyer = { ...validFarmer, phone: "0999887766", role: "buyer", email: "buyer@test.com" };
+    const validBuyer = {
+      ...validFarmer,
+      phone: "0999887766",
+      role: "buyer",
+      email: "buyer@test.com",
+    };
     const res = await request(app)
       .post("/api/v1/auth/register")
       .send(validBuyer);
-    
+
     expect(res.status).toBe(201);
     expect(res.body.data.user).toHaveProperty("email", "buyer@test.com");
   });
@@ -78,7 +85,9 @@ describe("Auth API", () => {
 
   it("should retrieve profile via GET /me using token", async () => {
     await request(app).post("/api/v1/auth/register").send(validFarmer);
-    const loginRes = await request(app).post("/api/v1/auth/login").send({ phone: "0911223344", pin: "1234" });
+    const loginRes = await request(app)
+      .post("/api/v1/auth/login")
+      .send({ phone: "0911223344", pin: "1234" });
     const token = loginRes.body.data.token;
 
     const meRes = await request(app)

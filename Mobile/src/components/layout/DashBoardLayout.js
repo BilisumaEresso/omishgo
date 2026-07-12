@@ -23,8 +23,6 @@ const DashboardLayout = ({
   onDismissNotification,
   contentPaddingHorizontal = 16,
   contentPaddingVertical = 12,
-  onNotificationPress,
-  notificationCount = 0,
   ...headerProps
 }) => {
   const { theme } = useTheme();
@@ -38,9 +36,6 @@ const DashboardLayout = ({
         <AppHeader
           title={title}
           subtitle={subtitle}
-          showNotification={true}
-          onNotificationPress={onNotificationPress}
-          notificationCount={notificationCount}
           {...headerProps} // notificationCount, showBack, etc. passed through
         />
       )}

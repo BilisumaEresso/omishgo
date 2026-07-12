@@ -7,13 +7,19 @@
     "loading": "Fe'aa jira...",
     "skip": "Irraanfadhu"
   },
+  "splash": {
+    "title": "OmishGo wayyaadha",
+    "subtitle": "Salphaa, bu'aa qabeessa, amanamaa"
+  },
   "onboarding": {
     "slide1Title": "Oomisha Kee Kallattiin Gurguri",
     "slide1Desc": "Qonnaa kee galchi, bittootaa mirkana'aa Itoophiyaa keessa jiraniif walqunnamii uumi.",
     "slide2Title": "Madda Irraa Bitadhu",
     "slide2Desc": "Oomisha qulqulluu qotee bultoota naannoo irraa gatii madaalawaan argadhu.",
     "slide3Title": "Afaan Keetiin Dubbadhu",
-    "slide3Desc": "Afaan Oromoo, Amaariffaa, yookiin Ingliziidhaan ergaa ergi ykn bilbili."
+    "slide3Desc": "Afaan Oromoo, Amaariffaa, yookiin Ingliziidhaan ergaa ergi ykn bilbili.",
+    "slide4Title": "Dabarsa Keessa Hunda hordofi",
+    "slide4Desc": "Ajaja kee irraa kaasee gara iddoo gaʼutti tarkaanfachiisu itti fufiinsa ifaa waliin."
   },
   "languagePicker": {
     "title": "Afaan Filadhu",
@@ -21,6 +27,20 @@
     "english": "English",
     "amharic": "አማርኛ",
     "oromo": "Afaan Oromoo"
+  },
+  "sidebar": {
+    "home": "Mana",
+    "products": "Oomisha Koo",
+    "orders": "Ajaja",
+    "analytics": "Xiinxala",
+    "marketplace": "Gabaa",
+    "saved": "Olkaa'ame",
+    "messages": "Ergaa",
+    "profile": "Profaayilii",
+    "postProduct": "Oomisha Galchi",
+    "help": "Gargaarsa",
+    "logout": "Ba'i",
+    "language": "Afaan"
   },
   "auth": {
     "loginTitle": "Baga Nagaan Deebitan",
@@ -42,11 +62,14 @@
     "locationLabel": "Iddoo",
     "regionLabel": "Naannoo",
     "zoneLabel": "Godina",
-    "kebeleLabel": "Aanaa/Ganda",
+    "weredaLabel": "Wereda",
     "langLabel": "Afaan Filatame",
     "loginBtn": "Seeni",
     "registerBtn": "Galmaa'i",
-    "hasAccount": "Herrega qabduu? Seeni"
+    "hasAccount": "Herrega qabduu?",
+    "noAccount": "Herrega hin qabduu?",
+    "registerError": "Galmeen hin milkoofne. Irra deebi'i.",
+    "registrationFailed": "Wanti tokko dogongore. Mee deebisii yaali."
   },
   "product": {
     "createTitle": "Oomisha Haaraa Galchi",

@@ -4,6 +4,7 @@ import { authorize, protect } from "../../middleware/auth.middleware.js";
 import {
   createProduct,
   deleteProduct,
+  getFarmerAnalytics,
   getMarketPrice,
   getProductById,
   getProducts,
@@ -15,6 +16,11 @@ const router = express.Router();
 // ─── Public routes (no auth required) ────────────────────────────────────────
 router.get("/", getProducts);
 router.get("/market-price", getMarketPrice);
+
+// ─── Protected routes ─────────────────────────────────────────────────────────
+// GET — farmer analytics (must come before /:id route)
+router.get("/analytics", protect, authorize(ROLES.FARMER), getFarmerAnalytics);
+
 router.get("/:id", getProductById);
 
 // ─── Protected routes ─────────────────────────────────────────────────────────

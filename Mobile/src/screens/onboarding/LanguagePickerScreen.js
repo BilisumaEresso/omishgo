@@ -1,20 +1,20 @@
 // Mobile/src/screens/onboarding/LanguagePickerScreen.js
-import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  StatusBar,
-  Image,
-  Platform,
-} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import AppText from "../../components/common/AppText";
+import {
+  Image,
+  StatusBar,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import AppButton from "../../components/common/AppButton";
+import AppText from "../../components/common/AppText";
 import api from "../../config/api";
 import { useTheme } from "../../hooks/useTheme";
+import { useAuthStore } from "../../store/auth.store";
 
 const LANGUAGE_OPTIONS = [
   { code: "en", label: "English", native: "English", letter: "EN" },
@@ -23,10 +23,11 @@ const LANGUAGE_OPTIONS = [
 ];
 
 export default function LanguagePickerScreen({ navigation }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { theme } = useTheme();
+  const setAppLanguage = useAuthStore((state) => state.setLanguage);
 
-  const [selected, setSelected] = useState("en");
+  const [selected, setSelected] = useState(i18n.language || "en");
 
   // ── Theme colours ──────────────────────────────────────────────────────────
   const primary = theme?.colors?.primary || "#2E7D32";
@@ -38,14 +39,14 @@ export default function LanguagePickerScreen({ navigation }) {
   const border = theme?.colors?.border || "#D0E8CE";
   const background = theme?.colors?.background || "#F9FBF9";
 
-  const handleContinue = async () => {
+  const handleContinue = async (language = selected) => {
     try {
-      await i18n.changeLanguage(selected);
-      await AsyncStorage.setItem("@app_language", selected);
+      await i18n.changeLanguage(language);
+      await setAppLanguage(language);
       await AsyncStorage.setItem("@language_selected", "true");
-      // Silently update backend
+      // Silently update backend if user is already signed in
       api
-        .patch("/api/v1/auth/me/language", { preferredLang: selected })
+        .patch("/api/v1/auth/me/language", { preferredLang: language })
         .catch(() => {});
     } catch (error) {
       // ignore errors – user can still proceed
@@ -80,16 +81,22 @@ export default function LanguagePickerScreen({ navigation }) {
 
         {/* Title & subtitle */}
         <AppText style={[styles.title, { color: textPrimary }]}>
-          Choose Your Language
+          {t("languagePicker.title")}
         </AppText>
         <AppText style={[styles.subtitle, { color: textMuted }]}>
-          You can change this later in settings
+          {t("languagePicker.subtitle")}
         </AppText>
 
         {/* Language cards */}
         <View style={styles.cardsContainer}>
           {LANGUAGE_OPTIONS.map((lang) => {
             const isSelected = selected === lang.code;
+            const labelKey =
+              lang.code === "en"
+                ? t("languagePicker.english")
+                : lang.code === "am"
+                  ? t("languagePicker.amharic")
+                  : t("languagePicker.oromo");
             return (
               <TouchableOpacity
                 key={lang.code}
@@ -120,7 +127,7 @@ export default function LanguagePickerScreen({ navigation }) {
                   <AppText
                     style={[styles.languageName, { color: textPrimary }]}
                   >
-                    {lang.label}
+                    {labelKey}
                   </AppText>
                   <AppText style={[styles.nativeName, { color: textMuted }]}>
                     {lang.native}
@@ -133,11 +140,20 @@ export default function LanguagePickerScreen({ navigation }) {
 
         {/* Continue button */}
         <AppButton
-          title="Continue"
+          title={t("common.continue")}
           onPress={handleContinue}
           fullWidth
           style={styles.continueButton}
         />
+        <TouchableOpacity
+          onPress={() => handleContinue("en")}
+          activeOpacity={0.7}
+          style={styles.skipLink}
+        >
+          <AppText style={{ color: primary, fontWeight: "600" }}>
+            {t("common.skip")}
+          </AppText>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -206,5 +222,9 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     marginTop: 16,
+  },
+  skipLink: {
+    marginTop: 12,
+    alignItems: "center",
   },
 });

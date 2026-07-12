@@ -7,13 +7,19 @@
     "loading": "በመጫን ላይ...",
     "skip": "ዝለል"
   },
+  "splash": {
+    "title": "OmishGo ይሻላል",
+    "subtitle": "ቀላል፣ ትርፋማ፣ ታማኝ"
+  },
   "onboarding": {
     "slide1Title": "ምርትዎን በቀጥታ ይሸጡ",
     "slide1Desc": "ሰብልዎን ያስገቡ፣ ከተረጋገጡ ገዢዎች ጋር ያያያዙ — ሸምጋዮች አያስፈልጉም።",
     "slide2Title": "ከምንጩ ቀጥታ ይግዙ",
     "slide2Desc": "ከአካባቢ አርሶ አደሮች ጥራት ያለው ምርት በተመጣጣኝ ዋጋ ያግኙ።",
     "slide3Title": "በቋንቋዎ ይወያዩ",
-    "slide3Desc": "በአማርኛ፣ በኦሮምኛ ወይም በእንግሊዝኛ ቀጥታ ይላኩ ወይም ይደውሉ።"
+    "slide3Desc": "በአማርኛ፣ በኦሮምኛ ወይም በእንግሊዝኛ ቀጥታ ይላኩ ወይም ይደውሉ።",
+    "slide4Title": "እያንዳንዱን ትራንስፖርት ተከታትሉ",
+    "slide4Desc": "ከፈጠራ እስከ ድረስ ትዕዛዙን በግልጽ እይታ ይከታተሉ."
   },
   "languagePicker": {
     "title": "ቋንቋ ይምረጡ",
@@ -21,6 +27,20 @@
     "english": "English",
     "amharic": "አማርኛ",
     "oromo": "Afaan Oromoo"
+  },
+  "sidebar": {
+    "home": "መነሻ",
+    "products": "ምርቶቼ",
+    "orders": "ትዕዛዞች",
+    "analytics": "ትንታኔ",
+    "marketplace": "ገበያ",
+    "saved": "የተቀመጡ",
+    "messages": "መልዕክቶች",
+    "profile": "መገለጫ",
+    "postProduct": "ምርት ለጥፍ",
+    "help": "እገዛ",
+    "logout": "ውጣ",
+    "language": "ቋንቋ"
   },
   "auth": {
     "loginTitle": "እንኳን ደህና መጡ",
@@ -42,11 +62,14 @@
     "locationLabel": "አድራሻ",
     "regionLabel": "ክልል",
     "zoneLabel": "ዞን",
-    "kebeleLabel": "ቀበሌ",
+    "weredaLabel": "ወረዳ",
     "langLabel": "የሚመርጡት ቋንቋ",
     "loginBtn": "ግባ",
     "registerBtn": "ተመዝገብ",
-    "hasAccount": "መለያ አልዎት? ይግቡ"
+    "hasAccount": "መለያ አለዎት?",
+    "noAccount": "መለያ የለዎትም?",
+    "registerError": "ምዝገባ አልተሳካም። እንደገና ይሞክሩ.",
+    "registrationFailed": "ነገር አንደኛ ተጠናቋል። እባክዎ እንደገና ይሞክሩ."
   },
   "product": {
     "createTitle": "አዲስ ምርት ያስገቡ",

@@ -23,7 +23,7 @@ export const registerValidation = z.object({
     location: z.object({
       region: z.string().min(1, "Region is required"),
       zone: z.string().min(1, "Zone is required"),
-      kebele: z.string().min(1, "Kebele is required"),
+      wereda: z.string().min(1, "Wereda is required"),
     }),
     preferredLang: z.enum(["en", "am", "om"]).default("am"),
   }),

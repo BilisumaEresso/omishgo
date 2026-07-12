@@ -9,12 +9,6 @@ export default function RecentActivityList({ activities }) {
   const { theme } = useTheme();
   return (
     <View style={styles.section}>
-      <AppText
-        variant="headingSm"
-        style={{ color: theme?.colors?.textPrimary, marginBottom: 12 }}
-      >
-        Recent Activity
-      </AppText>
       {activities.map((activity) => (
         <AppCard key={activity.id} style={styles.card}>
           <View style={styles.iconWrapper}>

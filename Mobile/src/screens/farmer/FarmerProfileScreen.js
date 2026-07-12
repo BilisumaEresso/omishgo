@@ -1,6 +1,5 @@
 // Mobile/src/screens/farmer/FarmerProfileScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
 import {
   Alert,
   Platform,
@@ -11,14 +10,14 @@ import {
 } from "react-native";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
-import AppSidebar from "../../components/layout/AppSidebar";
+import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
 const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
   const { user, logout } = useAuthStore();
-  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const { openSidebar } = useSidebar();
 
   // Theme colors
   const primary = theme?.colors?.primary || "#2E7D32";
@@ -64,7 +63,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
         showMenu={true}
         showNotification={true}
         notificationCount={0}
-        onMenuPress={() => setSidebarVisible(true)}
+        onMenuPress={openSidebar}
         onNotificationPress={() => navigation.navigate("Notifications")}
       />
 
@@ -208,32 +207,6 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
           </AppText>
         </TouchableOpacity>
       </View>
-
-      <AppSidebar
-        visible={sidebarVisible}
-        onClose={() => setSidebarVisible(false)}
-        onItemPress={(item) => {
-          setSidebarVisible(false);
-          if (item.route === "Conversations")
-            navigation.navigate("Conversations");
-          else if (item.route === "Chat") navigation.navigate("Chat");
-          else if (item.route === "PostProduct")
-            navigation.navigate("PostProduct");
-          else if (item.route === "Home") onSwitchTab?.("Home");
-          else if (onSwitchTab) {
-            const TAB_MAP = {
-              FarmerProducts: "Products",
-              FarmerOrders: "Orders",
-              FarmerAnalytics: "Insights",
-              Profile: "Profile",
-              BuyerMarketplace: "Marketplace",
-              BuyerOrders: "Orders",
-              BuyerSaved: "Saved",
-            };
-            if (TAB_MAP[item.route]) onSwitchTab(TAB_MAP[item.route]);
-          }
-        }}
-      />
     </View>
   );
 };

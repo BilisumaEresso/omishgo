@@ -1,6 +1,5 @@
 // Mobile/src/screens/buyer/BuyerProfileScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
 import {
   Alert,
   Platform,
@@ -11,14 +10,14 @@ import {
 } from "react-native";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
-import AppSidebar from "../../components/layout/AppSidebar";
+import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
 const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
   const { user, logout } = useAuthStore();
-  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const { openSidebar } = useSidebar();
 
   const primary = theme?.colors?.primary || "#1565C0";
   const primaryContainer = theme?.colors?.primaryContainer || "#E3F2FD";
@@ -60,10 +59,10 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
     <View style={[styles.screen, { backgroundColor: background }]}>
       <AppHeader
         title="My Profile"
-        showMenu={true}
-        showNotification={true}
+        showMenu
+        showNotification
         notificationCount={0}
-        onMenuPress={() => setSidebarVisible(true)}
+        onMenuPress={openSidebar}
         onNotificationPress={() => navigation.navigate("Notifications")}
       />
 
@@ -74,7 +73,7 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
         {/* Profile Hero Section */}
         <View style={styles.heroSection}>
           <View style={[styles.avatar, { backgroundColor: primary }]}>
-            <Ionicons name="person" size={40} color={surface} />
+            <Ionicons name="person" size={40} color="#FFFFFF" />
           </View>
           <AppText style={[styles.name, { color: textPrimary }]}>
             {userName}
@@ -200,37 +199,12 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
           <Ionicons
             name="log-out-outline"
             size={20}
-            color={surface}
+            color="#FFFFFF"
             style={{ marginRight: 8 }}
           />
-          <AppText style={[styles.logoutText, { color: surface }]}>
-            Logout
-          </AppText>
+          <AppText style={styles.logoutText}>Logout</AppText>
         </TouchableOpacity>
       </View>
-
-      <AppSidebar
-        visible={sidebarVisible}
-        onClose={() => setSidebarVisible(false)}
-        onItemPress={(item) => {
-          setSidebarVisible(false);
-          if (item.route === "Conversations")
-            navigation.navigate("Conversations");
-          else if (item.route === "Chat") navigation.navigate("Chat");
-          else if (item.route === "PostProduct")
-            navigation.navigate("PostProduct");
-          else if (item.route === "Home") onSwitchTab?.("Home");
-          else if (onSwitchTab) {
-            const TAB_MAP = {
-              BuyerMarketplace: "Marketplace",
-              BuyerOrders: "Orders",
-              BuyerSaved: "Saved",
-              Profile: "Profile",
-            };
-            if (TAB_MAP[item.route]) onSwitchTab(TAB_MAP[item.route]);
-          }
-        }}
-      />
     </View>
   );
 };
@@ -238,6 +212,25 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingBottom: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    textAlign: "center",
   },
   scrollContent: {
     paddingBottom: 20,
@@ -351,6 +344,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   logoutText: {
+    color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "700",
   },

@@ -1,87 +1,42 @@
 // Mobile/src/screens/farmer/FarmerOrdersScreen.js
-import { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useCallback, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import AppText from "../../components/common/AppText";
+import AppButton from "../../components/common/AppButton";
 import AppHeader from "../../components/layout/AppHeader";
-import AppSidebar from "../../components/layout/AppSidebar";
+import { useSidebar } from "../../context/SidebarContext";
+import api from "../../config/api";
+import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 
-// --- Mock Data ---
-const MOCK_ORDERS = [
-  {
-    id: "1",
-    cropType: "Maize",
-    quantity: 50,
-    unit: "kg",
-    price: 1200,
-    buyerName: "Emily Wanjiku",
-    status: "Pending",
-    date: "12 Jul 2025",
-  },
-  {
-    id: "2",
-    cropType: "Tomatoes",
-    quantity: 30,
-    unit: "kg",
-    price: 900,
-    buyerName: "John Mwangi",
-    status: "Confirmed",
-    date: "11 Jul 2025",
-  },
-  {
-    id: "3",
-    cropType: "Kales",
-    quantity: 20,
-    unit: "bundles",
-    price: 400,
-    buyerName: "Sarah Auma",
-    status: "Completed",
-    date: "10 Jul 2025",
-  },
-  {
-    id: "4",
-    cropType: "Beans",
-    quantity: 100,
-    unit: "kg",
-    price: 2500,
-    buyerName: "Peter Otieno",
-    status: "Pending",
-    date: "09 Jul 2025",
-  },
-  {
-    id: "5",
-    cropType: "Onions",
-    quantity: 40,
-    unit: "kg",
-    price: 800,
-    buyerName: "Grace Ndung'u",
-    status: "Cancelled",
-    date: "08 Jul 2025",
-  },
-  {
-    id: "6",
-    cropType: "Potatoes",
-    quantity: 75,
-    unit: "kg",
-    price: 1500,
-    buyerName: "David Kioko",
-    status: "Confirmed",
-    date: "07 Jul 2025",
-  },
-];
+const FILTER_TABS = ["All", "Pending", "Confirmed", "Delivered", "Cancelled"];
 
-const FILTER_TABS = ["All", "Pending", "Confirmed", "Completed"];
+const STATUS_LABEL = {
+  pending: "Pending",
+  confirmed: "Confirmed",
+  in_transit: "In Transit",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
+};
 
 const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
-  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const { openSidebar } = useSidebar();
 
   // Extract theme colors
   const primary = theme?.colors?.primary || "#2E7D32";
@@ -93,28 +48,69 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
   const success = theme?.colors?.success || "#2E7D32";
   const warning = theme?.colors?.warning || "#F57F17";
   const info = theme?.colors?.info || "#0277BD";
-  const error = theme?.colors?.error || "#C62828";
+  const errorColor = theme?.colors?.error || "#C62828";
+  const textMuted = theme?.colors?.textMuted || "#8FAF8A";
 
-  // Status badge colors - using theme colors with transparency
+  const fetchOrders = async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
+    setError("");
+    try {
+      const res = await api.get(API_ENDPOINTS.orders.list);
+      const raw = res.data?.data?.orders || [];
+      const normalized = raw.map((o) => ({
+        id: o._id,
+        cropType: o.cropType,
+        quantity: o.quantity,
+        unit: o.unit || "kg",
+        price: o.totalPrice,
+        buyerName: o.buyerId?.name || "Buyer",
+        buyerId: o.buyerId?._id,
+        status: STATUS_LABEL[o.status] || o.status,
+        rawStatus: o.status,
+        date: new Date(o.createdAt).toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+        _raw: o,
+      }));
+      setOrders(normalized);
+    } catch (err) {
+      setError(err?.response?.data?.message || err.message || "Failed to load orders");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchOrders();
+    }, []),
+  );
+
   const getStatusColor = (status) => {
     switch (status) {
       case "Pending":
         return { bg: warning + "18", text: warning };
       case "Confirmed":
         return { bg: info + "18", text: info };
-      case "Completed":
+      case "In Transit":
+        return { bg: primary + "18", text: primary };
+      case "Delivered":
         return { bg: success + "18", text: success };
       case "Cancelled":
-        return { bg: error + "18", text: error };
+        return { bg: errorColor + "18", text: errorColor };
       default:
-        return { bg: "#F5F5F5", text: "#757575" };
+        return { bg: "#F5F5F518", text: "#757575" };
     }
   };
 
   const filteredOrders =
     activeFilter === "All"
-      ? MOCK_ORDERS
-      : MOCK_ORDERS.filter((o) => o.status === activeFilter);
+      ? orders
+      : orders.filter((o) => o.status === activeFilter);
 
   const renderOrderCard = ({ item }) => {
     const statusColors = getStatusColor(item.status);
@@ -122,25 +118,16 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() =>
-          navigation?.navigate("OrderDetail", { order: item, role: "farmer" })
+          navigation?.navigate("OrderDetail", { order: item._raw, role: "farmer" })
         }
       >
         <View style={[styles.card, { backgroundColor: surface }]}>
           <View style={styles.cardRow}>
             {/* Crop info */}
             <View style={{ flex: 1 }}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginBottom: 4,
-                }}
-              >
-                <AppText style={{ fontSize: 20, marginRight: 6 }}></AppText>
-                <AppText style={[styles.cropName, { color: textPrimary }]}>
-                  {item.cropType}
-                </AppText>
-              </View>
+              <AppText style={[styles.cropName, { color: textPrimary }]}>
+                {item.cropType}
+              </AppText>
               <AppText style={[styles.subText, { color: textSecondary }]}>
                 {item.buyerName} • {item.date}
               </AppText>
@@ -149,7 +136,7 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
             {/* Price and badge */}
             <View style={{ alignItems: "flex-end" }}>
               <AppText style={[styles.price, { color: primary }]}>
-                KSh {item.price.toLocaleString()}
+                {item.price?.toLocaleString()} ETB
               </AppText>
               <View
                 style={[styles.badge, { backgroundColor: statusColors.bg }]}
@@ -165,6 +152,7 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
 
           {/* Quantity */}
           <View style={styles.quantityRow}>
+            <Ionicons name="cube-outline" size={14} color={textMuted} style={{ marginRight: 4 }} />
             <AppText style={[styles.quantityText, { color: textSecondary }]}>
               {item.quantity} {item.unit}
             </AppText>
@@ -176,9 +164,9 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <AppText style={styles.emptyEmoji}>📦</AppText>
+      <Ionicons name="cube-outline" size={48} color={textSecondary} style={{ marginBottom: 12 }} />
       <AppText style={[styles.emptyText, { color: textSecondary }]}>
-        No orders yet
+        {activeFilter === "All" ? "No orders yet" : `No ${activeFilter.toLowerCase()} orders`}
       </AppText>
     </View>
   );
@@ -190,7 +178,7 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
         showMenu={true}
         showNotification={true}
         notificationCount={0}
-        onMenuPress={() => setSidebarVisible(true)}
+        onMenuPress={openSidebar}
         onNotificationPress={() => navigation.navigate("Notifications")}
       />
 
@@ -218,9 +206,7 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
                 <AppText
                   style={[
                     styles.filterText,
-                    {
-                      color: isActive ? surface : textSecondary,
-                    },
+                    { color: isActive ? surface : textSecondary },
                   ]}
                 >
                   {tab}
@@ -231,56 +217,41 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
         </ScrollView>
       </View>
 
-      {/* Orders list */}
-      <FlatList
-        data={filteredOrders}
-        keyExtractor={(item) => item.id}
-        renderItem={renderOrderCard}
-        ListEmptyComponent={renderEmpty}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
-
-      <AppSidebar
-        visible={sidebarVisible}
-        onClose={() => setSidebarVisible(false)}
-        onItemPress={(item) => {
-          setSidebarVisible(false);
-          if (item.route === "Conversations")
-            navigation.navigate("Conversations");
-          else if (item.route === "Chat") navigation.navigate("Chat");
-          else if (item.route === "PostProduct")
-            navigation.navigate("PostProduct");
-          else if (item.route === "Home") onSwitchTab?.("Home");
-          else if (onSwitchTab) {
-            const TAB_MAP = {
-              FarmerProducts: "Products",
-              FarmerOrders: "Orders",
-              FarmerAnalytics: "Insights",
-              Profile: "Profile",
-              BuyerMarketplace: "Marketplace",
-              BuyerOrders: "Orders",
-              BuyerSaved: "Saved",
-            };
-            if (TAB_MAP[item.route]) onSwitchTab(TAB_MAP[item.route]);
+      {loading ? (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={primary} />
+        </View>
+      ) : error ? (
+        <View style={styles.center}>
+          <AppText style={{ color: errorColor, marginBottom: 12 }}>{error}</AppText>
+          <AppButton title="Retry" onPress={() => fetchOrders()} />
+        </View>
+      ) : (
+        <FlatList
+          data={filteredOrders}
+          keyExtractor={(item) => item.id}
+          renderItem={renderOrderCard}
+          ListEmptyComponent={renderEmpty}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => fetchOrders(true)}
+              colors={[primary]}
+            />
           }
-        }}
-      />
+        />
+      )}
+
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  filterContainer: {
-    paddingVertical: 12,
-    paddingLeft: 16,
-  },
-  filterScroll: {
-    paddingRight: 16,
-  },
+  screen: { flex: 1 },
+  filterContainer: { paddingVertical: 12, paddingLeft: 16 },
+  filterScroll: { paddingRight: 16 },
   filterTab: {
     paddingHorizontal: 16,
     paddingVertical: 8,
@@ -288,15 +259,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
     borderWidth: 1,
   },
-  filterText: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  listContent: {
-    paddingTop: 8, // breathing room
-    paddingBottom: 20,
-    flexGrow: 1,
-  },
+  filterText: { fontSize: 14, fontWeight: "600" },
+  listContent: { paddingTop: 8, paddingBottom: 20, flexGrow: 1 },
   card: {
     borderRadius: 12,
     padding: 14,
@@ -308,56 +272,27 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  cardRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  cropName: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  subText: {
-    fontSize: 13,
-    marginTop: 2,
-  },
-  price: {
-    fontSize: 15,
-    fontWeight: "700",
-    marginBottom: 4,
-  },
+  cardRow: { flexDirection: "row", justifyContent: "space-between" },
+  cropName: { fontSize: 16, fontWeight: "700" },
+  subText: { fontSize: 13, marginTop: 2 },
+  price: { fontSize: 15, fontWeight: "700", marginBottom: 4 },
   badge: {
     paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: 10,
     alignSelf: "flex-end",
   },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  quantityRow: {
-    marginTop: 8,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  quantityText: {
-    fontSize: 13,
-    fontWeight: "500",
-  },
+  badgeText: { fontSize: 12, fontWeight: "600" },
+  quantityRow: { marginTop: 8, flexDirection: "row", alignItems: "center" },
+  quantityText: { fontSize: 13, fontWeight: "500" },
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingBottom: 60,
   },
-  emptyEmoji: {
-    fontSize: 48,
-    marginBottom: 12,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: "500",
-  },
+  emptyText: { fontSize: 16, fontWeight: "500" },
+  center: { flex: 1, justifyContent: "center", alignItems: "center", padding: 32 },
 });
 
 export default FarmerOrdersScreen;

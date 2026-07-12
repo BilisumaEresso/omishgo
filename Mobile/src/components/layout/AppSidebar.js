@@ -1,6 +1,6 @@
-// src/components/layout/AppSidebar.js
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Animated,
   Dimensions,
@@ -8,63 +8,113 @@ import {
   Platform,
   Pressable,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   View,
 } from "react-native";
-import { ROLES } from "../../constants/roles";
-import { useTheme } from "../../hooks/useTheme";
-import { useAuthStore } from "../../store/auth.store";
-import AppText from "../common/AppText";
+import api from "../../config/api.js";
+import { ROLES } from "../../constants/roles.js";
+import { useTheme } from "../../hooks/useTheme.js";
+import { useAuthStore } from "../../store/auth.store.js";
+import AppText from "../common/AppText.js";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
-const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.75, 320); // capped at 320 for tablets
+const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.78, 320);
 
-const ROLE_MENU_ITEMS = {
-  [ROLES.FARMER]: [
-    { label: "Home", icon: "home-outline", route: "Home" },
-    { label: "My Products", icon: "leaf-outline", route: "FarmerProducts" },
-    { label: "My Orders", icon: "receipt-outline", route: "FarmerOrders" },
-    { label: "Post Product", icon: "add-circle-outline", route: "PostProduct" },
-    { label: "Messages", icon: "chatbubbles-outline", route: "Conversations" },
-    {
-      label: "Market Insights",
-      icon: "stats-chart-outline",
-      route: "FarmerAnalytics",
-    },
-  ],
-  [ROLES.BUYER]: [
-    { label: "Home", icon: "home-outline", route: "Home" },
-    {
-      label: "Marketplace",
-      icon: "storefront-outline",
-      route: "BuyerMarketplace",
-    },
-    { label: "My Orders", icon: "receipt-outline", route: "BuyerOrders" },
-    { label: "Saved", icon: "bookmark-outline", route: "BuyerSaved" },
-    { label: "Messages", icon: "chatbubbles-outline", route: "Conversations" },
-  ],
-  [ROLES.SUPPLIER]: [
-    { label: "Home", icon: "home-outline", route: "Home" },
-    { label: "Inventory", icon: "cube-outline", route: "SupplierInventory" },
-    { label: "Orders", icon: "receipt-outline", route: "SupplierOrders" },
-  ],
-  [ROLES.DRIVER]: [
-    { label: "Home", icon: "home-outline", route: "Home" },
-    { label: "Deliveries", icon: "bicycle-outline", route: "DriverDeliveries" },
-  ],
-};
-
-const COMMON_ITEMS = [
-  { label: "My Profile", icon: "person-outline", route: "Profile" },
-  { label: "Help", icon: "help-circle-outline", route: "Help" },
+const LANGUAGE_OPTIONS = [
+  { code: "en", label: "English" },
+  { code: "am", label: "አማርኛ" },
+  { code: "om", label: "Afaan Oromoo" },
 ];
 
+function getRoleMenuItems(role, t) {
+  if (role === ROLES.FARMER) {
+    return [
+      { label: t("sidebar.home"), icon: "home-outline", route: "Home" },
+      {
+        label: t("sidebar.products"),
+        icon: "leaf-outline",
+        route: "FarmerProducts",
+      },
+      {
+        label: t("sidebar.orders"),
+        icon: "receipt-outline",
+        route: "FarmerOrders",
+      },
+      {
+        label: t("sidebar.analytics"),
+        icon: "stats-chart-outline",
+        route: "FarmerAnalytics",
+      },
+      {
+        label: t("sidebar.postProduct"),
+        icon: "add-circle-outline",
+        route: "PostProduct",
+      },
+      {
+        label: t("sidebar.messages"),
+        icon: "chatbubbles-outline",
+        route: "Conversations",
+      },
+      {
+        label: t("sidebar.profile"),
+        icon: "person-outline",
+        route: "Profile",
+      },
+    ];
+  }
+
+  if (role === ROLES.BUYER) {
+    return [
+      { label: t("sidebar.home"), icon: "home-outline", route: "Home" },
+      {
+        label: t("sidebar.marketplace"),
+        icon: "storefront-outline",
+        route: "BuyerMarketplace",
+      },
+      {
+        label: t("sidebar.orders"),
+        icon: "receipt-outline",
+        route: "BuyerOrders",
+      },
+      {
+        label: t("sidebar.saved"),
+        icon: "bookmark-outline",
+        route: "BuyerSaved",
+      },
+      {
+        label: t("sidebar.messages"),
+        icon: "chatbubbles-outline",
+        route: "Conversations",
+      },
+      {
+        label: t("sidebar.profile"),
+        icon: "person-outline",
+        route: "Profile",
+      },
+    ];
+  }
+
+  return [];
+}
+
 const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
-  const { logout, user } = useAuthStore();
+  const { logout, user, language, setLanguage } = useAuthStore();
   const slideAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [showModal, setShowModal] = useState(visible);
+
+  const textPrimary = theme?.colors?.textPrimary || "#212121";
+  const textSecondary = theme?.colors?.textSecondary || "#757575";
+  const borderColor = theme?.colors?.border || "#E0E0E0";
+  const backgroundColor = theme?.colors?.surface || "#FFFFFF";
+  const pressedBg = theme?.colors?.backgroundSecondary || "#EEEEEE";
+  const errorColor = theme?.colors?.error || "#F44336";
+  const primaryColor = theme?.colors?.primary || "#4CAF50";
+  const spacing = theme.spacing || { sm: 8, md: 12, lg: 16 };
+  const radius = theme.radius || { sm: 8 };
 
   useEffect(() => {
     if (visible) {
@@ -93,11 +143,9 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
           duration: 200,
           useNativeDriver: true,
         }),
-      ]).start(() => {
-        setShowModal(false);
-      });
+      ]).start(() => setShowModal(false));
     }
-  }, [visible]);
+  }, [visible, slideAnim, fadeAnim]);
 
   const handleCloseAnimation = (callbackItem = null) => {
     Animated.parallel([
@@ -113,32 +161,61 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
       }),
     ]).start(() => {
       setShowModal(false);
-      if (callbackItem && onItemPress) {
-        onItemPress(callbackItem);
-      }
-      if (onClose) onClose();
+      if (callbackItem && onItemPress) onItemPress(callbackItem);
+      onClose?.();
     });
   };
 
-  const resolvedRole = role || user?.role;
-  const menuItems = resolvedRole ? ROLE_MENU_ITEMS[resolvedRole] || [] : [];
+  const handleLanguageSelect = async (code) => {
+    await setLanguage(code);
+    api
+      .patch("/api/v1/auth/me/language", { preferredLang: code })
+      .catch(() => {});
+  };
 
-  // Theme shortcuts
-  const textPrimary = theme?.colors?.textPrimary || "#212121";
-  const textSecondary = theme?.colors?.textSecondary || "#757575";
-  const borderColor = theme?.colors?.border || "#E0E0E0";
-  const backgroundColor = theme?.colors?.surface || "#FFFFFF";
-  const pressedBg = theme?.colors?.backgroundSecondary || "#EEEEEE";
-  const errorColor = theme?.colors?.error || "#F44336";
-  const primaryColor = theme?.colors?.primary || "#4CAF50";
-  const spacing = theme.spacing || { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 };
-  const radius = theme.radius || { sm: 8, md: 12 };
-
-  // Logout handler – we ensure the route is 'Logout' so dashboard can catch it
   const handleLogout = () => {
     logout();
-    handleCloseAnimation({ label: "Logout", route: "Logout" });
+    handleCloseAnimation({ label: t("sidebar.logout"), route: "Logout" });
   };
+
+  const menuItems = getRoleMenuItems(role, t);
+  const roleLabel =
+    role === ROLES.FARMER
+      ? t("auth.roleFarmer")
+      : role === ROLES.BUYER
+        ? t("auth.roleBuyer")
+        : role
+          ? role.charAt(0).toUpperCase() + role.slice(1)
+          : "User";
+
+  const renderMenuItem = (item) => (
+    <Pressable
+      key={item.route}
+      style={({ pressed }) => [
+        styles.menuItem,
+        {
+          backgroundColor: pressed ? pressedBg : "transparent",
+          borderRadius: radius.sm,
+        },
+      ]}
+      onPress={() => handleCloseAnimation(item)}
+      accessibilityRole="button"
+      accessibilityLabel={item.label}
+    >
+      <Ionicons
+        name={item.icon}
+        size={22}
+        color={textPrimary}
+        style={{ marginRight: spacing.sm }}
+      />
+      <AppText
+        variant="bodyMd"
+        style={{ color: textPrimary, fontWeight: "500" }}
+      >
+        {item.label}
+      </AppText>
+    </Pressable>
+  );
 
   return (
     <Modal
@@ -148,7 +225,6 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
       onRequestClose={() => handleCloseAnimation()}
     >
       <View style={styles.overlay}>
-        {/* Backdrop */}
         <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]}>
           <Pressable
             style={{ flex: 1 }}
@@ -157,7 +233,6 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
           />
         </Animated.View>
 
-        {/* Drawer */}
         <Animated.View
           style={[
             styles.drawer,
@@ -168,7 +243,6 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
           ]}
         >
           <SafeAreaView style={styles.drawerContent}>
-            {/* Profile section – now tappable */}
             <Pressable
               style={[
                 styles.profileSection,
@@ -178,10 +252,13 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
                 },
               ]}
               onPress={() =>
-                handleCloseAnimation({ label: "Profile", route: "Profile" })
+                handleCloseAnimation({
+                  label: t("sidebar.profile"),
+                  route: "Profile",
+                })
               }
               accessibilityRole="button"
-              accessibilityLabel="View profile"
+              accessibilityLabel={t("sidebar.profile")}
             >
               <View
                 style={[
@@ -197,13 +274,14 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
                   style={{ color: textPrimary, fontWeight: "700" }}
                   numberOfLines={1}
                 >
-                  {user?.name || "Farmer"}
+                  {user?.name || roleLabel}
                 </AppText>
                 <AppText
                   variant="caption"
                   style={{ color: textSecondary, marginTop: 2 }}
+                  numberOfLines={1}
                 >
-                  {role ? role.charAt(0).toUpperCase() + role.slice(1) : "User"}
+                  {roleLabel}
                 </AppText>
               </View>
               <Ionicons
@@ -213,38 +291,16 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
               />
             </Pressable>
 
-            {/* Menu items */}
-            <View style={[styles.menuList, { paddingHorizontal: spacing.md }]}>
-              {menuItems.map((item) => (
-                <Pressable
-                  key={item.label}
-                  style={({ pressed }) => [
-                    styles.menuItem,
-                    {
-                      backgroundColor: pressed ? pressedBg : "transparent",
-                      borderRadius: radius.sm,
-                    },
-                  ]}
-                  onPress={() => handleCloseAnimation(item)}
-                  accessibilityRole="button"
-                  accessibilityLabel={item.label}
-                >
-                  <Ionicons
-                    name={item.icon}
-                    size={24} // increased from 20
-                    color={textPrimary}
-                    style={{ marginRight: spacing.sm }}
-                  />
-                  <AppText
-                    variant="bodyMd"
-                    style={{ color: textPrimary, fontWeight: "500" }}
-                  >
-                    {item.label}
-                  </AppText>
-                </Pressable>
-              ))}
+            <ScrollView
+              style={styles.menuScroll}
+              contentContainerStyle={[
+                styles.menuList,
+                { paddingHorizontal: spacing.md },
+              ]}
+              showsVerticalScrollIndicator={false}
+            >
+              {menuItems.map(renderMenuItem)}
 
-              {/* Divider */}
               <View
                 style={[
                   styles.divider,
@@ -252,57 +308,77 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
                 ]}
               />
 
-              {/* Common items */}
-              {COMMON_ITEMS.map((item) => (
-                <Pressable
-                  key={item.label}
-                  style={({ pressed }) => [
-                    styles.menuItem,
-                    {
-                      backgroundColor: pressed ? pressedBg : "transparent",
-                      borderRadius: radius.sm,
-                    },
-                  ]}
-                  onPress={() => handleCloseAnimation(item)}
-                  accessibilityRole="button"
-                  accessibilityLabel={item.label}
-                >
-                  <Ionicons
-                    name={item.icon}
-                    size={24}
-                    color={textPrimary}
-                    style={{ marginRight: spacing.sm }}
-                  />
-                  <AppText
-                    variant="bodyMd"
-                    style={{ color: textPrimary, fontWeight: "500" }}
-                  >
-                    {item.label}
-                  </AppText>
-                </Pressable>
-              ))}
+              <AppText
+                variant="caption"
+                style={[
+                  styles.sectionLabel,
+                  { color: textSecondary, marginBottom: spacing.sm },
+                ]}
+              >
+                {t("sidebar.language")}
+              </AppText>
+              <View style={styles.languageRow}>
+                {LANGUAGE_OPTIONS.map((option) => {
+                  const selected = language === option.code;
+                  return (
+                    <Pressable
+                      key={option.code}
+                      style={[
+                        styles.languageBtn,
+                        {
+                          borderColor: selected ? primaryColor : borderColor,
+                          backgroundColor: selected
+                            ? primaryColor + "18"
+                            : "transparent",
+                        },
+                      ]}
+                      onPress={() => handleLanguageSelect(option.code)}
+                    >
+                      <AppText
+                        style={{
+                          color: selected ? primaryColor : textSecondary,
+                          fontWeight: selected ? "700" : "500",
+                          fontSize: 12,
+                        }}
+                      >
+                        {option.label}
+                      </AppText>
+                    </Pressable>
+                  );
+                })}
+              </View>
 
-              {/* Logout – now clearly separated and tappable */}
+              <View
+                style={[
+                  styles.divider,
+                  { backgroundColor: borderColor, marginVertical: spacing.md },
+                ]}
+              />
+
+              {renderMenuItem({
+                label: t("sidebar.help"),
+                icon: "help-circle-outline",
+                route: "Help",
+              })}
+
               <Pressable
                 style={({ pressed }) => [
                   styles.menuItem,
-                  styles.logoutItem,
                   {
                     backgroundColor: pressed
                       ? errorColor + "15"
                       : "transparent",
                     borderRadius: radius.sm,
-                    marginTop: "auto",
                     marginBottom: spacing.lg,
                   },
                 ]}
                 onPress={handleLogout}
                 accessibilityRole="button"
-                accessibilityLabel="Logout"
+                accessibilityLabel={t("sidebar.logout")}
               >
                 <Ionicons
                   name="log-out-outline"
-                  size={24}
+                  size={22}
                   color={errorColor}
                   style={{ marginRight: spacing.sm }}
                 />
@@ -310,10 +386,10 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
                   variant="bodyMd"
                   style={{ color: errorColor, fontWeight: "600" }}
                 >
-                  Logout
+                  {t("sidebar.logout")}
                 </AppText>
               </Pressable>
-            </View>
+            </ScrollView>
           </SafeAreaView>
         </Animated.View>
       </View>
@@ -340,9 +416,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.15,
         shadowRadius: 12,
       },
-      android: {
-        elevation: 20,
-      },
+      android: { elevation: 20 },
     }),
   },
   drawerContent: {
@@ -365,22 +439,42 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     flex: 1,
   },
-  menuList: {
+  menuScroll: {
     flex: 1,
+  },
+  menuList: {
     paddingTop: 8,
+    paddingBottom: 16,
   },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 14, // ensures minimum 48pt touch height with icon
+    paddingVertical: 13,
     paddingHorizontal: 12,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   divider: {
     height: 1,
   },
-  logoutItem: {
-    // already styled inline, but keep base if needed
+  sectionLabel: {
+    paddingHorizontal: 12,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    fontSize: 11,
+  },
+  languageRow: {
+    flexDirection: "row",
+    gap: 8,
+    paddingHorizontal: 12,
+  },
+  languageBtn: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1.5,
   },
 });
 

@@ -1,4 +1,58 @@
-export const ProductCard = ({ product, onView, theme, isSaved, onToggleSave }) => {
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import AppButton from "./AppButton";
+import AppText from "./AppText";
+
+const styles = StyleSheet.create({
+  card: {
+    borderWidth: 1,
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 12,
+    gap: 4,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  price: { fontWeight: "700" },
+  quantityRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 2,
+  },
+  categoryBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  locationRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  farmerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 2,
+  },
+  viewBtn: {
+    marginTop: 12,
+    alignSelf: "stretch",
+    borderRadius: 10,
+    paddingVertical: 10,
+  },
+});
+
+export const ProductCard = ({
+  product,
+  onView,
+  theme,
+  isSaved,
+  onToggleSave,
+}) => {
   const farmer = product.farmerId || {};
   const loc = product.location || {};
 
@@ -31,7 +85,7 @@ export const ProductCard = ({ product, onView, theme, isSaved, onToggleSave }) =
           {product.cropType}
         </AppText>
         <TouchableOpacity
-          onPress={() => onToggleSave(product._id)}
+          onPress={() => onToggleSave(product)}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           style={{ marginRight: 6 }}
         >
@@ -51,14 +105,14 @@ export const ProductCard = ({ product, onView, theme, isSaved, onToggleSave }) =
         <AppText variant="bodyMd" style={{ color: textSecondary }}>
           {product.quantity} {product.unit || "kg"}
         </AppText>
-        {product.category ? (
+        {product.category || product.cropType ? (
           <View
             style={[styles.categoryBadge, { backgroundColor: primaryCont }]}
           >
             <AppText
               style={{ color: primary, fontSize: 12, fontWeight: "600" }}
             >
-              {product.category}
+              {product.category || product.cropType}
             </AppText>
           </View>
         ) : null}

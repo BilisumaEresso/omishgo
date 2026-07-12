@@ -47,10 +47,38 @@ const slides = [
 ];
 
 export default function OnboardingCarousel({ navigation }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const flatListRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
+
+  const slides = [
+    {
+      id: "1",
+      image: require("../../assets/images/onboard_farmer.png"),
+      title: t("onboarding.slide1Title"),
+      description: t("onboarding.slide1Desc"),
+    },
+    {
+      id: "2",
+      image: require("../../assets/images/onboard_market.png"),
+      title: t("onboarding.slide2Title"),
+      description: t("onboarding.slide2Desc"),
+    },
+    {
+      id: "3",
+      image: require("../../assets/images/onboard_supply.png"),
+      title: t("onboarding.slide3Title"),
+      description: t("onboarding.slide3Desc"),
+    },
+    {
+      id: "4",
+      image: require("../../assets/images/onboard_track.png"),
+      title: t("onboarding.slide4Title"),
+      description: t("onboarding.slide4Desc"),
+    },
+  ];
 
   // Theme colors
   const primary = theme?.colors?.primary || "#2E7D32";
@@ -171,7 +199,7 @@ export default function OnboardingCarousel({ navigation }) {
       <View style={styles.bottom}>
         <View style={styles.dotsContainer}>{renderDots()}</View>
         <AppButton
-          title={isLast ? "Get Started" : "Next"}
+          title={isLast ? t("common.continue") : t("common.continue")}
           onPress={handleNext}
           fullWidth
           variant="primary"

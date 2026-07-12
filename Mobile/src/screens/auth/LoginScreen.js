@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Animated, Pressable, View } from "react-native";
 import AppButton from "../../components/common/AppButton";
 import AppInput from "../../components/common/AppInput";
@@ -10,6 +11,7 @@ import { useAuthStore } from "../../store/auth.store.js";
 
 const LoginScreen = ({ navigation }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const { login } = useAuthStore();
 
   const [phone, setPhone] = React.useState("");
@@ -78,8 +80,8 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <AuthLayout
-      title="Welcome Back"
-      subtitle="Login to your account"
+      title={t("auth.loginTitle")}
+      subtitle={t("auth.loginSubtitle")}
       logoSource={require("../../../assets/logo.png")}
       showBack={false}
     >
@@ -116,8 +118,8 @@ const LoginScreen = ({ navigation }) => {
           )}
 
           <AppInput
-            label="Phone Number"
-            placeholder="Enter your phone number"
+            label={t("auth.phoneLabel")}
+            placeholder={t("auth.phonePlaceholder")}
             value={phone}
             onChangeText={(text) => {
               setPhone(text);
@@ -125,12 +127,12 @@ const LoginScreen = ({ navigation }) => {
             }}
             keyboardType="phone-pad"
             error={errors.phone}
-            leftIcon="call-outline" // icon added
+            leftIcon="call-outline"
           />
 
           <AppInput
-            label="Enter PIN"
-            placeholder="Enter your PIN"
+            label={t("auth.pinLabel")}
+            placeholder={t("auth.pinPlaceholder")}
             value={pin}
             onChangeText={(text) => {
               const numericText = text.replace(/[^0-9]/g, "");
@@ -140,11 +142,11 @@ const LoginScreen = ({ navigation }) => {
             keyboardType="number-pad"
             secureTextEntry
             error={errors.pin}
-            leftIcon="lock-closed-outline" // icon added
+            leftIcon="lock-closed-outline"
           />
 
           <AppButton
-            title="Login"
+            title={t("auth.loginBtn")}
             onPress={handleSubmit}
             loading={loading}
             fullWidth
@@ -159,7 +161,7 @@ const LoginScreen = ({ navigation }) => {
             }}
           >
             <AppText variant="bodyMd" color={theme.colors.textSecondary}>
-              Don't have an account?{" "}
+              {t("auth.noAccount")}
             </AppText>
             <Pressable onPress={() => navigation.navigate("Register")}>
               <AppText
@@ -167,7 +169,7 @@ const LoginScreen = ({ navigation }) => {
                 color={primary}
                 style={{ fontWeight: "600" }}
               >
-                Register
+                {t("auth.registerBtn")}
               </AppText>
             </Pressable>
           </View>

@@ -11,31 +11,29 @@ const Stack = createNativeStackNavigator();
 
 export const RootNavigator = () => {
   const { isAuthenticated, restoreSession } = useAuthStore();
-  const [isReady, setIsReady] = useState(false); // Splash is showing
+  const [isReady, setIsReady] = useState(false); // Bootstrapping auth and language
+  const [showSplash, setShowSplash] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     const bootstrap = async () => {
-      // Check if language has been selected before (first launch detection)
       const langSelected = await AsyncStorage.getItem("@language_selected");
       setShowOnboarding(!langSelected);
 
-      // Restore persisted token/user from AsyncStorage
       await restoreSession();
       setIsReady(true);
     };
     bootstrap();
-  }, []);
+  }, [restoreSession]);
 
-  // Show splash while bootstrapping
-  if (!isReady) {
-    return (
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Splash" component={SplashScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    );
+  useEffect(() => {
+    if (!isReady) return;
+    const timer = setTimeout(() => setShowSplash(false), 2000);
+    return () => clearTimeout(timer);
+  }, [isReady]);
+
+  if (!isReady || showSplash) {
+    return <SplashScreen />;
   }
 
   return (

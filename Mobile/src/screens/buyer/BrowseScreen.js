@@ -15,11 +15,12 @@ import {
 import AppButton from "../../components/common/AppButton";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
-import AppSidebar from "../../components/layout/AppSidebar";
+import { useSidebar } from "../../context/SidebarContext";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 import { ProductCard } from "../../components/common/ProductCard";
+import { useSavedStore } from "../../store/saved.store";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const CATEGORY_FILTERS = ["All", "Grains", "Vegetables", "Fruits"];
@@ -41,8 +42,13 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [sortOrder, setSortOrder] = useState("Default");
-  const [savedIds, setSavedIds] = useState([]);
-  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const { openSidebar } = useSidebar();
+
+  // Saved state from global store
+  const savedIds = useSavedStore((s) => s.savedIds);
+  const toggleSave = useSavedStore((s) => s.toggleSave);
+  const fetchSaved = useSavedStore((s) => s.fetchSaved);
+  const savedInitialized = useSavedStore((s) => s.initialized);
 
   // Fetch products from API
   const fetchProducts = useCallback(async (isRefresh = false) => {
@@ -67,6 +73,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
 
   useEffect(() => {
     fetchProducts();
+    if (!savedInitialized) fetchSaved();
   }, [fetchProducts]);
 
   // ── Derived data ─────────────────────────────────────────────────────────
@@ -80,7 +87,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
   const filteredByCategory = useMemo(() => {
     if (categoryFilter === "All") return filteredBySearch;
     return filteredBySearch.filter(
-      (p) => p.category?.toLowerCase() === categoryFilter.toLowerCase(),
+      (p) => p.cropType?.toLowerCase() === categoryFilter.toLowerCase(),
     );
   }, [filteredBySearch, categoryFilter]);
 
@@ -107,13 +114,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
     return { total, avgPrice, uniqueFarmers };
   }, [allProducts]);
 
-  const toggleSave = (productId) => {
-    setSavedIds((prev) =>
-      prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
-        : [...prev, productId],
-    );
-  };
+
 
   const handleView = (product) =>
     navigation.navigate("ListingDetail", { product });
@@ -150,7 +151,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
         showMenu={true}
         showNotification={true}
         notificationCount={0}
-        onMenuPress={() => setSidebarVisible(true)}
+        onMenuPress={openSidebar}
         onNotificationPress={() => navigation.navigate("Notifications")}
       />
 
@@ -284,7 +285,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
               product={item}
               onView={handleView}
               theme={theme}
-              isSaved={savedIds.includes(item._id)}
+              isSaved={savedIds.has(item._id)}
               onToggleSave={toggleSave}
             />
           )}
@@ -314,25 +315,6 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
         />
       )}
 
-      <AppSidebar
-        visible={sidebarVisible}
-        onClose={() => setSidebarVisible(false)}
-        onItemPress={(item) => {
-          setSidebarVisible(false);
-          if (item.route === "Conversations")
-            navigation.navigate("Conversations");
-          else if (item.route === "Home") onSwitchTab?.("Home");
-          else if (onSwitchTab) {
-            const MAP = {
-              BuyerMarketplace: "Marketplace",
-              BuyerOrders: "Orders",
-              BuyerSaved: "Saved",
-              Profile: "Profile",
-            };
-            if (MAP[item.route]) onSwitchTab(MAP[item.route]);
-          }
-        }}
-      />
     </View>
   );
 }

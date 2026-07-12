@@ -1,78 +1,43 @@
 // Mobile/src/screens/buyer/BuyerOrdersScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import AppText from "../../components/common/AppText";
+import AppButton from "../../components/common/AppButton";
 import AppHeader from "../../components/layout/AppHeader";
-import AppSidebar from "../../components/layout/AppSidebar";
+import { useSidebar } from "../../context/SidebarContext";
+import api from "../../config/api";
+import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 
-// --- Mock Data ---
-const MOCK_ORDERS = [
-  {
-    id: "1",
-    cropType: "Maize",
-    quantity: 50,
-    unit: "kg",
-    totalPrice: 1200,
-    farmerName: "James Kariuki",
-    status: "Active",
-    orderedDate: "12 Jul 2025",
-  },
-  {
-    id: "2",
-    cropType: "Tomatoes",
-    quantity: 30,
-    unit: "kg",
-    totalPrice: 900,
-    farmerName: "Alice Wambui",
-    status: "Completed",
-    orderedDate: "10 Jul 2025",
-  },
-  {
-    id: "3",
-    cropType: "Kales",
-    quantity: 20,
-    unit: "bundles",
-    totalPrice: 400,
-    farmerName: "Peter Otieno",
-    status: "Active",
-    orderedDate: "09 Jul 2025",
-  },
-  {
-    id: "4",
-    cropType: "Onions",
-    quantity: 40,
-    unit: "kg",
-    totalPrice: 800,
-    farmerName: "Grace Auma",
-    status: "Completed",
-    orderedDate: "07 Jul 2025",
-  },
-  {
-    id: "5",
-    cropType: "Beans",
-    quantity: 100,
-    unit: "kg",
-    totalPrice: 2500,
-    farmerName: "David Mwangi",
-    status: "Active",
-    orderedDate: "05 Jul 2025",
-  },
-];
+const FILTER_TABS = ["All", "Pending", "Confirmed", "Delivered", "Cancelled"];
 
-const FILTER_TABS = ["All", "Active", "Completed"];
+// Map backend status (lowercase) to display label
+const STATUS_LABEL = {
+  pending: "Pending",
+  confirmed: "Confirmed",
+  in_transit: "In Transit",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
+};
 
 const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
-  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const { openSidebar } = useSidebar();
 
   // Extract theme colors with fallbacks
   const primary = theme?.colors?.primary || "#1565C0";
@@ -83,15 +48,64 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
   const border = theme?.colors?.border || "#D0DEF5";
   const success = theme?.colors?.success || "#2E7D32";
   const info = theme?.colors?.info || "#1565C0";
+  const warning = theme?.colors?.warning || "#EF6C00";
+  const errorColor = theme?.colors?.error || "#C62828";
   const textMuted = theme?.colors?.textMuted || "#8FA3BE";
 
-  // Status badge colors - using theme with transparency
+  const fetchOrders = async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
+    setError("");
+    try {
+      const res = await api.get(API_ENDPOINTS.orders.list);
+      const raw = res.data?.data?.orders || [];
+      // Normalize for display
+      const normalized = raw.map((o) => ({
+        id: o._id,
+        cropType: o.cropType,
+        quantity: o.quantity,
+        unit: o.unit || "kg",
+        totalPrice: o.totalPrice,
+        farmerName: o.farmerId?.name || "Farmer",
+        farmerId: o.farmerId?._id,
+        status: STATUS_LABEL[o.status] || o.status,
+        rawStatus: o.status,
+        orderedDate: new Date(o.createdAt).toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+        _raw: o,
+      }));
+      setOrders(normalized);
+    } catch (err) {
+      setError(err?.response?.data?.message || err.message || "Failed to load orders");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  // Refresh every time screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      fetchOrders();
+    }, []),
+  );
+
+  // Status badge colors
   const getStatusColor = (status) => {
     switch (status) {
-      case "Active":
+      case "Pending":
+        return { bg: warning + "18", text: warning };
+      case "Confirmed":
         return { bg: info + "18", text: info };
-      case "Completed":
+      case "In Transit":
+        return { bg: primary + "18", text: primary };
+      case "Delivered":
         return { bg: success + "18", text: success };
+      case "Cancelled":
+        return { bg: errorColor + "18", text: errorColor };
       default:
         return { bg: textMuted + "18", text: textMuted };
     }
@@ -99,18 +113,19 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
 
   const filteredOrders =
     activeFilter === "All"
-      ? MOCK_ORDERS
-      : MOCK_ORDERS.filter((o) => o.status === activeFilter);
+      ? orders
+      : orders.filter((o) => o.status === activeFilter);
 
   const renderOrderCard = ({ item }) => {
     const statusColors = getStatusColor(item.status);
-    const isActive = item.status === "Active";
+    const isActive =
+      item.rawStatus === "pending" || item.rawStatus === "confirmed" || item.rawStatus === "in_transit";
 
     return (
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() =>
-          navigation?.navigate("OrderDetail", { order: item, role: "buyer" })
+          navigation?.navigate("OrderDetail", { order: item._raw, role: "buyer" })
         }
       >
         <View style={[styles.card, { backgroundColor: surface }]}>
@@ -137,7 +152,7 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
             {/* Price and badge */}
             <View style={{ alignItems: "flex-end" }}>
               <AppText style={[styles.price, { color: primary }]}>
-                KSh {item.totalPrice.toLocaleString()}
+                {item.totalPrice?.toLocaleString()} ETB
               </AppText>
               <View
                 style={[styles.badge, { backgroundColor: statusColors.bg }]}
@@ -157,7 +172,7 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
               style={[styles.messageButton, { borderColor: primary }]}
               onPress={() =>
                 navigation?.navigate("Chat", {
-                  userId: "mock",
+                  userId: item.farmerId,
                   userName: item.farmerName,
                 })
               }
@@ -181,7 +196,6 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      {/* Replaced emoji with Ionicons */}
       <Ionicons
         name="cube-outline"
         size={48}
@@ -189,8 +203,20 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
         style={{ marginBottom: 12 }}
       />
       <AppText style={[styles.emptyText, { color: textSecondary }]}>
-        No orders yet
+        {activeFilter === "All"
+          ? "You haven't placed any orders yet"
+          : `No ${activeFilter.toLowerCase()} orders`}
       </AppText>
+      {activeFilter === "All" && (
+        <TouchableOpacity
+          onPress={() => onSwitchTab?.("Marketplace")}
+          style={[styles.browseBtn, { backgroundColor: primary }]}
+        >
+          <AppText style={{ color: "#fff", fontWeight: "700", fontSize: 14 }}>
+            Browse Marketplace
+          </AppText>
+        </TouchableOpacity>
+      )}
     </View>
   );
 
@@ -201,7 +227,7 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
         showMenu={true}
         showNotification={true}
         notificationCount={0}
-        onMenuPress={() => setSidebarVisible(true)}
+        onMenuPress={openSidebar}
         onNotificationPress={() => navigation.navigate("Notifications")}
       />
 
@@ -242,41 +268,35 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
         </ScrollView>
       </View>
 
-      {/* Orders list */}
-      <FlatList
-        data={filteredOrders}
-        keyExtractor={(item) => item.id}
-        renderItem={renderOrderCard}
-        ListEmptyComponent={renderEmpty}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
-
-      <AppSidebar
-        visible={sidebarVisible}
-        onClose={() => setSidebarVisible(false)}
-        onItemPress={(item) => {
-          setSidebarVisible(false);
-          if (item.route === "Conversations")
-            navigation.navigate("Conversations");
-          else if (item.route === "Chat") navigation.navigate("Chat");
-          else if (item.route === "PostProduct")
-            navigation.navigate("PostProduct");
-          else if (item.route === "Home") onSwitchTab?.("Home");
-          else if (onSwitchTab) {
-            const TAB_MAP = {
-              FarmerProducts: "Products",
-              FarmerOrders: "Orders",
-              FarmerAnalytics: "Insights",
-              Profile: "Profile",
-              BuyerMarketplace: "Marketplace",
-              BuyerOrders: "Orders",
-              BuyerSaved: "Saved",
-            };
-            if (TAB_MAP[item.route]) onSwitchTab(TAB_MAP[item.route]);
+      {/* Loading state */}
+      {loading ? (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={primary} />
+        </View>
+      ) : error ? (
+        <View style={styles.center}>
+          <AppText style={{ color: errorColor, marginBottom: 12 }}>{error}</AppText>
+          <AppButton title="Retry" onPress={() => fetchOrders()} />
+        </View>
+      ) : (
+        /* Orders list */
+        <FlatList
+          data={filteredOrders}
+          keyExtractor={(item) => item.id}
+          renderItem={renderOrderCard}
+          ListEmptyComponent={renderEmpty}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => fetchOrders(true)}
+              colors={[primary]}
+            />
           }
-        }}
-      />
+        />
+      )}
+
     </View>
   );
 };
@@ -364,10 +384,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingBottom: 60,
+    gap: 12,
   },
   emptyText: {
     fontSize: 16,
     fontWeight: "500",
+    textAlign: "center",
+  },
+  browseBtn: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 10,
+    marginTop: 4,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 32,
   },
 });
 

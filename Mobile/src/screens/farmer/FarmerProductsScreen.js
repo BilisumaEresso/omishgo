@@ -1,70 +1,32 @@
 // Mobile/src/screens/farmer/FarmerProductsScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
-import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
-import AppSidebar from "../../components/layout/AppSidebar";
+import FloatingActionButton from "../../components/layout/FloatingActionBotton";
+import { useSidebar } from "../../context/SidebarContext";
+import api from "../../config/api";
+import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
-
-// --- Mock Data ---
-const MOCK_PRODUCTS = [
-  {
-    id: "1",
-    cropType: "Maize",
-    quantity: 200,
-    unit: "kg",
-    price: 800,
-    status: "active",
-    location: "Kiambu, Central",
-    postedDate: "10 Jul 2025",
-  },
-  {
-    id: "2",
-    cropType: "Tomatoes",
-    quantity: 75,
-    unit: "kg",
-    price: 600,
-    status: "active",
-    location: "Nyeri, Central",
-    postedDate: "09 Jul 2025",
-  },
-  {
-    id: "3",
-    cropType: "Kales",
-    quantity: 40,
-    unit: "bundles",
-    price: 300,
-    status: "sold",
-    location: "Murang'a, Central",
-    postedDate: "05 Jul 2025",
-  },
-  {
-    id: "4",
-    cropType: "Beans",
-    quantity: 150,
-    unit: "kg",
-    price: 1200,
-    status: "draft",
-    location: "Embu, Eastern",
-    postedDate: "02 Jul 2025",
-  },
-  {
-    id: "5",
-    cropType: "Avocados",
-    quantity: 60,
-    unit: "pieces",
-    price: 1500,
-    status: "active",
-    location: "Meru, Eastern",
-    postedDate: "28 Jun 2025",
-  },
-];
+import { useAuthStore } from "../../store/auth.store";
 
 const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
-  const [products, setProducts] = useState(MOCK_PRODUCTS);
-  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const { openSidebar } = useSidebar();
+  const [updatingProductId, setUpdatingProductId] = useState(null);
+  const user = useAuthStore((s) => s.user);
 
   // Extract theme colors
   const primary = theme?.colors?.primary || "#2E7D32";
@@ -77,6 +39,65 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
   const success = theme?.colors?.success || "#2E7D32";
   const warning = theme?.colors?.warning || "#F57F17";
   const errorColor = theme?.colors?.error || "#C62828";
+
+  // Fetch farmer's products
+  const fetchMyProducts = async (isRefresh = false) => {
+    if (!isRefresh) setLoading(true);
+    try {
+      const res = await api.get(API_ENDPOINTS.products.list, {
+        params: { farmerId: user?._id || user?.id },
+      });
+      const raw = res.data?.data?.products || [];
+      const normalized = raw.map((p) => {
+        let locString = "Ethiopia";
+        if (p.location) {
+          locString = [p.location.region, p.location.zone, p.location.kebele]
+            .filter(Boolean)
+            .join(", ");
+        }
+
+        return {
+          id: p._id,
+          cropType: p.cropType,
+          quantity: p.quantity,
+          unit: p.unit || "kg",
+          price: p.price,
+          location: locString,
+          status: p.status,
+          photos: p.photos || [],
+          description: p.description || "",
+          postedDate: new Date(p.createdAt).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }),
+          _raw: p,
+        };
+      });
+      setProducts(normalized);
+    } catch (err) {
+      console.warn("FarmerProducts fetch error:", err.message);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMyProducts();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      fetchMyProducts(true);
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchMyProducts(true);
+  };
 
   // Counts
   const countActive = products.filter((p) => p.status === "active").length;
@@ -97,18 +118,39 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
     }
   };
 
-  const markAsSold = (id) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, status: "sold" } : p)),
-    );
+  const markAsSold = async (id) => {
+    setUpdatingProductId(id);
+    try {
+      await api.put(API_ENDPOINTS.products.update(id), { status: "sold" });
+      setProducts((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, status: "sold" } : p)),
+      );
+    } catch (err) {
+      Alert.alert(
+        "Unable to mark sold",
+        err?.response?.data?.message || "Could not update product status.",
+      );
+    } finally {
+      setUpdatingProductId(null);
+    }
   };
 
   const renderProductCard = ({ item }) => {
     const statusColors = getStatusColor(item.status);
     const isSold = item.status === "sold";
+    const formattedPrice = item.price
+      ? `ETB ${Number(item.price).toLocaleString()}`
+      : "ETB -";
+    const postedLabel = item.postedDate ? `Posted ${item.postedDate}` : "";
 
     return (
-      <View style={[styles.card, { backgroundColor: surface }]}>
+      <TouchableOpacity
+        activeOpacity={0.9}
+        style={[styles.card, { backgroundColor: surface }]}
+        onPress={() =>
+          navigation?.navigate("EditProduct", { product: item._raw })
+        }
+      >
         <View style={styles.cardRow}>
           <AppText style={[styles.cropName, { color: textPrimary }]}>
             {item.cropType}
@@ -120,12 +162,12 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
           </View>
         </View>
 
-        <View style={styles.cardRow}>
+        <View style={[styles.cardRow, { marginBottom: 4 }]}>
           <AppText style={[styles.quantityText, { color: textSecondary }]}>
             {item.quantity} {item.unit}
           </AppText>
           <AppText style={[styles.priceText, { color: primary }]}>
-            KSh {item.price.toLocaleString()}
+            {formattedPrice}
           </AppText>
         </View>
 
@@ -136,12 +178,20 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
           </AppText>
         </View>
 
+        {postedLabel ? (
+          <View style={[styles.locationRow, { marginTop: 4 }]}>
+            <AppText style={[styles.postedText, { color: textMuted }]}>
+              {postedLabel}
+            </AppText>
+          </View>
+        ) : null}
+
         {!isSold && (
           <View style={styles.actionsRow}>
             <TouchableOpacity
               style={[styles.outlineButton, { borderColor: textSecondary }]}
               onPress={() =>
-                navigation?.navigate("EditProduct", { product: item })
+                navigation?.navigate("EditProduct", { product: item._raw })
               }
             >
               <AppText
@@ -153,16 +203,17 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
             <TouchableOpacity
               style={[styles.outlineButton, { borderColor: errorColor }]}
               onPress={() => markAsSold(item.id)}
+              disabled={updatingProductId === item.id}
             >
               <AppText
                 style={[styles.outlineButtonText, { color: errorColor }]}
               >
-                Mark Sold
+                {updatingProductId === item.id ? "Updating..." : "Mark Sold"}
               </AppText>
             </TouchableOpacity>
           </View>
         )}
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -192,7 +243,7 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
         showMenu={true}
         showNotification={true}
         notificationCount={0}
-        onMenuPress={() => setSidebarVisible(true)}
+        onMenuPress={openSidebar}
         onNotificationPress={() => navigation.navigate("Notifications")}
       />
 
@@ -202,39 +253,58 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
         </AppText>
       </View>
 
-      <FlatList
-        data={products}
-        keyExtractor={(item) => item.id}
-        renderItem={renderProductCard}
-        ListEmptyComponent={renderEmpty}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+      {loading && (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingTop: 60,
+          }}
+        >
+          <ActivityIndicator size="large" color={primary} />
+        </View>
+      )}
 
-      <AppSidebar
-        visible={sidebarVisible}
-        onClose={() => setSidebarVisible(false)}
-        onItemPress={(item) => {
-          setSidebarVisible(false);
-          if (item.route === "Conversations")
-            navigation.navigate("Conversations");
-          else if (item.route === "Chat") navigation.navigate("Chat");
-          else if (item.route === "PostProduct")
-            navigation.navigate("PostProduct");
-          else if (item.route === "Home") onSwitchTab?.("Home");
-          else if (onSwitchTab) {
-            const TAB_MAP = {
-              FarmerProducts: "Products",
-              FarmerOrders: "Orders",
-              FarmerAnalytics: "Insights",
-              Profile: "Profile",
-              BuyerMarketplace: "Marketplace",
-              BuyerOrders: "Orders",
-              BuyerSaved: "Saved",
-            };
-            if (TAB_MAP[item.route]) onSwitchTab(TAB_MAP[item.route]);
+      {!loading && products.length === 0 && (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingTop: 60,
+          }}
+        >
+          <AppText
+            style={{ color: textMuted, fontSize: 16, textAlign: "center" }}
+          >
+            You have no active listings.{"\n"}Tap + to post your first product.
+          </AppText>
+        </View>
+      )}
+
+      {!loading && products.length > 0 && (
+        <FlatList
+          data={products}
+          keyExtractor={(item) => item.id}
+          renderItem={renderProductCard}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={[primary]}
+            />
           }
-        }}
+        />
+      )}
+
+      <FloatingActionButton
+        icon="add"
+        onPress={() => navigation?.navigate("PostProduct")}
+        bottom={24}
+        right={24}
       />
     </View>
   );

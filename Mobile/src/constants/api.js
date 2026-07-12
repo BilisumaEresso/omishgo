@@ -30,6 +30,7 @@ export const API_ENDPOINTS = {
     create: "/api/v1/products",
     update: (id) => `/api/v1/products/${id}`,
     delete: (id) => `/api/v1/products/${id}`,
+    analytics: "/api/v1/products/analytics",
   },
   messages: {
     thread: (userId) => `/api/v1/messages/thread/${userId}`,
@@ -45,7 +46,22 @@ export const API_ENDPOINTS = {
     price: (cropType) =>
       `/api/v1/products/market-price?cropType=${encodeURIComponent(cropType)}`,
   },
+  saved: {
+    list: "/api/v1/saved",
+    save: (productId) => `/api/v1/saved/${productId}`,
+    unsave: (productId) => `/api/v1/saved/${productId}`,
+  },
   help: {
     faqs: "/api/v1/help/faqs",
+  },
+  orders: {
+    list: "/api/v1/orders",
+    create: "/api/v1/orders",
+    detail: (id) => `/api/v1/orders/${id}`,
+    updateStatus: (id) => `/api/v1/orders/${id}/status`,
+  },
+  users: {
+    detail: (id) => `/api/v1/users/${id}`,
+    activities: "/api/v1/users/me/activities",
   },
 };

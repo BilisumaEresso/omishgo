@@ -1,6 +1,6 @@
-// src/screens/farmer/PostProductScreen.js
+// Mobile/src/screens/farmer/EditProductScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -19,7 +19,7 @@ import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 
-// ─── Data Constants ───────────────────────────────────────────────────────────
+// ─── Data Constants (duplicated from PostProductScreen) ──────────────────────
 const CROP_TYPES = [
   "Teff",
   "Wheat",
@@ -149,38 +149,7 @@ const ZONES_BY_REGION = {
   ],
 };
 
-const DEFAULT_DESCRIPTIONS = {
-  Teff: "White Teff, freshly harvested. Cleaned and ready for market. Grown without chemical fertilizers.",
-  Wheat:
-    "Red wheat, this season's harvest. Dry and clean. Suitable for flour milling.",
-  Onion: "Red onion, medium to large size. Fresh from the farm. No bruising.",
-  Tomato:
-    "Fresh tomatoes, fully ripe. Harvested this week. Best for immediate purchase.",
-  Maize: "Yellow maize, dried. Clean grain, ready for grinding or direct use.",
-  Potato: "White potato, good size. This season's harvest, dry stored.",
-  Coffee:
-    "Washed Arabica coffee, Grade 2. Dried on raised beds. Excellent cup quality.",
-  Garlic:
-    "White garlic bulbs, dry. Strong aroma. Stored in cool, dry conditions.",
-  Pepper: "Green pepper, fresh. Harvested this week. Uniform size.",
-  Barley:
-    "Barley grain, dried. This season's harvest, clean and stored properly.",
-};
-
-const REFERENCE_PRICES = {
-  Teff: { quintal: 5200, kg: 52 },
-  Wheat: { quintal: 3800, kg: 38 },
-  Maize: { quintal: 2800, kg: 28 },
-  Onion: { quintal: 4500, kg: 45 },
-  Tomato: { quintal: 3800, kg: 38 },
-  Potato: { quintal: 3200, kg: 32 },
-  Coffee: { quintal: 18000, kg: 180 },
-  Garlic: { quintal: 12000, kg: 120 },
-  Barley: { quintal: 3500, kg: 35 },
-  Sesame: { quintal: 9000, kg: 90 },
-};
-
-// ─── Reusable Dropdown Picker ─────────────────────────────────────────────────
+// ─── DropdownPicker (copied from PostProductScreen) ─────────────────────────
 const DropdownPicker = ({
   label,
   value,
@@ -201,9 +170,7 @@ const DropdownPicker = ({
   const selectedLabel = (() => {
     if (!value) return null;
     const found = options.find((opt) =>
-      typeof opt === "string"
-        ? opt === value
-        : opt.value === value,
+      typeof opt === "string" ? opt === value : opt.value === value,
     );
     return found ? (typeof found === "string" ? found : found.label) : value;
   })();
@@ -313,159 +280,112 @@ const DropdownPicker = ({
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export default function PostProductScreen({ navigation, route }) {
+export default function EditProductScreen({ route, navigation }) {
   const { theme } = useTheme();
-  const prefill = route?.params?.prefill || {};
+  const product = route.params?.product || {};
 
-  const [cropType, setCropType] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [unit, setUnit] = useState("kg");
-  const [price, setPrice] = useState("");
-  const [description, setDescription] = useState("");
-  const [region, setRegion] = useState("");
-  const [zone, setZone] = useState("");
-  const [wereda, setWereda] = useState("");
+  // Pre‑fill state from product
+  const [cropType, setCropType] = useState(product?.cropType || "");
+  const [quantity, setQuantity] = useState(String(product?.quantity || ""));
+  const [unit, setUnit] = useState(product?.unit || "kg");
+  const [price, setPrice] = useState(String(product?.price || ""));
+  const [description, setDescription] = useState(product?.description || "");
+  const [region, setRegion] = useState(product?.location?.region || "");
+  const [zone, setZone] = useState(product?.location?.zone || "");
+  const [wereda, setWereda] = useState(product?.location?.wereda || "");
   const [loading, setLoading] = useState(false);
-  const [priceWarning, setPriceWarning] = useState("");
-  const [priceSuggestion, setPriceSuggestion] = useState(null);
+
+  const regionRef = useRef(region);
+  const unitOptions = UNITS.map((option) =>
+    option === "ton" ? { value: option, label: UNIT_LABELS[option] } : option,
+  );
+  const unitDisplay = UNIT_LABELS[unit] || unit;
+
   const [showCropPicker, setShowCropPicker] = useState(false);
   const [showUnitPicker, setShowUnitPicker] = useState(false);
   const [showRegionPicker, setShowRegionPicker] = useState(false);
   const [showZonePicker, setShowZonePicker] = useState(false);
 
   const primary = theme?.colors?.primary || "#2E7D32";
-  const warningColor = theme?.colors?.warning || "#F57F17";
+  const error = theme?.colors?.error || "#C62828";
   const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
   const textSecondary = theme?.colors?.textSecondary || "#4A6741";
-  const textMuted = theme?.colors?.textMuted || "#8FAF8A";
   const background = theme?.colors?.background || "#F9FBF9";
 
-  const unitOptions = UNITS.map((option) =>
-    option === "ton" ? { value: option, label: UNIT_LABELS[option] } : option,
-  );
-  const unitDisplay = UNIT_LABELS[unit] || unit;
-
-  // Price validation
   useEffect(() => {
-    if (!price || !cropType) {
-      setPriceWarning("");
-      return;
+    if (regionRef.current !== region) {
+      setZone("");
     }
-    const ref = REFERENCE_PRICES[cropType];
-    if (!ref) {
-      setPriceWarning("");
-      return;
-    }
-    const unitKey = unit === "quintal" ? "quintal" : "kg";
-    const refPrice = ref[unitKey];
-    const entered = parseFloat(price);
-    if (isNaN(entered)) return;
-    if (entered < refPrice * 0.6) {
-      setPriceWarning(
-        `This price seems low. Market average is around ${refPrice} ETB per ${unitKey}.`,
-      );
-    } else if (entered > refPrice * 1.6) {
-      setPriceWarning(
-        `This price is higher than market. Average is around ${refPrice} ETB per ${unitKey}.`,
-      );
-    } else {
-      setPriceWarning("");
-    }
-    setPriceSuggestion(refPrice);
-  }, [price, cropType, unit]);
-
-  // Apply incoming prefill values from the dashboard or other routes
-  useEffect(() => {
-    if (prefill.cropType) {
-      setCropType(prefill.cropType);
-    }
-    if (prefill.price !== undefined && prefill.price !== null) {
-      setPrice(String(prefill.price));
-    }
-    if (prefill.unit) {
-      setUnit(prefill.unit);
-    }
-    if (prefill.region) {
-      setRegion(prefill.region);
-    }
-    if (prefill.zone) {
-      setZone(prefill.zone);
-    }
-    if (prefill.wereda) {
-      setWereda(prefill.wereda);
-    }
-  }, [prefill]);
-
-  // Default description when crop selected
-  useEffect(() => {
-    if (cropType && DEFAULT_DESCRIPTIONS[cropType] && !description) {
-      setDescription(DEFAULT_DESCRIPTIONS[cropType]);
-    }
-  }, [cropType]);
-
-  // Reset zone when region changes
-  useEffect(() => {
-    setZone("");
+    regionRef.current = region;
   }, [region]);
 
-  const handleSubmit = async () => {
-    if (!cropType.trim()) {
-      Alert.alert("Missing Crop", "Please select a crop type.");
-      return;
-    }
-    const qtyNum = parseFloat(quantity);
-    if (!quantity || isNaN(qtyNum) || qtyNum <= 0) {
-      Alert.alert("Invalid Quantity", "Enter a valid number for quantity");
-      return;
-    }
-    const priceNum = parseFloat(price);
-    if (!price || isNaN(priceNum) || priceNum <= 0) {
-      Alert.alert("Invalid Price", "Enter a valid price in ETB");
-      return;
-    }
-
-    if (!region.trim()) {
-      Alert.alert("Missing Location", "Please select your product region.");
+  const handleUpdate = async () => {
+    if (!cropType || !quantity || !price || !region) {
+      Alert.alert(
+        "Missing fields",
+        "Please fill in crop type, quantity, price, and region.",
+      );
       return;
     }
 
     if (region && ZONES_BY_REGION[region]?.length && !zone.trim()) {
-      Alert.alert("Missing Zone", "Please select a zone for your selected region.");
+      Alert.alert(
+        "Missing Zone",
+        "Please select a zone for your selected region.",
+      );
       return;
     }
 
     setLoading(true);
     try {
-      await api.post(API_ENDPOINTS.products.create, {
-        cropType: cropType.trim(),
-        quantity: qtyNum,
-        unit: unit.trim() || "kg",
-        price: priceNum,
-        description: description.trim(),
-        location: {
-          region: region.trim(),
-          zone: zone.trim(),
-          kebele: "",
-          wereda: wereda.trim(),
+      await api.put(
+        API_ENDPOINTS.products.update(product?.id || product?._id),
+        {
+          cropType,
+          quantity: Number(quantity),
+          unit,
+          price: Number(price),
+          description,
+          location: {
+            region: region.trim(),
+            zone: zone.trim(),
+            wereda: wereda.trim(),
+            kebele: "",
+          },
         },
-      });
-
-      navigation.navigate("FarmerTabs", {
-        successMessage: "Your listing was posted successfully!",
-      });
+      );
+      Alert.alert("Updated", "Your product has been updated.", [
+        { text: "OK", onPress: () => navigation.goBack() },
+      ]);
     } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        err.message ||
-        "Something went wrong. Please try again.";
-      Alert.alert("Error", msg);
+      Alert.alert(
+        "Error",
+        err.response?.data?.message || "Could not update product.",
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const isDefaultDescription =
-    cropType && description === DEFAULT_DESCRIPTIONS[cropType];
+  const handleDelete = () => {
+    Alert.alert("Delete Listing", "Are you sure? This cannot be undone.", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await api.delete(
+              API_ENDPOINTS.products.delete(product?.id || product?._id),
+            );
+            navigation.goBack();
+          } catch (err) {
+            Alert.alert("Error", "Could not delete listing.");
+          }
+        },
+      },
+    ]);
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: background }]}>
@@ -475,7 +395,7 @@ export default function PostProductScreen({ navigation, route }) {
         barStyle="dark-content"
       />
       <AppHeader
-        title="Post Product"
+        title="Edit Product"
         showBack={true}
         onBackPress={() => navigation.goBack()}
       />
@@ -490,7 +410,7 @@ export default function PostProductScreen({ navigation, route }) {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Crop Type Dropdown */}
+          {/* Crop Type */}
           <DropdownPicker
             label="Crop Type"
             value={cropType}
@@ -503,7 +423,7 @@ export default function PostProductScreen({ navigation, route }) {
             theme={theme}
           />
 
-          {/* Quantity & Unit row */}
+          {/* Quantity & Unit */}
           <View style={styles.row}>
             <View style={styles.flex2}>
               <AppText style={[styles.label, { color: textSecondary }]}>
@@ -531,7 +451,7 @@ export default function PostProductScreen({ navigation, route }) {
             </View>
           </View>
 
-          {/* Price input with suggestion and warning */}
+          {/* Price */}
           <AppText style={[styles.label, { color: textSecondary }]}>
             Price per {unitDisplay}
           </AppText>
@@ -542,51 +462,6 @@ export default function PostProductScreen({ navigation, route }) {
             keyboardType="numeric"
             leftIcon="pricetag-outline"
           />
-          {priceSuggestion && (
-            <TouchableOpacity
-              onPress={() => setPrice(String(priceSuggestion))}
-              style={{
-                backgroundColor: primary + "15",
-                borderRadius: 8,
-                paddingVertical: 8,
-                paddingHorizontal: 12,
-                marginTop: 8,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <Ionicons
-                name="bulb-outline"
-                size={14}
-                color={primary}
-                style={{ marginRight: 6 }}
-              />
-              <AppText
-                style={{ color: primary, fontSize: 13, fontWeight: "600" }}
-              >
-                Suggested: {priceSuggestion} ETB/{unitDisplay} → tap to use
-              </AppText>
-            </TouchableOpacity>
-          )}
-          {priceWarning ? (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginTop: 6,
-              }}
-            >
-              <Ionicons
-                name="warning-outline"
-                size={14}
-                color={warningColor}
-                style={{ marginRight: 4 }}
-              />
-              <AppText style={{ color: warningColor, fontSize: 13, flex: 1 }}>
-                {priceWarning}
-              </AppText>
-            </View>
-          ) : null}
 
           {/* Description */}
           <AppText style={[styles.label, { color: textSecondary }]}>
@@ -600,11 +475,6 @@ export default function PostProductScreen({ navigation, route }) {
             numberOfLines={4}
             inputStyle={styles.textArea}
           />
-          {isDefaultDescription && (
-            <AppText style={{ color: textMuted, fontSize: 12, marginTop: 4 }}>
-              Using default description — tap to edit
-            </AppText>
-          )}
 
           {/* Location Section */}
           <View style={styles.section}>
@@ -655,13 +525,24 @@ export default function PostProductScreen({ navigation, route }) {
             />
           </View>
 
+          {/* Save / Delete Buttons */}
           <AppButton
-            title={loading ? "Posting..." : "Post Listing"}
-            onPress={handleSubmit}
+            title="Save Changes"
+            onPress={handleUpdate}
             loading={loading}
             disabled={loading}
             fullWidth
             style={styles.submitButton}
+          />
+
+          <AppButton
+            title="Delete Listing"
+            variant="outline"
+            fullWidth
+            onPress={handleDelete}
+            style={{ marginTop: 12 }}
+            textStyle={{ color: error }}
+            borderColor={error}
           />
         </ScrollView>
       </KeyboardAvoidingView>
