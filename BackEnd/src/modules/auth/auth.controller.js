@@ -1,5 +1,7 @@
+import ApiError from "../../utils/ApiError.js";
 import asyncHandler from "../../utils/asyncHandler.js";
 import sendResponse from "../../utils/sendResponse.js";
+import User from "../user/user.model.js";
 import * as authService from "./auth.service.js";
 
 /**
@@ -51,6 +53,26 @@ export const getMe = asyncHandler(async (req, res) => {
   sendResponse(res, {
     statusCode: 200,
     message: "User profile retrieved successfully",
+    data: { user },
+  });
+});
+
+export const updateLanguage = asyncHandler(async (req, res) => {
+  const { preferredLang } = req.body;
+  const allowed = ["en", "am", "om"];
+  if (!preferredLang || !allowed.includes(preferredLang)) {
+    throw new ApiError(400, "preferredLang must be en, am, or om");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    { preferredLang },
+    { new: true },
+  ).select("-password");
+
+  return sendResponse(res, {
+    statusCode: 200,
+    message: "Language updated",
     data: { user },
   });
 });

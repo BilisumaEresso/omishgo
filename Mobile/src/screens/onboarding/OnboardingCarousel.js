@@ -1,106 +1,175 @@
-import React, { useRef, useState, useCallback } from "react";
+// Mobile/src/screens/onboarding/OnboardingCarousel.js
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useCallback, useRef, useState } from "react";
 import {
-  View, FlatList, StyleSheet, Dimensions, TouchableOpacity,
-  StatusBar, SafeAreaView, Animated, Text,
+  Animated,
+  Dimensions,
+  FlatList,
+  Image,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { useTranslation } from "react-i18next";
+import AppButton from "../../components/common/AppButton";
+import AppText from "../../components/common/AppText";
+import { useTheme } from "../../hooks/useTheme";
 
 const { width } = Dimensions.get("window");
 
-// MVP: 2 slides (farmer + buyer only — driver/supplier removed)
-const getSlides = (t) => [
+const slides = [
   {
-    id: "sell",
-    emoji: "🌾",
-    title: t("onboarding.slide1Title"),
-    description: t("onboarding.slide1Desc"),
-    color: "#2e7d32",
-    bg: "#e8f5e9",
+    id: "1",
+    image: require("../../assets/images/onboard_farmer.png"),
+    title: "Sell Your Harvest Directly",
+    description:
+      "List your crops and reach buyers across Ethiopia — no middlemen.",
   },
   {
-    id: "buy",
-    emoji: "🛒",
-    title: t("onboarding.slide2Title"),
-    description: t("onboarding.slide2Desc"),
-    color: "#1565c0",
-    bg: "#e3f2fd",
+    id: "2",
+    image: require("../../assets/images/onboard_market.png"),
+    title: "Browse Fresh from the Farm",
+    description:
+      "Find and order fresh produce directly from verified local farmers.",
   },
   {
-    id: "connect",
-    emoji: "💬",
-    title: t("onboarding.slide3Title"),
-    description: t("onboarding.slide3Desc"),
-    color: "#6a1b9a",
-    bg: "#f3e5f5",
+    id: "3",
+    image: require("../../assets/images/onboard_supply.png"),
+    title: "Farm Inputs at Your Door",
+    description: "Order seeds, fertilizers, and tools delivered to your farm.",
+  },
+  {
+    id: "4",
+    image: require("../../assets/images/onboard_track.png"),
+    title: "Track Every Delivery",
+    description: "Know exactly where your order is, from farm to your hands.",
   },
 ];
 
-const OnboardingCarousel = () => {
-  const navigation = useNavigation();
+export default function OnboardingCarousel({ navigation }) {
   const { t } = useTranslation();
-  const slides = getSlides(t);
-
+  const { theme } = useTheme();
   const flatListRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
+
+  const slides = [
+    {
+      id: "1",
+      image: require("../../assets/images/onboard_farmer.png"),
+      title: t("onboarding.slide1Title"),
+      description: t("onboarding.slide1Desc"),
+    },
+    {
+      id: "2",
+      image: require("../../assets/images/onboard_market.png"),
+      title: t("onboarding.slide2Title"),
+      description: t("onboarding.slide2Desc"),
+    },
+    {
+      id: "3",
+      image: require("../../assets/images/onboard_supply.png"),
+      title: t("onboarding.slide3Title"),
+      description: t("onboarding.slide3Desc"),
+    },
+    {
+      id: "4",
+      image: require("../../assets/images/onboard_track.png"),
+      title: t("onboarding.slide4Title"),
+      description: t("onboarding.slide4Desc"),
+    },
+  ];
+
+  // Theme colors
+  const primary = theme?.colors?.primary || "#2E7D32";
+  const border = theme?.colors?.border || "#D0E8CE";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
+  const textSecondary = theme?.colors?.textSecondary || "#4A6741";
+
+  const isLast = currentIndex === slides.length - 1;
 
   const onScrollEnd = useCallback((event) => {
     const index = Math.round(event.nativeEvent.contentOffset.x / width);
     setCurrentIndex(index);
   }, []);
 
-  const onScroll = useCallback(
-    Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
-      useNativeDriver: false,
-    }),
-    [scrollX],
+  const onScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+    { useNativeDriver: false },
   );
-
-  const isLast = currentIndex === slides.length - 1;
 
   const handleNext = () => {
     if (isLast) {
-      navigation.replace("Login");
+      handleFinish();
     } else {
-      flatListRef.current?.scrollToIndex({ index: currentIndex + 1, animated: true });
+      flatListRef.current?.scrollToIndex({
+        index: currentIndex + 1,
+        animated: true,
+      });
     }
   };
 
-  const handleSkip = () => navigation.replace("Login");
+  const handleSkip = () => handleFinish();
+
+  const handleFinish = async () => {
+    await AsyncStorage.setItem("@onboarding_done", "true");
+    navigation.replace("Login");
+  };
 
   const renderSlide = ({ item }) => (
-    <View style={[styles.slide, { backgroundColor: item.bg }]}>
-      <Text style={styles.emoji}>{item.emoji}</Text>
-      <Text style={[styles.slideTitle, { color: item.color }]}>{item.title}</Text>
-      <Text style={styles.slideDesc}>{item.description}</Text>
+    <View style={[styles.slide, { backgroundColor: surface }]}>
+      <Image source={item.image} style={styles.image} resizeMode="contain" />
+      <AppText style={[styles.title, { color: textPrimary }]}>
+        {item.title}
+      </AppText>
+      <AppText style={[styles.description, { color: textSecondary }]}>
+        {item.description}
+      </AppText>
     </View>
   );
 
   const renderDots = () =>
     slides.map((_, idx) => {
       const inputRange = [(idx - 1) * width, idx * width, (idx + 1) * width];
-      const w = scrollX.interpolate({ inputRange, outputRange: [8, 24, 8], extrapolate: "clamp" });
-      const opacity = scrollX.interpolate({ inputRange, outputRange: [0.3, 1, 0.3], extrapolate: "clamp" });
-      const color = slides[idx].color;
+      const dotWidth = scrollX.interpolate({
+        inputRange,
+        outputRange: [8, 24, 8],
+        extrapolate: "clamp",
+      });
+      const opacity = scrollX.interpolate({
+        inputRange,
+        outputRange: [0.4, 1, 0.4],
+        extrapolate: "clamp",
+      });
+
       return (
         <Animated.View
           key={idx}
-          style={[styles.dot, { width: w, opacity, backgroundColor: color }]}
+          style={[
+            styles.dot,
+            {
+              width: dotWidth,
+              opacity,
+              backgroundColor: idx === currentIndex ? primary : border,
+            },
+          ]}
         />
       );
     });
 
-  const currentColor = slides[currentIndex]?.color || "#2e7d32";
-
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-
-      {/* Skip */}
+    <View style={[styles.container, { backgroundColor: surface }]}>
+      {/* Skip button */}
       {!isLast && (
-        <TouchableOpacity onPress={handleSkip} style={styles.skipBtn}>
-          <Text style={styles.skipText}>{t("common.skip") || "Skip"}</Text>
+        <TouchableOpacity
+          onPress={handleSkip}
+          style={styles.skipBtn}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <AppText style={{ color: primary, fontWeight: "600", fontSize: 15 }}>
+            Skip
+          </AppText>
         </TouchableOpacity>
       )}
 
@@ -118,43 +187,62 @@ const OnboardingCarousel = () => {
         scrollEventThrottle={16}
         decelerationRate="fast"
         bounces={false}
-        getItemLayout={(_, index) => ({ length: width, offset: width * index, index })}
+        getItemLayout={(_, index) => ({
+          length: width,
+          offset: width * index,
+          index,
+        })}
         style={styles.flatList}
       />
 
-      {/* Bottom */}
+      {/* Bottom section */}
       <View style={styles.bottom}>
-        <View style={styles.dots}>{renderDots()}</View>
-
-        <TouchableOpacity
-          style={[styles.nextBtn, { backgroundColor: currentColor }]}
+        <View style={styles.dotsContainer}>{renderDots()}</View>
+        <AppButton
+          title={isLast ? t("common.continue") : t("common.continue")}
           onPress={handleNext}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.nextText}>
-            {isLast ? t("common.continue") : `${t("common.continue")} →`}
-          </Text>
-        </TouchableOpacity>
+          fullWidth
+          variant="primary"
+        />
       </View>
-    </SafeAreaView>
+    </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  skipBtn: { position: "absolute", top: 16, right: 24, zIndex: 10, padding: 8 },
-  skipText: { fontSize: 15, color: "#888", fontWeight: "600" },
+  container: { flex: 1 },
+  skipBtn: {
+    position: "absolute",
+    top: Platform.OS === "ios" ? 60 : 20,
+    right: 24,
+    zIndex: 10,
+    padding: 8,
+  },
   flatList: { flex: 1 },
   slide: {
     width,
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 40,
+    paddingHorizontal: 32,
   },
-  emoji: { fontSize: 80, marginBottom: 32 },
-  slideTitle: { fontSize: 26, fontWeight: "800", textAlign: "center", marginBottom: 16 },
-  slideDesc: { fontSize: 16, color: "#555", textAlign: "center", lineHeight: 24 },
+  image: {
+    width: width * 0.85,
+    height: 280,
+    marginBottom: 32,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: 12,
+  },
+  description: {
+    fontSize: 15,
+    textAlign: "center",
+    lineHeight: 22,
+    maxWidth: 280,
+  },
   bottom: {
     paddingHorizontal: 32,
     paddingBottom: 48,
@@ -163,15 +251,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 24,
   },
-  dots: { flexDirection: "row", alignItems: "center", gap: 8 },
-  dot: { height: 8, borderRadius: 4 },
-  nextBtn: {
-    width: "100%",
-    paddingVertical: 16,
-    borderRadius: 12,
+  dotsContainer: {
+    flexDirection: "row",
     alignItems: "center",
+    gap: 8,
   },
-  nextText: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  dot: {
+    height: 8,
+    borderRadius: 4,
+  },
 });
-
-export default OnboardingCarousel;

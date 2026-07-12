@@ -10,11 +10,16 @@ import {
   TouchableOpacity,
   StatusBar,
   Platform,
+  TextInput,
+  Modal,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import api from "../../config/api";
+import { API_ENDPOINTS } from "../../constants/api";
 import AppText from "../../components/common/AppText";
 import AppButton from "../../components/common/AppButton";
 import { useTheme } from "../../hooks/useTheme";
+import { useSavedStore } from "../../store/saved.store";
 
 // ─── Helper: relative time ────────────────────────────────────────────────────
 const timeAgo = (dateStr) => {
@@ -60,7 +65,11 @@ export default function ListingDetailScreen({ route, navigation }) {
   const { theme } = useTheme();
 
   const { product } = route.params || {};
-  const [isSaved, setIsSaved] = useState(false);
+  const isSaved = useSavedStore((s) => s.isSaved(product?._id || product?.id));
+  const toggleSave = useSavedStore((s) => s.toggleSave);
+  const [ordering, setOrdering] = useState(false);
+  const [buyQty, setBuyQty] = useState("");
+  const [showBuyModal, setShowBuyModal] = useState(false);
 
   // Extract theme colors with buyer fallbacks
   const primary = theme?.colors?.primary || "#1565C0";
@@ -152,6 +161,40 @@ export default function ListingDetailScreen({ route, navigation }) {
     }
   };
 
+  const handleSave = () => {
+    if (product) toggleSave(product);
+  };
+
+  const handleBuyNow = async () => {
+    const qty = parseFloat(buyQty);
+    if (!qty || qty <= 0) {
+      Alert.alert("Invalid quantity", "Please enter a valid quantity.");
+      return;
+    }
+    if (qty > product.quantity) {
+      Alert.alert("Too much", `Only ${product.quantity} ${unit} available.`);
+      return;
+    }
+    setOrdering(true);
+    try {
+      await api.post(API_ENDPOINTS.orders.create, {
+        productId: product._id || product.id,
+        quantity: qty,
+      });
+      setShowBuyModal(false);
+      setBuyQty("");
+      Alert.alert(
+        "Order Placed! 🎉",
+        `Your order for ${qty} ${unit} of ${product.cropType} has been placed.`,
+        [{ text: "View Orders", onPress: () => navigation.navigate("BuyerTabs") }],
+      );
+    } catch (err) {
+      Alert.alert("Order Failed", err?.response?.data?.message || "Could not place order.");
+    } finally {
+      setOrdering(false);
+    }
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: background }]}>
       {/* Fixed Header */}
@@ -187,7 +230,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           {product.cropType}
         </AppText>
         <TouchableOpacity
-          onPress={() => setIsSaved(!isSaved)}
+          onPress={handleSave}
           style={styles.saveBtn}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
@@ -369,7 +412,7 @@ export default function ListingDetailScreen({ route, navigation }) {
         <View style={styles.actions}>
           <AppButton
             title={t("browse.messageBtn") || "Message Farmer"}
-            variant="primary"
+            variant="outline"
             fullWidth
             onPress={handleMessageFarmer}
             style={styles.actionBtn}
@@ -382,8 +425,64 @@ export default function ListingDetailScreen({ route, navigation }) {
             style={styles.actionBtn}
             disabled={!farmerPhone}
           />
+          {product.status === "active" && (
+            <AppButton
+              title="Buy Now"
+              variant="primary"
+              fullWidth
+              onPress={() => setShowBuyModal(true)}
+              style={styles.actionBtn}
+            />
+          )}
         </View>
       </ScrollView>
+
+      {/* Buy Now Modal */}
+      <Modal
+        visible={showBuyModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowBuyModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, { backgroundColor: surface, borderColor: border }]}>
+            <AppText variant="headingSm" style={{ color: textPrimary, marginBottom: 4 }}>
+              Place Order
+            </AppText>
+            <AppText style={{ color: textSecondary, marginBottom: 16, fontSize: 13 }}>
+              Available: {product.quantity} {unit} at {product.price} ETB/{unit}
+            </AppText>
+            <TextInput
+              style={[styles.qtyInput, { borderColor: border, color: textPrimary }]}
+              placeholder={`Quantity (max ${product.quantity} ${unit})`}
+              placeholderTextColor={textSecondary}
+              keyboardType="numeric"
+              value={buyQty}
+              onChangeText={setBuyQty}
+            />
+            {buyQty ? (
+              <AppText style={{ color: primary, marginBottom: 12, fontWeight: "700" }}>
+                Total: {(parseFloat(buyQty) || 0) * product.price} ETB
+              </AppText>
+            ) : null}
+            <View style={{ gap: 10 }}>
+              <AppButton
+                title={ordering ? "Placing Order..." : "Confirm Order"}
+                variant="primary"
+                fullWidth
+                onPress={handleBuyNow}
+                disabled={ordering}
+              />
+              <AppButton
+                title="Cancel"
+                variant="outline"
+                fullWidth
+                onPress={() => { setShowBuyModal(false); setBuyQty(""); }}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -475,4 +574,25 @@ const styles = StyleSheet.create({
   infoContent: { flex: 1, gap: 2 },
   actions: { gap: 10 },
   actionBtn: {},
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
+  modalCard: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 24,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+  },
+  qtyInput: {
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 16,
+    marginBottom: 12,
+  },
 });

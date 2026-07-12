@@ -7,13 +7,19 @@
     "loading": "Loading...",
     "skip": "Skip"
   },
+  "splash": {
+    "title": "OmishGo is better",
+    "subtitle": "Simple, profitable, trusted"
+  },
   "onboarding": {
     "slide1Title": "Sell Your Harvest Directly",
     "slide1Desc": "Post your crops and connect with verified buyers across Ethiopia — no middlemen.",
     "slide2Title": "Buy Fresh from the Source",
     "slide2Desc": "Browse quality produce from local farmers at fair prices, direct from the field.",
     "slide3Title": "Chat & Call in Your Language",
-    "slide3Desc": "Message or call sellers directly in Amharic, Afan Oromo, or English."
+    "slide3Desc": "Message or call sellers directly in Amharic, Afan Oromo, or English.",
+    "slide4Title": "Track Every Delivery",
+    "slide4Desc": "Follow your order from farm to doorstep with transparent updates."
   },
   "languagePicker": {
     "title": "Select Language",
@@ -21,6 +27,20 @@
     "english": "English",
     "amharic": "አማርኛ",
     "oromo": "Afaan Oromoo"
+  },
+  "sidebar": {
+    "home": "Home",
+    "products": "My Products",
+    "orders": "Orders",
+    "analytics": "Analytics",
+    "marketplace": "Marketplace",
+    "saved": "Saved",
+    "messages": "Messages",
+    "profile": "Profile",
+    "postProduct": "Post Product",
+    "help": "Help & Support",
+    "logout": "Logout",
+    "language": "Language"
   },
   "auth": {
     "loginTitle": "Welcome Back",
@@ -42,11 +62,14 @@
     "locationLabel": "Location",
     "regionLabel": "Region",
     "zoneLabel": "Zone",
-    "kebeleLabel": "Kebele",
+    "weredaLabel": "Wereda",
     "langLabel": "Preferred Language",
     "loginBtn": "Login",
     "registerBtn": "Register",
-    "hasAccount": "Already have an account? Login"
+    "hasAccount": "Already have an account?",
+    "noAccount": "Don't have an account?",
+    "registerError": "Registration failed. Try again.",
+    "registrationFailed": "Something went wrong. Please try again."
   },
   "product": {
     "createTitle": "Post New Listing",

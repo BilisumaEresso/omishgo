@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(
     location: {
       region: { type: String, required: true },
       zone: { type: String, required: true },
-      kebele: { type: String, required: true },
+      wereda: { type: String, required: true },
     },
     preferredLang: {
       type: String,

@@ -38,8 +38,9 @@ const productSchema = new mongoose.Schema(
     },
     location: {
       region: { type: String, default: "" },
-      zone:   { type: String, default: "" },
+      zone: { type: String, default: "" },
       kebele: { type: String, default: "" },
+      wereda: { type: String, default: "" },
     },
     status: {
       type: String,
@@ -52,7 +53,7 @@ const productSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Index for the most common public query: active listings by cropType + region

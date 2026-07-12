@@ -1,71 +1,130 @@
-import  { useState } from "react";
+import  { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/auth.store";
+
+const styles = {
+  container: {
+    minHeight: "100vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f5f7fa",
+    padding: "20px",
+  },
+  card: {
+    width: "100%",
+    maxWidth: "420px",
+    backgroundColor: "#ffffff",
+    borderRadius: "16px",
+    padding: "40px 32px",
+    boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
+  },
+  logoContainer: {
+    textAlign: "center",
+    marginBottom: "32px",
+  },
+  logoMain: {
+    fontSize: "36px",
+    fontWeight: "800",
+    fontFamily: "system-ui, sans-serif",
+  },
+  logoGreen: { color: "#1A5C2A" },
+  logoDark: { color: "#0D1F0F" },
+  subtitle: {
+    fontSize: "14px",
+    color: "#666",
+    marginTop: "4px",
+    letterSpacing: "0.5px",
+  },
+  input: {
+    width: "100%",
+    padding: "12px 16px",
+    fontSize: "15px",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+    marginBottom: "16px",
+    outline: "none",
+    boxSizing: "border-box",
+  },
+  button: {
+    width: "100%",
+    padding: "14px",
+    backgroundColor: "#1A5C2A",
+    color: "#fff",
+    fontSize: "16px",
+    fontWeight: "600",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    marginTop: "8px",
+  },
+  error: {
+    backgroundColor: "#FFEBEE",
+    color: "#C62828",
+    padding: "10px 14px",
+    borderRadius: "6px",
+    fontSize: "14px",
+    marginBottom: "16px",
+  },
+};
 
 const Login = () => {
   const [phone, setPhone] = useState("");
   const [pin, setPin] = useState("");
-  const { login, loading, error } = useAuthStore();
   const navigate = useNavigate();
+  const { login, loading, error, isAuthenticated } = useAuthStore();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!phone.trim() || !pin) {
+      return;
+    }
     try {
-      await login(phone, pin);
-      navigate("/");
+      await login(phone.trim(), pin);
     } catch (err) {
-      // Error is handled in store and displayed below
+      console.error(err);
+      // Error is handled in the store
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">OmishGo Admin</h2>
-          <p className="text-gray-500 mt-2">Sign in to access the dashboard</p>
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <div style={styles.logoContainer}>
+          <div style={styles.logoMain}>
+            <span style={styles.logoDark}>Omish</span>
+            <span style={styles.logoGreen}>Go</span>
+          </div>
+          <div style={styles.subtitle}>Admin Panel</div>
         </div>
 
-        {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 text-sm">
-            {error}
-          </div>
-        )}
+        <form onSubmit={handleSubmit}>
+          {error && <div style={styles.error}>{error}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Phone Number</label>
-            <input
-              type="tel"
-              required
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
-              placeholder="e.g. 0911234567"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">PIN (4-6 digits)</label>
-            <input
-              type="password"
-              required
-              maxLength={6}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
-              placeholder="••••"
-              value={pin}
-              onChange={(e) => setPin(e.target.value)}
-            />
-          </div>
-
-          <button
-            type="submit"
+          <input
+            style={styles.input}
+            type="text"
+            placeholder="Phone Number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             disabled={loading}
-            className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${
-              loading ? "opacity-75 cursor-not-allowed" : ""
-            }`}
-          >
-            {loading ? "Signing in..." : "Sign in"}
+          />
+          <input
+            style={styles.input}
+            type="password"
+            placeholder="PIN"
+            value={pin}
+            onChange={(e) => setPin(e.target.value)}
+            disabled={loading}
+          />
+          <button style={styles.button} type="submit" disabled={loading}>
+            {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
       </div>

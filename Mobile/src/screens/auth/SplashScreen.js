@@ -1,18 +1,17 @@
 // src/screens/SplashScreen.js
-import React, { useEffect, useRef } from "react";
-import { View, StyleSheet, Image, Animated, StatusBar } from "react-native";
+import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { Animated, Image, StatusBar, StyleSheet, View } from "react-native";
+import AppText from "../../components/common/AppText";
 import { useTheme } from "../../hooks/useTheme";
-import { useAuthStore } from "../../store/auth.store";
 
-export default function SplashScreen({ navigation }) {
+export default function SplashScreen() {
+  const { t } = useTranslation();
   const { theme } = useTheme();
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
 
   useEffect(() => {
-    // Animate logo entrance
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -25,21 +24,12 @@ export default function SplashScreen({ navigation }) {
         useNativeDriver: true,
       }),
     ]).start();
+  }, [fadeAnim, scaleAnim]);
 
-    // Navigate after 2 seconds
-    const timer = setTimeout(() => {
-      if (isAuthenticated) {
-        navigation.replace("App"); // or your main navigator
-      } else {
-        navigation.replace("Auth"); // or "Login"
-      }
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const backgroundColor = theme?.colors?.background || "#FFFFFF";
-  const primaryColor = theme?.colors?.primary || "#4CAF50";
+  const colors = theme?.colors || {};
+  const backgroundColor = colors.background || "#FFFFFF";
+  const primaryColor = colors.primary || "#4CAF50";
+  const textSecondaryColor = colors.textSecondary || "#757575";
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
@@ -59,6 +49,12 @@ export default function SplashScreen({ navigation }) {
           style={styles.logo}
           resizeMode="contain"
         />
+        <AppText style={[styles.title, { color: primaryColor }]}>
+          {t("splash.title")}
+        </AppText>
+        <AppText style={[styles.subtitle, { color: textSecondaryColor }]}>
+          {t("splash.subtitle")}
+        </AppText>
       </Animated.View>
 
       {/* Subtle loading dots */}
@@ -96,6 +92,19 @@ const styles = StyleSheet.create({
     gap: 8,
     position: "absolute",
     bottom: 60,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "700",
+    marginTop: 16,
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 14,
+    marginTop: 8,
+    textAlign: "center",
+    maxWidth: 280,
+    lineHeight: 20,
   },
   dot: {
     width: 10,

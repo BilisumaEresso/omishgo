@@ -1,7 +1,6 @@
 // src/screens/buyer/BuyerDashboardScreen.js
-import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import BuyerQuickActions from "../../components/buyer/BuyerQuickActions";
 import CategoryFilters from "../../components/buyer/CategoryFilters";
 import FeaturedProductsList from "../../components/buyer/FeaturedProductsList";
@@ -10,83 +9,100 @@ import PriceTrendWidget from "../../components/buyer/PriceTrendWidget";
 import RecentActivityList from "../../components/buyer/RecentActivityList";
 import AgriPriceChangeWidget from "../../components/common/AgriPriceChangeWidget";
 import AppText from "../../components/common/AppText";
-import AppSidebar from "../../components/layout/AppSidebar";
 import DashboardLayout from "../../components/layout/DashBoardLayout";
 import FloatingActionButton from "../../components/layout/FloatingActionBotton";
 import SummaryCard from "../../components/SummaryCard";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
+import { useSidebar } from "../../context/SidebarContext"; // reuse the existing component
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
-// Mock data (unchanged)
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const CARD_GAP = 12;
+
+// Mock data (shape matches ProductCard / backend)
 const mockProducts = [
   {
-    id: "p1",
-    name: "50kg Red Onion",
+    _id: "p1",
+    cropType: "Red Onion",
+    quantity: 50,
+    unit: "kg",
     price: 4500,
     category: "Onion",
-    farmerName: "Farmer Bekele",
-    farmerAvatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-    location: "Adama",
-    image: "https://images.unsplash.com/photo-1618512496248-a07fe83766a4?w=600",
-    isPremium: true,
+    farmerId: { _id: "f1", name: "Farmer Bekele" },
+    location: { region: "Adama" },
+    photos: [
+      "https://images.unsplash.com/photo-1618512496248-a07fe83766a4?w=600",
+    ],
+    status: "active",
+    createdAt: new Date().toISOString(),
   },
   {
-    id: "p2",
-    name: "100kg White Teff",
+    _id: "p2",
+    cropType: "White Teff",
+    quantity: 100,
+    unit: "kg",
     price: 5200,
     category: "Teff",
-    farmerName: "Farmer Alemitu",
-    farmerAvatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
-    location: "Debre Zeit",
-    image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600",
-    isPremium: false,
+    farmerId: { _id: "f2", name: "Farmer Alemitu" },
+    location: { region: "Debre Zeit" },
+    photos: [
+      "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600",
+    ],
+    status: "active",
+    createdAt: new Date().toISOString(),
   },
   {
-    id: "p3",
-    name: "50kg Tomato",
+    _id: "p3",
+    cropType: "Tomato",
+    quantity: 50,
+    unit: "kg",
     price: 3800,
     category: "Tomato",
-    farmerName: "Farmer Tadese",
-    farmerAvatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-    location: "Ziway",
-    image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600",
-    isPremium: true,
+    farmerId: { _id: "f3", name: "Farmer Tadese" },
+    location: { region: "Ziway" },
+    photos: [
+      "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600",
+    ],
+    status: "active",
+    createdAt: new Date().toISOString(),
   },
   {
-    id: "p4",
-    name: "Garlic (5kg)",
+    _id: "p4",
+    cropType: "Garlic",
+    quantity: 5,
+    unit: "kg",
     price: 1200,
     category: "Garlic",
-    farmerName: "Farmer Genet",
-    farmerAvatar:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150",
-    location: "Bishoftu",
-    image: "https://images.unsplash.com/photo-1618512496248-a07fe83766a4?w=600",
-    isPremium: false,
+    farmerId: { _id: "f4", name: "Farmer Genet" },
+    location: { region: "Bishoftu" },
+    photos: [
+      "https://images.unsplash.com/photo-1618512496248-a07fe83766a4?w=600",
+    ],
+    status: "active",
+    createdAt: new Date().toISOString(),
   },
 ];
 
 const mockFarmers = [
   {
-    id: "f1",
+    _id: "f1",
     name: "Farmer Bekele",
     avatar:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
     distance: "2.3 km",
     rating: "4.8",
+    location: { region: "Adama" },
   },
   {
-    id: "f2",
+    _id: "f2",
     name: "Farmer Alemitu",
     avatar:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
     distance: "5.1 km",
     rating: "4.9",
+    location: { region: "Debre Zeit" },
   },
 ];
 
@@ -97,6 +113,7 @@ const mockActivities = [
     title: "Order ORD-8492",
     description: "50kg Red Onion placed successfully.",
     time: "2 hours ago",
+    order: { _id: "ord1", cropType: "Red Onion", quantity: 50 },
   },
   {
     id: "a2",
@@ -104,6 +121,7 @@ const mockActivities = [
     title: "Farmer Bekele replied",
     description: "Your order will be ready tomorrow.",
     time: "5 hours ago",
+    farmerId: "f1",
   },
 ];
 
@@ -113,37 +131,23 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
   const { theme } = useTheme();
   const user = useAuthStore((state) => state.user);
 
-  // Extract all theme colors with fallbacks (standardised)
-  const primary = theme?.colors?.primary || "#1565C0";
-  const primaryLight = theme?.colors?.primaryLight || "#5E92F3";
-  const primaryDark = theme?.colors?.primaryDark || "#0D47A1";
-  const primaryCont = theme?.colors?.primaryContainer || "#E3F2FD";
-  const secondary = theme?.colors?.secondary || "#00897B";
-  const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
-  const textSecondary = theme?.colors?.textSecondary || "#4A6080";
-  const textMuted = theme?.colors?.textMuted || "#8FA3BE";
-  const surface = theme?.colors?.surface || "#FFFFFF";
-  const background = theme?.colors?.background || "#F5F8FF";
-  const border = theme?.colors?.border || "#D0DEF5";
-  const success = theme?.colors?.success || "#2E7D32";
-  const warning = theme?.colors?.warning || "#EF6C00";
-  const info = theme?.colors?.info || "#1565C0";
-  const error = theme?.colors?.error || "#C62828";
-
-  // State (unchanged)
-  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const { openSidebar } = useSidebar();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [cartCount, setCartCount] = useState(0);
   const [successMsg, setSuccessMsg] = useState("");
   const [products, setProducts] = useState(mockProducts);
+  const [farmers, setFarmers] = useState(mockFarmers);
+  const [activities, setActivities] = useState(mockActivities);
   const [refreshing, setRefreshing] = useState(false);
 
-  // KPI data (static)
+  // KPI data
   const activeOrders = 2;
   const savedItems = 5;
 
-  // Fetch real products on mount
+  const primaryColor = theme?.colors?.primary || "#2E7DFF";
+  const textPrimary = theme?.colors?.textPrimary || "#1C2430";
+
   useEffect(() => {
     const fetchRealProducts = async () => {
       try {
@@ -151,87 +155,108 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         const fetched = res.data?.data?.products || [];
         if (fetched.length > 0) {
           const formatted = fetched.map((p) => ({
-            id: p._id,
-            name: `${p.quantity}${p.unit || "kg"} ${p.cropType}`,
+            _id: p._id,
+            cropType: p.cropType || p.category || "Produce",
+            quantity: p.quantity ?? 0,
+            unit: p.unit || "kg",
             price: p.price,
-            category: p.cropType,
-            farmerName: p.farmerId?.name || "Farmer",
-            farmerAvatar:
-              "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-            location: p.location?.region || "Ethiopia",
-            image:
-              p.photos?.[0] ||
-              "https://images.unsplash.com/photo-1618512496248-a07fe83766a4?w=600",
-            isPremium: false,
+            category: p.cropType || p.category,
+            farmerId: p.farmerId || { _id: p.farmerId, name: "Farmer" },
+            location: p.location || {},
+            photos: p.photos || [],
+            status: p.status || "active",
+            createdAt: p.createdAt,
+            description: p.description,
           }));
           setProducts(formatted);
+          // Derive nearby farmers from products (unique by id)
+          const byId = {};
+          formatted.forEach((p) => {
+            const f = p.farmerId || {};
+            const fid = f._id || f;
+            if (!fid) return;
+            if (!byId[fid]) {
+              byId[fid] = {
+                _id: fid,
+                name: f.name || p.farmerName || "Farmer",
+                avatar: f.avatar || null,
+                distance: p.distance || "",
+                location: p.location || {},
+                rating: f.rating || "",
+              };
+            }
+          });
+          setFarmers(Object.values(byId).slice(0, 4));
         }
       } catch (err) {
         console.warn("Using mock products:", err.message);
       }
     };
     fetchRealProducts();
+
+    // Fetch recent activities for the current user
+    const fetchActivities = async () => {
+      try {
+        const res = await api.get(API_ENDPOINTS.users.activities);
+        const fetched = res.data?.data?.activities || [];
+        // Normalize to frontend shape: ensure `order` field exists when type === 'order'
+        const normalized = fetched.map((a) => ({
+          id: a.id || a._id,
+          type: a.type,
+          title: a.title,
+          description: a.description,
+          time: a.time,
+          order: a._raw || a.order || null,
+          farmerId: a.farmerId || null,
+        }));
+        setActivities(normalized);
+      } catch (err) {
+        console.warn("Failed to load activities:", err.message);
+      }
+    };
+    fetchActivities();
   }, []);
 
-  // Real refresh handler (Fix 8)
   const handleRefresh = async () => {
     setRefreshing(true);
-    try {
-      const res = await api.get(API_ENDPOINTS.products.list);
-      const fetched = res.data?.data?.products || [];
-      if (fetched.length > 0) {
-        const formatted = fetched.map((p) => ({
-          id: p._id,
-          name: `${p.quantity}${p.unit || "kg"} ${p.cropType}`,
-          price: p.price,
-          category: p.cropType,
-          farmerName: p.farmerId?.name || "Farmer",
-          farmerAvatar:
-            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-          location: p.location?.region || "Ethiopia",
-          image:
-            p.photos?.[0] ||
-            "https://images.unsplash.com/photo-1618512496248-a07fe83766a4?w=600",
-          isPremium: false,
-        }));
-        setProducts(formatted);
-      }
-    } catch (err) {
-      console.warn("Refresh failed, keeping current data:", err.message);
-    }
+    // Simulate data refresh
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     setRefreshing(false);
   };
 
   const handlePlaceOrder = (product) => {
     setCartCount((prev) => prev + 1);
-    setSuccessMsg(`Added ${product.name} to your cart!`);
+    setSuccessMsg(`Added ${product.cropType || product.name} to your cart!`);
     setTimeout(() => setSuccessMsg(""), 3000);
   };
 
-  const handleSidebarItemPress = (item) => {
-    setSidebarVisible(false);
-    if (item.route === "Logout") return;
-    const TAB_MAP = {
-      BuyerMarketplace: "Marketplace",
-      BuyerOrders: "Orders",
-      BuyerSaved: "Saved",
-      Profile: "Profile",
-      Home: "Home",
-    };
-    const STACK_ROUTES = ["Conversations", "Chat", "ListingDetail"];
-    if (item.route === "Home") {
-      onSwitchTab?.("Home");
-    } else if (TAB_MAP[item.route]) {
-      onSwitchTab?.(TAB_MAP[item.route]);
-    } else if (STACK_ROUTES.includes(item.route)) {
-      navigation.navigate(item.route);
+  const handleViewProduct = (product) => {
+    navigation?.navigate("ListingDetail", { product });
+  };
+
+  const handleFarmerPress = (farmer) => {
+    const farmerId = farmer._id || farmer.id || farmer.farmerId || null;
+    if (farmerId) navigation?.navigate("FarmerProfile", { farmerId });
+  };
+
+  const handleActivityPress = (activity) => {
+    if (activity.type === "order") {
+      const order = activity.order || activity._raw || null;
+      if (order) navigation?.navigate("OrderDetail", { order, role: "buyer" });
+      return;
     }
+    // message or other types may reference a farmer id
+    const fid =
+      activity.farmerId || activity.farmerId?._id || activity.farmerId;
+    if (fid) navigation?.navigate("FarmerProfile", { farmerId: fid });
   };
 
   const filteredProducts = products.filter((p) => {
-    const matchesSearch =
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.farmerName.toLowerCase().includes(searchQuery.toLowerCase());
+    const q = searchQuery.trim().toLowerCase();
+    const matchesSearch = q
+      ? (p.cropType || "").toLowerCase().includes(q) ||
+        (p.farmerId?.name || "").toLowerCase().includes(q)
+      : true;
     const matchesCat =
       selectedCategory === "All" || p.category === selectedCategory;
     return matchesSearch && matchesCat;
@@ -241,101 +266,41 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
     <>
       <DashboardLayout
         title="Buyer Dashboard"
-        subtitle={`Welcome, ${user?.name || "Buyer"}!`}
+        subtitle={`Welcome, ${user?.name || ""}!`}
         role="buyer"
         scrollable={true}
         showMenu={true}
-        onMenuPress={() => setSidebarVisible(true)}
-        showNotification={true}
-        notificationCount={0}
-        onNotificationPress={() => navigation.navigate("Notifications")}
+        onMenuPress={openSidebar}
         refreshing={refreshing}
         onRefresh={handleRefresh}
         notificationMessage={successMsg}
         onDismissNotification={() => setSuccessMsg("")}
         contentPaddingHorizontal={12}
       >
-        {/* KPI Cards (Fix 2) */}
+        {/* KPI Cards */}
         <View style={styles.summaryRow}>
           <SummaryCard
             icon="cart-outline"
             label="Active Orders"
             value={activeOrders}
-            color={warning}
+            color="#FF9800"
             onPress={() => onSwitchTab?.("Orders")}
           />
           <SummaryCard
             icon="bookmark-outline"
             label="Saved Items"
             value={savedItems}
-            color={secondary}
+            color="#4CAF50"
             onPress={() => onSwitchTab?.("Saved")}
           />
           <SummaryCard
             icon="storefront-outline"
             label="Products"
             value={products.length}
-            color={primary}
+            color="#2196F3"
             onPress={() => onSwitchTab?.("Marketplace")}
           />
         </View>
-
-        {/* Shortcut Row (Fix 4) */}
-        <View style={styles.shortcutRow}>
-          {[
-            {
-              icon: "storefront-outline",
-              label: "Browse",
-              onPress: () => onSwitchTab?.("Marketplace"),
-            },
-            {
-              icon: "chatbubbles-outline",
-              label: "Messages",
-              onPress: () => navigation.navigate("Conversations"),
-            },
-            {
-              icon: "bookmark-outline",
-              label: "Saved",
-              onPress: () => onSwitchTab?.("Saved"),
-            },
-            {
-              icon: "notifications-outline",
-              label: "Alerts",
-              onPress: () => navigation.navigate("Notifications"),
-            },
-          ].map((s) => (
-            <TouchableOpacity
-              key={s.label}
-              style={[styles.shortcut, { backgroundColor: primaryCont }]}
-              onPress={s.onPress}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.shortcutIcon, { backgroundColor: primary }]}>
-                <Ionicons name={s.icon} size={18} color="#fff" />
-              </View>
-              <AppText
-                style={{
-                  fontSize: 10,
-                  color: textPrimary,
-                  fontWeight: "600",
-                  marginTop: 5,
-                  textAlign: "center",
-                }}
-              >
-                {s.label}
-              </AppText>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Agri Price Change (Fix 3) */}
-        <AgriPriceChangeWidget
-          productName="Teff"
-          currentPrice="3,450 ETB/q"
-          changePercent={4.2}
-          changeLabel="Market Price Today"
-        />
-
         <BuyerQuickActions
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -350,78 +315,56 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
 
         <PriceTrendWidget />
 
-        {/* Featured Products Section (Fix 5) */}
+        {/* Featured Products */}
         <View style={styles.sectionHeader}>
-          <AppText
-            style={{ fontSize: 16, fontWeight: "700", color: textPrimary }}
-          >
+          <AppText style={{ fontWeight: "700", color: textPrimary }}>
             Featured Products
           </AppText>
           <TouchableOpacity onPress={() => onSwitchTab?.("Marketplace")}>
-            <AppText
-              style={{ color: primary, fontWeight: "600", fontSize: 14 }}
-            >
+            <AppText style={{ color: primaryColor, fontWeight: "600" }}>
               See All
             </AppText>
           </TouchableOpacity>
         </View>
         <FeaturedProductsList
           products={filteredProducts}
-          onOrder={handlePlaceOrder}
+          onView={handleViewProduct}
         />
 
-        {/* Nearby Farmers Section (Fix 6) */}
+        {/* Nearby Farmers */}
         <View style={styles.sectionHeader}>
-          <AppText
-            style={{ fontSize: 16, fontWeight: "700", color: textPrimary }}
-          >
+          <AppText style={{ fontWeight: "700", color: textPrimary }}>
             Nearby Farmers
           </AppText>
-          <TouchableOpacity onPress={() => onSwitchTab?.("Marketplace")}>
-            <AppText
-              style={{ color: primary, fontWeight: "600", fontSize: 14 }}
-            >
-              Browse All
+          <TouchableOpacity onPress={() => onSwitchTab?.("Farmers")}>
+            <AppText style={{ color: primaryColor, fontWeight: "600" }}>
+              See All
             </AppText>
           </TouchableOpacity>
         </View>
-        <NearbyFarmersList farmers={mockFarmers} />
-
-        {/* Recent Activity Section (Fix 7) */}
-        <View style={styles.sectionHeader}>
-          <AppText
-            style={{ fontSize: 16, fontWeight: "700", color: textPrimary }}
-          >
-            Recent Activity
-          </AppText>
-        </View>
-        <RecentActivityList
-          activities={mockActivities}
-          onActivityPress={(activity) => {
-            if (activity.type === "order") onSwitchTab?.("Orders");
-            else if (activity.type === "message")
-              navigation.navigate("Conversations");
-          }}
+        <NearbyFarmersList
+          farmers={farmers}
+          onFarmerPress={handleFarmerPress}
         />
 
+        {/* Recent Activity */}
+        <RecentActivityList
+          activities={activities}
+          onActivityPress={handleActivityPress}
+        />
+
+        {/* Bottom spacer so FAB doesn't hide content */}
         <View style={{ height: 80 }} />
       </DashboardLayout>
 
-      {/* Floating Cart Button (Fix 9) */}
+      {/* Floating Cart Button */}
       {cartCount > 0 && (
         <FloatingActionButton
           onPress={() => onSwitchTab?.("Orders")}
           icon="cart"
-          bottom={28}
+          bottom={90}
         />
       )}
-
-      <AppSidebar
-        visible={sidebarVisible}
-        onClose={() => setSidebarVisible(false)}
-        role="buyer"
-        onItemPress={handleSidebarItemPress}
-      />
     </>
   );
 }
@@ -429,28 +372,9 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
 const styles = StyleSheet.create({
   summaryRow: {
     flexDirection: "row",
-    gap: 12,
+    gap: CARD_GAP,
     marginBottom: 16,
     marginTop: 8,
-  },
-  shortcutRow: {
-    flexDirection: "row",
-    gap: 8,
-    marginBottom: 20,
-    marginTop: 8,
-  },
-  shortcut: {
-    flex: 1,
-    alignItems: "center",
-    paddingVertical: 12,
-    borderRadius: 14,
-  },
-  shortcutIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
   },
   sectionHeader: {
     flexDirection: "row",

@@ -1,12 +1,12 @@
-import React, { useRef, useEffect } from "react";
-import { View, Pressable, StyleSheet, Animated, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import * as NavigationBar from "expo-navigation-bar";
+import { useEffect, useRef } from "react";
+import { Animated, Platform, Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import AppText from "../common/AppText";
-import { useTheme } from "../../hooks/useTheme";
 import { ROLE_TABS } from "../../constants/navigationTabs";
 import { ROLES } from "../../constants/roles";
-import * as NavigationBar from "expo-navigation-bar";
+import { useTheme } from "../../hooks/useTheme";
+import AppText from "../common/AppText";
 
 const BAR_BG = "#1A1C2E";
 const INACTIVE = "#6B7280";

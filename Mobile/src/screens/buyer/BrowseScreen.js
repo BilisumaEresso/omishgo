@@ -15,124 +15,28 @@ import {
 import AppButton from "../../components/common/AppButton";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
-import AppSidebar from "../../components/layout/AppSidebar";
+import { useSidebar } from "../../context/SidebarContext";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
+import { ProductCard } from "../../components/common/ProductCard";
+import { useSavedStore } from "../../store/saved.store";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-const CATEGORY_FILTERS = ["All", "Grains", "Vegetables", "Fruits"];
+// ─── Crop filter list (static for now) ───────────────────────────────────────
+const CROP_FILTERS = [
+  "All",
+  "Tomato",
+  "Teff",
+  "Wheat",
+  "Maize",
+  "Onion",
+  "Cabbage",
+  "Potato",
+];
+
+// ─── Sort options (no icons) ──────────────────────────────────────────────────
 const SORT_OPTIONS = ["Default", "Price ↑", "Price ↓"];
 
-// ─── Product Card ─────────────────────────────────────────────────────────────
-const ProductCard = ({ product, onView, theme, isSaved, onToggleSave }) => {
-  const farmer = product.farmerId || {};
-  const loc = product.location || {};
-
-  // Extract theme colors
-  const primary = theme?.colors?.primary || "#1565C0";
-  const primaryCont = theme?.colors?.primaryContainer || "#E3F2FD";
-  const surface = theme?.colors?.surface || "#FFFFFF";
-  const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
-  const textSecondary = theme?.colors?.textSecondary || "#4A6080";
-  const border = theme?.colors?.border || "#D0DEF5";
-
-  return (
-    <View
-      style={[
-        styles.card,
-        {
-          backgroundColor: surface,
-          borderColor: border,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.05,
-          shadowRadius: 4,
-          elevation: 2,
-        },
-      ]}
-    >
-      {/* Top row: crop type + bookmark + price */}
-      <View style={styles.cardHeader}>
-        <AppText variant="headingSm" style={{ color: textPrimary, flex: 1 }}>
-          {product.cropType}
-        </AppText>
-        <TouchableOpacity
-          onPress={() => onToggleSave(product._id)}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          style={{ marginRight: 6 }}
-        >
-          <Ionicons
-            name={isSaved ? "bookmark" : "bookmark-outline"}
-            size={22}
-            color={primary}
-          />
-        </TouchableOpacity>
-        <AppText variant="headingSm" style={[styles.price, { color: primary }]}>
-          {product.price} ETB / {product.unit || "kg"}
-        </AppText>
-      </View>
-
-      {/* Quantity + category badge */}
-      <View style={styles.quantityRow}>
-        <AppText variant="bodyMd" style={{ color: textSecondary }}>
-          {product.quantity} {product.unit || "kg"}
-        </AppText>
-        {product.category ? (
-          <View
-            style={[styles.categoryBadge, { backgroundColor: primaryCont }]}
-          >
-            <AppText
-              style={{ color: primary, fontSize: 12, fontWeight: "600" }}
-            >
-              {product.category}
-            </AppText>
-          </View>
-        ) : null}
-      </View>
-
-      {/* Location – icon replaces emoji */}
-      {loc.region || loc.zone ? (
-        <View style={styles.locationRow}>
-          <Ionicons
-            name="location-outline"
-            size={14}
-            color={textSecondary}
-            style={{ marginRight: 4 }}
-          />
-          <AppText variant="bodySm" style={{ color: textSecondary }}>
-            {[loc.region, loc.zone].filter(Boolean).join(", ")}
-          </AppText>
-        </View>
-      ) : null}
-
-      {/* Farmer name – icon replaces emoji */}
-      {farmer.name ? (
-        <View style={styles.farmerRow}>
-          <Ionicons
-            name="person-outline"
-            size={14}
-            color={textSecondary}
-            style={{ marginRight: 4 }}
-          />
-          <AppText variant="bodySm" style={{ color: textSecondary }}>
-            {farmer.name}
-          </AppText>
-        </View>
-      ) : null}
-
-      {/* View button – full width */}
-      <AppButton
-        title="View"
-        variant="outline"
-        onPress={() => onView(product)}
-        style={styles.viewBtn}
-      />
-    </View>
-  );
-};
-
-// ─── Main Screen ──────────────────────────────────────────────────────────────
 export default function BrowseScreen({ navigation, onSwitchTab }) {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -145,17 +49,21 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
 
   // UI states
   const [search, setSearch] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [cropFilter, setCropFilter] = useState("All");
   const [sortOrder, setSortOrder] = useState("Default");
-  const [savedIds, setSavedIds] = useState([]);
-  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+  const { openSidebar } = useSidebar();
 
-  // Fetch products from API
+  // Saved store
+  const savedIds = useSavedStore((s) => s.savedIds);
+  const toggleSave = useSavedStore((s) => s.toggleSave);
+  const fetchSaved = useSavedStore((s) => s.fetchSaved);
+  const savedInitialized = useSavedStore((s) => s.initialized);
+
   const fetchProducts = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
     setError("");
-
     try {
       const res = await api.get(API_ENDPOINTS.products.list);
       setAllProducts(res.data?.data?.products || []);
@@ -173,6 +81,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
 
   useEffect(() => {
     fetchProducts();
+    if (!savedInitialized) fetchSaved();
   }, [fetchProducts]);
 
   // ── Derived data ─────────────────────────────────────────────────────────
@@ -183,19 +92,20 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
     );
   }, [allProducts, search]);
 
-  const filteredByCategory = useMemo(() => {
-    if (categoryFilter === "All") return filteredBySearch;
+  // Filter by selected crop (cropType match)
+  const filteredByCrop = useMemo(() => {
+    if (cropFilter === "All") return filteredBySearch;
     return filteredBySearch.filter(
-      (p) => p.category?.toLowerCase() === categoryFilter.toLowerCase(),
+      (p) => p.cropType?.toLowerCase() === cropFilter.toLowerCase(),
     );
-  }, [filteredBySearch, categoryFilter]);
+  }, [filteredBySearch, cropFilter]);
 
   const sortedProducts = useMemo(() => {
-    const list = [...filteredByCategory];
+    const list = [...filteredByCrop];
     if (sortOrder === "Price ↑") return list.sort((a, b) => a.price - b.price);
     if (sortOrder === "Price ↓") return list.sort((a, b) => b.price - a.price);
     return list;
-  }, [filteredByCategory, sortOrder]);
+  }, [filteredByCrop, sortOrder]);
 
   const insights = useMemo(() => {
     const total = allProducts.length;
@@ -213,18 +123,10 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
     return { total, avgPrice, uniqueFarmers };
   }, [allProducts]);
 
-  const toggleSave = (productId) => {
-    setSavedIds((prev) =>
-      prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
-        : [...prev, productId],
-    );
-  };
-
   const handleView = (product) =>
     navigation.navigate("ListingDetail", { product });
 
-  // Extract theme colors for the screen
+  // Theme colours
   const primary = theme?.colors?.primary || "#1565C0";
   const primaryCont = theme?.colors?.primaryContainer || "#E3F2FD";
   const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
@@ -256,7 +158,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
         showMenu={true}
         showNotification={true}
         notificationCount={0}
-        onMenuPress={() => setSidebarVisible(true)}
+        onMenuPress={openSidebar}
         onNotificationPress={() => navigation.navigate("Notifications")}
       />
 
@@ -279,6 +181,11 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
           returnKeyType="search"
           clearButtonMode="while-editing"
         />
+        {search ? (
+          <TouchableOpacity onPress={() => setSearch("")}>
+            <Ionicons name="close-circle" size={18} color={textSecondary} />
+          </TouchableOpacity>
+        ) : null}
       </View>
 
       {/* Insights banner */}
@@ -302,72 +209,94 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
         ))}
       </View>
 
-      {/* Category filter tabs */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.filterScroll}
-        contentContainerStyle={styles.filterScrollContent}
-      >
-        {CATEGORY_FILTERS.map((cat) => {
-          const isActive = categoryFilter === cat;
-          return (
-            <TouchableOpacity
-              key={cat}
-              onPress={() => setCategoryFilter(cat)}
-              style={[
-                styles.filterTab,
-                {
-                  backgroundColor: isActive ? primary : "transparent",
-                  borderColor: isActive ? primary : border,
-                },
-              ]}
-            >
-              <AppText
-                style={{
-                  color: isActive ? surface : textSecondary,
-                  fontSize: 13,
-                  fontWeight: "600",
-                }}
-              >
-                {cat}
-              </AppText>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+      {/* Filters & Sort combined bar */}
+      <View style={styles.filtersBar}>
+        <View style={styles.filtersRow}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{ flex: 1 }}
+          >
+            {CROP_FILTERS.map((crop) => {
+              const isActive = cropFilter === crop;
+              return (
+                <TouchableOpacity
+                  key={crop}
+                  onPress={() => setCropFilter(crop)}
+                  style={[
+                    styles.filterChip,
+                    {
+                      backgroundColor: isActive ? primary : surface,
+                      borderColor: isActive ? primary : border,
+                    },
+                  ]}
+                >
+                  <AppText
+                    style={{
+                      color: isActive ? surface : textSecondary,
+                      fontSize: 13,
+                      fontWeight: "600",
+                    }}
+                  >
+                    {crop}
+                  </AppText>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
 
-      {/* Sort row */}
-      <View style={styles.sortRow}>
-        <AppText style={{ color: textSecondary, fontSize: 13 }}>
-          Sort by:
-        </AppText>
-        {SORT_OPTIONS.map((opt) => {
-          const isActive = sortOrder === opt;
-          return (
+          {/* Sort dropdown */}
+          <View style={{ position: "relative" }}>
             <TouchableOpacity
-              key={opt}
-              onPress={() => setSortOrder(opt)}
+              onPress={() => setSortDropdownOpen(!sortDropdownOpen)}
               style={[
-                styles.sortPill,
-                {
-                  backgroundColor: isActive ? primary + "18" : "transparent",
-                  borderColor: isActive ? primary : "transparent",
-                },
+                styles.sortButton,
+                { backgroundColor: surface, borderColor: border },
               ]}
             >
               <AppText
-                style={{
-                  color: isActive ? primary : textSecondary,
-                  fontSize: 13,
-                  fontWeight: isActive ? "700" : "400",
-                }}
+                style={{ color: textPrimary, fontSize: 13, fontWeight: "600" }}
               >
-                {opt}
+                Sort
               </AppText>
             </TouchableOpacity>
-          );
-        })}
+            {sortDropdownOpen && (
+              <View
+                style={[
+                  styles.sortDropdown,
+                  { backgroundColor: surface, borderColor: border },
+                ]}
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <TouchableOpacity
+                    key={opt}
+                    onPress={() => {
+                      setSortOrder(opt);
+                      setSortDropdownOpen(false);
+                    }}
+                    style={[
+                      styles.sortDropdownItem,
+                      { borderBottomColor: border },
+                      sortOrder === opt && {
+                        backgroundColor: primary + "10",
+                      },
+                    ]}
+                  >
+                    <AppText
+                      style={{
+                        color: sortOrder === opt ? primary : textPrimary,
+                        fontSize: 13,
+                        fontWeight: sortOrder === opt ? "600" : "400",
+                      }}
+                    >
+                      {opt}
+                    </AppText>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </View>
+        </View>
       </View>
 
       {error ? (
@@ -390,7 +319,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
               product={item}
               onView={handleView}
               theme={theme}
-              isSaved={savedIds.includes(item._id)}
+              isSaved={savedIds.has(item._id)}
               onToggleSave={toggleSave}
             />
           )}
@@ -405,13 +334,12 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
           }
           ListEmptyComponent={
             <View style={styles.center}>
-              {/* Replaced emoji with Ionicons */}
               <Ionicons name="leaf-outline" size={48} color={textSecondary} />
               <AppText
                 variant="headingSm"
                 style={[styles.centerText, { color: textSecondary }]}
               >
-                {search || categoryFilter !== "All"
+                {search || cropFilter !== "All"
                   ? t("browse.noMatch") || "No listings match your filters"
                   : t("browse.empty") || "No listings available right now"}
               </AppText>
@@ -419,31 +347,10 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
           }
         />
       )}
-
-      <AppSidebar
-        visible={sidebarVisible}
-        onClose={() => setSidebarVisible(false)}
-        onItemPress={(item) => {
-          setSidebarVisible(false);
-          if (item.route === "Conversations")
-            navigation.navigate("Conversations");
-          else if (item.route === "Home") onSwitchTab?.("Home");
-          else if (onSwitchTab) {
-            const MAP = {
-              BuyerMarketplace: "Marketplace",
-              BuyerOrders: "Orders",
-              BuyerSaved: "Saved",
-              Profile: "Profile",
-            };
-            if (MAP[item.route]) onSwitchTab(MAP[item.route]);
-          }
-        }}
-      />
     </View>
   );
 }
 
-// ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   searchBar: {
     flexDirection: "row",
@@ -453,14 +360,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 10,
     gap: 8,
   },
   searchInput: { flex: 1, fontSize: 15 },
   insightsRow: {
     flexDirection: "row",
     marginHorizontal: 16,
-    marginBottom: 4,
+    marginBottom: 8,
     gap: 8,
   },
   insightCard: {
@@ -472,69 +379,49 @@ const styles = StyleSheet.create({
   },
   insightValue: { fontSize: 16, fontWeight: "700" },
   insightLabel: { fontSize: 12, marginTop: 2 },
-  filterScroll: { marginTop: 8, paddingLeft: 16, marginBottom: 4 },
-  filterScrollContent: { paddingRight: 16, alignItems: "center" },
-  filterTab: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginRight: 8,
-    borderWidth: 1,
+  filtersBar: {
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+    marginBottom: 4,
   },
-  sortRow: {
+  filtersRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    marginBottom: 8,
     gap: 8,
   },
-  sortPill: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+  filterChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    marginRight: 8,
+  },
+  sortButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  sortDropdown: {
+    position: "absolute",
+    top: 42,
+    right: 0,
+    width: 150,
     borderRadius: 12,
     borderWidth: 1,
+    zIndex: 100,
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  sortDropdownItem: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   list: { paddingHorizontal: 16, paddingBottom: 32 },
-  card: {
-    borderWidth: 1,
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 12,
-    gap: 4,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  price: { fontWeight: "700" },
-  quantityRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 2,
-  },
-  categoryBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  locationRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 4,
-  },
-  farmerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 2,
-  },
-  viewBtn: {
-    marginTop: 12,
-    alignSelf: "stretch",
-    borderRadius: 10,
-    paddingVertical: 10,
-  },
   center: {
     flex: 1,
     justifyContent: "center",

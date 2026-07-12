@@ -1,14 +1,25 @@
 // Mobile/src/screens/farmer/FarmerAnalyticsScreen.js
-import { useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 import AppText from "../../components/common/AppText";
+import api from "../../config/api";
+import { API_ENDPOINTS } from "../../constants/api";
 import AppHeader from "../../components/layout/AppHeader";
-import AppSidebar from "../../components/layout/AppSidebar";
+import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 
 const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
-  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const { openSidebar } = useSidebar();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get(API_ENDPOINTS.products.analytics)
+      .then((res) => setData(res.data?.data || null))
+      .catch((err) => console.warn("Analytics fetch:", err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   // Extract theme colors with fallbacks
   const primary = theme?.colors?.primary || "#2E7D32";
@@ -24,19 +35,18 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
 
   // This Week Stats
   const weeklyStats = [
-    { label: "Revenue", value: "ETB 24,500" },
-    { label: "Sales", value: "18 kg" },
-    { label: "Buyers", value: "7" },
+    { label: "Total Products", value: data?.totalProducts ?? 0 },
+    { label: "Total Revenue", value: data?.totalRevenue ?? 0 },
+    { label: "Total Orders", value: data?.totalOrders ?? 0 },
+    { label: "Delivered", value: data?.delivered ?? 0 },
+    { label: "Pending", value: data?.pending ?? 0 },
   ];
 
-  // Top Crops by Demand (percentage)
-  const topCrops = [
-    { name: "Teff", percent: 87 },
-    { name: "Onion", percent: 74 },
-    { name: "Tomato", percent: 68 },
-    { name: "Wheat", percent: 55 },
-    { name: "Pepper", percent: 41 },
+  // Top Crops by Demand
+  const topCrops = data?.topCrops || [
+    { _id: "No data yet", orders: 1 },
   ];
+  const maxOrders = Math.max(...topCrops.map(c => c.orders), 1);
 
   // Market Prices Today
   const marketPrices = [
@@ -65,14 +75,21 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
         showMenu={true}
         showNotification={true}
         notificationCount={0}
-        onMenuPress={() => setSidebarVisible(true)}
+        onMenuPress={openSidebar}
         onNotificationPress={() => navigation.navigate("Notifications")}
       />
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      {loading && (
+        <View style={{ flex:1, justifyContent:"center", alignItems:"center", paddingTop: 80 }}>
+          <ActivityIndicator size="large" color={primary} />
+        </View>
+      )}
+
+      {!loading && (
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
         {/* This Week Section */}
         <AppText style={[styles.sectionTitle, { color: textPrimary }]}>
           This Week
@@ -103,7 +120,7 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
           {topCrops.map((crop, index) => (
             <View key={index} style={styles.cropRow}>
               <AppText style={[styles.cropName, { color: textPrimary }]}>
-                {crop.name}
+                {crop._id}
               </AppText>
               <View style={[styles.barContainer, { backgroundColor: border }]}>
                 <View
@@ -111,13 +128,13 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
                     styles.bar,
                     {
                       backgroundColor: primary,
-                      width: `${crop.percent}%`,
+                      width: `${(crop.orders / maxOrders) * 100}%`,
                     },
                   ]}
                 />
               </View>
               <AppText style={[styles.percentText, { color: textPrimary }]}>
-                {crop.percent}%
+                {crop.orders}
               </AppText>
             </View>
           ))}
@@ -163,35 +180,11 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
 
         {/* Footer Note */}
         <AppText style={[styles.footerNote, { color: textMuted }]}>
-          Prices sourced from local market data
+          Reference prices from local markets
         </AppText>
       </ScrollView>
+      )}
 
-      <AppSidebar
-        visible={sidebarVisible}
-        onClose={() => setSidebarVisible(false)}
-        onItemPress={(item) => {
-          setSidebarVisible(false);
-          if (item.route === "Conversations")
-            navigation.navigate("Conversations");
-          else if (item.route === "Chat") navigation.navigate("Chat");
-          else if (item.route === "PostProduct")
-            navigation.navigate("PostProduct");
-          else if (item.route === "Home") onSwitchTab?.("Home");
-          else if (onSwitchTab) {
-            const TAB_MAP = {
-              FarmerProducts: "Products",
-              FarmerOrders: "Orders",
-              FarmerAnalytics: "Insights",
-              Profile: "Profile",
-              BuyerMarketplace: "Marketplace",
-              BuyerOrders: "Orders",
-              BuyerSaved: "Saved",
-            };
-            if (TAB_MAP[item.route]) onSwitchTab(TAB_MAP[item.route]);
-          }
-        }}
-      />
     </View>
   );
 };
@@ -212,16 +205,17 @@ const styles = StyleSheet.create({
   },
   statsRow: {
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     marginBottom: 4,
   },
   statCard: {
-    flex: 1,
+    width: "31%",
     borderRadius: 12,
     paddingVertical: 16,
-    paddingHorizontal: 8,
+    paddingHorizontal: 4,
     alignItems: "center",
-    marginHorizontal: 4,
+    marginBottom: 8,
   },
   statValue: {
     fontSize: 22,

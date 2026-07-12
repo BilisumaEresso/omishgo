@@ -1,71 +1,86 @@
-// src/components/layout/AppSidebar.js
+// Mobile/src/components/layout/AppSidebar.js
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useRef, useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
   Modal,
   Platform,
   Pressable,
-  SafeAreaView,
+  ScrollView,
   StyleSheet,
+  TouchableOpacity,
   View,
 } from "react-native";
-import { ROLES } from "../../constants/roles";
-import { useTheme } from "../../hooks/useTheme";
-import { useAuthStore } from "../../store/auth.store";
+import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
+import { useTheme } from "../../hooks/useTheme";
+import { ROLES } from "../../constants/roles";
+import { useAuthStore } from "../../store/auth.store";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
-const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.75, 320); // capped at 320 for tablets
+const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.78, 300);
 
+// ---------- role-based menu items ----------
 const ROLE_MENU_ITEMS = {
   [ROLES.FARMER]: [
-    { label: "Home", icon: "home-outline", route: "Home" },
-    { label: "My Products", icon: "leaf-outline", route: "FarmerProducts" },
-    { label: "My Orders", icon: "receipt-outline", route: "FarmerOrders" },
-    { label: "Post Product", icon: "add-circle-outline", route: "PostProduct" },
-    { label: "Messages", icon: "chatbubbles-outline", route: "Conversations" },
+    { label: "Products", icon: "leaf-outline", route: "FarmerProducts" },
+    { label: "Orders", icon: "cart-outline", route: "FarmerOrders" },
     {
-      label: "Market Insights",
+      label: "Insights",
       icon: "stats-chart-outline",
       route: "FarmerAnalytics",
     },
   ],
   [ROLES.BUYER]: [
-    { label: "Home", icon: "home-outline", route: "Home" },
     {
       label: "Marketplace",
       icon: "storefront-outline",
       route: "BuyerMarketplace",
     },
-    { label: "My Orders", icon: "receipt-outline", route: "BuyerOrders" },
+    { label: "Orders", icon: "cart-outline", route: "BuyerOrders" },
     { label: "Saved", icon: "bookmark-outline", route: "BuyerSaved" },
-    { label: "Messages", icon: "chatbubbles-outline", route: "Conversations" },
   ],
   [ROLES.SUPPLIER]: [
-    { label: "Home", icon: "home-outline", route: "Home" },
     { label: "Inventory", icon: "cube-outline", route: "SupplierInventory" },
-    { label: "Orders", icon: "receipt-outline", route: "SupplierOrders" },
+    { label: "Orders", icon: "cart-outline", route: "SupplierOrders" },
+    {
+      label: "Reports",
+      icon: "document-text-outline",
+      route: "SupplierReports",
+    },
   ],
   [ROLES.DRIVER]: [
-    { label: "Home", icon: "home-outline", route: "Home" },
     { label: "Deliveries", icon: "bicycle-outline", route: "DriverDeliveries" },
+    { label: "History", icon: "time-outline", route: "DriverHistory" },
   ],
 };
 
-const COMMON_ITEMS = [
-  { label: "My Profile", icon: "person-outline", route: "Profile" },
-  { label: "Help", icon: "help-circle-outline", route: "Help" },
+// ---------- language options ----------
+const LANGUAGES = [
+  { code: "en", label: "English", native: "English" },
+  { code: "am", label: "አማርኛ", native: "Amharic" },
+  { code: "om", label: "Afaan Oromoo", native: "Afan Oromo" },
 ];
 
-const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
+const AppSidebar = ({
+  visible,
+  onClose,
+  role,
+  onItemPress,
+  activeRoute = "",
+}) => {
   const { theme } = useTheme();
+  const { i18n } = useTranslation();
   const { logout, user } = useAuthStore();
+
   const slideAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const [showModal, setShowModal] = useState(visible);
+  const [showModal, setShowModal] = useState(false);
+  const [languageOpen, setLanguageOpen] = useState(false);
 
+  // ---------- animation ----------
   useEffect(() => {
     if (visible) {
       setShowModal(true);
@@ -95,11 +110,12 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
         }),
       ]).start(() => {
         setShowModal(false);
+        setLanguageOpen(false);
       });
     }
   }, [visible]);
 
-  const handleCloseAnimation = (callbackItem = null) => {
+  const handleClose = () => {
     Animated.parallel([
       Animated.timing(slideAnim, {
         toValue: -DRAWER_WIDTH,
@@ -113,46 +129,83 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
       }),
     ]).start(() => {
       setShowModal(false);
-      if (callbackItem && onItemPress) {
-        onItemPress(callbackItem);
-      }
+      setLanguageOpen(false);
       if (onClose) onClose();
     });
   };
 
-  const resolvedRole = role || user?.role;
-  const menuItems = resolvedRole ? ROLE_MENU_ITEMS[resolvedRole] || [] : [];
-
-  // Theme shortcuts
-  const textPrimary = theme?.colors?.textPrimary || "#212121";
-  const textSecondary = theme?.colors?.textSecondary || "#757575";
-  const borderColor = theme?.colors?.border || "#E0E0E0";
-  const backgroundColor = theme?.colors?.surface || "#FFFFFF";
-  const pressedBg = theme?.colors?.backgroundSecondary || "#EEEEEE";
-  const errorColor = theme?.colors?.error || "#F44336";
-  const primaryColor = theme?.colors?.primary || "#4CAF50";
-  const spacing = theme.spacing || { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 };
-  const radius = theme.radius || { sm: 8, md: 12 };
-
-  // Logout handler – we ensure the route is 'Logout' so dashboard can catch it
-  const handleLogout = () => {
-    logout();
-    handleCloseAnimation({ label: "Logout", route: "Logout" });
+  const handleItem = (item) => {
+    Animated.parallel([
+      Animated.timing(slideAnim, {
+        toValue: -DRAWER_WIDTH,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setShowModal(false);
+      setLanguageOpen(false);
+      if (onItemPress) onItemPress(item);
+    });
   };
+
+  const handleLogout = () => {
+    Animated.parallel([
+      Animated.timing(slideAnim, {
+        toValue: -DRAWER_WIDTH,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setShowModal(false);
+      setLanguageOpen(false);
+      logout();
+    });
+  };
+
+  const changeLanguage = (code) => {
+    i18n.changeLanguage(code).catch(() => {});
+    setLanguageOpen(false);
+  };
+
+  // ---------- theme colours ----------
+  const primaryColor = theme.colors.primary || "#2E7D32";
+  const primaryDark = theme.colors.primaryDark || "#1B5E20";
+  const textPrimary = theme.colors.textPrimary || "#1A2E1A";
+  const textSecondary = theme.colors.textSecondary || "#4A6741";
+  const borderColor = theme.colors.border || "#D0E8CE";
+  const surface = theme.colors.surface || "#FFFFFF";
+  const errorColor = theme.colors.error || "#C62828";
+  const successColor = theme.colors.success || "#2E7D32";
+  const menuItems = role ? ROLE_MENU_ITEMS[role] || [] : [];
+
+  // ---------- current language display ----------
+  const currentLang = i18n.language || "en";
+  const currentLangLabel =
+    LANGUAGES.find((l) => l.code === currentLang)?.label || "English";
 
   return (
     <Modal
       visible={showModal}
       transparent
       animationType="none"
-      onRequestClose={() => handleCloseAnimation()}
+      onRequestClose={handleClose}
     >
       <View style={styles.overlay}>
         {/* Backdrop */}
         <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]}>
           <Pressable
             style={{ flex: 1 }}
-            onPress={() => handleCloseAnimation()}
+            onPress={handleClose}
             accessibilityLabel="Close menu"
           />
         </Animated.View>
@@ -162,159 +215,187 @@ const AppSidebar = ({ visible, onClose, role, onItemPress }) => {
           style={[
             styles.drawer,
             {
-              backgroundColor,
+              backgroundColor: surface,
               transform: [{ translateX: slideAnim }],
             },
           ]}
         >
-          <SafeAreaView style={styles.drawerContent}>
-            {/* Profile section – now tappable */}
+          {/* Profile header with gradient */}
+          <LinearGradient
+            colors={[primaryColor, primaryDark]}
+            style={styles.profileHeader}
+          >
             <Pressable
-              style={[
-                styles.profileSection,
-                {
-                  borderBottomColor: borderColor,
-                  paddingHorizontal: spacing.lg,
-                },
-              ]}
-              onPress={() =>
-                handleCloseAnimation({ label: "Profile", route: "Profile" })
-              }
+              onPress={() => handleItem({ label: "Profile", route: "Profile" })}
+              style={styles.profilePressable}
               accessibilityRole="button"
               accessibilityLabel="View profile"
             >
-              <View
-                style={[
-                  styles.profileAvatar,
-                  { backgroundColor: primaryColor },
-                ]}
-              >
-                <Ionicons name="person" size={26} color="#fff" />
+              <View style={styles.avatar}>
+                <Ionicons name="person" size={32} color={primaryColor} />
               </View>
               <View style={styles.profileInfo}>
-                <AppText
-                  variant="headingSm"
-                  style={{ color: textPrimary, fontWeight: "700" }}
-                  numberOfLines={1}
-                >
-                  {user?.name || "Farmer"}
+                <AppText style={styles.userName} numberOfLines={1}>
+                  {user?.name || "User"}
                 </AppText>
-                <AppText
-                  variant="caption"
-                  style={{ color: textSecondary, marginTop: 2 }}
-                >
-                  {role ? role.charAt(0).toUpperCase() + role.slice(1) : "User"}
-                </AppText>
+                <View style={styles.rolePill}>
+                  <AppText style={styles.roleText}>
+                    {role ? role.toUpperCase() : "USER"}
+                  </AppText>
+                </View>
               </View>
-              <Ionicons
-                name="chevron-forward"
-                size={20}
-                color={textSecondary}
-              />
+              <Ionicons name="chevron-forward" size={20} color="#FFF" />
             </Pressable>
+          </LinearGradient>
 
-            {/* Menu items */}
-            <View style={[styles.menuList, { paddingHorizontal: spacing.md }]}>
-              {menuItems.map((item) => (
-                <Pressable
+          {/* Scrollable menu area */}
+          <ScrollView
+            style={styles.menuScroll}
+            contentContainerStyle={styles.menuContent}
+          >
+            {/* Role-based items */}
+            {menuItems.map((item) => {
+              const isActive = activeRoute === item.route;
+              return (
+                <TouchableOpacity
                   key={item.label}
-                  style={({ pressed }) => [
+                  style={[
                     styles.menuItem,
-                    {
-                      backgroundColor: pressed ? pressedBg : "transparent",
-                      borderRadius: radius.sm,
-                    },
+                    isActive && { backgroundColor: primaryColor + "15" },
                   ]}
-                  onPress={() => handleCloseAnimation(item)}
+                  onPress={() => handleItem(item)}
                   accessibilityRole="button"
                   accessibilityLabel={item.label}
                 >
                   <Ionicons
                     name={item.icon}
-                    size={24} // increased from 20
-                    color={textPrimary}
-                    style={{ marginRight: spacing.sm }}
+                    size={22}
+                    color={isActive ? primaryColor : textSecondary}
                   />
                   <AppText
-                    variant="bodyMd"
-                    style={{ color: textPrimary, fontWeight: "500" }}
+                    style={[
+                      styles.menuLabel,
+                      { color: isActive ? primaryColor : textPrimary },
+                    ]}
                   >
                     {item.label}
                   </AppText>
-                </Pressable>
-              ))}
+                </TouchableOpacity>
+              );
+            })}
 
-              {/* Divider */}
-              <View
-                style={[
-                  styles.divider,
-                  { backgroundColor: borderColor, marginVertical: spacing.md },
-                ]}
-              />
+            {/* Divider */}
+            <View style={[styles.divider, { backgroundColor: borderColor }]} />
 
-              {/* Common items */}
-              {COMMON_ITEMS.map((item) => (
-                <Pressable
-                  key={item.label}
-                  style={({ pressed }) => [
-                    styles.menuItem,
-                    {
-                      backgroundColor: pressed ? pressedBg : "transparent",
-                      borderRadius: radius.sm,
-                    },
-                  ]}
-                  onPress={() => handleCloseAnimation(item)}
-                  accessibilityRole="button"
-                  accessibilityLabel={item.label}
-                >
-                  <Ionicons
-                    name={item.icon}
-                    size={24}
-                    color={textPrimary}
-                    style={{ marginRight: spacing.sm }}
-                  />
-                  <AppText
-                    variant="bodyMd"
-                    style={{ color: textPrimary, fontWeight: "500" }}
-                  >
-                    {item.label}
-                  </AppText>
-                </Pressable>
-              ))}
-
-              {/* Logout – now clearly separated and tappable */}
-              <Pressable
-                style={({ pressed }) => [
-                  styles.menuItem,
-                  styles.logoutItem,
-                  {
-                    backgroundColor: pressed
-                      ? errorColor + "15"
-                      : "transparent",
-                    borderRadius: radius.sm,
-                    marginTop: "auto",
-                    marginBottom: spacing.lg,
-                  },
-                ]}
-                onPress={handleLogout}
+            {/* Settings & Help */}
+            {["Settings", "Help"].map((label) => (
+              <TouchableOpacity
+                key={label}
+                style={styles.menuItem}
+                onPress={() => handleItem({ label, route: label })}
                 accessibilityRole="button"
-                accessibilityLabel="Logout"
+                accessibilityLabel={label}
               >
                 <Ionicons
-                  name="log-out-outline"
-                  size={24}
-                  color={errorColor}
-                  style={{ marginRight: spacing.sm }}
+                  name={
+                    label === "Settings"
+                      ? "settings-outline"
+                      : "help-circle-outline"
+                  }
+                  size={22}
+                  color={textSecondary}
+                />
+                <AppText style={[styles.menuLabel, { color: textPrimary }]}>
+                  {label}
+                </AppText>
+              </TouchableOpacity>
+            ))}
+
+            {/* Language Picker */}
+            <View style={{ marginVertical: 4 }}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => setLanguageOpen(!languageOpen)}
+                accessibilityRole="button"
+                accessibilityLabel="Change language"
+              >
+                <Ionicons
+                  name="globe-outline"
+                  size={22}
+                  color={textSecondary}
                 />
                 <AppText
-                  variant="bodyMd"
-                  style={{ color: errorColor, fontWeight: "600" }}
+                  style={[styles.menuLabel, { color: textPrimary, flex: 1 }]}
                 >
-                  Logout
+                  {currentLangLabel}
                 </AppText>
-              </Pressable>
+                <Ionicons
+                  name={languageOpen ? "chevron-up" : "chevron-down"}
+                  size={18}
+                  color={textSecondary}
+                />
+              </TouchableOpacity>
+              {languageOpen && (
+                <View style={styles.languageSubmenu}>
+                  {LANGUAGES.map((lang) => (
+                    <TouchableOpacity
+                      key={lang.code}
+                      style={[
+                        styles.languageOption,
+                        currentLang === lang.code && {
+                          backgroundColor: primaryColor + "15",
+                        },
+                      ]}
+                      onPress={() => changeLanguage(lang.code)}
+                      accessibilityRole="button"
+                      accessibilityLabel={lang.native}
+                    >
+                      <AppText
+                        style={[
+                          styles.languageOptionText,
+                          {
+                            color:
+                              currentLang === lang.code
+                                ? primaryColor
+                                : textPrimary,
+                          },
+                        ]}
+                      >
+                        {lang.native}
+                      </AppText>
+                      {currentLang === lang.code && (
+                        <Ionicons
+                          name="checkmark"
+                          size={18}
+                          color={primaryColor}
+                        />
+                      )}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
             </View>
-          </SafeAreaView>
+          </ScrollView>
+
+          {/* Logout button (fixed at bottom) */}
+          <View
+            style={[styles.logoutContainer, { borderTopColor: borderColor }]}
+          >
+            <TouchableOpacity
+              style={styles.logoutButton}
+              onPress={handleLogout}
+              accessibilityRole="button"
+              accessibilityLabel="Logout"
+            >
+              <Ionicons name="log-out-outline" size={22} color={errorColor} />
+              <AppText style={[styles.logoutLabel, { color: errorColor }]}>
+                Logout
+              </AppText>
+            </TouchableOpacity>
+            <AppText style={[styles.version, { color: textSecondary }]}>
+              v1.0.0
+            </AppText>
+          </View>
         </Animated.View>
       </View>
     </Modal>
@@ -340,47 +421,115 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.15,
         shadowRadius: 12,
       },
-      android: {
-        elevation: 20,
-      },
+      android: { elevation: 20 },
     }),
   },
-  drawerContent: {
-    flex: 1,
+  profileHeader: {
+    paddingTop: Platform.OS === "android" ? 40 : 60,
+    paddingBottom: 20,
+    paddingHorizontal: 16,
   },
-  profileSection: {
+  profilePressable: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 20,
-    borderBottomWidth: 1,
   },
-  profileAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: "center",
+  avatar: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "#FFF",
     justifyContent: "center",
+    alignItems: "center",
+    marginRight: 14,
   },
   profileInfo: {
-    marginLeft: 12,
+    flex: 1,
+    justifyContent: "center",
+  },
+  userName: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#FFF",
+    marginBottom: 4,
+  },
+  rolePill: {
+    backgroundColor: "rgba(255,255,255,0.25)",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 2,
+    alignSelf: "flex-start",
+  },
+  roleText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#FFF",
+    letterSpacing: 0.5,
+  },
+  menuScroll: {
     flex: 1,
   },
-  menuList: {
-    flex: 1,
-    paddingTop: 8,
+  menuContent: {
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    flexGrow: 1,
   },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 14, // ensures minimum 48pt touch height with icon
+    paddingVertical: 14,
     paddingHorizontal: 12,
-    marginBottom: 4,
+    marginBottom: 2,
+    borderRadius: 10,
+  },
+  menuLabel: {
+    fontSize: 15,
+    fontWeight: "500",
+    marginLeft: 14,
+    flex: 1,
   },
   divider: {
     height: 1,
+    marginVertical: 8,
+    marginHorizontal: 12,
   },
-  logoutItem: {
-    // already styled inline, but keep base if needed
+  languageSubmenu: {
+    marginLeft: 36,
+    marginTop: 4,
+    marginBottom: 8,
+  },
+  languageOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginBottom: 2,
+  },
+  languageOptionText: {
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  logoutContainer: {
+    borderTopWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    paddingBottom: Platform.OS === "ios" ? 20 : 14,
+  },
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 6,
+  },
+  logoutLabel: {
+    fontSize: 15,
+    fontWeight: "600",
+    marginLeft: 14,
+  },
+  version: {
+    fontSize: 11,
+    textAlign: "center",
+    marginTop: 8,
   },
 });
 

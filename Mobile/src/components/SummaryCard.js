@@ -1,29 +1,12 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import {
   View,
   TouchableOpacity,
   Text,
-  Animated,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-
-// ---- Local animated number hook ----
-const useAnimatedNumber = (target, duration = 800) => {
-  const animatedValue = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    animatedValue.setValue(0);
-    Animated.timing(animatedValue, {
-      toValue: 1,
-      duration,
-      useNativeDriver: false,
-    }).start();
-  }, [target]);
-  return animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, target],
-  });
-};
 
 // ---- Summary Card ----
 const SummaryCard = ({
@@ -34,9 +17,8 @@ const SummaryCard = ({
   suffix = "",
   color = "#4CAF50",
   onPress,
+  loading = false,
 }) => {
-  const animatedNumber = useAnimatedNumber(value);
-
   return (
     <TouchableOpacity
       style={[styles.card, { backgroundColor: color + "15" }]}
@@ -48,14 +30,15 @@ const SummaryCard = ({
       </View>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.valueRow}>
-        <Text style={styles.prefix}>{prefix}</Text>
-        <Animated.Text style={styles.value}>
-          {animatedNumber.interpolate({
-            inputRange: [0, value],
-            outputRange: [0, value].map((v) => Math.round(v).toString()),
-          })}
-        </Animated.Text>
-        <Text style={styles.suffix}>{suffix}</Text>
+        {loading ? (
+          <ActivityIndicator size="small" color={color} />
+        ) : (
+          <>
+            <Text style={styles.prefix}>{prefix}</Text>
+            <Text style={styles.value}>{value}</Text>
+            <Text style={styles.suffix}>{suffix}</Text>
+          </>
+        )}
       </View>
     </TouchableOpacity>
   );

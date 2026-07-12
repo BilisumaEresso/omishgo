@@ -1,8 +1,7 @@
-import React from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
-import AppText from "../common/AppText";
-import AppCard from "../common/AppCard";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
+import AppCard from "../common/AppCard";
+import AppText from "../common/AppText";
 
 export default function MarketTrendsList({ trends, onSellPress }) {
   const { theme } = useTheme();
@@ -15,14 +14,7 @@ export default function MarketTrendsList({ trends, onSellPress }) {
   return (
     <View style={styles.section}>
       <View style={styles.header}>
-        <AppText variant="headingSm" style={{ color: textPrimary }}>
-          Market Analysis
-        </AppText>
-        <TouchableOpacity onPress={() => {}}>
-          <AppText variant="caption" style={{ color: primaryColor }}>
-            View full report →
-          </AppText>
-        </TouchableOpacity>
+        <TouchableOpacity onPress={() => {}}></TouchableOpacity>
       </View>
       {trends.map((trend, idx) => (
         <AppCard key={idx} style={styles.card}>
@@ -54,7 +46,7 @@ export default function MarketTrendsList({ trends, onSellPress }) {
           </View>
           <TouchableOpacity
             style={[styles.button, { backgroundColor: primaryColor }]}
-            onPress={() => onSellPress(trend.crop)}
+            onPress={() => onSellPress(trend)}
           >
             <AppText
               variant="caption"

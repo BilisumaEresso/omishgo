@@ -3,8 +3,8 @@ import axios from "axios";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { API_BASE_URL } from "../constants/api.js";
+import i18n from "../locales/i18n.js";
 import authService from "../services/auth.service.js";
-import roleService from "../services/role.service.js";
 import storageService from "../services/storage.service.js";
 
 const isTokenExpired = (token) => {
@@ -83,11 +83,25 @@ export const useAuthStore = create(
       user: null,
       token: null,
       refreshToken: null,
+      language: "en",
       isAuthenticated: false,
       isLoading: false,
       isInitializingAuth: true,
       error: null,
       role: null,
+
+      setLanguage: async (language) => {
+        const normalized = ["en", "am", "om"].includes(language)
+          ? language
+          : "en";
+        set({ language: normalized });
+        try {
+          await i18n.changeLanguage(normalized);
+          await AsyncStorage.setItem("@app_language", normalized);
+        } catch (error) {
+          console.warn("Failed to persist app language", error);
+        }
+      },
 
       register: async (userData) => {
         set({ isLoading: true, error: null });
@@ -103,7 +117,10 @@ export const useAuthStore = create(
           // Step 2: Immediately log in with the same credentials so the
           // user lands directly on their role dashboard. RootNavigator will
           // swap to AppNavigator as soon as isAuthenticated flips to true.
-          const loginResult = await authService.login(userData.phone, userData.pin);
+          const loginResult = await authService.login(
+            userData.phone,
+            userData.pin,
+          );
           if (!loginResult.success) {
             // Registration worked but auto-login failed — send them to Login screen
             set({ isLoading: false, error: null });
@@ -117,6 +134,7 @@ export const useAuthStore = create(
             user: loginResult.data.user,
             token: loginResult.data.token,
             role: loginResult.data.user.role,
+            language: loginResult.data.user.preferredLang || "en",
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -153,6 +171,7 @@ export const useAuthStore = create(
             user: result.data.user,
             token: result.data.token,
             role: result.data.user.role,
+            language: result.data.user.preferredLang || "en",
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -174,10 +193,12 @@ export const useAuthStore = create(
           const user = await storageService.getUser();
 
           if (!token || !user) {
+            const storedLanguage = await AsyncStorage.getItem("@app_language");
             set({
               user: null,
               token: null,
               refreshToken: null,
+              language: storedLanguage || "en",
               isAuthenticated: false,
               isLoading: false,
               isInitializingAuth: false,
@@ -240,6 +261,7 @@ export const useAuthStore = create(
             user,
             token,
             refreshToken,
+            language: user.preferredLang || "en",
             isAuthenticated: true,
             isLoading: false,
             isInitializingAuth: false,
@@ -262,7 +284,6 @@ export const useAuthStore = create(
         }
       },
       // MVP: Removed requestRole and switchRole since users only have a single role
-
 
       logout: async () => {
         set({ isLoading: true });
@@ -308,6 +329,7 @@ export const useAuthStore = create(
         token: state.token,
         isAuthenticated: state.isAuthenticated,
         role: state.role,
+        language: state.language,
       }),
     },
   ),

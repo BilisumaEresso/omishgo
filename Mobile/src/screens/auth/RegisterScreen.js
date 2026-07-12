@@ -1,26 +1,41 @@
 // src/screens/auth/RegisterScreen.js
-import React, { useState, useRef } from "react";
-import {
-  View,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  Animated,
-  StatusBar,
-} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import AppText from "../../components/common/AppText";
-import AppInput from "../../components/common/AppInput";
+import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import {
+    Animated,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    TouchableOpacity,
+    View,
+} from "react-native";
 import AppButton from "../../components/common/AppButton";
+import AppInput from "../../components/common/AppInput";
+import AppText from "../../components/common/AppText";
+import {
+    REGIONS,
+    getWeredaByZone,
+    getZonesByRegion,
+} from "../../constants/locations.js";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
+const LANGUAGE_OPTIONS = [
+  { code: "en", label: "English" },
+  { code: "am", label: "አማርኛ" },
+  { code: "om", label: "Afaan Oromoo" },
+];
+
 export default function RegisterScreen({ navigation }) {
   const { theme } = useTheme();
+  const { t, i18n } = useTranslation();
   const register = useAuthStore((state) => state.register);
+  const setAppLanguage = useAuthStore((state) => state.setLanguage);
+  const currentLanguage = useAuthStore((state) => state.language);
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -29,10 +44,19 @@ export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [region, setRegion] = useState("");
   const [zone, setZone] = useState("");
-  const [kebele, setKebele] = useState("");
+  const [wereda, setWereda] = useState("");
+  const [preferredLang, setPreferredLang] = useState(
+    currentLanguage || i18n.language || "en",
+  );
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [registerError, setRegisterError] = useState("");
+  const [showRegionPicker, setShowRegionPicker] = useState(false);
+  const [showZonePicker, setShowZonePicker] = useState(false);
+  const [showWeredaPicker, setShowWeredaPicker] = useState(false);
+
+  const availableZones = region ? getZonesByRegion(region) : [];
+  const availableWereda = zone ? getWeredaByZone(region, zone) : [];
 
   const primary = theme?.colors?.primary || "#2E7D32";
   const textPrimary = theme?.colors?.textPrimary || "#212121";
@@ -54,6 +78,17 @@ export default function RegisterScreen({ navigation }) {
     if (registerError) setRegisterError("");
   };
 
+  useEffect(() => {
+    if (currentLanguage) {
+      setPreferredLang(currentLanguage);
+    }
+  }, [currentLanguage]);
+
+  const handleLanguageSelect = async (code) => {
+    setPreferredLang(code);
+    await setAppLanguage(code);
+  };
+
   const validate = () => {
     const newErrors = {};
     if (!name.trim()) newErrors.name = "Full name is required.";
@@ -62,7 +97,7 @@ export default function RegisterScreen({ navigation }) {
       newErrors.pin = "Create a PIN with at least 4 digits.";
     if (!region.trim()) newErrors.region = "Region is required.";
     if (!zone.trim()) newErrors.zone = "Zone is required.";
-    if (!kebele.trim()) newErrors.kebele = "Kebele is required.";
+    if (!wereda.trim()) newErrors.wereda = "Wereda is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -81,20 +116,27 @@ export default function RegisterScreen({ navigation }) {
         location: {
           region: region.trim(),
           zone: zone.trim(),
-          kebele: kebele.trim(),
+          wereda: wereda.trim(),
         },
-        preferredLang: "en",
+        preferredLang,
       });
       if (!result.success) {
-        setRegisterError(result.message || "Registration failed. Try again.");
+        setRegisterError(
+          result.message ||
+            t("auth.registerError") ||
+            "Registration failed. Try again.",
+        );
         return;
       }
+      await setAppLanguage(preferredLang);
       if (result.autoLoginFailed) {
         navigation.replace("Login");
       }
     } catch (error) {
       setRegisterError(
-        error.message || "Something went wrong. Please try again.",
+        error.message ||
+          t("auth.registrationFailed") ||
+          "Something went wrong. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -156,26 +198,26 @@ export default function RegisterScreen({ navigation }) {
             variant="headingLg"
             style={[styles.title, { color: textPrimary }]}
           >
-            Create Account
+            {t("auth.registerTitle")}
           </AppText>
           <AppText
             variant="bodyMd"
             style={[styles.subtitle, { color: textSecondary }]}
           >
-            Join OmishGo and start trading
+            {t("auth.registerSubtitle")}
           </AppText>
 
           <View style={styles.form}>
             {/* Full Name */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: textSecondary }]}>
-                Full Name
+                {t("auth.nameLabel")}
               </AppText>
               <AppInput
-                placeholder="e.g. Bekele Tadesse"
+                placeholder={t("auth.namePlaceholder")}
                 value={name}
-                onChangeText={(t) => {
-                  setName(t);
+                onChangeText={(txt) => {
+                  setName(txt);
                   clearFieldError("name");
                 }}
                 leftIcon="person-outline"
@@ -194,14 +236,14 @@ export default function RegisterScreen({ navigation }) {
             {/* Phone */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: textSecondary }]}>
-                Phone Number
+                {t("auth.phoneLabel")}
               </AppText>
               <AppInput
-                placeholder="e.g. 0911223344"
+                placeholder={t("auth.phonePlaceholder")}
                 keyboardType="phone-pad"
                 value={phone}
-                onChangeText={(t) => {
-                  setPhone(t);
+                onChangeText={(txt) => {
+                  setPhone(txt);
                   clearFieldError("phone");
                 }}
                 leftIcon="call-outline"
@@ -220,16 +262,16 @@ export default function RegisterScreen({ navigation }) {
             {/* PIN */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: textSecondary }]}>
-                Create a PIN
+                {t("auth.pinLabel")}
               </AppText>
               <AppInput
-                placeholder="At least 4 digits"
+                placeholder={t("auth.pinPlaceholder")}
                 keyboardType="numeric"
                 secureTextEntry
                 maxLength={6}
                 value={pin}
-                onChangeText={(t) => {
-                  setPin(t);
+                onChangeText={(txt) => {
+                  setPin(txt);
                   clearFieldError("pin");
                 }}
                 leftIcon="lock-closed-outline"
@@ -248,7 +290,7 @@ export default function RegisterScreen({ navigation }) {
             {/* Role */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: textSecondary }]}>
-                I am a...
+                {t("auth.roleLabel")}
               </AppText>
               <View style={styles.roleContainer}>
                 <TouchableOpacity
@@ -274,7 +316,7 @@ export default function RegisterScreen({ navigation }) {
                       { color: role === "farmer" ? primary : textSecondary },
                     ]}
                   >
-                    Farmer
+                    {t("auth.roleFarmer")}
                   </AppText>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -300,9 +342,50 @@ export default function RegisterScreen({ navigation }) {
                       { color: role === "buyer" ? primary : textSecondary },
                     ]}
                   >
-                    Buyer
+                    {t("auth.roleBuyer")}
                   </AppText>
                 </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Language Picker */}
+            <View style={styles.inputGroup}>
+              <AppText style={[styles.label, { color: textSecondary }]}>
+                {t("auth.langLabel")}
+              </AppText>
+              <View style={styles.languageContainer}>
+                {LANGUAGE_OPTIONS.map((option) => (
+                  <TouchableOpacity
+                    key={option.code}
+                    style={[
+                      styles.languageBtn,
+                      {
+                        borderColor:
+                          preferredLang === option.code ? primary : border,
+                        backgroundColor:
+                          preferredLang === option.code
+                            ? primary + "15"
+                            : "transparent",
+                      },
+                    ]}
+                    onPress={() => handleLanguageSelect(option.code)}
+                    activeOpacity={0.8}
+                  >
+                    <AppText
+                      style={[
+                        styles.languageText,
+                        {
+                          color:
+                            preferredLang === option.code
+                              ? primary
+                              : textSecondary,
+                        },
+                      ]}
+                    >
+                      {option.label}
+                    </AppText>
+                  </TouchableOpacity>
+                ))}
               </View>
             </View>
 
@@ -314,20 +397,59 @@ export default function RegisterScreen({ navigation }) {
               Location
             </AppText>
 
+            {/* Region Picker */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: textSecondary }]}>
-                Region
+                {t("auth.regionLabel")}
               </AppText>
-              <AppInput
-                placeholder="e.g. Oromia"
-                value={region}
-                onChangeText={(t) => {
-                  setRegion(t);
-                  clearFieldError("region");
-                }}
-                leftIcon="location-outline"
-                style={errors.region ? { borderColor: errorColor } : {}}
-              />
+              <TouchableOpacity
+                onPress={() => setShowRegionPicker(!showRegionPicker)}
+                style={[
+                  styles.pickerButton,
+                  { borderColor: errors.region ? errorColor : border },
+                ]}
+              >
+                <AppText
+                  style={{
+                    color: region ? textPrimary : textSecondary,
+                    flex: 1,
+                  }}
+                >
+                  {region || t("auth.regionLabel")}
+                </AppText>
+                <Ionicons
+                  name={showRegionPicker ? "chevron-up" : "chevron-down"}
+                  size={20}
+                  color={primary}
+                />
+              </TouchableOpacity>
+              {showRegionPicker && (
+                <View
+                  style={[
+                    styles.dropdownContainer,
+                    { backgroundColor: surface, borderColor: border },
+                  ]}
+                >
+                  {REGIONS.map((r) => (
+                    <TouchableOpacity
+                      key={r}
+                      onPress={() => {
+                        setRegion(r);
+                        setZone("");
+                        setWereda("");
+                        setShowRegionPicker(false);
+                        clearFieldError("region");
+                      }}
+                      style={[
+                        styles.dropdownItem,
+                        { borderBottomColor: border },
+                      ]}
+                    >
+                      <AppText style={{ color: textPrimary }}>{r}</AppText>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
               {errors.region && (
                 <View style={styles.errorRow}>
                   <Ionicons name="alert-circle" size={14} color={errorColor} />
@@ -338,19 +460,62 @@ export default function RegisterScreen({ navigation }) {
               )}
             </View>
 
+            {/* Zone Picker */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: textSecondary }]}>
-                Zone
+                {t("auth.zoneLabel")}
               </AppText>
-              <AppInput
-                placeholder="e.g. Jimma"
-                value={zone}
-                onChangeText={(t) => {
-                  setZone(t);
-                  clearFieldError("zone");
-                }}
-                style={errors.zone ? { borderColor: errorColor } : {}}
-              />
+              <TouchableOpacity
+                onPress={() => setShowZonePicker(!showZonePicker)}
+                disabled={!region}
+                style={[
+                  styles.pickerButton,
+                  {
+                    borderColor: errors.zone ? errorColor : border,
+                    opacity: region ? 1 : 0.5,
+                  },
+                ]}
+              >
+                <AppText
+                  style={{
+                    color: zone ? textPrimary : textSecondary,
+                    flex: 1,
+                  }}
+                >
+                  {zone || t("auth.zoneLabel")}
+                </AppText>
+                <Ionicons
+                  name={showZonePicker ? "chevron-up" : "chevron-down"}
+                  size={20}
+                  color={primary}
+                />
+              </TouchableOpacity>
+              {showZonePicker && availableZones.length > 0 && (
+                <View
+                  style={[
+                    styles.dropdownContainer,
+                    { backgroundColor: surface, borderColor: border },
+                  ]}
+                >
+                  {availableZones.map((z) => (
+                    <TouchableOpacity
+                      key={z}
+                      onPress={() => {
+                        setZone(z);
+                        setWereda("");
+                        setShowZonePicker(false);
+                        clearFieldError("zone");
+                      }}
+                      style={[
+                        styles.dropdownItem,
+                        { borderBottomColor: border },
+                      ]}
+                    >
+                      <AppText style={{ color: textPrimary }}>{z}</AppText>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
               {errors.zone && (
                 <View style={styles.errorRow}>
                   <Ionicons name="alert-circle" size={14} color={errorColor} />
@@ -361,24 +526,66 @@ export default function RegisterScreen({ navigation }) {
               )}
             </View>
 
+            {/* Wereda Picker */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: textSecondary }]}>
-                Kebele
+                Wereda
               </AppText>
-              <AppInput
-                placeholder="e.g. Bure"
-                value={kebele}
-                onChangeText={(t) => {
-                  setKebele(t);
-                  clearFieldError("kebele");
-                }}
-                style={errors.kebele ? { borderColor: errorColor } : {}}
-              />
-              {errors.kebele && (
+              <TouchableOpacity
+                onPress={() => setShowWeredaPicker(!showWeredaPicker)}
+                disabled={!zone}
+                style={[
+                  styles.pickerButton,
+                  {
+                    borderColor: errors.wereda ? errorColor : border,
+                    opacity: zone ? 1 : 0.5,
+                  },
+                ]}
+              >
+                <AppText
+                  style={{
+                    color: wereda ? textPrimary : textSecondary,
+                    flex: 1,
+                  }}
+                >
+                  {wereda || "Select Wereda"}
+                </AppText>
+                <Ionicons
+                  name={showWeredaPicker ? "chevron-up" : "chevron-down"}
+                  size={20}
+                  color={primary}
+                />
+              </TouchableOpacity>
+              {showWeredaPicker && availableWereda.length > 0 && (
+                <View
+                  style={[
+                    styles.dropdownContainer,
+                    { backgroundColor: surface, borderColor: border },
+                  ]}
+                >
+                  {availableWereda.map((w) => (
+                    <TouchableOpacity
+                      key={w}
+                      onPress={() => {
+                        setWereda(w);
+                        setShowWeredaPicker(false);
+                        clearFieldError("wereda");
+                      }}
+                      style={[
+                        styles.dropdownItem,
+                        { borderBottomColor: border },
+                      ]}
+                    >
+                      <AppText style={{ color: textPrimary }}>{w}</AppText>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+              {errors.wereda && (
                 <View style={styles.errorRow}>
                   <Ionicons name="alert-circle" size={14} color={errorColor} />
                   <AppText style={[styles.errorText, { color: errorColor }]}>
-                    {errors.kebele}
+                    {errors.wereda}
                   </AppText>
                 </View>
               )}
@@ -387,10 +594,10 @@ export default function RegisterScreen({ navigation }) {
             {/* Email */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: textSecondary }]}>
-                Email (optional)
+                {t("auth.emailLabel")}
               </AppText>
               <AppInput
-                placeholder="e.g. bek@example.com"
+                placeholder={t("auth.emailPlaceholder")}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={email}
@@ -416,7 +623,7 @@ export default function RegisterScreen({ navigation }) {
             ) : null}
 
             <AppButton
-              title={loading ? "Creating Account..." : "Sign Up"}
+              title={loading ? t("common.loading") : t("auth.registerBtn")}
               onPress={handleRegister}
               loading={loading}
               disabled={loading}
@@ -431,7 +638,7 @@ export default function RegisterScreen({ navigation }) {
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
               <AppText style={[styles.linkText, { color: primary }]}>
-                Already have an account? Sign in
+                {t("auth.hasAccount")} {t("auth.loginBtn")}
               </AppText>
             </TouchableOpacity>
           </View>
@@ -521,9 +728,47 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   roleText: { fontWeight: "600", fontSize: 15 },
+  languageContainer: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 8,
+  },
+  languageBtn: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1.5,
+  },
+  languageText: {
+    fontWeight: "600",
+    fontSize: 13,
+  },
   sectionTitle: {
     marginTop: 16,
     marginBottom: 8,
+  },
+  pickerButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginTop: 8,
+  },
+  dropdownContainer: {
+    borderRadius: 8,
+    borderWidth: 1,
+    maxHeight: 200,
+    marginTop: 4,
+    overflow: "hidden",
+  },
+  dropdownItem: {
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   loginButton: { marginTop: 24 },
   linkButton: {

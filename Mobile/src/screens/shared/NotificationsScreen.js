@@ -1,108 +1,51 @@
 // src/screens/shared/NotificationsScreen.js
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
   View,
   FlatList,
   StyleSheet,
   TouchableOpacity,
   Pressable,
+  AppState,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
+import api from "../../config/api";
+import { API_ENDPOINTS } from "../../constants/api";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
 import { useTheme } from "../../hooks/useTheme";
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-const INITIAL_NOTIFICATIONS = [
-  {
-    id: "1",
-    type: "order",
-    title: "New order received",
-    body: "Abebe Girma ordered 50kg Teff",
-    time: "2 min ago",
-    isRead: false,
-  },
-  {
-    id: "2",
-    type: "message",
-    title: "New message",
-    body: "Buyer Tigist sent you a message",
-    time: "15 min ago",
-    isRead: false,
-  },
-  {
-    id: "3",
-    type: "market",
-    title: "Price update",
-    body: "Onion prices rose 12% today in Meki market",
-    time: "1 hr ago",
-    isRead: true,
-  },
-  {
-    id: "4",
-    type: "system",
-    title: "Account verified",
-    body: "Your account has been verified by the Union",
-    time: "2 days ago",
-    isRead: true,
-  },
-  {
-    id: "5",
-    type: "order",
-    title: "Order completed",
-    body: "Delivery of 30kg Tomatoes to Tigist is complete",
-    time: "3 hr ago",
-    isRead: false,
-  },
-  {
-    id: "6",
-    type: "market",
-    title: "Demand alert",
-    body: "Maize demand is high in Adama region",
-    time: "5 hr ago",
-    isRead: false,
-  },
-  {
-    id: "7",
-    type: "message",
-    title: "New message",
-    body: "Farmer Dawit asked about your listing",
-    time: "1 day ago",
-    isRead: true,
-  },
-  {
-    id: "8",
-    type: "system",
-    title: "Update available",
-    body: "New features: order tracking & price graphs",
-    time: "3 days ago",
-    isRead: true,
-  },
-];
-
-// ─── Icon & Color helpers by type ────────────────────────────────────────────
-const typeConfig = {
-  order: {
-    icon: "receipt-outline",
-    colorKey: "primary", // will use theme.colors.primary
-  },
-  message: {
-    icon: "chatbubbles-outline",
-    colorKey: "info",
-  },
-  market: {
-    icon: "stats-chart-outline",
-    colorKey: "warning",
-  },
-  system: {
-    icon: "shield-checkmark-outline",
-    colorKey: "success",
-  },
-};
-
 export default function NotificationsScreen({ navigation }) {
   const { theme } = useTheme();
-  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
+  
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const pollRef = useRef(null);
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await api.get(API_ENDPOINTS.notifications.list);
+      const list = res.data?.data?.notifications || [];
+      setNotifications(list);
+      setUnreadCount(list.filter(n => !n.isRead).length);
+    } catch (err) {
+      console.warn("Notifications fetch:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchNotifications();
+      pollRef.current = setInterval(fetchNotifications, 15000); // poll every 15s
+      return () => {
+        if (pollRef.current) clearInterval(pollRef.current);
+      };
+    }, [])
+  );
 
   const primary = theme.colors.primary || "#2E7D32";
   const backgroundColor = theme.colors.background || "#F9FBF9";
@@ -112,33 +55,40 @@ export default function NotificationsScreen({ navigation }) {
   const textMuted = theme.colors.textMuted || "#8FAF8A";
   const borderColor = theme.colors.border || "#E0E0E0";
 
-  // Map type color key to actual color from theme
-  const getTypeColor = (type) => {
-    const colorKey = typeConfig[type]?.colorKey || "primary";
-    return theme.colors[colorKey] || primary;
+  const handleMarkRead = async (id) => {
+    try {
+      await api.patch(API_ENDPOINTS.notifications.markRead(id));
+      setNotifications((prev) =>
+        prev.map((n) => n._id === id ? { ...n, isRead: true } : n)
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    } catch (_) {}
   };
 
-  const handleMarkRead = (id) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
-    );
+  const handleMarkAllRead = async () => {
+    try {
+      await api.patch(API_ENDPOINTS.notifications.markAllRead);
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch (_) {}
   };
 
-  const handleMarkAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-  };
-
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
   const allRead = unreadCount === 0;
 
   const renderItem = ({ item }) => {
-    const config = typeConfig[item.type] || typeConfig.system;
-    const typeColor = getTypeColor(item.type);
     const isUnread = !item.isRead;
+    const TYPE_CONFIG = {
+      new_message:        { icon: "chatbubbles-outline",      color: theme.colors.info || "#2196F3" },
+      new_order:          { icon: "receipt-outline",          color: primary },
+      order_update:       { icon: "bicycle-outline",          color: theme.colors.warning || "#FF9800" },
+      account_approved:   { icon: "shield-checkmark-outline", color: theme.colors.success || "#4CAF50" },
+      account_rejected:   { icon: "close-circle-outline",     color: theme.colors.error || "#F44336" },
+    };
+    const config = TYPE_CONFIG[item.type] || { icon: "notifications-outline", color: primary };
 
     return (
       <Pressable
-        onPress={() => handleMarkRead(item.id)}
+        onPress={() => handleMarkRead(item._id || item.id)}
         style={[
           styles.notificationRow,
           {
@@ -148,7 +98,7 @@ export default function NotificationsScreen({ navigation }) {
         ]}
       >
         {/* Left icon */}
-        <View style={[styles.iconCircle, { backgroundColor: typeColor }]}>
+        <View style={[styles.iconCircle, { backgroundColor: config.color }]}>
           <Ionicons name={config.icon} size={20} color="#FFFFFF" />
         </View>
 
@@ -164,10 +114,10 @@ export default function NotificationsScreen({ navigation }) {
             style={[styles.body, { color: textSecondary }]}
             numberOfLines={2}
           >
-            {item.body}
+            {item.message || item.body}
           </AppText>
           <AppText style={[styles.time, { color: textMuted }]}>
-            {item.time}
+            {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : item.time}
           </AppText>
         </View>
 
@@ -211,7 +161,7 @@ export default function NotificationsScreen({ navigation }) {
       {/* Notification list */}
       <FlatList
         data={notifications}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id || item.id}
         renderItem={renderItem}
         ListEmptyComponent={renderEmpty}
         contentContainerStyle={notifications.length === 0 && styles.emptyList}
