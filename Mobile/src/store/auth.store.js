@@ -91,7 +91,9 @@ export const useAuthStore = create(
       role: null,
 
       setLanguage: async (language) => {
-        const normalized = ["en", "am", "om"].includes(language) ? language : "en";
+        const normalized = ["en", "am", "om"].includes(language)
+          ? language
+          : "en";
         set({ language: normalized });
         try {
           await i18n.changeLanguage(normalized);

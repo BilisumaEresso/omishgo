@@ -1,9 +1,8 @@
-import React from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import AppText from "../common/AppText";
-import AppCard from "../common/AppCard";
+import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
+import AppCard from "../common/AppCard";
+import AppText from "../common/AppText";
 
 export default function NearbyFarmersList({ farmers, onFarmerPress }) {
   const { theme } = useTheme();
@@ -32,9 +31,22 @@ export default function NearbyFarmersList({ farmers, onFarmerPress }) {
             activeOpacity={0.7}
           >
             <AppCard style={styles.card}>
-              <View style={[styles.avatarFallback, { backgroundColor: theme?.colors?.primaryContainer }]}>
-                <Ionicons name="person" size={24} color={theme?.colors?.primary} />
-              </View>
+              {farmer.avatar ? (
+                <Image source={{ uri: farmer.avatar }} style={styles.avatar} />
+              ) : (
+                <View
+                  style={[
+                    styles.avatarFallback,
+                    { backgroundColor: theme?.colors?.primaryContainer },
+                  ]}
+                >
+                  <Ionicons
+                    name="person"
+                    size={24}
+                    color={theme?.colors?.primary}
+                  />
+                </View>
+              )}
               <AppText
                 variant="bodyMd"
                 style={{
@@ -50,7 +62,7 @@ export default function NearbyFarmersList({ farmers, onFarmerPress }) {
                 variant="caption"
                 style={{ color: theme?.colors?.textSecondary }}
               >
-                {farmer.location || "Ethiopia"}
+                {farmer.location?.region || farmer.location?.zone || "Ethiopia"}
               </AppText>
               <View style={styles.rating}>
                 <Ionicons name="star" size={12} color="#FFB800" />
@@ -81,6 +93,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  avatar: { width: 60, height: 60, borderRadius: 30, resizeMode: "cover" },
   rating: {
     flexDirection: "row",
     alignItems: "center",

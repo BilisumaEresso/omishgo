@@ -201,9 +201,7 @@ const DropdownPicker = ({
   const selectedLabel = (() => {
     if (!value) return null;
     const found = options.find((opt) =>
-      typeof opt === "string"
-        ? opt === value
-        : opt.value === value,
+      typeof opt === "string" ? opt === value : opt.value === value,
     );
     return found ? (typeof found === "string" ? found : found.label) : value;
   })();
@@ -430,7 +428,10 @@ export default function PostProductScreen({ navigation, route }) {
     }
 
     if (region && ZONES_BY_REGION[region]?.length && !zone.trim()) {
-      Alert.alert("Missing Zone", "Please select a zone for your selected region.");
+      Alert.alert(
+        "Missing Zone",
+        "Please select a zone for your selected region.",
+      );
       return;
     }
 

@@ -21,74 +21,88 @@ import { useAuthStore } from "../../store/auth.store";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_GAP = 12;
 
-// Mock data
+// Mock data (shape matches ProductCard / backend)
 const mockProducts = [
   {
-    id: "p1",
-    name: "50kg Red Onion",
+    _id: "p1",
+    cropType: "Red Onion",
+    quantity: 50,
+    unit: "kg",
     price: 4500,
     category: "Onion",
-    farmerName: "Farmer Bekele",
-    farmerAvatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-    location: "Adama",
-    image: "https://images.unsplash.com/photo-1618512496248-a07fe83766a4?w=600",
-    isPremium: true,
+    farmerId: { _id: "f1", name: "Farmer Bekele" },
+    location: { region: "Adama" },
+    photos: [
+      "https://images.unsplash.com/photo-1618512496248-a07fe83766a4?w=600",
+    ],
+    status: "active",
+    createdAt: new Date().toISOString(),
   },
   {
-    id: "p2",
-    name: "100kg White Teff",
+    _id: "p2",
+    cropType: "White Teff",
+    quantity: 100,
+    unit: "kg",
     price: 5200,
     category: "Teff",
-    farmerName: "Farmer Alemitu",
-    farmerAvatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
-    location: "Debre Zeit",
-    image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600",
-    isPremium: false,
+    farmerId: { _id: "f2", name: "Farmer Alemitu" },
+    location: { region: "Debre Zeit" },
+    photos: [
+      "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600",
+    ],
+    status: "active",
+    createdAt: new Date().toISOString(),
   },
   {
-    id: "p3",
-    name: "50kg Tomato",
+    _id: "p3",
+    cropType: "Tomato",
+    quantity: 50,
+    unit: "kg",
     price: 3800,
     category: "Tomato",
-    farmerName: "Farmer Tadese",
-    farmerAvatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-    location: "Ziway",
-    image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600",
-    isPremium: true,
+    farmerId: { _id: "f3", name: "Farmer Tadese" },
+    location: { region: "Ziway" },
+    photos: [
+      "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600",
+    ],
+    status: "active",
+    createdAt: new Date().toISOString(),
   },
   {
-    id: "p4",
-    name: "Garlic (5kg)",
+    _id: "p4",
+    cropType: "Garlic",
+    quantity: 5,
+    unit: "kg",
     price: 1200,
     category: "Garlic",
-    farmerName: "Farmer Genet",
-    farmerAvatar:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150",
-    location: "Bishoftu",
-    image: "https://images.unsplash.com/photo-1618512496248-a07fe83766a4?w=600",
-    isPremium: false,
+    farmerId: { _id: "f4", name: "Farmer Genet" },
+    location: { region: "Bishoftu" },
+    photos: [
+      "https://images.unsplash.com/photo-1618512496248-a07fe83766a4?w=600",
+    ],
+    status: "active",
+    createdAt: new Date().toISOString(),
   },
 ];
 
 const mockFarmers = [
   {
-    id: "f1",
+    _id: "f1",
     name: "Farmer Bekele",
     avatar:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
     distance: "2.3 km",
     rating: "4.8",
+    location: { region: "Adama" },
   },
   {
-    id: "f2",
+    _id: "f2",
     name: "Farmer Alemitu",
     avatar:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
     distance: "5.1 km",
     rating: "4.9",
+    location: { region: "Debre Zeit" },
   },
 ];
 
@@ -99,6 +113,7 @@ const mockActivities = [
     title: "Order ORD-8492",
     description: "50kg Red Onion placed successfully.",
     time: "2 hours ago",
+    order: { _id: "ord1", cropType: "Red Onion", quantity: 50 },
   },
   {
     id: "a2",
@@ -106,6 +121,7 @@ const mockActivities = [
     title: "Farmer Bekele replied",
     description: "Your order will be ready tomorrow.",
     time: "5 hours ago",
+    farmerId: "f1",
   },
 ];
 
@@ -121,6 +137,8 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
   const [cartCount, setCartCount] = useState(0);
   const [successMsg, setSuccessMsg] = useState("");
   const [products, setProducts] = useState(mockProducts);
+  const [farmers, setFarmers] = useState(mockFarmers);
+  const [activities, setActivities] = useState(mockActivities);
   const [refreshing, setRefreshing] = useState(false);
 
   // KPI data
@@ -137,26 +155,66 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         const fetched = res.data?.data?.products || [];
         if (fetched.length > 0) {
           const formatted = fetched.map((p) => ({
-            id: p._id,
-            name: `${p.quantity}${p.unit || "kg"} ${p.cropType}`,
+            _id: p._id,
+            cropType: p.cropType || p.category || "Produce",
+            quantity: p.quantity ?? 0,
+            unit: p.unit || "kg",
             price: p.price,
-            category: p.cropType,
-            farmerName: p.farmerId?.name || "Farmer",
-            farmerAvatar:
-              "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-            location: p.location?.region || "Ethiopia",
-            image:
-              p.photos?.[0] ||
-              "https://images.unsplash.com/photo-1618512496248-a07fe83766a4?w=600",
-            isPremium: false,
+            category: p.cropType || p.category,
+            farmerId: p.farmerId || { _id: p.farmerId, name: "Farmer" },
+            location: p.location || {},
+            photos: p.photos || [],
+            status: p.status || "active",
+            createdAt: p.createdAt,
+            description: p.description,
           }));
           setProducts(formatted);
+          // Derive nearby farmers from products (unique by id)
+          const byId = {};
+          formatted.forEach((p) => {
+            const f = p.farmerId || {};
+            const fid = f._id || f;
+            if (!fid) return;
+            if (!byId[fid]) {
+              byId[fid] = {
+                _id: fid,
+                name: f.name || p.farmerName || "Farmer",
+                avatar: f.avatar || null,
+                distance: p.distance || "",
+                location: p.location || {},
+                rating: f.rating || "",
+              };
+            }
+          });
+          setFarmers(Object.values(byId).slice(0, 4));
         }
       } catch (err) {
         console.warn("Using mock products:", err.message);
       }
     };
     fetchRealProducts();
+
+    // Fetch recent activities for the current user
+    const fetchActivities = async () => {
+      try {
+        const res = await api.get(API_ENDPOINTS.users.activities);
+        const fetched = res.data?.data?.activities || [];
+        // Normalize to frontend shape: ensure `order` field exists when type === 'order'
+        const normalized = fetched.map((a) => ({
+          id: a.id || a._id,
+          type: a.type,
+          title: a.title,
+          description: a.description,
+          time: a.time,
+          order: a._raw || a.order || null,
+          farmerId: a.farmerId || null,
+        }));
+        setActivities(normalized);
+      } catch (err) {
+        console.warn("Failed to load activities:", err.message);
+      }
+    };
+    fetchActivities();
   }, []);
 
   const handleRefresh = async () => {
@@ -168,14 +226,37 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
 
   const handlePlaceOrder = (product) => {
     setCartCount((prev) => prev + 1);
-    setSuccessMsg(`Added ${product.name} to your cart!`);
+    setSuccessMsg(`Added ${product.cropType || product.name} to your cart!`);
     setTimeout(() => setSuccessMsg(""), 3000);
   };
 
+  const handleViewProduct = (product) => {
+    navigation?.navigate("ListingDetail", { product });
+  };
+
+  const handleFarmerPress = (farmer) => {
+    const farmerId = farmer._id || farmer.id || farmer.farmerId || null;
+    if (farmerId) navigation?.navigate("FarmerProfile", { farmerId });
+  };
+
+  const handleActivityPress = (activity) => {
+    if (activity.type === "order") {
+      const order = activity.order || activity._raw || null;
+      if (order) navigation?.navigate("OrderDetail", { order, role: "buyer" });
+      return;
+    }
+    // message or other types may reference a farmer id
+    const fid =
+      activity.farmerId || activity.farmerId?._id || activity.farmerId;
+    if (fid) navigation?.navigate("FarmerProfile", { farmerId: fid });
+  };
+
   const filteredProducts = products.filter((p) => {
-    const matchesSearch =
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.farmerName.toLowerCase().includes(searchQuery.toLowerCase());
+    const q = searchQuery.trim().toLowerCase();
+    const matchesSearch = q
+      ? (p.cropType || "").toLowerCase().includes(q) ||
+        (p.farmerId?.name || "").toLowerCase().includes(q)
+      : true;
     const matchesCat =
       selectedCategory === "All" || p.category === selectedCategory;
     return matchesSearch && matchesCat;
@@ -220,9 +301,6 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
             onPress={() => onSwitchTab?.("Marketplace")}
           />
         </View>
-
-        <AgriPriceChangeWidget />
-
         <BuyerQuickActions
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -239,6 +317,9 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
 
         {/* Featured Products */}
         <View style={styles.sectionHeader}>
+          <AppText style={{ fontWeight: "700", color: textPrimary }}>
+            Featured Products
+          </AppText>
           <TouchableOpacity onPress={() => onSwitchTab?.("Marketplace")}>
             <AppText style={{ color: primaryColor, fontWeight: "600" }}>
               See All
@@ -247,12 +328,30 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         </View>
         <FeaturedProductsList
           products={filteredProducts}
-          onOrder={handlePlaceOrder}
+          onView={handleViewProduct}
         />
-        <NearbyFarmersList farmers={mockFarmers} />
+
+        {/* Nearby Farmers */}
+        <View style={styles.sectionHeader}>
+          <AppText style={{ fontWeight: "700", color: textPrimary }}>
+            Nearby Farmers
+          </AppText>
+          <TouchableOpacity onPress={() => onSwitchTab?.("Farmers")}>
+            <AppText style={{ color: primaryColor, fontWeight: "600" }}>
+              See All
+            </AppText>
+          </TouchableOpacity>
+        </View>
+        <NearbyFarmersList
+          farmers={farmers}
+          onFarmerPress={handleFarmerPress}
+        />
 
         {/* Recent Activity */}
-        <RecentActivityList activities={mockActivities} />
+        <RecentActivityList
+          activities={activities}
+          onActivityPress={handleActivityPress}
+        />
 
         {/* Bottom spacer so FAB doesn't hide content */}
         <View style={{ height: 80 }} />

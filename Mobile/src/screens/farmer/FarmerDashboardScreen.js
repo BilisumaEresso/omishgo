@@ -1,5 +1,6 @@
 // src/screens/farmer/FarmerDashboardScreen.js
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
 import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import AgriPriceChangeWidget from "../../components/common/AgriPriceChangeWidget";
@@ -11,11 +12,8 @@ import AppSidebar from "../../components/layout/AppSidebar";
 import DashboardLayout from "../../components/layout/DashBoardLayout";
 import FloatingActionButton from "../../components/layout/FloatingActionBotton";
 import SummaryCard from "../../components/SummaryCard";
-import api from "../../config/api";
-import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
-import { useFocusEffect } from "@react-navigation/native";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_GAP = 12;
