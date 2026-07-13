@@ -24,6 +24,7 @@ const STACK_ROUTES = new Set([
   "Help",
   "Notifications",
   "ListingDetail",
+  "Settings",
 ]);
 
 export function navigateFromSidebar({ item, navigation, onSwitchTab, role }) {
