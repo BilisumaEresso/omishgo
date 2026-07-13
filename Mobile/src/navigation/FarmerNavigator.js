@@ -14,6 +14,8 @@ import ChatScreen from "../screens/shared/ChatScreen";
 import ConversationsScreen from "../screens/shared/ConversationsScreen";
 import HelpScreen from "../screens/shared/HelpScreen";
 import NotificationsScreen from "../screens/shared/NotificationsScreen";
+import OrderDetailScreen from "../screens/shared/OrderDetailScreen";
+import EditProductScreen from "../screens/farmer/EditProductScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -56,6 +58,8 @@ const FarmerNavigator = () => (
     <Stack.Screen name="Chat" component={ChatScreen} />
     <Stack.Screen name="Help" component={HelpScreen} />
     <Stack.Screen name="Notifications" component={NotificationsScreen} />
+    <Stack.Screen name="OrderDetail" component={OrderDetailScreen}/>
+    <Stack.Screen name="EditProduct" component={EditProductScreen}/>
   </Stack.Navigator>
 );
 
