@@ -287,24 +287,24 @@ const AppSidebar = ({
             {/* Divider */}
             <View style={[styles.divider, { backgroundColor: borderColor }]} />
 
-            {/* Settings & Help */}
-            {["Settings", "Help"].map((label) => (
+            {/* My Profile, Settings & Help */}
+            {[
+              { label: "My Profile", route: "Profile", icon: "person-outline" },
+              {
+                label: "Settings",
+                route: "Settings",
+                icon: "settings-outline",
+              },
+              { label: "Help", route: "Help", icon: "help-circle-outline" },
+            ].map(({ label, route, icon }) => (
               <TouchableOpacity
-                key={label}
+                key={route}
                 style={styles.menuItem}
-                onPress={() => handleItem({ label, route: label })}
+                onPress={() => handleItem({ label, route })}
                 accessibilityRole="button"
                 accessibilityLabel={label}
               >
-                <Ionicons
-                  name={
-                    label === "Settings"
-                      ? "settings-outline"
-                      : "help-circle-outline"
-                  }
-                  size={22}
-                  color={textSecondary}
-                />
+                <Ionicons name={icon} size={22} color={textSecondary} />
                 <AppText style={[styles.menuLabel, { color: textPrimary }]}>
                   {label}
                 </AppText>

@@ -12,8 +12,8 @@ import {
 } from "react-native";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
-import { useSidebar } from "../../context/SidebarContext";
 import api from "../../config/api";
+import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
@@ -256,7 +256,25 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
             </View>
           )}
         </View>
-
+        <TouchableOpacity
+          style={[
+            styles.menuItem,
+            { backgroundColor: surface, borderColor: border },
+          ]}
+          onPress={() => navigation?.navigate("Settings")}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="settings-outline" size={20} color={primary} />
+          <AppText style={[styles.menuLabel, { color: textPrimary }]}>
+            Settings
+          </AppText>
+          <Ionicons
+            name="chevron-forward"
+            size={16}
+            color={textMuted}
+            style={{ marginLeft: "auto" }}
+          />
+        </TouchableOpacity>
         {/* Logout Button */}
         <View style={[styles.logoutContainer, { backgroundColor: background }]}>
           <TouchableOpacity

@@ -8,12 +8,14 @@ import AppText from "../../components/common/AppText";
 import AddProductModal from "../../components/farmer/AddProductModal";
 import MarketTrendsList from "../../components/farmer/MarketTrendsList";
 import QuickActionsGrid from "../../components/farmer/QuickActionsGrid";
-import AppSidebar from "../../components/layout/AppSidebar";
 import DashboardLayout from "../../components/layout/DashBoardLayout";
 import FloatingActionButton from "../../components/layout/FloatingActionBotton";
 import SummaryCard from "../../components/SummaryCard";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
+import api from "../../config/api";
+import { API_ENDPOINTS } from "../../constants/api";
+import { useSidebar } from "../../context/SidebarContext";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_GAP = 12;
@@ -54,6 +56,7 @@ const marketTrends = [
 export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
   const { theme } = useTheme();
   const user = useAuthStore((state) => state.user);
+  const { openSidebar } = useSidebar();
 
   // Theme colors (unchanged)
   const primary = theme?.colors?.primary || "#2E7D32";
@@ -87,9 +90,6 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
     ? parseInt(biggestMover.price.replace(/[^0-9]/g, ""), 10)
     : null;
 
-  const todaySales = 12;
-  const activeOrders = orders.filter((o) => o.status !== "Completed").length;
-  const revenue = 47800;
 
   const hours = new Date().getHours();
   const greeting =
@@ -101,11 +101,60 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
 
   // Data fetching (unchanged)
   const fetchProducts = async () => {
-    /* ... unchanged ... */
+    try {
+      const res = await api.get(API_ENDPOINTS.products.list, {
+        params: { farmerId: user?._id || user?.id },
+      });
+      const raw = res.data?.data?.products || [];
+      if (raw.length > 0) {
+        setProducts(
+          raw.map((p) => ({
+            id: p._id,
+            name: `${p.quantity}${p.unit || "kg"} ${p.cropType}`,
+            price: p.price,
+            category: p.cropType,
+            unit: p.unit || "kg",
+            location: `${p.location?.region || ""}, Ethiopia`,
+            farmerName: user?.name || "Farmer",
+            image:
+              p.photos?.[0] ||
+              "https://images.unsplash.com/photo-1618512496248-a07fe83766a4?w=600",
+          })),
+        );
+      }
+    } catch (e) {
+      console.warn("fetchProducts failed:", e.message);
+      // keep mockProducts as fallback — already set as default state
+    }
   };
-  const fetchOrders = async () => {
-    /* ... unchanged ... */
-  };
+ const fetchOrders = async () => {
+   try {
+     const res = await api.get(API_ENDPOINTS.orders.list);
+     const raw = res.data?.data?.orders || [];
+     setOrders(
+       raw.map((o) => ({
+         id: o._id,
+         item: `${o.quantity}${o.unit || "kg"} ${o.productId?.cropType || "Product"}`,
+         type: o.productId?.cropType || "—",
+         price: o.priceAtOrder,
+         totalPrice: o.totalPrice,
+         date: new Date(o.createdAt).toLocaleDateString("en-GB", {
+           day: "numeric",
+           month: "short",
+           year: "numeric",
+         }),
+         status:
+           o.status === "in_transit"
+             ? "In Transit"
+             : o.status.charAt(0).toUpperCase() + o.status.slice(1),
+         buyer: o.buyerId?.name || "Buyer",
+         buyerId: o.buyerId?._id,
+       })),
+     );
+   } catch (e) {
+     console.warn("fetchOrders failed:", e.message);
+   }
+ };
 
   useEffect(() => {
     if (user?.id) {
@@ -121,7 +170,15 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
       }
     }, [user?.id]),
   );
-
+const todaySales = orders.filter(
+  (o) => new Date(o.date) >= new Date(Date.now() - 86400000),
+).length;
+const activeOrders = orders.filter(
+  (o) => o.status !== "Completed" && o.status !== "cancelled",
+).length;
+const revenue = orders
+  .filter((o) => o.status === "Completed" || o.status === "Delivered")
+  .reduce((sum, o) => sum + (o.totalPrice || o.price || 0), 0);
   const handleRefresh = async () => {
     setRefreshing(true);
     await Promise.all([fetchProducts(), fetchOrders()]);
@@ -158,7 +215,7 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
         role="farmer"
         scrollable={true}
         showMenu={true}
-        onMenuPress={() => setSidebarVisible(true)}
+        onMenuPress={() => openSidebar(true)}
         showNotification={true}
         notificationCount={0}
         onNotificationPress={() => navigation.navigate("Notifications")}
@@ -371,13 +428,6 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
           })
         }
         bottom={28}
-      />
-
-      <AppSidebar
-        visible={sidebarVisible}
-        onClose={() => setSidebarVisible(false)}
-        role="farmer"
-        onItemPress={handleSidebarItemPress}
       />
       <AddProductModal
         visible={modalVisible}
