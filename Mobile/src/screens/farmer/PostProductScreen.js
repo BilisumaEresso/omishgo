@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import AppButton from "../../components/common/AppButton";
 import AppInput from "../../components/common/AppInput";
 import AppText from "../../components/common/AppText";
@@ -191,6 +192,7 @@ const DropdownPicker = ({
   onClose,
   icon,
   theme,
+  placeholder,
 }) => {
   const primary = theme?.colors?.primary || "#2E7D32";
   const surface = theme?.colors?.surface || "#FFF";
@@ -245,7 +247,7 @@ const DropdownPicker = ({
           <AppText
             style={{ fontSize: 15, color: value ? textPrimary : textSecondary }}
           >
-            {selectedLabel || `Select ${label}`}
+            {selectedLabel || placeholder || `Select ${label}`}
           </AppText>
         </View>
         <Ionicons
@@ -312,6 +314,7 @@ const DropdownPicker = ({
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function PostProductScreen({ navigation, route }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const prefill = route?.params?.prefill || {};
 
@@ -359,13 +362,9 @@ export default function PostProductScreen({ navigation, route }) {
     const entered = parseFloat(price);
     if (isNaN(entered)) return;
     if (entered < refPrice * 0.6) {
-      setPriceWarning(
-        `This price seems low. Market average is around ${refPrice} ETB per ${unitKey}.`,
-      );
+      setPriceWarning(t("postProduct.priceLowWarning", { refPrice, unitKey }));
     } else if (entered > refPrice * 1.6) {
-      setPriceWarning(
-        `This price is higher than market. Average is around ${refPrice} ETB per ${unitKey}.`,
-      );
+      setPriceWarning(t("postProduct.priceHighWarning", { refPrice, unitKey }));
     } else {
       setPriceWarning("");
     }
@@ -408,29 +407,41 @@ export default function PostProductScreen({ navigation, route }) {
 
   const handleSubmit = async () => {
     if (!cropType.trim()) {
-      Alert.alert("Missing Crop", "Please select a crop type.");
+      Alert.alert(
+        t("postProduct.missingCropTitle"),
+        t("postProduct.missingCropMessage"),
+      );
       return;
     }
     const qtyNum = parseFloat(quantity);
     if (!quantity || isNaN(qtyNum) || qtyNum <= 0) {
-      Alert.alert("Invalid Quantity", "Enter a valid number for quantity");
+      Alert.alert(
+        t("postProduct.invalidQuantityTitle"),
+        t("postProduct.invalidQuantityMessage"),
+      );
       return;
     }
     const priceNum = parseFloat(price);
     if (!price || isNaN(priceNum) || priceNum <= 0) {
-      Alert.alert("Invalid Price", "Enter a valid price in ETB");
+      Alert.alert(
+        t("postProduct.invalidPriceTitle"),
+        t("postProduct.invalidPriceMessage"),
+      );
       return;
     }
 
     if (!region.trim()) {
-      Alert.alert("Missing Location", "Please select your product region.");
+      Alert.alert(
+        t("postProduct.missingLocationTitle"),
+        t("postProduct.missingLocationMessage"),
+      );
       return;
     }
 
     if (region && ZONES_BY_REGION[region]?.length && !zone.trim()) {
       Alert.alert(
-        "Missing Zone",
-        "Please select a zone for your selected region.",
+        t("postProduct.missingZoneTitle"),
+        t("postProduct.missingZoneMessage"),
       );
       return;
     }
@@ -452,14 +463,14 @@ export default function PostProductScreen({ navigation, route }) {
       });
 
       navigation.navigate("FarmerTabs", {
-        successMessage: "Your listing was posted successfully!",
+        successMessage: t("postProduct.successMessage"),
       });
     } catch (err) {
       const msg =
         err?.response?.data?.message ||
         err.message ||
-        "Something went wrong. Please try again.";
-      Alert.alert("Error", msg);
+        t("postProduct.defaultErrorMessage");
+      Alert.alert(t("postProduct.error"), msg);
     } finally {
       setLoading(false);
     }
@@ -476,7 +487,7 @@ export default function PostProductScreen({ navigation, route }) {
         barStyle="dark-content"
       />
       <AppHeader
-        title="Post Product"
+        title={t("postProduct.title")}
         showBack={true}
         onBackPress={() => navigation.goBack()}
       />
@@ -493,7 +504,7 @@ export default function PostProductScreen({ navigation, route }) {
         >
           {/* Crop Type Dropdown */}
           <DropdownPicker
-            label="Crop Type"
+            label={t("postProduct.cropType")}
             value={cropType}
             options={CROP_TYPES}
             onSelect={setCropType}
@@ -502,13 +513,16 @@ export default function PostProductScreen({ navigation, route }) {
             onClose={() => setShowCropPicker(false)}
             icon="leaf-outline"
             theme={theme}
+            placeholder={t("postProduct.selectLabel", {
+              label: t("postProduct.cropType"),
+            })}
           />
 
           {/* Quantity & Unit row */}
           <View style={styles.row}>
             <View style={styles.flex2}>
               <AppText style={[styles.label, { color: textSecondary }]}>
-                Quantity
+                {t("postProduct.quantity")}
               </AppText>
               <AppInput
                 placeholder="0"
@@ -519,7 +533,7 @@ export default function PostProductScreen({ navigation, route }) {
             </View>
             <View style={styles.flex1}>
               <DropdownPicker
-                label="Unit"
+                label={t("postProduct.unit")}
                 value={unit}
                 options={unitOptions}
                 onSelect={setUnit}
@@ -528,13 +542,16 @@ export default function PostProductScreen({ navigation, route }) {
                 onClose={() => setShowUnitPicker(false)}
                 icon="cube-outline"
                 theme={theme}
+                placeholder={t("postProduct.selectLabel", {
+                  label: t("postProduct.unit"),
+                })}
               />
             </View>
           </View>
 
           {/* Price input with suggestion and warning */}
           <AppText style={[styles.label, { color: textSecondary }]}>
-            Price per {unitDisplay}
+            {t("postProduct.pricePer", { unit: unitDisplay })}
           </AppText>
           <AppInput
             placeholder="0"
@@ -565,7 +582,10 @@ export default function PostProductScreen({ navigation, route }) {
               <AppText
                 style={{ color: primary, fontSize: 13, fontWeight: "600" }}
               >
-                Suggested: {priceSuggestion} ETB/{unitDisplay} → tap to use
+                {t("postProduct.priceSuggestion", {
+                  price: priceSuggestion,
+                  unit: unitDisplay,
+                })}
               </AppText>
             </TouchableOpacity>
           )}
@@ -591,10 +611,10 @@ export default function PostProductScreen({ navigation, route }) {
 
           {/* Description */}
           <AppText style={[styles.label, { color: textSecondary }]}>
-            Description (optional)
+            {t("postProduct.descriptionOptional")}
           </AppText>
           <AppInput
-            placeholder="Quality, harvest date, other details..."
+            placeholder={t("postProduct.descriptionPlaceholder")}
             value={description}
             onChangeText={setDescription}
             multiline
@@ -603,7 +623,7 @@ export default function PostProductScreen({ navigation, route }) {
           />
           {isDefaultDescription && (
             <AppText style={{ color: textMuted, fontSize: 12, marginTop: 4 }}>
-              Using default description — tap to edit
+              {t("postProduct.defaultDescriptionHint")}
             </AppText>
           )}
 
@@ -613,11 +633,11 @@ export default function PostProductScreen({ navigation, route }) {
               variant="headingSm"
               style={[styles.sectionTitle, { color: textPrimary }]}
             >
-              Location
+              {t("postProduct.location")}
             </AppText>
 
             <DropdownPicker
-              label="Region"
+              label={t("postProduct.region")}
               value={region}
               options={REGIONS}
               onSelect={setRegion}
@@ -626,17 +646,23 @@ export default function PostProductScreen({ navigation, route }) {
               onClose={() => setShowRegionPicker(false)}
               icon="location-outline"
               theme={theme}
+              placeholder={t("postProduct.selectLabel", {
+                label: t("postProduct.region"),
+              })}
             />
 
             <DropdownPicker
-              label="Zone"
+              label={t("postProduct.zone")}
               value={zone}
               options={region ? ZONES_BY_REGION[region] || [] : []}
               onSelect={setZone}
               visible={showZonePicker}
               onOpen={() => {
                 if (!region) {
-                  Alert.alert("Select Region", "Please select a region first.");
+                  Alert.alert(
+                    t("postProduct.selectRegionFirstTitle"),
+                    t("postProduct.selectRegionFirstMessage"),
+                  );
                   return;
                 }
                 setShowZonePicker(true);
@@ -644,20 +670,25 @@ export default function PostProductScreen({ navigation, route }) {
               onClose={() => setShowZonePicker(false)}
               icon="map-outline"
               theme={theme}
+              placeholder={t("postProduct.selectLabel", {
+                label: t("postProduct.zone"),
+              })}
             />
 
             <AppText style={[styles.label, { color: textSecondary }]}>
-              Wereda
+              {t("postProduct.wereda")}
             </AppText>
             <AppInput
-              placeholder="e.g. Meki, Adama"
+              placeholder={t("postProduct.weredaPlaceholder")}
               value={wereda}
               onChangeText={setWereda}
             />
           </View>
 
           <AppButton
-            title={loading ? "Posting..." : "Post Listing"}
+            title={
+              loading ? t("postProduct.posting") : t("postProduct.postListing")
+            }
             onPress={handleSubmit}
             loading={loading}
             disabled={loading}

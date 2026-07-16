@@ -1,7 +1,7 @@
 // Mobile/src/components/layout/AppSidebar.js
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -22,38 +22,30 @@ import { useAuthStore } from "../../store/auth.store";
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.78, 300);
 
-// ---------- role-based menu items ----------
-const ROLE_MENU_ITEMS = {
+// ---------- role-based menu items (raw keys for translation) ----------
+const ROLE_MENU_ITEM_KEYS = {
   [ROLES.FARMER]: [
-    { label: "Products", icon: "leaf-outline", route: "FarmerProducts" },
-    { label: "Orders", icon: "cart-outline", route: "FarmerOrders" },
-    {
-      label: "Insights",
-      icon: "stats-chart-outline",
-      route: "FarmerAnalytics",
-    },
+    { key: "products", icon: "leaf-outline", route: "FarmerProducts" },
+    { key: "orders", icon: "cart-outline", route: "FarmerOrders" },
+    { key: "insights", icon: "stats-chart-outline", route: "FarmerAnalytics" },
   ],
   [ROLES.BUYER]: [
     {
-      label: "Marketplace",
+      key: "marketplace",
       icon: "storefront-outline",
       route: "BuyerMarketplace",
     },
-    { label: "Orders", icon: "cart-outline", route: "BuyerOrders" },
-    { label: "Saved", icon: "bookmark-outline", route: "BuyerSaved" },
+    { key: "orders", icon: "cart-outline", route: "BuyerOrders" },
+    { key: "saved", icon: "bookmark-outline", route: "BuyerSaved" },
   ],
   [ROLES.SUPPLIER]: [
-    { label: "Inventory", icon: "cube-outline", route: "SupplierInventory" },
-    { label: "Orders", icon: "cart-outline", route: "SupplierOrders" },
-    {
-      label: "Reports",
-      icon: "document-text-outline",
-      route: "SupplierReports",
-    },
+    { key: "inventory", icon: "cube-outline", route: "SupplierInventory" },
+    { key: "orders", icon: "cart-outline", route: "SupplierOrders" },
+    { key: "reports", icon: "document-text-outline", route: "SupplierReports" },
   ],
   [ROLES.DRIVER]: [
-    { label: "Deliveries", icon: "bicycle-outline", route: "DriverDeliveries" },
-    { label: "History", icon: "time-outline", route: "DriverHistory" },
+    { key: "deliveries", icon: "bicycle-outline", route: "DriverDeliveries" },
+    { key: "history", icon: "time-outline", route: "DriverHistory" },
   ],
 };
 
@@ -72,13 +64,55 @@ const AppSidebar = ({
   activeRoute = "",
 }) => {
   const { theme } = useTheme();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { logout, user } = useAuthStore();
 
   const slideAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [showModal, setShowModal] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
+
+  // ---------- translated menu items ----------
+  const menuItems = useMemo(() => {
+    const rawItems = role ? ROLE_MENU_ITEM_KEYS[role] || [] : [];
+    return rawItems.map((item) => ({
+      label: t(`appSidebar.${item.key}`),
+      icon: item.icon,
+      route: item.route,
+    }));
+  }, [role, t]);
+
+  const staticItems = useMemo(
+    () => [
+      {
+        label: t("appSidebar.myProfile"),
+        route: "Profile",
+        icon: "person-outline",
+      },
+      {
+        label: t("appSidebar.settings"),
+        route: "Settings",
+        icon: "settings-outline",
+      },
+      {
+        label: t("appSidebar.help"),
+        route: "Help",
+        icon: "help-circle-outline",
+      },
+      {
+        label: t("appSidebar.chat"),
+        route: "Conversations",
+        icon: "chatbubble-outline",
+      },
+    ],
+    [t],
+  );
+
+  const roleDisplay = role
+    ? t(
+        `appSidebar.role${role.charAt(0).toUpperCase() + role.slice(1).toLowerCase()}`,
+      )
+    : t("appSidebar.roleUser");
 
   // ---------- animation ----------
   useEffect(() => {
@@ -186,7 +220,6 @@ const AppSidebar = ({
   const surface = theme.colors.surface || "#FFFFFF";
   const errorColor = theme.colors.error || "#C62828";
   const successColor = theme.colors.success || "#2E7D32";
-  const menuItems = role ? ROLE_MENU_ITEMS[role] || [] : [];
 
   // ---------- current language display ----------
   const currentLang = i18n.language || "en";
@@ -206,7 +239,7 @@ const AppSidebar = ({
           <Pressable
             style={{ flex: 1 }}
             onPress={handleClose}
-            accessibilityLabel="Close menu"
+            accessibilityLabel={t("appSidebar.closeMenu")}
           />
         </Animated.View>
 
@@ -229,19 +262,17 @@ const AppSidebar = ({
               onPress={() => handleItem({ label: "Profile", route: "Profile" })}
               style={styles.profilePressable}
               accessibilityRole="button"
-              accessibilityLabel="View profile"
+              accessibilityLabel={t("appSidebar.viewProfile")}
             >
               <View style={styles.avatar}>
                 <Ionicons name="person" size={32} color={primaryColor} />
               </View>
               <View style={styles.profileInfo}>
                 <AppText style={styles.userName} numberOfLines={1}>
-                  {user?.name || "User"}
+                  {user?.name || t("appSidebar.fallbackUserName")}
                 </AppText>
                 <View style={styles.rolePill}>
-                  <AppText style={styles.roleText}>
-                    {role ? role.toUpperCase() : "USER"}
-                  </AppText>
+                  <AppText style={styles.roleText}>{roleDisplay}</AppText>
                 </View>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#FFF" />
@@ -288,15 +319,7 @@ const AppSidebar = ({
             <View style={[styles.divider, { backgroundColor: borderColor }]} />
 
             {/* My Profile, Settings & Help */}
-            {[
-              { label: "My Profile", route: "Profile", icon: "person-outline" },
-              {
-                label: "Settings",
-                route: "Settings",
-                icon: "settings-outline",
-              },
-              { label: "Help", route: "Help", icon: "help-circle-outline" },
-            ].map(({ label, route, icon }) => (
+            {staticItems.map(({ label, route, icon }) => (
               <TouchableOpacity
                 key={route}
                 style={styles.menuItem}
@@ -317,7 +340,7 @@ const AppSidebar = ({
                 style={styles.menuItem}
                 onPress={() => setLanguageOpen(!languageOpen)}
                 accessibilityRole="button"
-                accessibilityLabel="Change language"
+                accessibilityLabel={t("appSidebar.changeLanguage")}
               >
                 <Ionicons
                   name="globe-outline"
@@ -385,11 +408,11 @@ const AppSidebar = ({
               style={styles.logoutButton}
               onPress={handleLogout}
               accessibilityRole="button"
-              accessibilityLabel="Logout"
+              accessibilityLabel={t("appSidebar.logout")}
             >
               <Ionicons name="log-out-outline" size={22} color={errorColor} />
               <AppText style={[styles.logoutLabel, { color: errorColor }]}>
-                Logout
+                {t("appSidebar.logout")}
               </AppText>
             </TouchableOpacity>
             <AppText style={[styles.version, { color: textSecondary }]}>

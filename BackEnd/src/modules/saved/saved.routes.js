@@ -15,11 +15,16 @@ router.get(
   "/",
   asyncHandler(async (req, res) => {
     const saved = await Saved.find({ buyerId: req.user._id })
-      .populate(
-        "productId",
-        "cropType quantity unit price photos location farmerId status",
-      )
+      .populate({
+        path: "productId",
+        select: "cropType quantity unit price photos location farmerId status",
+        populate: {
+          path: "farmerId",
+          select: "name phone location",
+        },
+      })
       .sort("-createdAt");
+
     const products = saved.filter((s) => s.productId).map((s) => s.productId);
     return sendResponse(res, {
       statusCode: 200,

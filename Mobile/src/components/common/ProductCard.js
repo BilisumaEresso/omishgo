@@ -1,5 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import AppButton from "./AppButton";
 import AppText from "./AppText";
 
@@ -53,6 +54,7 @@ export const ProductCard = ({
   isSaved,
   onToggleSave,
 }) => {
+  const { t } = useTranslation();
   const farmer = product.farmerId || {};
   const loc = product.location || {};
 
@@ -96,7 +98,10 @@ export const ProductCard = ({
           />
         </TouchableOpacity>
         <AppText variant="headingSm" style={[styles.price, { color: primary }]}>
-          {product.price} ETB / {product.unit || "kg"}
+          {t("productCard.priceFormat", {
+            price: product.price,
+            unit: product.unit || "kg",
+          })}
         </AppText>
       </View>
 
@@ -150,7 +155,7 @@ export const ProductCard = ({
 
       {/* View button – full width */}
       <AppButton
-        title="View"
+        title={t("productCard.view")}
         variant="outline"
         onPress={() => onView(product)}
         style={styles.viewBtn}

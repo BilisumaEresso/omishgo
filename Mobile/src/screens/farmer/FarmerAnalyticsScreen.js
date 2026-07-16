@@ -1,6 +1,7 @@
 // Mobile/src/screens/farmer/FarmerAnalyticsScreen.js
 import { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import AppText from "../../components/common/AppText";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
@@ -9,13 +10,15 @@ import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 
 const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const { openSidebar } = useSidebar();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get(API_ENDPOINTS.products.analytics)
+    api
+      .get(API_ENDPOINTS.products.analytics)
       .then((res) => setData(res.data?.data || null))
       .catch((err) => console.warn("Analytics fetch:", err.message))
       .finally(() => setLoading(false));
@@ -35,25 +38,31 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
 
   // This Week Stats
   const weeklyStats = [
-    { label: "Total Products", value: data?.totalProducts ?? 0 },
-    { label: "Total Revenue", value: data?.totalRevenue ?? 0 },
-    { label: "Total Orders", value: data?.totalOrders ?? 0 },
-    { label: "Delivered", value: data?.delivered ?? 0 },
-    { label: "Pending", value: data?.pending ?? 0 },
+    {
+      label: t("farmerAnalytics.totalProducts"),
+      value: data?.totalProducts ?? 0,
+    },
+    {
+      label: t("farmerAnalytics.totalRevenue"),
+      value: data?.totalRevenue ?? 0,
+    },
+    { label: t("farmerAnalytics.totalOrders"), value: data?.totalOrders ?? 0 },
+    { label: t("farmerAnalytics.delivered"), value: data?.delivered ?? 0 },
+    { label: t("farmerAnalytics.pending"), value: data?.pending ?? 0 },
   ];
 
   // Top Crops by Demand
   const topCrops = data?.topCrops || [
-    { _id: "No data yet", orders: 1 },
+    { _id: t("farmerAnalytics.noDataYet"), orders: 1 },
   ];
-  const maxOrders = Math.max(...topCrops.map(c => c.orders), 1);
+  const maxOrders = Math.max(...topCrops.map((c) => c.orders), 1);
 
   // Market Prices Today
   const marketPrices = [
-    { name: "Teff", price: "5,200", trend: "up" },
-    { name: "Onion", price: "4,500", trend: "up" },
-    { name: "Tomato", price: "3,800", trend: "down" },
-    { name: "Wheat", price: "4,100", trend: "neutral" },
+    { name: t("farmerAnalytics.cropTeff"), price: "5,200", trend: "up" },
+    { name: t("farmerAnalytics.cropOnion"), price: "4,500", trend: "up" },
+    { name: t("farmerAnalytics.cropTomato"), price: "3,800", trend: "down" },
+    { name: t("farmerAnalytics.cropWheat"), price: "4,100", trend: "neutral" },
   ];
 
   const getTrendArrow = (trend) => {
@@ -71,7 +80,7 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
   return (
     <View style={[styles.screen, { backgroundColor: background }]}>
       <AppHeader
-        title="Market Insights"
+        title={t("farmerAnalytics.title")}
         showMenu={true}
         showNotification={true}
         notificationCount={0}
@@ -80,7 +89,14 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
       />
 
       {loading && (
-        <View style={{ flex:1, justifyContent:"center", alignItems:"center", paddingTop: 80 }}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingTop: 80,
+          }}
+        >
           <ActivityIndicator size="large" color={primary} />
         </View>
       )}
@@ -90,101 +106,106 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-        {/* This Week Section */}
-        <AppText style={[styles.sectionTitle, { color: textPrimary }]}>
-          This Week
-        </AppText>
-        <View style={styles.statsRow}>
-          {weeklyStats.map((stat, index) => (
-            <View
-              key={index}
-              style={[styles.statCard, { backgroundColor: primaryContainer }]}
-            >
-              <AppText style={[styles.statValue, { color: primary }]}>
-                {stat.value}
-              </AppText>
-              <AppText style={[styles.statLabel, { color: textSecondary }]}>
-                {stat.label}
-              </AppText>
-            </View>
-          ))}
-        </View>
-
-        {/* Top Crops by Demand */}
-        <AppText
-          style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}
-        >
-          Top Crops by Demand
-        </AppText>
-        <View style={styles.cropsContainer}>
-          {topCrops.map((crop, index) => (
-            <View key={index} style={styles.cropRow}>
-              <AppText style={[styles.cropName, { color: textPrimary }]}>
-                {crop._id}
-              </AppText>
-              <View style={[styles.barContainer, { backgroundColor: border }]}>
-                <View
-                  style={[
-                    styles.bar,
-                    {
-                      backgroundColor: primary,
-                      width: `${(crop.orders / maxOrders) * 100}%`,
-                    },
-                  ]}
-                />
-              </View>
-              <AppText style={[styles.percentText, { color: textPrimary }]}>
-                {crop.orders}
-              </AppText>
-            </View>
-          ))}
-        </View>
-
-        {/* Market Prices Today */}
-        <AppText
-          style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}
-        >
-          Market Prices Today
-        </AppText>
-        <View style={[styles.pricesCard, { backgroundColor: surface }]}>
-          {marketPrices.map((item, index) => {
-            const arrow = getTrendArrow(item.trend);
-            const arrowColor = getTrendColor(item.trend);
-            return (
+          {/* This Week Section */}
+          <AppText style={[styles.sectionTitle, { color: textPrimary }]}>
+            {t("farmerAnalytics.thisWeek")}
+          </AppText>
+          <View style={styles.statsRow}>
+            {weeklyStats.map((stat, index) => (
               <View
                 key={index}
-                style={[
-                  styles.priceRow,
-                  index !== marketPrices.length - 1 && {
-                    borderBottomWidth: 1,
-                    borderBottomColor: border,
-                  },
-                ]}
+                style={[styles.statCard, { backgroundColor: primaryContainer }]}
               >
-                <AppText style={[styles.priceCropName, { color: textPrimary }]}>
-                  {item.name}
+                <AppText style={[styles.statValue, { color: primary }]}>
+                  {stat.value}
                 </AppText>
-                <View style={styles.priceRight}>
-                  <AppText style={[styles.priceValue, { color: textPrimary }]}>
-                    {item.price} ETB/q
-                  </AppText>
-                  <AppText style={[styles.priceArrow, { color: arrowColor }]}>
-                    {"  "}
-                    {arrow}
-                  </AppText>
-                </View>
+                <AppText style={[styles.statLabel, { color: textSecondary }]}>
+                  {stat.label}
+                </AppText>
               </View>
-            );
-          })}
-        </View>
+            ))}
+          </View>
 
-        {/* Footer Note */}
-        <AppText style={[styles.footerNote, { color: textMuted }]}>
-          Reference prices from local markets
-        </AppText>
-      </ScrollView>
+          {/* Top Crops by Demand */}
+          <AppText
+            style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}
+          >
+            {t("farmerAnalytics.topCropsByDemand")}
+          </AppText>
+          <View style={styles.cropsContainer}>
+            {topCrops.map((crop, index) => (
+              <View key={index} style={styles.cropRow}>
+                <AppText style={[styles.cropName, { color: textPrimary }]}>
+                  {crop._id}
+                </AppText>
+                <View
+                  style={[styles.barContainer, { backgroundColor: border }]}
+                >
+                  <View
+                    style={[
+                      styles.bar,
+                      {
+                        backgroundColor: primary,
+                        width: `${(crop.orders / maxOrders) * 100}%`,
+                      },
+                    ]}
+                  />
+                </View>
+                <AppText style={[styles.percentText, { color: textPrimary }]}>
+                  {crop.orders}
+                </AppText>
+              </View>
+            ))}
+          </View>
+
+          {/* Market Prices Today */}
+          <AppText
+            style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}
+          >
+            {t("farmerAnalytics.marketPricesToday")}
+          </AppText>
+          <View style={[styles.pricesCard, { backgroundColor: surface }]}>
+            {marketPrices.map((item, index) => {
+              const arrow = getTrendArrow(item.trend);
+              const arrowColor = getTrendColor(item.trend);
+              return (
+                <View
+                  key={index}
+                  style={[
+                    styles.priceRow,
+                    index !== marketPrices.length - 1 && {
+                      borderBottomWidth: 1,
+                      borderBottomColor: border,
+                    },
+                  ]}
+                >
+                  <AppText
+                    style={[styles.priceCropName, { color: textPrimary }]}
+                  >
+                    {item.name}
+                  </AppText>
+                  <View style={styles.priceRight}>
+                    <AppText
+                      style={[styles.priceValue, { color: textPrimary }]}
+                    >
+                      {item.price} ETB/q
+                    </AppText>
+                    <AppText style={[styles.priceArrow, { color: arrowColor }]}>
+                      {"  "}
+                      {arrow}
+                    </AppText>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+
+          {/* Footer Note */}
+          <AppText style={[styles.footerNote, { color: textMuted }]}>
+            {t("farmerAnalytics.referencePrices")}
+          </AppText>
+        </ScrollView>
       )}
-
     </View>
   );
 };

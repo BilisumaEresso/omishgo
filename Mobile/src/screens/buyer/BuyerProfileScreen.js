@@ -27,7 +27,7 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
   const { user, logout, setLanguage } = useAuthStore();
   const { openSidebar } = useSidebar();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [languageOpen, setLanguageOpen] = useState(false);
   const [updatingLang, setUpdatingLang] = useState(false);
 
@@ -59,10 +59,18 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
   };
 
   const handleLogout = () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Logout", style: "destructive", onPress: () => logout() },
-    ]);
+    Alert.alert(
+      t("buyerProfile.logoutAlertTitle"),
+      t("buyerProfile.logoutAlertMessage"),
+      [
+        { text: t("buyerProfile.logoutAlertCancel"), style: "cancel" },
+        {
+          text: t("buyerProfile.logoutAlertConfirm"),
+          style: "destructive",
+          onPress: () => logout(),
+        },
+      ],
+    );
   };
 
   const handleChangeLanguage = async (code) => {
@@ -82,7 +90,7 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
     }
   };
 
-  const userName = user?.name || "Buyer";
+  const userName = user?.name || t("buyerProfile.fallbackName");
   const phone = user?.phone || "+251 900 000000";
   const location = user?.location || { region: "Addis Ababa", zone: "Bole" };
   const isVerified = user?.isVerified ?? true;
@@ -90,7 +98,7 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
   return (
     <View style={[styles.screen, { backgroundColor: background }]}>
       <AppHeader
-        title="My Profile"
+        title={t("buyerProfile.title")}
         showMenu
         showNotification
         notificationCount={0}
@@ -114,7 +122,7 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
             style={[styles.rolePill, { backgroundColor: primaryContainer }]}
           >
             <AppText style={[styles.roleText, { color: primary }]}>
-              BUYER
+              {t("buyerProfile.roleBuyer")}
             </AppText>
           </View>
           <AppText style={[styles.phoneNumber, { color: textSecondary }]}>
@@ -129,7 +137,7 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
               8
             </AppText>
             <AppText style={[styles.statLabel, { color: textSecondary }]}>
-              Orders
+              {t("buyerProfile.statsOrders")}
             </AppText>
           </View>
           <View style={[styles.statCard, { backgroundColor: surface }]}>
@@ -137,29 +145,29 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
               4
             </AppText>
             <AppText style={[styles.statLabel, { color: textSecondary }]}>
-              Saved
+              {t("buyerProfile.statsSaved")}
             </AppText>
           </View>
           <View style={[styles.statCard, { backgroundColor: surface }]}>
             <AppText style={[styles.statValue, { color: textPrimary }]}>
-              ETB 32,400
+              {t("buyerProfile.spentAmount", { amount: "32,400" })}
             </AppText>
             <AppText style={[styles.statLabel, { color: textSecondary }]}>
-              Spent
+              {t("buyerProfile.statsSpent")}
             </AppText>
           </View>
         </View>
 
         {/* Account Info Section */}
         <AppText style={[styles.sectionTitle, { color: textPrimary }]}>
-          Account Info
+          {t("buyerProfile.sectionAccountInfo")}
         </AppText>
         <View style={[styles.infoCard, { backgroundColor: surface }]}>
           <View style={styles.infoRow}>
             <Ionicons name="location-outline" size={20} color={textSecondary} />
             <View style={styles.infoTextContainer}>
               <AppText style={[styles.infoLabel, { color: textMuted }]}>
-                Location
+                {t("buyerProfile.infoLocation")}
               </AppText>
               <AppText style={[styles.infoValue, { color: textPrimary }]}>
                 {location.region}, {location.zone}
@@ -171,7 +179,7 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
             <Ionicons name="call-outline" size={20} color={textSecondary} />
             <View style={styles.infoTextContainer}>
               <AppText style={[styles.infoLabel, { color: textMuted }]}>
-                Phone
+                {t("buyerProfile.infoPhone")}
               </AppText>
               <AppText style={[styles.infoValue, { color: textPrimary }]}>
                 {phone}
@@ -187,7 +195,7 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
             />
             <View style={styles.infoTextContainer}>
               <AppText style={[styles.infoLabel, { color: textMuted }]}>
-                Status
+                {t("buyerProfile.infoStatus")}
               </AppText>
               <AppText
                 style={[
@@ -195,7 +203,9 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
                   { color: isVerified ? successColor : textMuted },
                 ]}
               >
-                {isVerified ? "Verified" : "Unverified"}
+                {isVerified
+                  ? t("buyerProfile.statusVerified")
+                  : t("buyerProfile.statusUnverified")}
               </AppText>
             </View>
           </View>
@@ -205,7 +215,7 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
         <AppText
           style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}
         >
-          Language
+          {t("buyerProfile.sectionLanguage")}
         </AppText>
         <View style={[styles.infoCard, { backgroundColor: surface }]}>
           <TouchableOpacity
@@ -263,6 +273,27 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
           )}
         </View>
 
+        {/* Settings menu item – fixed UI */}
+        <TouchableOpacity
+          style={[
+            styles.menuItem,
+            { backgroundColor: surface, borderColor: border },
+          ]}
+          onPress={() => navigation?.navigate("Settings")}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="settings-outline" size={20} color={primary} />
+          <AppText style={[styles.menuLabel, { color: textPrimary }]}>
+            {t("farmerProfile.menuSettings")}
+          </AppText>
+          <Ionicons
+            name="chevron-forward"
+            size={16}
+            color={textMuted}
+            style={{ marginLeft: "auto" }}
+          />
+        </TouchableOpacity>
+
         {/* Logout Button */}
         <View style={[styles.logoutContainer, { backgroundColor: background }]}>
           <TouchableOpacity
@@ -276,7 +307,9 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
               color="#FFFFFF"
               style={{ marginRight: 8 }}
             />
-            <AppText style={styles.logoutText}>Logout</AppText>
+            <AppText style={styles.logoutText}>
+              {t("buyerProfile.logoutButton")}
+            </AppText>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -377,10 +410,28 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     borderRadius: 8,
   },
+  // Settings menu item
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 16,
+    marginTop: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 12,
+  },
+  menuLabel: {
+    fontSize: 15,
+    fontWeight: "500",
+    flex: 1,
+  },
   logoutContainer: {
     paddingHorizontal: 16,
     paddingBottom: Platform.OS === "ios" ? 20 : 16,
     paddingTop: 10,
+    marginTop: 16,
   },
   logoutButton: {
     flexDirection: "row",

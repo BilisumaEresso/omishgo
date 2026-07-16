@@ -17,6 +17,7 @@ import { API_ENDPOINTS } from "../../constants/api";
 import { useSidebar } from "../../context/SidebarContext"; // reuse the existing component
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
+import { useTranslation } from "react-i18next";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_GAP = 12;
@@ -130,6 +131,7 @@ const categories = ["All", "Tomato", "Teff", "Onion", "Garlic"];
 export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
   const { theme } = useTheme();
   const user = useAuthStore((state) => state.user);
+  const { t } = useTranslation();
 
   const { openSidebar } = useSidebar();
   const [searchQuery, setSearchQuery] = useState("");
@@ -226,7 +228,11 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
 
   const handlePlaceOrder = (product) => {
     setCartCount((prev) => prev + 1);
-    setSuccessMsg(`Added ${product.cropType || product.name} to your cart!`);
+    setSuccessMsg(
+      t("buyerDashboard.addedToCart", {
+        productName: product.cropType || product.name,
+      }),
+    );
     setTimeout(() => setSuccessMsg(""), 3000);
   };
 
@@ -265,8 +271,10 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
   return (
     <>
       <DashboardLayout
-        title="Buyer Dashboard"
-        subtitle={`Welcome, ${user?.name || ""}!`}
+        title={t("buyerDashboard.title")}
+        subtitle={t("buyerDashboard.welcomeMessage", {
+          name: user?.name || "",
+        })}
         role="buyer"
         scrollable={true}
         showMenu={true}
@@ -281,21 +289,21 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         <View style={styles.summaryRow}>
           <SummaryCard
             icon="cart-outline"
-            label="Active Orders"
+            label={t("buyerDashboard.activeOrders")}
             value={activeOrders}
             color="#FF9800"
             onPress={() => onSwitchTab?.("Orders")}
           />
           <SummaryCard
             icon="bookmark-outline"
-            label="Saved Items"
+            label={t("buyerDashboard.savedItems")}
             value={savedItems}
             color="#4CAF50"
             onPress={() => onSwitchTab?.("Saved")}
           />
           <SummaryCard
             icon="storefront-outline"
-            label="Products"
+            label={t("buyerDashboard.products")}
             value={products.length}
             color="#2196F3"
             onPress={() => onSwitchTab?.("Marketplace")}
@@ -318,11 +326,11 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         {/* Featured Products */}
         <View style={styles.sectionHeader}>
           <AppText style={{ fontWeight: "700", color: textPrimary }}>
-            Featured Products
+            {t("buyerDashboard.featuredProducts")}
           </AppText>
           <TouchableOpacity onPress={() => onSwitchTab?.("Marketplace")}>
             <AppText style={{ color: primaryColor, fontWeight: "600" }}>
-              See All
+              {t("buyerDashboard.seeAll")}
             </AppText>
           </TouchableOpacity>
         </View>
@@ -334,11 +342,11 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         {/* Nearby Farmers */}
         <View style={styles.sectionHeader}>
           <AppText style={{ fontWeight: "700", color: textPrimary }}>
-            Nearby Farmers
+            {t("buyerDashboard.nearbyFarmers")}
           </AppText>
           <TouchableOpacity onPress={() => onSwitchTab?.("Farmers")}>
             <AppText style={{ color: primaryColor, fontWeight: "600" }}>
-              See All
+              {t("buyerDashboard.seeAll")}
             </AppText>
           </TouchableOpacity>
         </View>

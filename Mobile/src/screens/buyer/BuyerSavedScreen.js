@@ -1,6 +1,6 @@
 // Mobile/src/screens/buyer/BuyerSavedScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -11,14 +11,15 @@ import {
   View,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
 import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 import { useSavedStore } from "../../store/saved.store";
-import { useState } from "react";
 
 const BuyerSavedScreen = ({ navigation, onSwitchTab }) => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const { openSidebar } = useSidebar();
   const [refreshing, setRefreshing] = useState(false);
@@ -54,12 +55,12 @@ const BuyerSavedScreen = ({ navigation, onSwitchTab }) => {
   const handleUnsave = (product) => {
     const id = product._id || product.id;
     Alert.alert(
-      "Remove Saved Listing",
-      `Remove "${product.cropType}" from your saved listings?`,
+      t("buyerSaved.removeConfirmTitle"),
+      t("buyerSaved.removeConfirmMessage", { cropType: product.cropType }),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("buyerSaved.cancel"), style: "cancel" },
         {
-          text: "Remove",
+          text: t("buyerSaved.remove"),
           style: "destructive",
           onPress: () => toggleSave(product),
         },
@@ -67,30 +68,29 @@ const BuyerSavedScreen = ({ navigation, onSwitchTab }) => {
     );
   };
 
-  // Normalize both populated and raw product objects
-  const normalize = (p) => ({
+  const items = savedProducts.map((p) => ({
     _id: p._id,
     id: p._id,
     cropType: p.cropType,
     quantity: p.quantity,
     unit: p.unit || "kg",
     price: p.price,
-    farmerName: p.farmerId?.name || "Farmer",
-    location: p.location?.region || "Ethiopia",
+    farmerName: p.farmerId?.name || t("buyerSaved.unknownFarmer"),
+    location: p.location?.region || t("buyerSaved.unknownLocation"),
     photos: p.photos || [],
     status: p.status,
     farmerId: p.farmerId,
     location_obj: p.location,
     _raw: p,
-  });
-
-  const items = savedProducts.map(normalize);
+  }));
 
   const renderSavedCard = ({ item }) => (
     <TouchableOpacity
       style={[styles.card, { backgroundColor: surface }]}
       activeOpacity={0.7}
-      onPress={() => navigation?.navigate("ListingDetail", { product: item._raw })}
+      onPress={() =>
+        navigation?.navigate("ListingDetail", { product: item._raw })
+      }
     >
       <View style={styles.cardTopRow}>
         <AppText style={[styles.cropName, { color: textPrimary }]}>
@@ -106,7 +106,9 @@ const BuyerSavedScreen = ({ navigation, onSwitchTab }) => {
 
       <View style={styles.cardMiddleRow}>
         <AppText style={[styles.price, { color: primary }]}>
-          {item.price?.toLocaleString()} ETB
+          {t("buyerSaved.priceWithCurrency", {
+            amount: item.price?.toLocaleString(),
+          })}
         </AppText>
         <AppText style={[styles.quantity, { color: textSecondary }]}>
           {item.quantity} {item.unit}
@@ -139,11 +141,13 @@ const BuyerSavedScreen = ({ navigation, onSwitchTab }) => {
       {/* View button */}
       <TouchableOpacity
         style={[styles.viewBtn, { borderColor: primary }]}
-        onPress={() => navigation?.navigate("ListingDetail", { product: item._raw })}
+        onPress={() =>
+          navigation?.navigate("ListingDetail", { product: item._raw })
+        }
         activeOpacity={0.7}
       >
         <AppText style={{ color: primary, fontWeight: "600", fontSize: 14 }}>
-          View Listing
+          {t("buyerSaved.viewListing")}
         </AppText>
       </TouchableOpacity>
     </TouchableOpacity>
@@ -158,16 +162,18 @@ const BuyerSavedScreen = ({ navigation, onSwitchTab }) => {
         style={{ marginBottom: 12 }}
       />
       <AppText style={[styles.emptyTitle, { color: textPrimary }]}>
-        No saved listings
+        {t("buyerSaved.emptyTitle")}
       </AppText>
       <AppText style={[styles.emptySubtitle, { color: textSecondary }]}>
-        Tap the bookmark icon on any listing to save it here
+        {t("buyerSaved.emptySubtitle")}
       </AppText>
       <TouchableOpacity
         style={[styles.browseButton, { backgroundColor: primary }]}
         onPress={() => onSwitchTab?.("Marketplace")}
       >
-        <AppText style={styles.browseButtonText}>Go to Marketplace</AppText>
+        <AppText style={styles.browseButtonText}>
+          {t("buyerSaved.browseMarketplace")}
+        </AppText>
       </TouchableOpacity>
     </View>
   );
@@ -175,7 +181,11 @@ const BuyerSavedScreen = ({ navigation, onSwitchTab }) => {
   return (
     <View style={[styles.screen, { backgroundColor: background }]}>
       <AppHeader
-        title={`Saved Listings${items.length > 0 ? ` (${items.length})` : ""}`}
+        title={
+          items.length > 0
+            ? t("buyerSaved.titleWithCount", { count: items.length })
+            : t("buyerSaved.title")
+        }
         showMenu={true}
         showNotification={true}
         notificationCount={0}
@@ -204,7 +214,6 @@ const BuyerSavedScreen = ({ navigation, onSwitchTab }) => {
           }
         />
       )}
-
     </View>
   );
 };

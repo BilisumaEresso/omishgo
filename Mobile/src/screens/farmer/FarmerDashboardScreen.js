@@ -1,8 +1,9 @@
 // src/screens/farmer/FarmerDashboardScreen.js
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import AgriPriceChangeWidget from "../../components/common/AgriPriceChangeWidget";
 import AppText from "../../components/common/AppText";
 import AddProductModal from "../../components/farmer/AddProductModal";
@@ -54,6 +55,7 @@ const marketTrends = [
 
 // ---------- main screen ----------
 export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const user = useAuthStore((state) => state.user);
   const { openSidebar } = useSidebar();
@@ -90,14 +92,13 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
     ? parseInt(biggestMover.price.replace(/[^0-9]/g, ""), 10)
     : null;
 
-
   const hours = new Date().getHours();
-  const greeting =
+  const greetingText =
     hours < 12
-      ? "Good morning"
+      ? t("farmerDashboard.goodMorning")
       : hours < 17
-        ? "Good afternoon"
-        : "Good evening";
+        ? t("farmerDashboard.goodAfternoon")
+        : t("farmerDashboard.goodEvening");
 
   // Data fetching (unchanged)
   const fetchProducts = async () => {
@@ -127,34 +128,36 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
       // keep mockProducts as fallback — already set as default state
     }
   };
- const fetchOrders = async () => {
-   try {
-     const res = await api.get(API_ENDPOINTS.orders.list);
-     const raw = res.data?.data?.orders || [];
-     setOrders(
-       raw.map((o) => ({
-         id: o._id,
-         item: `${o.quantity}${o.unit || "kg"} ${o.productId?.cropType || "Product"}`,
-         type: o.productId?.cropType || "—",
-         price: o.priceAtOrder,
-         totalPrice: o.totalPrice,
-         date: new Date(o.createdAt).toLocaleDateString("en-GB", {
-           day: "numeric",
-           month: "short",
-           year: "numeric",
-         }),
-         status:
-           o.status === "in_transit"
-             ? "In Transit"
-             : o.status.charAt(0).toUpperCase() + o.status.slice(1),
-         buyer: o.buyerId?.name || "Buyer",
-         buyerId: o.buyerId?._id,
-       })),
-     );
-   } catch (e) {
-     console.warn("fetchOrders failed:", e.message);
-   }
- };
+  const fetchOrders = async () => {
+    try {
+      const res = await api.get(API_ENDPOINTS.orders.list);
+      const raw = res.data?.data?.orders || [];
+      setOrders(
+        raw.map((o) => ({
+          id: o._id,
+          item: `${o.quantity}${o.unit || "kg"} ${o.productId?.cropType || "Product"}`,
+          type: o.productId?.cropType || "—",
+          price: o.priceAtOrder,
+          totalPrice: o.totalPrice,
+          date: new Date(o.createdAt).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }),
+          status:
+            o.status === "in_transit"
+              ? "In Transit"
+              : o.status.charAt(0).toUpperCase() + o.status.slice(1),
+          buyer: o.buyerId?.name || "Buyer",
+          buyerId: o.buyerId?._id,
+          cropType: o.productId?.cropType || "Product",
+          buyerName: o.buyerId?.name || "Buyer",
+        })),
+      );
+    } catch (e) {
+      console.warn("fetchOrders failed:", e.message);
+    }
+  };
 
   useEffect(() => {
     if (user?.id) {
@@ -170,15 +173,16 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
       }
     }, [user?.id]),
   );
-const todaySales = orders.filter(
-  (o) => new Date(o.date) >= new Date(Date.now() - 86400000),
-).length;
-const activeOrders = orders.filter(
-  (o) => o.status !== "Completed" && o.status !== "cancelled",
-).length;
-const revenue = orders
-  .filter((o) => o.status === "Completed" || o.status === "Delivered")
-  .reduce((sum, o) => sum + (o.totalPrice || o.price || 0), 0);
+
+  const todaySales = orders.filter(
+    (o) => new Date(o.date) >= new Date(Date.now() - 86400000),
+  ).length;
+  const activeOrders = orders.filter(
+    (o) => o.status !== "Completed" && o.status !== "cancelled",
+  ).length;
+  const revenue = orders
+    .filter((o) => o.status === "Completed" || o.status === "Delivered")
+    .reduce((sum, o) => sum + (o.totalPrice || o.price || 0), 0);
   const handleRefresh = async () => {
     setRefreshing(true);
     await Promise.all([fetchProducts(), fetchOrders()]);
@@ -192,7 +196,7 @@ const revenue = orders
     };
     setProducts([product, ...products]);
     setModalVisible(false);
-    setSuccessMsg("Product added successfully!");
+    setSuccessMsg(t("farmerDashboard.productAddedSuccess"));
     setTimeout(() => setSuccessMsg(""), 3000);
   };
 
@@ -207,11 +211,24 @@ const revenue = orders
     /* ... unchanged ... */
   };
 
+  // Status label mapping for translation
+  const statusLabelMap = {
+    Pending: "farmerDashboard.statusPending",
+    Confirmed: "farmerDashboard.statusConfirmed",
+    "In Transit": "farmerDashboard.statusInTransit",
+    Delivered: "farmerDashboard.statusDelivered",
+    Completed: "farmerDashboard.statusCompleted",
+    Cancelled: "farmerDashboard.statusCancelled",
+  };
+
   return (
     <>
       <DashboardLayout
-        title="Farmer Dashboard"
-        subtitle={`${greeting}, ${user?.name || "Farmer"}!`}
+        title={t("farmerDashboard.title")}
+        subtitle={t("farmerDashboard.subtitle", {
+          greeting: greetingText,
+          name: user?.name || t("farmerDashboard.fallbackName"),
+        })}
         role="farmer"
         scrollable={true}
         showMenu={true}
@@ -229,23 +246,22 @@ const revenue = orders
         <View style={styles.summaryRow}>
           <SummaryCard
             icon="cart-outline"
-            label="Today's Sales"
+            label={t("farmerDashboard.todaySales")}
             value={todaySales}
             color={warning}
             onPress={() => onSwitchTab?.("Orders")}
           />
           <SummaryCard
             icon="time-outline"
-            label="Active Orders"
+            label={t("farmerDashboard.activeOrders")}
             value={activeOrders}
             color={info}
             onPress={() => onSwitchTab?.("Orders")}
           />
           <SummaryCard
             icon="wallet-outline"
-            label="Revenue"
+            label={t("farmerDashboard.revenue")}
             value={revenue}
-            prefix="ETB "
             color={success}
             onPress={() => {}}
           />
@@ -257,7 +273,7 @@ const revenue = orders
             productName={biggestMover.crop}
             currentPrice={`${biggestMover.price}/q`}
             changePercent={parseFloat(biggestMover.demandChange)}
-            changeLabel="Demand Change"
+            changeLabel={t("farmerDashboard.demandChange")}
           />
         </TouchableOpacity>
 
@@ -275,17 +291,17 @@ const revenue = orders
           {[
             {
               icon: "chatbubbles-outline",
-              label: "Messages",
+              label: t("farmerDashboard.messages"),
               onPress: () => navigation.navigate("Conversations"),
             },
             {
               icon: "notifications-outline",
-              label: "Alerts",
+              label: t("farmerDashboard.alerts"),
               onPress: () => navigation.navigate("Notifications"),
             },
             {
               icon: "leaf-outline",
-              label: "My Crops",
+              label: t("farmerDashboard.myCrops"),
               onPress: () => onSwitchTab?.("Products"),
             },
           ].map((s) => (
@@ -316,11 +332,11 @@ const revenue = orders
         {/* ---- Market Trends ---- */}
         <View style={styles.sectionHeader}>
           <AppText style={[styles.sectionTitle, { color: textPrimary }]}>
-            Market Trends
+            {t("farmerDashboard.marketTrends")}
           </AppText>
           <TouchableOpacity onPress={() => {}}>
             <AppText style={[styles.seeAll, { color: primary }]}>
-              See All
+              {t("farmerDashboard.seeAll")}
             </AppText>
           </TouchableOpacity>
         </View>
@@ -344,11 +360,11 @@ const revenue = orders
         {/* ---- Recent Orders ---- */}
         <View style={styles.sectionHeader}>
           <AppText style={[styles.sectionTitle, { color: textPrimary }]}>
-            Recent Orders
+            {t("farmerDashboard.recentOrders")}
           </AppText>
           <TouchableOpacity onPress={() => onSwitchTab?.("Orders")}>
             <AppText style={[styles.seeAll, { color: primary }]}>
-              View All
+              {t("farmerDashboard.viewAll")}
             </AppText>
           </TouchableOpacity>
         </View>
@@ -385,31 +401,11 @@ const revenue = orders
                     ]}
                   />
                   <AppText style={{ fontSize: 12, color: textSecondary }}>
-                    {order.statusLabel || order.status}
+                    {t(statusLabelMap[order.status] || order.status)}
                   </AppText>
                 </View>
               </View>
-              <View style={styles.orderActions}>
-                {order.status !== "delivered" && (
-                  <TouchableOpacity
-                    style={[
-                      styles.orderActionBtn,
-                      { backgroundColor: success },
-                    ]}
-                    onPress={() => markOrderCompleted(order.id)}
-                  >
-                    <Ionicons name="checkmark" size={18} color="#fff" />
-                  </TouchableOpacity>
-                )}
-                {order.status !== "in_transit" && (
-                  <TouchableOpacity
-                    style={[styles.orderActionBtn, { backgroundColor: info }]}
-                    onPress={() => markOrderPendingPickup(order.id)}
-                  >
-                    <Ionicons name="bicycle" size={18} color="#fff" />
-                  </TouchableOpacity>
-                )}
-              </View>
+
             </View>
           </TouchableOpacity>
         ))}

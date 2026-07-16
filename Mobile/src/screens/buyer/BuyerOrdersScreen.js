@@ -1,6 +1,6 @@
 // Mobile/src/screens/buyer/BuyerOrdersScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 import AppText from "../../components/common/AppText";
 import AppButton from "../../components/common/AppButton";
 import AppHeader from "../../components/layout/AppHeader";
@@ -19,25 +20,39 @@ import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 
-const FILTER_TABS = ["All", "Pending", "Confirmed", "Delivered", "Cancelled"];
-
-// Map backend status (lowercase) to display label
-const STATUS_LABEL = {
-  pending: "Pending",
-  confirmed: "Confirmed",
-  in_transit: "In Transit",
-  delivered: "Delivered",
-  cancelled: "Cancelled",
-};
-
 const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [activeFilter, setActiveFilter] = useState(t("buyerOrders.filterAll"));
   const { openSidebar } = useSidebar();
+
+  // Translated filter tabs
+  const filterTabs = useMemo(
+    () => [
+      t("buyerOrders.filterAll"),
+      t("buyerOrders.filterPending"),
+      t("buyerOrders.filterConfirmed"),
+      t("buyerOrders.filterDelivered"),
+      t("buyerOrders.filterCancelled"),
+    ],
+    [t],
+  );
+
+  // Translated status labels
+  const statusLabel = useMemo(
+    () => ({
+      pending: t("buyerOrders.statusPending"),
+      confirmed: t("buyerOrders.statusConfirmed"),
+      in_transit: t("buyerOrders.statusInTransit"),
+      delivered: t("buyerOrders.statusDelivered"),
+      cancelled: t("buyerOrders.statusCancelled"),
+    }),
+    [t],
+  );
 
   // Extract theme colors with fallbacks
   const primary = theme?.colors?.primary || "#1565C0";
@@ -64,11 +79,11 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
         id: o._id,
         cropType: o.cropType,
         quantity: o.quantity,
-        unit: o.unit || "kg",
+        unit: o.unit || t("buyerOrders.unitKg"),
         totalPrice: o.totalPrice,
-        farmerName: o.farmerId?.name || "Farmer",
+        farmerName: o.farmerId?.name || t("buyerOrders.unknownFarmer"),
         farmerId: o.farmerId?._id,
-        status: STATUS_LABEL[o.status] || o.status,
+        status: statusLabel[o.status] || o.status,
         rawStatus: o.status,
         orderedDate: new Date(o.createdAt).toLocaleDateString("en-GB", {
           day: "numeric",
@@ -79,7 +94,11 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
       }));
       setOrders(normalized);
     } catch (err) {
-      setError(err?.response?.data?.message || err.message || "Failed to load orders");
+      setError(
+        err?.response?.data?.message ||
+          err.message ||
+          t("buyerOrders.errorLoadOrders"),
+      );
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -96,15 +115,15 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
   // Status badge colors
   const getStatusColor = (status) => {
     switch (status) {
-      case "Pending":
+      case t("buyerOrders.statusPending"):
         return { bg: warning + "18", text: warning };
-      case "Confirmed":
+      case t("buyerOrders.statusConfirmed"):
         return { bg: info + "18", text: info };
-      case "In Transit":
+      case t("buyerOrders.statusInTransit"):
         return { bg: primary + "18", text: primary };
-      case "Delivered":
+      case t("buyerOrders.statusDelivered"):
         return { bg: success + "18", text: success };
-      case "Cancelled":
+      case t("buyerOrders.statusCancelled"):
         return { bg: errorColor + "18", text: errorColor };
       default:
         return { bg: textMuted + "18", text: textMuted };
@@ -112,20 +131,25 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
   };
 
   const filteredOrders =
-    activeFilter === "All"
+    activeFilter === t("buyerOrders.filterAll")
       ? orders
       : orders.filter((o) => o.status === activeFilter);
 
   const renderOrderCard = ({ item }) => {
     const statusColors = getStatusColor(item.status);
     const isActive =
-      item.rawStatus === "pending" || item.rawStatus === "confirmed" || item.rawStatus === "in_transit";
+      item.rawStatus === "pending" ||
+      item.rawStatus === "confirmed" ||
+      item.rawStatus === "in_transit";
 
     return (
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() =>
-          navigation?.navigate("OrderDetail", { order: item._raw, role: "buyer" })
+          navigation?.navigate("OrderDetail", {
+            order: item._raw,
+            role: "buyer",
+          })
         }
       >
         <View style={[styles.card, { backgroundColor: surface }]}>
@@ -152,7 +176,7 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
             {/* Price and badge */}
             <View style={{ alignItems: "flex-end" }}>
               <AppText style={[styles.price, { color: primary }]}>
-                {item.totalPrice?.toLocaleString()} ETB
+                {item.totalPrice?.toLocaleString()}
               </AppText>
               <View
                 style={[styles.badge, { backgroundColor: statusColors.bg }]}
@@ -185,7 +209,7 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
                 style={{ marginRight: 6 }}
               />
               <AppText style={[styles.messageButtonText, { color: primary }]}>
-                Message Farmer
+                {t("buyerOrders.messageFarmer")}
               </AppText>
             </TouchableOpacity>
           )}
@@ -203,17 +227,19 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
         style={{ marginBottom: 12 }}
       />
       <AppText style={[styles.emptyText, { color: textSecondary }]}>
-        {activeFilter === "All"
-          ? "You haven't placed any orders yet"
-          : `No ${activeFilter.toLowerCase()} orders`}
+        {activeFilter === t("buyerOrders.filterAll")
+          ? t("buyerOrders.emptyNoOrders")
+          : t("buyerOrders.emptyNoFilterOrders", {
+              filter: activeFilter.toLowerCase(),
+            })}
       </AppText>
-      {activeFilter === "All" && (
+      {activeFilter === t("buyerOrders.filterAll") && (
         <TouchableOpacity
           onPress={() => onSwitchTab?.("Marketplace")}
           style={[styles.browseBtn, { backgroundColor: primary }]}
         >
           <AppText style={{ color: "#fff", fontWeight: "700", fontSize: 14 }}>
-            Browse Marketplace
+            {t("buyerOrders.browseMarketplace")}
           </AppText>
         </TouchableOpacity>
       )}
@@ -223,7 +249,7 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
   return (
     <View style={[styles.screen, { backgroundColor: background }]}>
       <AppHeader
-        title="My Orders"
+        title={t("buyerOrders.title")}
         showMenu={true}
         showNotification={true}
         notificationCount={0}
@@ -238,7 +264,7 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.filterScroll}
         >
-          {FILTER_TABS.map((tab) => {
+          {filterTabs.map((tab) => {
             const isActive = activeFilter === tab;
             return (
               <TouchableOpacity
@@ -275,8 +301,13 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
         </View>
       ) : error ? (
         <View style={styles.center}>
-          <AppText style={{ color: errorColor, marginBottom: 12 }}>{error}</AppText>
-          <AppButton title="Retry" onPress={() => fetchOrders()} />
+          <AppText style={{ color: errorColor, marginBottom: 12 }}>
+            {error}
+          </AppText>
+          <AppButton
+            title={t("buyerOrders.retry")}
+            onPress={() => fetchOrders()}
+          />
         </View>
       ) : (
         /* Orders list */
@@ -296,7 +327,6 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
           }
         />
       )}
-
     </View>
   );
 };

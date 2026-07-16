@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import AppText from "../../components/common/AppText";
 import { ProductCard } from "../../components/common/ProductCard";
 import AppHeader from "../../components/layout/AppHeader";
@@ -17,6 +18,7 @@ import { useSavedStore } from "../../store/saved.store";
 
 export default function FarmerProfileScreen({ route, navigation }) {
   const { farmerId } = route.params;
+  const { t } = useTranslation();
   const { theme } = useTheme();
 
   const primary = theme?.colors?.primary || "#1565C0";
@@ -43,7 +45,7 @@ export default function FarmerProfileScreen({ route, navigation }) {
         setFarmer(farmerRes.data?.data?.user);
         setProducts(productsRes.data?.data?.products || []);
       } catch (err) {
-        setError("Failed to load farmer profile");
+        setError(t("farmerProfile.errorLoadProfile"));
       } finally {
         setLoading(false);
       }
@@ -62,9 +64,16 @@ export default function FarmerProfileScreen({ route, navigation }) {
   if (error || !farmer) {
     return (
       <View style={[styles.center, { backgroundColor: background }]}>
-        <AppText style={{ color: textSecondary }}>{error || "Farmer not found"}</AppText>
-        <TouchableOpacity style={{ marginTop: 20 }} onPress={() => navigation.goBack()}>
-          <AppText style={{ color: primary }}>Go Back</AppText>
+        <AppText style={{ color: textSecondary }}>
+          {error || t("farmerProfile.farmerNotFound")}
+        </AppText>
+        <TouchableOpacity
+          style={{ marginTop: 20 }}
+          onPress={() => navigation.goBack()}
+        >
+          <AppText style={{ color: primary }}>
+            {t("farmerProfile.goBack")}
+          </AppText>
         </TouchableOpacity>
       </View>
     );
@@ -75,17 +84,25 @@ export default function FarmerProfileScreen({ route, navigation }) {
       <View style={styles.avatarContainer}>
         <Ionicons name="person-circle" size={80} color={primary} />
       </View>
-      <AppText variant="headingMd" style={{ color: textPrimary, textAlign: "center" }}>
+      <AppText
+        variant="headingMd"
+        style={{ color: textPrimary, textAlign: "center" }}
+      >
         {farmer.name}
       </AppText>
       <View style={styles.locationRow}>
         <Ionicons name="location-outline" size={16} color={textSecondary} />
-        <AppText variant="bodySm" style={{ color: textSecondary, marginLeft: 4 }}>
+        <AppText
+          variant="bodySm"
+          style={{ color: textSecondary, marginLeft: 4 }}
+        >
           {farmer.location?.region}, {farmer.location?.zone}
         </AppText>
       </View>
-      <AppText style={{ color: textSecondary, marginTop: 8, textAlign: "center" }}>
-        Active Listings: {products.length}
+      <AppText
+        style={{ color: textSecondary, marginTop: 8, textAlign: "center" }}
+      >
+        {t("farmerProfile.activeListings", { count: products.length })}
       </AppText>
     </View>
   );
@@ -93,7 +110,7 @@ export default function FarmerProfileScreen({ route, navigation }) {
   return (
     <View style={[styles.container, { backgroundColor: background }]}>
       <AppHeader
-        title="Farmer Profile"
+        title={t("farmerProfile.title")}
         showBack={true}
         onBackPress={() => navigation.goBack()}
       />
@@ -109,14 +126,16 @@ export default function FarmerProfileScreen({ route, navigation }) {
             theme={theme}
             isSaved={savedIds.has(item._id)}
             onToggleSave={toggleSave}
-            onView={(product) => navigation.navigate("ListingDetail", { product })}
+            onView={(product) =>
+              navigation.navigate("ListingDetail", { product })
+            }
           />
         )}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="leaf-outline" size={48} color={textSecondary} />
             <AppText style={{ color: textSecondary, marginTop: 12 }}>
-              No active listings at the moment
+              {t("farmerProfile.emptyListings")}
             </AppText>
           </View>
         }

@@ -21,18 +21,6 @@ import AppButton from "../../components/common/AppButton";
 import { useTheme } from "../../hooks/useTheme";
 import { useSavedStore } from "../../store/saved.store";
 
-// ─── Helper: relative time ────────────────────────────────────────────────────
-const timeAgo = (dateStr) => {
-  if (!dateStr) return "";
-  const now = Date.now();
-  const then = new Date(dateStr).getTime();
-  const diffMs = now - then;
-  const days = Math.floor(diffMs / 86400000);
-  if (days === 0) return "Today";
-  if (days === 1) return "Yesterday";
-  return `${days} days ago`;
-};
-
 // ─── Info Row ─────────────────────────────────────────────────────────────────
 const InfoRow = ({ iconName, label, value, theme }) => {
   const primary = theme?.colors?.primary || "#1565C0";
@@ -82,6 +70,17 @@ export default function ListingDetailScreen({ route, navigation }) {
   const success = theme?.colors?.success || "#2E7D32";
   const warning = theme?.colors?.warning || "#EF6C00";
   const error = theme?.colors?.error || "#C62828";
+  // ─── Helper: relative time (inside component to access t) ──────────────────
+  const timeAgo = (dateStr) => {
+    if (!dateStr) return "";
+    const now = Date.now();
+    const then = new Date(dateStr).getTime();
+    const diffMs = now - then;
+    const days = Math.floor(diffMs / 86400000);
+    if (days === 0) return t("listingDetail.timeToday");
+    if (days === 1) return t("listingDetail.timeYesterday");
+    return t("listingDetail.timeDaysAgo", { count: days });
+  };
 
   if (!product) {
     return (
@@ -90,7 +89,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           {t("browse.notFound") || "Listing not found"}
         </AppText>
         <AppButton
-          title="Go Back"
+          title={t("listingDetail.goBack")}
           onPress={() => navigation.goBack()}
           style={{ marginTop: 16 }}
         />
@@ -100,6 +99,7 @@ export default function ListingDetailScreen({ route, navigation }) {
 
   const farmer = product.farmerId || {};
   const loc = product.location || {};
+  console.log(product)
   const farmerName =
     farmer.name || t("browse.unknownFarmer") || "Unknown Farmer";
   const farmerPhone = farmer.phone || null;
@@ -115,8 +115,8 @@ export default function ListingDetailScreen({ route, navigation }) {
   const handleMessageFarmer = () => {
     if (!farmer._id) {
       Alert.alert(
-        t("common.error") || "Error",
-        "Farmer information unavailable",
+        t("listingDetail.farmerUnavailableTitle"),
+        t("listingDetail.farmerUnavailableMessage"),
       );
       return;
     }
@@ -168,11 +168,20 @@ export default function ListingDetailScreen({ route, navigation }) {
   const handleBuyNow = async () => {
     const qty = parseFloat(buyQty);
     if (!qty || qty <= 0) {
-      Alert.alert("Invalid quantity", "Please enter a valid quantity.");
+      Alert.alert(
+        t("listingDetail.invalidQuantityTitle"),
+        t("listingDetail.invalidQuantityMessage"),
+      );
       return;
     }
     if (qty > product.quantity) {
-      Alert.alert("Too much", `Only ${product.quantity} ${unit} available.`);
+      Alert.alert(
+        t("listingDetail.quantityExceededTitle"),
+        t("listingDetail.quantityExceededMessage", {
+          max: product.quantity,
+          unit,
+        }),
+      );
       return;
     }
     setOrdering(true);
@@ -184,16 +193,45 @@ export default function ListingDetailScreen({ route, navigation }) {
       setShowBuyModal(false);
       setBuyQty("");
       Alert.alert(
-        "Order Placed! 🎉",
-        `Your order for ${qty} ${unit} of ${product.cropType} has been placed.`,
-        [{ text: "View Orders", onPress: () => navigation.navigate("BuyerTabs") }],
+        t("listingDetail.orderPlacedTitle"),
+        t("listingDetail.orderPlacedMessage", {
+          qty,
+          unit,
+          cropType: product.cropType,
+        }),
+        [
+          {
+            text: t("listingDetail.viewOrders"),
+            onPress: () => navigation.navigate("BuyerTabs"),
+          },
+        ],
       );
     } catch (err) {
-      Alert.alert("Order Failed", err?.response?.data?.message || "Could not place order.");
+      Alert.alert(
+        t("listingDetail.orderFailedTitle"),
+        err?.response?.data?.message || t("listingDetail.couldNotPlaceOrder"),
+      );
     } finally {
       setOrdering(false);
     }
   };
+
+  // Translated status text
+  const statusText = (() => {
+    switch (product.status) {
+      case "sold":
+        return t("listingDetail.statusSold");
+      case "draft":
+        return t("listingDetail.statusDraft");
+      default:
+        return t("listingDetail.statusActive");
+    }
+  })();
+
+  const demandText =
+    demandLevel === "High"
+      ? t("listingDetail.demandHigh")
+      : t("listingDetail.demandMedium");
 
   return (
     <View style={[styles.container, { backgroundColor: background }]}>
@@ -262,7 +300,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           ]}
         >
           <AppText variant="label" style={{ color: surface }}>
-            {product.status?.toUpperCase() || "ACTIVE"}
+            {statusText}
           </AppText>
         </View>
 
@@ -272,14 +310,17 @@ export default function ListingDetailScreen({ route, navigation }) {
             variant="headingMd"
             style={{ color: surface, fontWeight: "700" }}
           >
-            {product.price} ETB
+            {t("listingDetail.priceETB", { price: product.price })}
           </AppText>
           <AppText style={{ color: surface, fontSize: 14, marginTop: 2 }}>
-            per {unit} · {product.quantity} {unit} available
+            {t("listingDetail.perUnitAvailable", {
+              unit,
+              quantity: product.quantity,
+            })}
           </AppText>
         </View>
 
-        {/* Market insights card - emoji replaced with icon */}
+        {/* Market insights card */}
         <View
           style={[
             styles.insightsCard,
@@ -300,21 +341,24 @@ export default function ListingDetailScreen({ route, navigation }) {
               style={{ marginRight: 6 }}
             />
             <AppText variant="headingSm" style={{ color: textPrimary }}>
-              Market Insights
+              {t("listingDetail.marketInsights")}
             </AppText>
           </View>
           <View style={styles.insightsRow}>
             <View style={styles.insightItem}>
               <AppText variant="label" style={{ color: textSecondary }}>
-                Avg Price
+                {t("listingDetail.avgPriceLabel")}
               </AppText>
               <AppText style={{ color: primary, fontWeight: "700" }}>
-                {avgMarketPrice} ETB/{unit}
+                {t("listingDetail.avgPriceValue", {
+                  price: avgMarketPrice,
+                  unit,
+                })}
               </AppText>
             </View>
             <View style={styles.insightItem}>
               <AppText variant="label" style={{ color: textSecondary }}>
-                Demand
+                {t("listingDetail.demandLabel")}
               </AppText>
               <AppText
                 style={{
@@ -322,12 +366,12 @@ export default function ListingDetailScreen({ route, navigation }) {
                   fontWeight: "700",
                 }}
               >
-                {demandLevel}
+                {demandText}
               </AppText>
             </View>
             <View style={styles.insightItem}>
               <AppText variant="label" style={{ color: textSecondary }}>
-                Listed
+                {t("listingDetail.listedLabel")}
               </AppText>
               <AppText style={{ color: textPrimary }}>{listedTime}</AppText>
             </View>
@@ -427,7 +471,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           />
           {product.status === "active" && (
             <AppButton
-              title="Buy Now"
+              title={t("listingDetail.buyNow")}
               variant="primary"
               fullWidth
               onPress={() => setShowBuyModal(true)}
@@ -445,39 +489,70 @@ export default function ListingDetailScreen({ route, navigation }) {
         onRequestClose={() => setShowBuyModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalCard, { backgroundColor: surface, borderColor: border }]}>
-            <AppText variant="headingSm" style={{ color: textPrimary, marginBottom: 4 }}>
-              Place Order
+          <View
+            style={[
+              styles.modalCard,
+              { backgroundColor: surface, borderColor: border },
+            ]}
+          >
+            <AppText
+              variant="headingSm"
+              style={{ color: textPrimary, marginBottom: 4 }}
+            >
+              {t("listingDetail.placeOrder")}
             </AppText>
-            <AppText style={{ color: textSecondary, marginBottom: 16, fontSize: 13 }}>
-              Available: {product.quantity} {unit} at {product.price} ETB/{unit}
+            <AppText
+              style={{ color: textSecondary, marginBottom: 16, fontSize: 13 }}
+            >
+              {t("listingDetail.availableInfo", {
+                quantity: product.quantity,
+                unit,
+                price: product.price,
+              })}
             </AppText>
             <TextInput
-              style={[styles.qtyInput, { borderColor: border, color: textPrimary }]}
-              placeholder={`Quantity (max ${product.quantity} ${unit})`}
+              style={[
+                styles.qtyInput,
+                { borderColor: border, color: textPrimary },
+              ]}
+              placeholder={t("listingDetail.qtyPlaceholder", {
+                max: product.quantity,
+                unit,
+              })}
               placeholderTextColor={textSecondary}
               keyboardType="numeric"
               value={buyQty}
               onChangeText={setBuyQty}
             />
             {buyQty ? (
-              <AppText style={{ color: primary, marginBottom: 12, fontWeight: "700" }}>
-                Total: {(parseFloat(buyQty) || 0) * product.price} ETB
+              <AppText
+                style={{ color: primary, marginBottom: 12, fontWeight: "700" }}
+              >
+                {t("listingDetail.totalWithCurrency", {
+                  total: (parseFloat(buyQty) || 0) * product.price,
+                })}
               </AppText>
             ) : null}
             <View style={{ gap: 10 }}>
               <AppButton
-                title={ordering ? "Placing Order..." : "Confirm Order"}
+                title={
+                  ordering
+                    ? t("listingDetail.placingOrder")
+                    : t("listingDetail.confirmOrder")
+                }
                 variant="primary"
                 fullWidth
                 onPress={handleBuyNow}
                 disabled={ordering}
               />
               <AppButton
-                title="Cancel"
+                title={t("listingDetail.cancel")}
                 variant="outline"
                 fullWidth
-                onPress={() => { setShowBuyModal(false); setBuyQty(""); }}
+                onPress={() => {
+                  setShowBuyModal(false);
+                  setBuyQty("");
+                }}
               />
             </View>
           </View>

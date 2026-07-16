@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
 import FloatingActionButton from "../../components/layout/FloatingActionBotton";
@@ -20,6 +21,7 @@ import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
 const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -49,7 +51,7 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
       });
       const raw = res.data?.data?.products || [];
       const normalized = raw.map((p) => {
-        let locString = "Ethiopia";
+        let locString = t("farmerProducts.fallbackLocation");
         if (p.location) {
           locString = [p.location.region, p.location.zone, p.location.kebele]
             .filter(Boolean)
@@ -127,8 +129,9 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
       );
     } catch (err) {
       Alert.alert(
-        "Unable to mark sold",
-        err?.response?.data?.message || "Could not update product status.",
+        t("farmerProducts.unableToMarkSoldTitle"),
+        err?.response?.data?.message ||
+          t("farmerProducts.unableToMarkSoldMessage"),
       );
     } finally {
       setUpdatingProductId(null);
@@ -139,9 +142,23 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
     const statusColors = getStatusColor(item.status);
     const isSold = item.status === "sold";
     const formattedPrice = item.price
-      ? `ETB ${Number(item.price).toLocaleString()}`
-      : "ETB -";
-    const postedLabel = item.postedDate ? `Posted ${item.postedDate}` : "";
+      ? t("farmerProducts.priceFormat", {
+          price: Number(item.price).toLocaleString(),
+        })
+      : t("farmerProducts.priceUnavailable");
+    const postedLabel = item.postedDate
+      ? t("farmerProducts.postedLabel", { date: item.postedDate })
+      : "";
+
+    // Status display text
+    const statusDisplay =
+      item.status === "active"
+        ? t("farmerProducts.statusActive")
+        : item.status === "sold"
+          ? t("farmerProducts.statusSold")
+          : item.status === "draft"
+            ? t("farmerProducts.statusDraft")
+            : item.status;
 
     return (
       <TouchableOpacity
@@ -157,7 +174,7 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
           </AppText>
           <View style={[styles.badge, { backgroundColor: statusColors.bg }]}>
             <AppText style={[styles.badgeText, { color: statusColors.text }]}>
-              {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+              {statusDisplay}
             </AppText>
           </View>
         </View>
@@ -197,7 +214,7 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
               <AppText
                 style={[styles.outlineButtonText, { color: textSecondary }]}
               >
-                Edit
+                {t("farmerProducts.edit")}
               </AppText>
             </TouchableOpacity>
             <TouchableOpacity
@@ -208,7 +225,9 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
               <AppText
                 style={[styles.outlineButtonText, { color: errorColor }]}
               >
-                {updatingProductId === item.id ? "Updating..." : "Mark Sold"}
+                {updatingProductId === item.id
+                  ? t("farmerProducts.updating")
+                  : t("farmerProducts.markSold")}
               </AppText>
             </TouchableOpacity>
           </View>
@@ -221,25 +240,29 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
     <View style={styles.emptyContainer}>
       <AppText style={styles.emptyEmoji}>🌱</AppText>
       <AppText style={[styles.emptyText, { color: textSecondary }]}>
-        Post your first product
+        {t("farmerProducts.emptyTitle")}
       </AppText>
       <TouchableOpacity
         style={[styles.addButton, { backgroundColor: primary }]}
         onPress={() => navigation?.navigate("PostProduct")}
       >
         <AppText style={[styles.addButtonText, { color: surface }]}>
-          Post Product
+          {t("farmerProducts.postProduct")}
         </AppText>
       </TouchableOpacity>
     </View>
   );
 
-  const countSummary = `${countActive} Active · ${countSold} Sold · ${countDraft} Draft`;
+  const countSummary = t("farmerProducts.countSummary", {
+    active: countActive,
+    sold: countSold,
+    draft: countDraft,
+  });
 
   return (
     <View style={[styles.screen, { backgroundColor: background }]}>
       <AppHeader
-        title="My Products"
+        title={t("farmerProducts.title")}
         showMenu={true}
         showNotification={true}
         notificationCount={0}
@@ -278,7 +301,7 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
           <AppText
             style={{ color: textMuted, fontSize: 16, textAlign: "center" }}
           >
-            You have no active listings.{"\n"}Tap + to post your first product.
+            {t("farmerProducts.emptyFallbackMessage")}
           </AppText>
         </View>
       )}
@@ -371,6 +394,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   locationText: {
+    fontSize: 12,
+    marginLeft: 4,
+  },
+  postedText: {
     fontSize: 12,
     marginLeft: 4,
   },

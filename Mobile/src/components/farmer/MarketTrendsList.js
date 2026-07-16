@@ -1,9 +1,11 @@
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "../../hooks/useTheme";
 import AppCard from "../common/AppCard";
 import AppText from "../common/AppText";
 
 export default function MarketTrendsList({ trends, onSellPress }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const textPrimary = theme?.colors?.textPrimary;
   const textSecondary = theme?.colors?.textSecondary;
@@ -52,7 +54,7 @@ export default function MarketTrendsList({ trends, onSellPress }) {
               variant="caption"
               style={{ color: "#FFF", fontWeight: "bold" }}
             >
-              Sell Now
+              {t("marketTrendsList.sellNow")}
             </AppText>
           </TouchableOpacity>
         </AppCard>
