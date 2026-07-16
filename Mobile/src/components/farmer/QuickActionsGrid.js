@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "../../hooks/useTheme";
 import AppText from "../common/AppText";
 
@@ -10,6 +11,7 @@ export default function QuickActionsGrid({
   onProductsPress,
   onTrainingPress,
 }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const primaryColor = theme?.colors?.primary;
   const surfaceColor = theme?.colors?.surface;
@@ -27,7 +29,7 @@ export default function QuickActionsGrid({
       >
         <Ionicons name="add-circle-outline" size={32} color="#FFF" />
         <AppText variant="bodyMd" style={[styles.label, { color: "#FFF" }]}>
-          Add Product
+          {t("quickActionsGrid.addProduct")}
         </AppText>
       </TouchableOpacity>
 
@@ -45,7 +47,7 @@ export default function QuickActionsGrid({
           variant="bodyMd"
           style={[styles.label, { color: textPrimary }]}
         >
-          My Products ({productCount})
+          {t("quickActionsGrid.myProducts", { count: productCount })}
         </AppText>
       </TouchableOpacity>
 
@@ -63,7 +65,7 @@ export default function QuickActionsGrid({
           variant="bodyMd"
           style={[styles.label, { color: textPrimary }]}
         >
-          Orders
+          {t("quickActionsGrid.orders")}
         </AppText>
         <View style={styles.badge}>
           <AppText
@@ -87,10 +89,10 @@ export default function QuickActionsGrid({
           variant="bodyMd"
           style={[styles.label, { color: textPrimary }]}
         >
-          Training
+          {t("quickActionsGrid.training")}
         </AppText>
         <AppText variant="caption" style={{ color: textSecondary }}>
-          2 tutorials
+          {t("quickActionsGrid.tutorialsCount", { count: 2 })}
         </AppText>
       </View>
     </View>

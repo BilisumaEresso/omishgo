@@ -1,11 +1,13 @@
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
 import AppCard from "../common/AppCard";
 import { useTheme } from "../../hooks/useTheme";
 
-function StatusBadge({ status }) {
+function StatusBadge({ status, t }) {
+  const statusKey = `recentOrdersList.status${status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}`;
   let bgColor = "#FFF3E0",
     textColor = "#FF9800";
   if (status === "Completed") {
@@ -21,13 +23,14 @@ function StatusBadge({ status }) {
         variant="caption"
         style={{ color: textColor, fontWeight: "600" }}
       >
-        {status}
+        {t(statusKey)}
       </AppText>
     </View>
   );
 }
 
 export default function RecentOrdersList({ orders }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const primaryColor = theme?.colors?.primary;
   const textPrimary = theme?.colors?.textPrimary;
@@ -37,11 +40,11 @@ export default function RecentOrdersList({ orders }) {
     <View style={styles.section}>
       <View style={styles.header}>
         <AppText variant="headingSm" style={{ color: textPrimary }}>
-          Recent Orders
+          {t("recentOrdersList.title")}
         </AppText>
         <TouchableOpacity onPress={() => {}}>
           <AppText variant="caption" style={{ color: primaryColor }}>
-            See all
+            {t("recentOrdersList.seeAll")}
           </AppText>
         </TouchableOpacity>
       </View>
@@ -69,7 +72,10 @@ export default function RecentOrdersList({ orders }) {
                   {order.item}
                 </AppText>
                 <AppText variant="caption" style={{ color: textSecondary }}>
-                  Order #{order.id} • {order.date}
+                  {t("recentOrdersList.orderIdDate", {
+                    id: order.id,
+                    date: order.date,
+                  })}
                 </AppText>
               </View>
             </View>
@@ -78,9 +84,11 @@ export default function RecentOrdersList({ orders }) {
                 variant="bodyMd"
                 style={{ fontWeight: "bold", color: primaryColor }}
               >
-                {order.price.toLocaleString()} ETB
+                {t("recentOrdersList.priceWithCurrency", {
+                  price: order.price.toLocaleString(),
+                })}
               </AppText>
-              <StatusBadge status={order.status} />
+              <StatusBadge status={order.status} t={t} />
             </View>
           </View>
         </AppCard>

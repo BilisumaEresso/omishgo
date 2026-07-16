@@ -1,11 +1,13 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
 import AppCard from "../common/AppCard";
 import { useTheme } from "../../hooks/useTheme";
 
 export default function PriceTrendWidget() {
+  const { t } = useTranslation();
   const { theme } = useTheme();
 
   const primary = theme?.colors?.primary || "#2E7D32";
@@ -13,6 +15,14 @@ export default function PriceTrendWidget() {
   const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
   const textSecondary = theme?.colors?.textSecondary || "#4A6741";
   const success = theme?.colors?.success || "#2E7D32";
+
+  const weekDays = [
+    t("priceTrendWidget.dayMon"),
+    t("priceTrendWidget.dayTue"),
+    t("priceTrendWidget.dayWed"),
+    t("priceTrendWidget.dayThu"),
+    t("priceTrendWidget.dayToday"),
+  ];
 
   return (
     <AppCard
@@ -27,7 +37,7 @@ export default function PriceTrendWidget() {
           variant="headingSm"
           style={[styles.productName, { color: textPrimary }]}
         >
-          Teff
+          {t("priceTrendWidget.productName")}
         </AppText>
         <View style={[styles.changeBadge, { backgroundColor: success + "20" }]}>
           <Ionicons
@@ -40,20 +50,22 @@ export default function PriceTrendWidget() {
             variant="caption"
             style={{ color: success, fontWeight: "700" }}
           >
-            +4.2%
+            {t("priceTrendWidget.changePercent", { percent: "+4.2" })}
           </AppText>
         </View>
       </View>
 
       {/* Price – large and bold */}
-      <AppText style={[styles.price, { color: primary }]}>3,450 ETB</AppText>
+      <AppText style={[styles.price, { color: primary }]}>
+        {t("priceTrendWidget.priceETB", { price: "3450" })}
+      </AppText>
 
       {/* Subtitle / description */}
       <AppText
         variant="caption"
         style={{ color: textSecondary, marginBottom: 12 }}
       >
-        Rising demand in central Ethiopia.
+        {t("priceTrendWidget.subtitle")}
       </AppText>
 
       {/* Bar chart – more visible */}
@@ -75,24 +87,18 @@ export default function PriceTrendWidget() {
         </View>
         {/* Optional axis labels */}
         <View style={styles.axisLabels}>
-          <AppText variant="caption" style={{ color: textSecondary }}>
-            Mon
-          </AppText>
-          <AppText variant="caption" style={{ color: textSecondary }}>
-            Tue
-          </AppText>
-          <AppText variant="caption" style={{ color: textSecondary }}>
-            Wed
-          </AppText>
-          <AppText variant="caption" style={{ color: textSecondary }}>
-            Thu
-          </AppText>
-          <AppText
-            variant="caption"
-            style={{ color: primary, fontWeight: "600" }}
-          >
-            Today
-          </AppText>
+          {weekDays.map((label, idx) => (
+            <AppText
+              key={idx}
+              variant="caption"
+              style={{
+                color: idx === 4 ? primary : textSecondary,
+                fontWeight: idx === 4 ? "600" : "400",
+              }}
+            >
+              {label}
+            </AppText>
+          ))}
         </View>
       </View>
     </AppCard>

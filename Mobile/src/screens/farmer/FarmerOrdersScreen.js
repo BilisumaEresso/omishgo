@@ -1,6 +1,6 @@
 // Mobile/src/screens/farmer/FarmerOrdersScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 import AppText from "../../components/common/AppText";
 import AppButton from "../../components/common/AppButton";
 import AppHeader from "../../components/layout/AppHeader";
@@ -19,24 +20,39 @@ import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 
-const FILTER_TABS = ["All", "Pending", "Confirmed", "Delivered", "Cancelled"];
-
-const STATUS_LABEL = {
-  pending: "Pending",
-  confirmed: "Confirmed",
-  in_transit: "In Transit",
-  delivered: "Delivered",
-  cancelled: "Cancelled",
-};
-
 const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [activeFilter, setActiveFilter] = useState(t("farmerOrders.filterAll"));
   const { openSidebar } = useSidebar();
+
+  // Translated filter tabs
+  const filterTabs = useMemo(
+    () => [
+      t("farmerOrders.filterAll"),
+      t("farmerOrders.filterPending"),
+      t("farmerOrders.filterConfirmed"),
+      t("farmerOrders.filterDelivered"),
+      t("farmerOrders.filterCancelled"),
+    ],
+    [t],
+  );
+
+  // Translated status labels
+  const statusLabel = useMemo(
+    () => ({
+      pending: t("farmerOrders.statusPending"),
+      confirmed: t("farmerOrders.statusConfirmed"),
+      in_transit: t("farmerOrders.statusInTransit"),
+      delivered: t("farmerOrders.statusDelivered"),
+      cancelled: t("farmerOrders.statusCancelled"),
+    }),
+    [t],
+  );
 
   // Extract theme colors
   const primary = theme?.colors?.primary || "#2E7D32";
@@ -62,11 +78,11 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
         id: o._id,
         cropType: o.cropType,
         quantity: o.quantity,
-        unit: o.unit || "kg",
+        unit: o.unit || t("farmerOrders.unitKg"),
         price: o.totalPrice,
-        buyerName: o.buyerId?.name || "Buyer",
+        buyerName: o.buyerId?.name || t("farmerOrders.unknownBuyer"),
         buyerId: o.buyerId?._id,
-        status: STATUS_LABEL[o.status] || o.status,
+        status: statusLabel[o.status] || o.status,
         rawStatus: o.status,
         date: new Date(o.createdAt).toLocaleDateString("en-GB", {
           day: "numeric",
@@ -77,7 +93,11 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
       }));
       setOrders(normalized);
     } catch (err) {
-      setError(err?.response?.data?.message || err.message || "Failed to load orders");
+      setError(
+        err?.response?.data?.message ||
+          err.message ||
+          t("farmerOrders.errorLoadOrders"),
+      );
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -92,15 +112,15 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "Pending":
+      case t("farmerOrders.statusPending"):
         return { bg: warning + "18", text: warning };
-      case "Confirmed":
+      case t("farmerOrders.statusConfirmed"):
         return { bg: info + "18", text: info };
-      case "In Transit":
+      case t("farmerOrders.statusInTransit"):
         return { bg: primary + "18", text: primary };
-      case "Delivered":
+      case t("farmerOrders.statusDelivered"):
         return { bg: success + "18", text: success };
-      case "Cancelled":
+      case t("farmerOrders.statusCancelled"):
         return { bg: errorColor + "18", text: errorColor };
       default:
         return { bg: "#F5F5F518", text: "#757575" };
@@ -108,7 +128,7 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
   };
 
   const filteredOrders =
-    activeFilter === "All"
+    activeFilter === t("farmerOrders.filterAll")
       ? orders
       : orders.filter((o) => o.status === activeFilter);
 
@@ -118,7 +138,10 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() =>
-          navigation?.navigate("OrderDetail", { order: item._raw, role: "farmer" })
+          navigation?.navigate("OrderDetail", {
+            order: item._raw,
+            role: "farmer",
+          })
         }
       >
         <View style={[styles.card, { backgroundColor: surface }]}>
@@ -136,7 +159,7 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
             {/* Price and badge */}
             <View style={{ alignItems: "flex-end" }}>
               <AppText style={[styles.price, { color: primary }]}>
-                {item.price?.toLocaleString()} ETB
+                {item.price?.toLocaleString()}
               </AppText>
               <View
                 style={[styles.badge, { backgroundColor: statusColors.bg }]}
@@ -152,7 +175,12 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
 
           {/* Quantity */}
           <View style={styles.quantityRow}>
-            <Ionicons name="cube-outline" size={14} color={textMuted} style={{ marginRight: 4 }} />
+            <Ionicons
+              name="cube-outline"
+              size={14}
+              color={textMuted}
+              style={{ marginRight: 4 }}
+            />
             <AppText style={[styles.quantityText, { color: textSecondary }]}>
               {item.quantity} {item.unit}
             </AppText>
@@ -164,9 +192,18 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="cube-outline" size={48} color={textSecondary} style={{ marginBottom: 12 }} />
+      <Ionicons
+        name="cube-outline"
+        size={48}
+        color={textSecondary}
+        style={{ marginBottom: 12 }}
+      />
       <AppText style={[styles.emptyText, { color: textSecondary }]}>
-        {activeFilter === "All" ? "No orders yet" : `No ${activeFilter.toLowerCase()} orders`}
+        {activeFilter === t("farmerOrders.filterAll")
+          ? t("farmerOrders.emptyNoOrders")
+          : t("farmerOrders.emptyNoFilterOrders", {
+              filter: activeFilter.toLowerCase(),
+            })}
       </AppText>
     </View>
   );
@@ -174,7 +211,7 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
   return (
     <View style={[styles.screen, { backgroundColor: background }]}>
       <AppHeader
-        title="My Orders"
+        title={t("farmerOrders.title")}
         showMenu={true}
         showNotification={true}
         notificationCount={0}
@@ -189,7 +226,7 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.filterScroll}
         >
-          {FILTER_TABS.map((tab) => {
+          {filterTabs.map((tab) => {
             const isActive = activeFilter === tab;
             return (
               <TouchableOpacity
@@ -223,8 +260,13 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
         </View>
       ) : error ? (
         <View style={styles.center}>
-          <AppText style={{ color: errorColor, marginBottom: 12 }}>{error}</AppText>
-          <AppButton title="Retry" onPress={() => fetchOrders()} />
+          <AppText style={{ color: errorColor, marginBottom: 12 }}>
+            {error}
+          </AppText>
+          <AppButton
+            title={t("farmerOrders.retry")}
+            onPress={() => fetchOrders()}
+          />
         </View>
       ) : (
         <FlatList
@@ -243,7 +285,6 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
           }
         />
       )}
-
     </View>
   );
 };
@@ -292,7 +333,12 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
   },
   emptyText: { fontSize: 16, fontWeight: "500" },
-  center: { flex: 1, justifyContent: "center", alignItems: "center", padding: 32 },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 32,
+  },
 });
 
 export default FarmerOrdersScreen;

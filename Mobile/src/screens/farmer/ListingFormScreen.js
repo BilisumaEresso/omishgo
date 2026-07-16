@@ -90,7 +90,10 @@ const ListingFormScreen = ({ navigation }) => {
         // await api.post("/products", draft);
         console.log("Synced draft to backend:", draft);
         await clearDraft();
-        Alert.alert("Success", "Offline draft synced successfully!");
+        Alert.alert(
+          t("listingForm.draftSyncedTitle"),
+          t("listingForm.draftSyncedMessage"),
+        );
         setTitle("");
         setDescription("");
         setPrice("");
@@ -106,7 +109,7 @@ const ListingFormScreen = ({ navigation }) => {
 
   const handleSubmit = async () => {
     if (!title || !price) {
-      Alert.alert("Error", "Title and Price are required");
+      Alert.alert(t("listingForm.errorTitle"), t("listingForm.errorRequired"));
       return;
     }
 
@@ -114,7 +117,7 @@ const ListingFormScreen = ({ navigation }) => {
 
     if (isOffline) {
       await saveDraft(productData);
-      Alert.alert("Offline", t("product.draftSaved"));
+      Alert.alert(t("listingForm.offlineTitle"), t("product.draftSaved"));
       navigation.goBack();
       return;
     }
@@ -123,10 +126,16 @@ const ListingFormScreen = ({ navigation }) => {
       // await api.post("/products", productData);
       console.log("Submitted product:", productData);
       await clearDraft();
-      Alert.alert("Success", "Listing submitted and pending approval");
+      Alert.alert(
+        t("listingForm.submittedTitle"),
+        t("listingForm.submittedMessage"),
+      );
       navigation.goBack();
     } catch (error) {
-      Alert.alert("Error", "Failed to submit listing");
+      Alert.alert(
+        t("listingForm.submitErrorTitle"),
+        t("listingForm.submitErrorMessage"),
+      );
     }
   };
 

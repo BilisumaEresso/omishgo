@@ -1,6 +1,6 @@
 // Mobile/src/screens/onboarding/OnboardingCarousel.js
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -11,40 +11,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import AppButton from "../../components/common/AppButton";
 import AppText from "../../components/common/AppText";
 import { useTheme } from "../../hooks/useTheme";
 
 const { width } = Dimensions.get("window");
-
-const slides = [
-  {
-    id: "1",
-    image: require("../../assets/images/onboard_farmer.png"),
-    title: "Sell Your Harvest Directly",
-    description:
-      "List your crops and reach buyers across Ethiopia — no middlemen.",
-  },
-  {
-    id: "2",
-    image: require("../../assets/images/onboard_market.png"),
-    title: "Browse Fresh from the Farm",
-    description:
-      "Find and order fresh produce directly from verified local farmers.",
-  },
-  {
-    id: "3",
-    image: require("../../assets/images/onboard_supply.png"),
-    title: "Farm Inputs at Your Door",
-    description: "Order seeds, fertilizers, and tools delivered to your farm.",
-  },
-  {
-    id: "4",
-    image: require("../../assets/images/onboard_track.png"),
-    title: "Track Every Delivery",
-    description: "Know exactly where your order is, from farm to your hands.",
-  },
-];
 
 export default function OnboardingCarousel({ navigation }) {
   const { t } = useTranslation();
@@ -53,32 +25,35 @@ export default function OnboardingCarousel({ navigation }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
 
-  const slides = [
-    {
-      id: "1",
-      image: require("../../assets/images/onboard_farmer.png"),
-      title: t("onboarding.slide1Title"),
-      description: t("onboarding.slide1Desc"),
-    },
-    {
-      id: "2",
-      image: require("../../assets/images/onboard_market.png"),
-      title: t("onboarding.slide2Title"),
-      description: t("onboarding.slide2Desc"),
-    },
-    {
-      id: "3",
-      image: require("../../assets/images/onboard_supply.png"),
-      title: t("onboarding.slide3Title"),
-      description: t("onboarding.slide3Desc"),
-    },
-    {
-      id: "4",
-      image: require("../../assets/images/onboard_track.png"),
-      title: t("onboarding.slide4Title"),
-      description: t("onboarding.slide4Desc"),
-    },
-  ];
+  const slides = useMemo(
+    () => [
+      {
+        id: "1",
+        image: require("../../assets/images/onboard_farmer.png"),
+        title: t("onboarding.slide1Title"),
+        description: t("onboarding.slide1Desc"),
+      },
+      {
+        id: "2",
+        image: require("../../assets/images/onboard_market.png"),
+        title: t("onboarding.slide2Title"),
+        description: t("onboarding.slide2Desc"),
+      },
+      {
+        id: "3",
+        image: require("../../assets/images/onboard_supply.png"),
+        title: t("onboarding.slide3Title"),
+        description: t("onboarding.slide3Desc"),
+      },
+      {
+        id: "4",
+        image: require("../../assets/images/onboard_track.png"),
+        title: t("onboarding.slide4Title"),
+        description: t("onboarding.slide4Desc"),
+      },
+    ],
+    [t],
+  );
 
   // Theme colors
   const primary = theme?.colors?.primary || "#2E7D32";
@@ -168,7 +143,7 @@ export default function OnboardingCarousel({ navigation }) {
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <AppText style={{ color: primary, fontWeight: "600", fontSize: 15 }}>
-            Skip
+            {t("onboarding.skip")}
           </AppText>
         </TouchableOpacity>
       )}
@@ -199,7 +174,7 @@ export default function OnboardingCarousel({ navigation }) {
       <View style={styles.bottom}>
         <View style={styles.dotsContainer}>{renderDots()}</View>
         <AppButton
-          title={isLast ? t("common.continue") : t("common.continue")}
+          title={t("onboarding.continue")}
           onPress={handleNext}
           fullWidth
           variant="primary"

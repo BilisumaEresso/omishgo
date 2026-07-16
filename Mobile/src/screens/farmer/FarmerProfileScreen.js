@@ -27,7 +27,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
   const { theme } = useTheme();
   const { user, logout, setLanguage } = useAuthStore();
   const { openSidebar } = useSidebar();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [languageOpen, setLanguageOpen] = useState(false);
   const [updatingLang, setUpdatingLang] = useState(false);
 
@@ -48,10 +48,18 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
     LANGUAGES.find((l) => l.code === currentLang)?.native || "English";
 
   const handleLogout = () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Logout", style: "destructive", onPress: () => logout() },
-    ]);
+    Alert.alert(
+      t("farmerProfile.logoutAlertTitle"),
+      t("farmerProfile.logoutAlertMessage"),
+      [
+        { text: t("farmerProfile.logoutAlertCancel"), style: "cancel" },
+        {
+          text: t("farmerProfile.logoutAlertConfirm"),
+          style: "destructive",
+          onPress: () => logout(),
+        },
+      ],
+    );
   };
 
   const handleChangeLanguage = async (code) => {
@@ -72,7 +80,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
     }
   };
 
-  const userName = user?.name || "Farmer";
+  const userName = user?.name || t("farmerProfile.fallbackName");
   const phone = user?.phone || "+251 900 000000";
   const location = user?.location || { region: "Addis Ababa", zone: "Bole" };
   const isVerified = user?.isVerified ?? true;
@@ -80,7 +88,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
   return (
     <View style={[styles.screen, { backgroundColor: background }]}>
       <AppHeader
-        title="My Profile"
+        title={t("farmerProfile.title")}
         showMenu={true}
         showNotification={true}
         notificationCount={0}
@@ -104,7 +112,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
             style={[styles.rolePill, { backgroundColor: primaryContainer }]}
           >
             <AppText style={[styles.roleText, { color: primary }]}>
-              FARMER
+              {t("farmerProfile.roleFarmer")}
             </AppText>
           </View>
           <AppText style={[styles.phoneNumber, { color: textSecondary }]}>
@@ -119,7 +127,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
               5
             </AppText>
             <AppText style={[styles.statLabel, { color: textSecondary }]}>
-              Products
+              {t("farmerProfile.statsProducts")}
             </AppText>
           </View>
           <View style={[styles.statCard, { backgroundColor: surface }]}>
@@ -127,7 +135,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
               12
             </AppText>
             <AppText style={[styles.statLabel, { color: textSecondary }]}>
-              Orders
+              {t("farmerProfile.statsOrders")}
             </AppText>
           </View>
           <View style={[styles.statCard, { backgroundColor: surface }]}>
@@ -135,21 +143,21 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
               4.8 ⭐
             </AppText>
             <AppText style={[styles.statLabel, { color: textSecondary }]}>
-              Rating
+              {t("farmerProfile.statsRating")}
             </AppText>
           </View>
         </View>
 
         {/* Account Info */}
         <AppText style={[styles.sectionTitle, { color: textPrimary }]}>
-          Account Info
+          {t("farmerProfile.sectionAccountInfo")}
         </AppText>
         <View style={[styles.infoCard, { backgroundColor: surface }]}>
           <View style={styles.infoRow}>
             <Ionicons name="location-outline" size={20} color={textSecondary} />
             <View style={styles.infoTextContainer}>
               <AppText style={[styles.infoLabel, { color: textMuted }]}>
-                Location
+                {t("farmerProfile.infoLocation")}
               </AppText>
               <AppText style={[styles.infoValue, { color: textPrimary }]}>
                 {location.region}, {location.zone}
@@ -163,7 +171,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
             <Ionicons name="call-outline" size={20} color={textSecondary} />
             <View style={styles.infoTextContainer}>
               <AppText style={[styles.infoLabel, { color: textMuted }]}>
-                Phone
+                {t("farmerProfile.infoPhone")}
               </AppText>
               <AppText style={[styles.infoValue, { color: textPrimary }]}>
                 {phone}
@@ -181,7 +189,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
             />
             <View style={styles.infoTextContainer}>
               <AppText style={[styles.infoLabel, { color: textMuted }]}>
-                Status
+                {t("farmerProfile.infoStatus")}
               </AppText>
               <AppText
                 style={[
@@ -189,7 +197,9 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
                   { color: isVerified ? successColor : textMuted },
                 ]}
               >
-                {isVerified ? "Verified" : "Unverified"}
+                {isVerified
+                  ? t("farmerProfile.statusVerified")
+                  : t("farmerProfile.statusUnverified")}
               </AppText>
             </View>
           </View>
@@ -199,7 +209,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
         <AppText
           style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}
         >
-          Language
+          {t("farmerProfile.sectionLanguage")}
         </AppText>
         <View style={[styles.infoCard, { backgroundColor: surface }]}>
           <TouchableOpacity
@@ -266,7 +276,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
         >
           <Ionicons name="settings-outline" size={20} color={primary} />
           <AppText style={[styles.menuLabel, { color: textPrimary }]}>
-            Settings
+            {t("farmerProfile.menuSettings")}
           </AppText>
           <Ionicons
             name="chevron-forward"
@@ -289,7 +299,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
               style={{ marginRight: 8 }}
             />
             <AppText style={[styles.logoutText, { color: surface }]}>
-              Logout
+              {t("farmerProfile.logoutButton")}
             </AppText>
           </TouchableOpacity>
         </View>
@@ -391,6 +401,21 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     borderRadius: 8,
   },
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 16,
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 16,
+    borderWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  menuLabel: { fontSize: 15, fontWeight: "500", flex: 1, marginLeft: 12 },
   logoutContainer: {
     paddingHorizontal: 16,
     paddingBottom: Platform.OS === "ios" ? 20 : 16,

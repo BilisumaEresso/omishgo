@@ -4,14 +4,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
+  Animated,
   FlatList,
-  KeyboardAvoidingView,
+  Keyboard,
   Platform,
   StyleSheet,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
 import api from "../../config/api";
@@ -21,8 +23,15 @@ import { useAuthStore } from "../../store/auth.store";
 
 const POLL_INTERVAL_MS = 5000;
 
-// ─── Single message bubble ────────────────────────────────────────────────────
-const MessageBubble = ({ message, isMe, theme }) => {
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+const formatTime = (iso) => {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+};
+
+// ─── Message bubble (unchanged except for minor polish) ──────────────────────
+const MessageBubble = ({ message, isMe, showAvatar, avatarLetter, theme }) => {
   const primary = theme?.colors?.primary || "#2E7D32";
   const surface = theme?.colors?.surface || "#FFFFFF";
   const border = theme?.colors?.border || "#E0E0E0";
@@ -31,6 +40,15 @@ const MessageBubble = ({ message, isMe, theme }) => {
 
   return (
     <View style={[styles.bubbleRow, isMe ? styles.rowRight : styles.rowLeft]}>
+      {/* Other person’s avatar */}
+      {!isMe && showAvatar ? (
+        <View style={[styles.avatarSmall, { backgroundColor: primary }]}>
+          <AppText style={styles.avatarText}>{avatarLetter}</AppText>
+        </View>
+      ) : (
+        !isMe && <View style={{ width: 30 }} />
+      )}
+
       <View
         style={[
           styles.bubble,
@@ -38,10 +56,7 @@ const MessageBubble = ({ message, isMe, theme }) => {
             ? [styles.bubbleMe, { backgroundColor: primary }]
             : [
                 styles.bubbleThem,
-                {
-                  backgroundColor: surface,
-                  borderColor: border,
-                },
+                { backgroundColor: surface, borderColor: border },
               ],
         ]}
       >
@@ -51,32 +66,35 @@ const MessageBubble = ({ message, isMe, theme }) => {
         >
           {message.content}
         </AppText>
-        <AppText
-          variant="label"
-          style={[
-            styles.timestamp,
-            {
-              color: isMe ? "rgba(255,255,255,0.65)" : textSecondary,
-            },
-          ]}
-        >
-          {formatTime(message.createdAt)}
-        </AppText>
+        <View style={styles.metaRow}>
+          <AppText
+            variant="label"
+            style={[
+              styles.timestamp,
+              { color: isMe ? "rgba(255,255,255,0.65)" : textSecondary },
+            ]}
+          >
+            {formatTime(message.createdAt)}
+          </AppText>
+          {isMe && (
+            <Ionicons
+              name={message.isRead ? "checkmark-done" : "checkmark"}
+              size={14}
+              color={message.isRead ? "#4CAF50" : "rgba(255,255,255,0.65)"}
+              style={{ marginLeft: 4 }}
+            />
+          )}
+        </View>
       </View>
     </View>
   );
-};
-
-const formatTime = (iso) => {
-  if (!iso) return "";
-  const d = new Date(iso);
-  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 };
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 export default function ChatScreen({ route, navigation }) {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
   const currentUser = useAuthStore((state) => state.user);
 
   const { userId, userName } = route.params || {};
@@ -88,8 +106,50 @@ export default function ChatScreen({ route, navigation }) {
   const [error, setError] = useState("");
   const flatListRef = useRef(null);
   const latestMsgCount = useRef(0);
+  const [isAtBottom, setIsAtBottom] = useState(true);
 
-  // Extract theme colors
+  // ----- Keyboard handling (pixel‑perfect) -----
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const keyboardPadding = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const showEvent =
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent =
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      const height = e.endCoordinates.height;
+      setKeyboardHeight(height);
+      Animated.timing(keyboardPadding, {
+        toValue: height,
+        duration: e.duration || 250,
+        useNativeDriver: false,
+      }).start();
+      // scroll to bottom after a tiny delay to allow layout to settle
+      setTimeout(() => {
+        if (flatListRef.current && isAtBottom) {
+          flatListRef.current.scrollToEnd({ animated: true });
+        }
+      }, 150);
+    });
+
+    const hideSub = Keyboard.addListener(hideEvent, (e) => {
+      Animated.timing(keyboardPadding, {
+        toValue: 0,
+        duration: e.duration || 150,
+        useNativeDriver: false,
+      }).start();
+      setTimeout(() => setKeyboardHeight(0), 150);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, [isAtBottom]);
+
+  // Theme colors
   const primary = theme?.colors?.primary || "#2E7D32";
   const background = theme?.colors?.background || "#F5F5F5";
   const surface = theme?.colors?.surface || "#FFFFFF";
@@ -103,18 +163,18 @@ export default function ChatScreen({ route, navigation }) {
     async (silent = false) => {
       if (!userId) return;
       if (!silent) setLoading(true);
-
       try {
         const res = await api.get(API_ENDPOINTS.messages.thread(userId));
         const fetched = res.data?.data?.messages || [];
-
         if (fetched.length !== latestMsgCount.current) {
           latestMsgCount.current = fetched.length;
           setMessages(fetched);
-          setTimeout(
-            () => flatListRef.current?.scrollToEnd({ animated: true }),
-            100,
-          );
+          if (isAtBottom) {
+            setTimeout(
+              () => flatListRef.current?.scrollToEnd({ animated: true }),
+              100,
+            );
+          }
         }
         setError("");
       } catch (err) {
@@ -122,14 +182,14 @@ export default function ChatScreen({ route, navigation }) {
           setError(
             err?.response?.data?.message ||
               err.message ||
-              "Failed to load messages",
+              t("chatScreen.errorLoadMessages"),
           );
         }
       } finally {
         setLoading(false);
       }
     },
-    [userId],
+    [userId, isAtBottom],
   );
 
   useEffect(() => {
@@ -154,8 +214,6 @@ export default function ChatScreen({ route, navigation }) {
     };
     setMessages((prev) => [...prev, optimistic]);
     setText("");
-    setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 80);
-
     setSending(true);
     try {
       const res = await api.post(API_ENDPOINTS.messages.send, {
@@ -163,7 +221,6 @@ export default function ChatScreen({ route, navigation }) {
         content: trimmed,
       });
       const saved = res.data?.data?.message;
-
       if (saved) {
         setMessages((prev) =>
           prev.map((m) => (m._id === optimistic._id ? saved : m)),
@@ -172,9 +229,15 @@ export default function ChatScreen({ route, navigation }) {
       }
     } catch (err) {
       setMessages((prev) => prev.filter((m) => m._id !== optimistic._id));
-      setError(err?.response?.data?.message || "Failed to send message");
+      setError(
+        err?.response?.data?.message || t("chatScreen.errorSendMessage"),
+      );
     } finally {
       setSending(false);
+      setTimeout(
+        () => flatListRef.current?.scrollToEnd({ animated: true }),
+        100,
+      );
     }
   };
 
@@ -184,140 +247,275 @@ export default function ChatScreen({ route, navigation }) {
     return sid === myId;
   };
 
-  return (
-    <View style={[styles.container, { backgroundColor: background }]}>
-      <AppHeader
-        title={userName || t("messaging.unknownUser") || "Chat"}
-        showBack={true}
-        onBackPress={() => navigation.goBack()}
-      />
+  // ── Date separators ───────────────────────────────────────────────────────
+  const messagesWithSeparators = useCallback(() => {
+    if (!messages.length) return [];
+    const result = [];
+    let lastDate = null;
+    messages.forEach((msg, index) => {
+      const currentDate = new Date(msg.createdAt).toDateString();
+      if (currentDate !== lastDate) {
+        result.push({
+          type: "date",
+          date: currentDate,
+          id: `date-${currentDate}`,
+        });
+        lastDate = currentDate;
+      }
+      result.push({ type: "message", ...msg, id: msg._id });
+    });
+    return result;
+  }, [messages]);
 
-      {loading ? (
+  // ── Scroll helpers ────────────────────────────────────────────────────────
+  const handleScroll = (event) => {
+    const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
+    setIsAtBottom(
+      contentOffset.y >= contentSize.height - layoutMeasurement.height - 50,
+    );
+  };
+
+  const scrollToBottom = () => {
+    flatListRef.current?.scrollToEnd({ animated: true });
+    setIsAtBottom(true);
+  };
+
+  // ── Render item ───────────────────────────────────────────────────────────
+  const renderItem = ({ item }) => {
+    if (item.type === "date") {
+      return (
+        <View style={styles.dateSeparator}>
+          <AppText style={styles.dateText}>{item.date}</AppText>
+        </View>
+      );
+    }
+    const showAvatar =
+      !isMe(item) &&
+      item.senderId !== messages[messages.indexOf(item) - 1]?.senderId;
+    const avatarLetter = userName?.charAt(0).toUpperCase() || "?";
+
+    return (
+      <MessageBubble
+        message={item}
+        isMe={isMe(item)}
+        showAvatar={showAvatar}
+        avatarLetter={avatarLetter}
+        theme={theme}
+      />
+    );
+  };
+
+  // ── Loading / error states ────────────────────────────────────────────────
+  if (loading) {
+    return (
+      <View style={[styles.container, { backgroundColor: background }]}>
+        <AppHeader
+          title={
+            userName || t("messaging.unknownUser") || t("chatScreen.title")
+          }
+          showBack
+          onBackPress={() => navigation.goBack()}
+        />
         <View style={styles.center}>
           <ActivityIndicator size="large" color={primary} />
         </View>
-      ) : error && messages.length === 0 ? (
+      </View>
+    );
+  }
+
+  if (error && messages.length === 0) {
+    return (
+      <View style={[styles.container, { backgroundColor: background }]}>
+        <AppHeader
+          title={
+            userName || t("messaging.unknownUser") || t("chatScreen.title")
+          }
+          showBack
+          onBackPress={() => navigation.goBack()}
+        />
         <View style={styles.center}>
           <AppText style={{ color: errorColor, textAlign: "center" }}>
             {error}
           </AppText>
         </View>
-      ) : (
-        <KeyboardAvoidingView
-          style={styles.flex}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          keyboardVerticalOffset={90}
-        >
-          <FlatList
-            ref={flatListRef}
-            data={messages}
-            keyExtractor={(item) => item._id}
-            renderItem={({ item }) => (
-              <MessageBubble message={item} isMe={isMe(item)} theme={theme} />
-            )}
-            contentContainerStyle={styles.messageList}
-            showsVerticalScrollIndicator={false}
-            onContentSizeChange={() =>
-              flatListRef.current?.scrollToEnd({ animated: false })
-            }
-            ListEmptyComponent={
-              <View style={styles.center}>
-                <Ionicons
-                  name="chatbubble-ellipses-outline"
-                  size={36}
-                  color={textSecondary}
-                />
-                <AppText
-                  variant="bodyMd"
-                  style={{
-                    color: textSecondary,
-                    marginTop: 8,
-                    textAlign: "center",
-                  }}
-                >
-                  {t("messaging.noMessages") || "No messages yet. Say hello!"}
-                </AppText>
-              </View>
-            }
-          />
+      </View>
+    );
+  }
 
-          {/* Input bar */}
-          <View
-            style={[
-              styles.inputBar,
-              {
-                backgroundColor: surface,
-                borderTopColor: border,
-              },
-            ]}
-          >
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: background,
-                  color: textPrimary,
-                },
-              ]}
-              placeholder={t("messaging.placeholder") || "Type a message..."}
-              placeholderTextColor={textSecondary}
-              value={text}
-              onChangeText={setText}
-              multiline
-              maxLength={1000}
-              returnKeyType="default"
+  return (
+    <View style={[styles.container, { backgroundColor: background }]}>
+      <AppHeader
+        title={userName || t("messaging.unknownUser") || t("chatScreen.title")}
+        showBack
+        onBackPress={() => navigation.goBack()}
+      />
+
+      {/* Chat list */}
+      <FlatList
+        ref={flatListRef}
+        data={messagesWithSeparators()}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.messageList}
+        showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive"
+        ListEmptyComponent={
+          <View style={styles.center}>
+            <Ionicons
+              name="chatbubble-ellipses-outline"
+              size={36}
+              color={textSecondary}
             />
-            <TouchableOpacity
-              style={[
-                styles.sendBtn,
-                { backgroundColor: primary },
-                (!text.trim() || sending) && styles.sendBtnDisabled,
-              ]}
-              onPress={handleSend}
-              disabled={!text.trim() || sending}
-              activeOpacity={0.8}
+            <AppText
+              variant="bodyMd"
+              style={{
+                color: textSecondary,
+                marginTop: 8,
+                textAlign: "center",
+              }}
             >
-              {sending ? (
-                <ActivityIndicator size="small" color={surface} />
-              ) : (
-                <Ionicons name="send" size={18} color={surface} />
-              )}
-            </TouchableOpacity>
+              {t("messaging.noMessages") || "No messages yet. Say hello!"}
+            </AppText>
           </View>
-        </KeyboardAvoidingView>
+        }
+      />
+
+      {/* Scroll to bottom button */}
+      {!isAtBottom && (
+        <TouchableOpacity
+          style={styles.scrollToBottomBtn}
+          onPress={scrollToBottom}
+        >
+          <Ionicons name="chevron-down" size={20} color="#fff" />
+        </TouchableOpacity>
       )}
+
+      {/* Input bar – always on top of the keyboard */}
+      <Animated.View
+        style={[
+          styles.inputBar,
+          {
+            backgroundColor: surface,
+            borderTopColor: border,
+            paddingBottom: Animated.add(keyboardPadding, insets.bottom),
+          },
+        ]}
+      >
+        <TextInput
+          style={[
+            styles.input,
+            { backgroundColor: background, color: textPrimary },
+          ]}
+          placeholder={t("messaging.placeholder") || "Type a message..."}
+          placeholderTextColor={textSecondary}
+          value={text}
+          onChangeText={setText}
+          multiline
+          maxLength={1000}
+        />
+        <TouchableOpacity
+          style={[
+            styles.sendBtn,
+            { backgroundColor: primary },
+            (!text.trim() || sending) && styles.sendBtnDisabled,
+          ]}
+          onPress={handleSend}
+          disabled={!text.trim() || sending}
+          activeOpacity={0.8}
+        >
+          {sending ? (
+            <ActivityIndicator size="small" color={surface} />
+          ) : (
+            <Ionicons name="send" size={18} color={surface} />
+          )}
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 }
 
+// ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  flex: { flex: 1 },
   messageList: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    gap: 6,
     flexGrow: 1,
   },
-  bubbleRow: { marginVertical: 3, maxWidth: "80%" },
-  rowRight: { alignSelf: "flex-end" },
-  rowLeft: { alignSelf: "flex-start" },
+  dateSeparator: {
+    alignItems: "center",
+    marginVertical: 12,
+  },
+  dateText: {
+    fontSize: 12,
+    color: "#999",
+    backgroundColor: "#e0e0e0",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  bubbleRow: {
+    flexDirection: "row",
+    marginVertical: 3,
+    alignItems: "flex-end",
+  },
+  rowRight: { justifyContent: "flex-end" },
+  rowLeft: { justifyContent: "flex-start" },
+  avatarSmall: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 8,
+    alignSelf: "flex-end",
+  },
+  avatarText: { color: "#fff", fontWeight: "700", fontSize: 14 },
   bubble: {
     borderRadius: 18,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    gap: 4,
+    maxWidth: "75%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
-  bubbleMe: { borderBottomRightRadius: 4 },
+  bubbleMe: { borderBottomRightRadius: 4, marginRight: 8 },
   bubbleThem: { borderBottomLeftRadius: 4, borderWidth: 1 },
-  timestamp: { fontSize: 10, alignSelf: "flex-end" },
+  metaRow: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  timestamp: { fontSize: 10 },
+  scrollToBottomBtn: {
+    position: "absolute",
+    bottom: 70,
+    right: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#999",
+    justifyContent: "center",
+    alignItems: "center",
+    opacity: 0.8,
+    zIndex: 10,
+  },
   inputBar: {
     flexDirection: "row",
     alignItems: "flex-end",
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingTop: 10,
     borderTopWidth: 1,
     gap: 8,
+    // paddingBottom is now animated + safe area handled above
   },
   input: {
     flex: 1,

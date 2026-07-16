@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Linking,
   ScrollView,
@@ -11,50 +12,8 @@ import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
 import { useTheme } from "../../hooks/useTheme";
 
-const faqs = [
-  {
-    question: "How do I post a product?",
-    answer:
-      "Tap the Products tab or the Post button on your dashboard. Fill in your crop type, quantity, price, and location. Your listing goes live immediately.",
-  },
-  {
-    question: "How do buyers contact me?",
-    answer:
-      "Buyers can message you directly from your listing. You will receive a notification when a new message arrives.",
-  },
-  {
-    question: "How is the price suggested?",
-    answer:
-      "We show average prices from recent listings on the platform. Use it as a guide — you set your own price.",
-  },
-  {
-    question: "How do I change my language?",
-    answer:
-      "Open the sidebar menu and tap My Profile. Language settings are in your profile page.",
-  },
-  {
-    question: "Is my phone number safe?",
-    answer:
-      "Your phone number is only shared with buyers or farmers you have an active order with.",
-  },
-  {
-    question: "What is a Quintal?",
-    answer:
-      "One quintal equals 100 kilograms. It is the standard unit for grain trading in Ethiopia.",
-  },
-  {
-    question: "How do I cancel an order?",
-    answer:
-      "Open the order from your Orders tab and tap Cancel. Cancellation is only possible before delivery begins.",
-  },
-  {
-    question: "I found a bug or have a suggestion.",
-    answer:
-      "We appreciate your feedback. Tap Send Message above to contact our team directly.",
-  },
-];
-
 export default function HelpScreen({ navigation }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const [expandedIndex, setExpandedIndex] = useState(null);
 
@@ -63,6 +22,41 @@ export default function HelpScreen({ navigation }) {
   const primaryContainer = theme?.colors?.primaryContainer || "#E8F5E9";
   const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
   const textSecondary = theme?.colors?.textSecondary || "#4A6741";
+
+  const faqs = [
+    {
+      question: t("helpScreen.faq1Question"),
+      answer: t("helpScreen.faq1Answer"),
+    },
+    {
+      question: t("helpScreen.faq2Question"),
+      answer: t("helpScreen.faq2Answer"),
+    },
+    {
+      question: t("helpScreen.faq3Question"),
+      answer: t("helpScreen.faq3Answer"),
+    },
+    {
+      question: t("helpScreen.faq4Question"),
+      answer: t("helpScreen.faq4Answer"),
+    },
+    {
+      question: t("helpScreen.faq5Question"),
+      answer: t("helpScreen.faq5Answer"),
+    },
+    {
+      question: t("helpScreen.faq6Question"),
+      answer: t("helpScreen.faq6Answer"),
+    },
+    {
+      question: t("helpScreen.faq7Question"),
+      answer: t("helpScreen.faq7Answer"),
+    },
+    {
+      question: t("helpScreen.faq8Question"),
+      answer: t("helpScreen.faq8Answer"),
+    },
+  ];
 
   const toggleFaq = (index) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
@@ -82,7 +76,7 @@ export default function HelpScreen({ navigation }) {
   return (
     <View style={{ flex: 1, backgroundColor }}>
       <AppHeader
-        title="Help & Support"
+        title={t("helpScreen.title")}
         showBack={true}
         onBackPress={() => navigation.goBack()}
       />
@@ -92,7 +86,7 @@ export default function HelpScreen({ navigation }) {
             variant="headingSm"
             style={[styles.sectionTitle, { color: textPrimary }]}
           >
-            Quick Contact
+            {t("helpScreen.quickContact")}
           </AppText>
           <View style={styles.contactRow}>
             <TouchableOpacity
@@ -105,7 +99,7 @@ export default function HelpScreen({ navigation }) {
             >
               <Ionicons name="call-outline" size={24} color={primary} />
               <AppText style={[styles.cardTitle, { color: primary }]}>
-                Call Support
+                {t("helpScreen.callSupport")}
               </AppText>
             </TouchableOpacity>
             <TouchableOpacity
@@ -118,7 +112,7 @@ export default function HelpScreen({ navigation }) {
             >
               <Ionicons name="mail-outline" size={24} color={primary} />
               <AppText style={[styles.cardTitle, { color: primary }]}>
-                Send Message
+                {t("helpScreen.sendMessage")}
               </AppText>
             </TouchableOpacity>
           </View>
@@ -129,7 +123,7 @@ export default function HelpScreen({ navigation }) {
             variant="headingSm"
             style={[styles.sectionTitle, { color: textPrimary }]}
           >
-            Frequently Asked Questions
+            {t("helpScreen.faqTitle")}
           </AppText>
           {faqs.map((item, index) => (
             <TouchableOpacity
@@ -162,10 +156,10 @@ export default function HelpScreen({ navigation }) {
 
         <View style={styles.versionContainer}>
           <AppText style={[styles.versionText, { color: textSecondary }]}>
-            OmishGo v1.0 MVP
+            {t("helpScreen.versionTitle")}
           </AppText>
           <AppText style={[styles.versionText, { color: textSecondary }]}>
-            Built for Ethiopian Farmers
+            {t("helpScreen.versionSubtitle")}
           </AppText>
         </View>
       </ScrollView>

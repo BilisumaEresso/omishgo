@@ -5,8 +5,10 @@ import { Ionicons } from "@expo/vector-icons";
 import AppText from "./AppText";
 import AppButton from "./AppButton";
 import { useTheme } from "../../hooks/useTheme";
+import { useTranslation } from "react-i18next";
 
 const ErrorMessage = ({ message, onRetry, inline = false, style }) => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
 
   if (!message) return null;
@@ -53,9 +55,12 @@ const ErrorMessage = ({ message, onRetry, inline = false, style }) => {
 
       <AppText
         variant="headingSm"
-        style={[styles.title, { color: theme?.colors?.textPrimary || "#212121" }]}
+        style={[
+          styles.title,
+          { color: theme?.colors?.textPrimary || "#212121" },
+        ]}
       >
-        An Error Occurred
+        {t("errorMessage.title")}
       </AppText>
 
       <AppText
@@ -71,7 +76,7 @@ const ErrorMessage = ({ message, onRetry, inline = false, style }) => {
 
       {onRetry && (
         <AppButton
-          title="Try Again"
+          title={t("errorMessage.tryAgain")}
           onPress={onRetry}
           variant="outline"
           style={styles.retryButton}

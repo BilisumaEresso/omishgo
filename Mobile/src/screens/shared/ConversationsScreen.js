@@ -17,8 +17,20 @@ import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 
+// ─── Helper: format relative time ────────────────────────────────────────────
+const formatRelativeTime = (iso, t) => {
+  if (!iso) return "";
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return t("conversationsScreen.timeNow");
+  if (mins < 60) return t("conversationsScreen.timeMinutes", { mins });
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return t("conversationsScreen.timeHours", { hrs });
+  return t("conversationsScreen.timeDays", { days: Math.floor(hrs / 24) });
+};
+
 // ─── Conversation row ─────────────────────────────────────────────────────────
-const ConvoRow = ({ convo, onPress, theme }) => {
+const ConvoRow = ({ convo, onPress, theme, t }) => {
   // Extract theme colors
   const primary = theme?.colors?.primary || "#2E7D32";
   const surface = theme?.colors?.surface || "#FFFFFF";
@@ -27,6 +39,8 @@ const ConvoRow = ({ convo, onPress, theme }) => {
   const textSecondary = theme?.colors?.textSecondary || "#4A6741";
 
   const hasUnread = convo.unreadCount > 0;
+  const partnerName =
+    convo.partnerName || t("conversationsScreen.unknownPartner");
 
   return (
     <TouchableOpacity
@@ -43,7 +57,7 @@ const ConvoRow = ({ convo, onPress, theme }) => {
       {/* Avatar */}
       <View style={[styles.avatar, { backgroundColor: primary }]}>
         <AppText style={[styles.avatarText, { color: surface }]}>
-          {(convo.partnerName || "?")[0].toUpperCase()}
+          {(partnerName || "?")[0].toUpperCase()}
         </AppText>
       </View>
 
@@ -58,10 +72,10 @@ const ConvoRow = ({ convo, onPress, theme }) => {
               hasUnread && styles.bold,
             ]}
           >
-            {convo.partnerName || "Unknown"}
+            {partnerName}
           </AppText>
           <AppText variant="label" style={{ color: textSecondary }}>
-            {formatRelativeTime(convo.lastMessageAt)}
+            {formatRelativeTime(convo.lastMessageAt, t)}
           </AppText>
         </View>
         <View style={styles.rowBottom}>
@@ -87,17 +101,6 @@ const ConvoRow = ({ convo, onPress, theme }) => {
       </View>
     </TouchableOpacity>
   );
-};
-
-const formatRelativeTime = (iso) => {
-  if (!iso) return "";
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "now";
-  if (mins < 60) return `${mins}m`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h`;
-  return `${Math.floor(hrs / 24)}d`;
 };
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
@@ -131,7 +134,7 @@ export default function ConversationsScreen({ navigation }) {
       setError(
         err?.response?.data?.message ||
           err.message ||
-          "Failed to load conversations",
+          t("conversationsScreen.errorLoadConversations"),
       );
     } finally {
       setLoading(false);
@@ -181,7 +184,10 @@ export default function ConversationsScreen({ navigation }) {
           >
             {error}
           </AppText>
-          <AppButton title="Retry" onPress={() => fetchConversations()} />
+          <AppButton
+            title={t("conversationsScreen.retry")}
+            onPress={() => fetchConversations()}
+          />
         </View>
       ) : (
         <FlatList
@@ -192,6 +198,7 @@ export default function ConversationsScreen({ navigation }) {
               convo={item}
               onPress={() => handleOpen(item)}
               theme={theme}
+              t={t}
             />
           )}
           showsVerticalScrollIndicator={false}

@@ -22,8 +22,8 @@ import { useTheme } from "../../hooks/useTheme";
 import { ProductCard } from "../../components/common/ProductCard";
 import { useSavedStore } from "../../store/saved.store";
 
-// ─── Crop filter list (static for now) ───────────────────────────────────────
-const CROP_FILTERS = [
+// ─── Crop filter values (English, used for data matching) ─────────────────────
+const CROP_VALUES = [
   "All",
   "Tomato",
   "Teff",
@@ -34,8 +34,8 @@ const CROP_FILTERS = [
   "Potato",
 ];
 
-// ─── Sort options (no icons) ──────────────────────────────────────────────────
-const SORT_OPTIONS = ["Default", "Price ↑", "Price ↓"];
+// ─── Sort option values (English, used for data matching) ─────────────────────
+const SORT_VALUES = ["Default", "Price ↑", "Price ↓"];
 
 export default function BrowseScreen({ navigation, onSwitchTab }) {
   const { t } = useTranslation();
@@ -59,6 +59,30 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
   const toggleSave = useSavedStore((s) => s.toggleSave);
   const fetchSaved = useSavedStore((s) => s.fetchSaved);
   const savedInitialized = useSavedStore((s) => s.initialized);
+
+  // Translated filter & sort items
+  const cropFilterItems = useMemo(
+    () => [
+      { value: "All", label: t("browse.all") },
+      { value: "Tomato", label: t("browse.tomato") },
+      { value: "Teff", label: t("browse.teff") },
+      { value: "Wheat", label: t("browse.wheat") },
+      { value: "Maize", label: t("browse.maize") },
+      { value: "Onion", label: t("browse.onion") },
+      { value: "Cabbage", label: t("browse.cabbage") },
+      { value: "Potato", label: t("browse.potato") },
+    ],
+    [t],
+  );
+
+  const sortItems = useMemo(
+    () => [
+      { value: "Default", label: t("browse.sortDefault") },
+      { value: "Price ↑", label: t("browse.sortPriceAsc") },
+      { value: "Price ↓", label: t("browse.sortPriceDesc") },
+    ],
+    [t],
+  );
 
   const fetchProducts = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -154,7 +178,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
   return (
     <View style={{ flex: 1, backgroundColor: background }}>
       <AppHeader
-        title="Marketplace"
+        title={t("browse.title")}
         showMenu={true}
         showNotification={true}
         notificationCount={0}
@@ -191,9 +215,9 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
       {/* Insights banner */}
       <View style={styles.insightsRow}>
         {[
-          { label: "Products", value: insights.total },
-          { label: "Avg Price", value: `${insights.avgPrice} ETB` },
-          { label: "Farmers", value: insights.uniqueFarmers },
+          { label: t("browse.products"), value: insights.total },
+          { label: t("browse.avgPrice"), value: `${insights.avgPrice} ETB` },
+          { label: t("browse.farmers"), value: insights.uniqueFarmers },
         ].map((item, index) => (
           <View
             key={index}
@@ -217,12 +241,12 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
             showsHorizontalScrollIndicator={false}
             style={{ flex: 1 }}
           >
-            {CROP_FILTERS.map((crop) => {
-              const isActive = cropFilter === crop;
+            {cropFilterItems.map((item) => {
+              const isActive = cropFilter === item.value;
               return (
                 <TouchableOpacity
-                  key={crop}
-                  onPress={() => setCropFilter(crop)}
+                  key={item.value}
+                  onPress={() => setCropFilter(item.value)}
                   style={[
                     styles.filterChip,
                     {
@@ -238,7 +262,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
                       fontWeight: "600",
                     }}
                   >
-                    {crop}
+                    {item.label}
                   </AppText>
                 </TouchableOpacity>
               );
@@ -257,7 +281,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
               <AppText
                 style={{ color: textPrimary, fontSize: 13, fontWeight: "600" }}
               >
-                Sort
+                {t("browse.sort")}
               </AppText>
             </TouchableOpacity>
             {sortDropdownOpen && (
@@ -267,29 +291,29 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
                   { backgroundColor: surface, borderColor: border },
                 ]}
               >
-                {SORT_OPTIONS.map((opt) => (
+                {sortItems.map((item) => (
                   <TouchableOpacity
-                    key={opt}
+                    key={item.value}
                     onPress={() => {
-                      setSortOrder(opt);
+                      setSortOrder(item.value);
                       setSortDropdownOpen(false);
                     }}
                     style={[
                       styles.sortDropdownItem,
                       { borderBottomColor: border },
-                      sortOrder === opt && {
+                      sortOrder === item.value && {
                         backgroundColor: primary + "10",
                       },
                     ]}
                   >
                     <AppText
                       style={{
-                        color: sortOrder === opt ? primary : textPrimary,
+                        color: sortOrder === item.value ? primary : textPrimary,
                         fontSize: 13,
-                        fontWeight: sortOrder === opt ? "600" : "400",
+                        fontWeight: sortOrder === item.value ? "600" : "400",
                       }}
                     >
-                      {opt}
+                      {item.label}
                     </AppText>
                   </TouchableOpacity>
                 ))}
@@ -305,7 +329,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
             {error}
           </AppText>
           <AppButton
-            title="Retry"
+            title={t("browse.retry")}
             onPress={() => fetchProducts()}
             style={{ marginTop: 12 }}
           />

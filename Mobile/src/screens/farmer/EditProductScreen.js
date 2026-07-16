@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import AppButton from "../../components/common/AppButton";
 import AppInput from "../../components/common/AppInput";
 import AppText from "../../components/common/AppText";
@@ -160,6 +161,7 @@ const DropdownPicker = ({
   onClose,
   icon,
   theme,
+  placeholder,
 }) => {
   const primary = theme?.colors?.primary || "#2E7D32";
   const surface = theme?.colors?.surface || "#FFF";
@@ -214,7 +216,7 @@ const DropdownPicker = ({
           <AppText
             style={{ fontSize: 15, color: value ? textPrimary : textSecondary }}
           >
-            {selectedLabel || `Select ${label}`}
+            {selectedLabel || placeholder || `Select ${label}`}
           </AppText>
         </View>
         <Ionicons
@@ -281,6 +283,7 @@ const DropdownPicker = ({
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function EditProductScreen({ route, navigation }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const product = route.params?.product || {};
 
@@ -322,16 +325,16 @@ export default function EditProductScreen({ route, navigation }) {
   const handleUpdate = async () => {
     if (!cropType || !quantity || !price || !region) {
       Alert.alert(
-        "Missing fields",
-        "Please fill in crop type, quantity, price, and region.",
+        t("editProduct.missingFieldsTitle"),
+        t("editProduct.missingFieldsMessage"),
       );
       return;
     }
 
     if (region && ZONES_BY_REGION[region]?.length && !zone.trim()) {
       Alert.alert(
-        "Missing Zone",
-        "Please select a zone for your selected region.",
+        t("editProduct.missingZoneTitle"),
+        t("editProduct.missingZoneMessage"),
       );
       return;
     }
@@ -354,13 +357,15 @@ export default function EditProductScreen({ route, navigation }) {
           },
         },
       );
-      Alert.alert("Updated", "Your product has been updated.", [
-        { text: "OK", onPress: () => navigation.goBack() },
-      ]);
+      Alert.alert(
+        t("editProduct.updateSuccessTitle"),
+        t("editProduct.updateSuccessMessage"),
+        [{ text: t("editProduct.ok"), onPress: () => navigation.goBack() }],
+      );
     } catch (err) {
       Alert.alert(
-        "Error",
-        err.response?.data?.message || "Could not update product.",
+        t("editProduct.updateErrorTitle"),
+        err.response?.data?.message || t("editProduct.updateErrorMessage"),
       );
     } finally {
       setLoading(false);
@@ -368,23 +373,30 @@ export default function EditProductScreen({ route, navigation }) {
   };
 
   const handleDelete = () => {
-    Alert.alert("Delete Listing", "Are you sure? This cannot be undone.", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await api.delete(
-              API_ENDPOINTS.products.delete(product?.id || product?._id),
-            );
-            navigation.goBack();
-          } catch (err) {
-            Alert.alert("Error", "Could not delete listing.");
-          }
+    Alert.alert(
+      t("editProduct.deleteConfirmTitle"),
+      t("editProduct.deleteConfirmMessage"),
+      [
+        { text: t("editProduct.cancel"), style: "cancel" },
+        {
+          text: t("editProduct.delete"),
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await api.delete(
+                API_ENDPOINTS.products.delete(product?.id || product?._id),
+              );
+              navigation.goBack();
+            } catch (err) {
+              Alert.alert(
+                t("editProduct.deleteErrorTitle"),
+                t("editProduct.deleteErrorMessage"),
+              );
+            }
+          },
         },
-      },
-    ]);
+      ],
+    );
   };
 
   return (
@@ -395,7 +407,7 @@ export default function EditProductScreen({ route, navigation }) {
         barStyle="dark-content"
       />
       <AppHeader
-        title="Edit Product"
+        title={t("editProduct.title")}
         showBack={true}
         onBackPress={() => navigation.goBack()}
       />
@@ -412,7 +424,7 @@ export default function EditProductScreen({ route, navigation }) {
         >
           {/* Crop Type */}
           <DropdownPicker
-            label="Crop Type"
+            label={t("editProduct.cropType")}
             value={cropType}
             options={CROP_TYPES}
             onSelect={setCropType}
@@ -421,16 +433,19 @@ export default function EditProductScreen({ route, navigation }) {
             onClose={() => setShowCropPicker(false)}
             icon="leaf-outline"
             theme={theme}
+            placeholder={t("editProduct.selectLabel", {
+              label: t("editProduct.cropType"),
+            })}
           />
 
           {/* Quantity & Unit */}
           <View style={styles.row}>
             <View style={styles.flex2}>
               <AppText style={[styles.label, { color: textSecondary }]}>
-                Quantity
+                {t("editProduct.quantity")}
               </AppText>
               <AppInput
-                placeholder="0"
+                placeholder={t("editProduct.quantityPlaceholder")}
                 value={quantity}
                 onChangeText={setQuantity}
                 keyboardType="numeric"
@@ -438,7 +453,7 @@ export default function EditProductScreen({ route, navigation }) {
             </View>
             <View style={styles.flex1}>
               <DropdownPicker
-                label="Unit"
+                label={t("editProduct.unit")}
                 value={unit}
                 options={unitOptions}
                 onSelect={setUnit}
@@ -447,16 +462,19 @@ export default function EditProductScreen({ route, navigation }) {
                 onClose={() => setShowUnitPicker(false)}
                 icon="cube-outline"
                 theme={theme}
+                placeholder={t("editProduct.selectLabel", {
+                  label: t("editProduct.unit"),
+                })}
               />
             </View>
           </View>
 
           {/* Price */}
           <AppText style={[styles.label, { color: textSecondary }]}>
-            Price per {unitDisplay}
+            {t("editProduct.pricePerUnit", { unit: unitDisplay })}
           </AppText>
           <AppInput
-            placeholder="0"
+            placeholder={t("editProduct.pricePlaceholder")}
             value={price}
             onChangeText={setPrice}
             keyboardType="numeric"
@@ -465,10 +483,10 @@ export default function EditProductScreen({ route, navigation }) {
 
           {/* Description */}
           <AppText style={[styles.label, { color: textSecondary }]}>
-            Description (optional)
+            {t("editProduct.description")}
           </AppText>
           <AppInput
-            placeholder="Quality, harvest date, other details..."
+            placeholder={t("editProduct.descriptionPlaceholder")}
             value={description}
             onChangeText={setDescription}
             multiline
@@ -482,11 +500,11 @@ export default function EditProductScreen({ route, navigation }) {
               variant="headingSm"
               style={[styles.sectionTitle, { color: textPrimary }]}
             >
-              Location
+              {t("editProduct.location")}
             </AppText>
 
             <DropdownPicker
-              label="Region"
+              label={t("editProduct.region")}
               value={region}
               options={REGIONS}
               onSelect={setRegion}
@@ -495,17 +513,23 @@ export default function EditProductScreen({ route, navigation }) {
               onClose={() => setShowRegionPicker(false)}
               icon="location-outline"
               theme={theme}
+              placeholder={t("editProduct.selectLabel", {
+                label: t("editProduct.region"),
+              })}
             />
 
             <DropdownPicker
-              label="Zone"
+              label={t("editProduct.zone")}
               value={zone}
               options={region ? ZONES_BY_REGION[region] || [] : []}
               onSelect={setZone}
               visible={showZonePicker}
               onOpen={() => {
                 if (!region) {
-                  Alert.alert("Select Region", "Please select a region first.");
+                  Alert.alert(
+                    t("editProduct.selectRegionFirstTitle"),
+                    t("editProduct.selectRegionFirstMessage"),
+                  );
                   return;
                 }
                 setShowZonePicker(true);
@@ -513,13 +537,16 @@ export default function EditProductScreen({ route, navigation }) {
               onClose={() => setShowZonePicker(false)}
               icon="map-outline"
               theme={theme}
+              placeholder={t("editProduct.selectLabel", {
+                label: t("editProduct.zone"),
+              })}
             />
 
             <AppText style={[styles.label, { color: textSecondary }]}>
-              Wereda
+              {t("editProduct.wereda")}
             </AppText>
             <AppInput
-              placeholder="e.g. Meki, Adama"
+              placeholder={t("editProduct.weredaPlaceholder")}
               value={wereda}
               onChangeText={setWereda}
             />
@@ -527,7 +554,7 @@ export default function EditProductScreen({ route, navigation }) {
 
           {/* Save / Delete Buttons */}
           <AppButton
-            title="Save Changes"
+            title={t("editProduct.saveChanges")}
             onPress={handleUpdate}
             loading={loading}
             disabled={loading}
@@ -536,7 +563,7 @@ export default function EditProductScreen({ route, navigation }) {
           />
 
           <AppButton
-            title="Delete Listing"
+            title={t("editProduct.deleteListing")}
             variant="outline"
             fullWidth
             onPress={handleDelete}

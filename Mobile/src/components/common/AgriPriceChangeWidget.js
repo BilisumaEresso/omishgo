@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "../../hooks/useTheme";
 import AppCard from "./AppCard";
 import AppText from "./AppText";
@@ -8,8 +9,9 @@ export default function AgriPriceChangeWidget({
   productName = "Teff",
   currentPrice = "5,200 ETB/q",
   changePercent = 12.5,
-  changeLabel = "Today's Change",
+  changeLabel,
 }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const textPrimary = theme?.colors?.textPrimary;
   const textSecondary = theme?.colors?.textSecondary;
@@ -18,6 +20,8 @@ export default function AgriPriceChangeWidget({
   const changeColor = isPositive ? "#4CAF50" : "#F44336";
   const bgColor = isPositive ? "#E8F5E9" : "#FFEBEE";
   const iconName = isPositive ? "trending-up" : "trending-down";
+
+  const label = changeLabel || t("agriPriceChangeWidget.todaysChange");
 
   return (
     <AppCard style={styles.card}>
@@ -40,7 +44,7 @@ export default function AgriPriceChangeWidget({
 
         <View>
           <AppText variant="caption" style={{ color: textSecondary }}>
-            {changeLabel}
+            {label}
           </AppText>
           <AppText
             variant="headingSm"

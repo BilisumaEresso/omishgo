@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import AppText from "../../components/common/AppText";
@@ -17,8 +18,9 @@ import AppHeader from "../../components/layout/AppHeader";
 import { useTheme } from "../../hooks/useTheme";
 
 export default function NotificationsScreen({ navigation }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
-  
+
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -131,7 +133,7 @@ export default function NotificationsScreen({ navigation }) {
     <View style={styles.emptyContainer}>
       <Ionicons name="notifications-off-outline" size={64} color={textMuted} />
       <AppText style={[styles.emptyText, { color: textSecondary }]}>
-        No notifications
+        {t("notificationsScreen.empty")}
       </AppText>
     </View>
   );
@@ -140,7 +142,7 @@ export default function NotificationsScreen({ navigation }) {
     <View style={[styles.container, { backgroundColor }]}>
       {/* Header with back arrow */}
       <AppHeader
-        title="Notifications"
+        title={t("notificationsScreen.title")}
         showBack={true}
         onBackPress={() => navigation.goBack()}
       />
@@ -154,7 +156,7 @@ export default function NotificationsScreen({ navigation }) {
         <AppText
           style={[styles.markAllText, { color: allRead ? textMuted : primary }]}
         >
-          Mark all as read
+          {t("notificationsScreen.markAllRead")}
         </AppText>
       </TouchableOpacity>
 

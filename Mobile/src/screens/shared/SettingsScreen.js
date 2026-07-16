@@ -10,13 +10,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
-// ── Mock settings state (not wired to API — display only) ────────────────
 const SettingsScreen = ({ navigation }) => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const { user } = useAuthStore();
 
@@ -30,7 +31,6 @@ const SettingsScreen = ({ navigation }) => {
   const border = theme?.colors?.border || "#D0E8CE";
   const error = theme?.colors?.error || "#C62828";
 
-  // ── Local toggle states (mock — no API) ────────────────────────────────
   const [pushNotifications, setPushNotifications] = useState(true);
   const [messageAlerts, setMessageAlerts] = useState(true);
   const [orderUpdates, setOrderUpdates] = useState(true);
@@ -40,11 +40,10 @@ const SettingsScreen = ({ navigation }) => {
 
   const handleComingSoon = (feature) =>
     Alert.alert(
-      "Coming Soon",
-      `${feature} will be available in a future update.`,
+      t("settingsScreen.comingSoonTitle"),
+      t("settingsScreen.comingSoonMessage", { feature }),
     );
 
-  // ── Reusable row components ────────────────────────────────────────────
   const SectionTitle = ({ title }) => (
     <AppText style={[styles.sectionTitle, { color: textMuted }]}>
       {title}
@@ -117,7 +116,7 @@ const SettingsScreen = ({ navigation }) => {
   return (
     <View style={[styles.root, { backgroundColor: background }]}>
       <AppHeader
-        title="Settings"
+        title={t("settingsScreen.title")}
         showBack={true}
         onBackPress={() => navigation?.goBack()}
       />
@@ -126,115 +125,118 @@ const SettingsScreen = ({ navigation }) => {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* ── NOTIFICATIONS ─────────────────────────────────────────── */}
-        <SectionTitle title="NOTIFICATIONS" />
+        {/* NOTIFICATIONS */}
+        <SectionTitle title={t("settingsScreen.sectionNotifications")} />
         <View style={[styles.card, { borderColor: border }]}>
           <ToggleRow
             icon="notifications-outline"
-            label="Push Notifications"
-            subtitle="Receive alerts on your device"
+            label={t("settingsScreen.pushNotifications")}
+            subtitle={t("settingsScreen.pushNotificationsSubtitle")}
             value={pushNotifications}
             onToggle={setPushNotifications}
           />
           <ToggleRow
             icon="chatbubbles-outline"
-            label="Message Alerts"
-            subtitle="New message from buyer or farmer"
+            label={t("settingsScreen.messageAlerts")}
+            subtitle={t("settingsScreen.messageAlertsSubtitle")}
             value={messageAlerts}
             onToggle={setMessageAlerts}
           />
           <ToggleRow
             icon="receipt-outline"
-            label="Order Updates"
-            subtitle="Status changes on your orders"
+            label={t("settingsScreen.orderUpdates")}
+            subtitle={t("settingsScreen.orderUpdatesSubtitle")}
             value={orderUpdates}
             onToggle={setOrderUpdates}
           />
           <ToggleRow
             icon="trending-up-outline"
-            label="Market Price Alerts"
-            subtitle="When crop prices change significantly"
+            label={t("settingsScreen.marketPriceAlerts")}
+            subtitle={t("settingsScreen.marketPriceAlertsSubtitle")}
             value={priceAlerts}
             onToggle={setPriceAlerts}
           />
         </View>
 
-        {/* ── APPEARANCE ────────────────────────────────────────────── */}
-        <SectionTitle title="APPEARANCE" />
+        {/* APPEARANCE */}
+        <SectionTitle title={t("settingsScreen.sectionAppearance")} />
         <View style={[styles.card, { borderColor: border }]}>
           <ToggleRow
             icon="moon-outline"
-            label="Dark Mode"
-            subtitle="Coming soon"
+            label={t("settingsScreen.darkMode")}
+            subtitle={t("settingsScreen.comingSoon")}
             value={darkMode}
-            onToggle={() => handleComingSoon("Dark mode")}
+            onToggle={() => handleComingSoon(t("settingsScreen.darkMode"))}
           />
           <TapRow
             icon="language-outline"
-            label="Language"
-            subtitle="Change app language"
-            onPress={() => handleComingSoon("Language change from settings")}
+            label={t("settingsScreen.language")}
+            subtitle={t("settingsScreen.languageSubtitle")}
+            onPress={() =>
+              handleComingSoon(t("settingsScreen.languageChangeFromSettings"))
+            }
           />
           <TapRow
             icon="text-outline"
-            label="Font Size"
-            subtitle="Adjust text size for readability"
-            onPress={() => handleComingSoon("Font size")}
+            label={t("settingsScreen.fontSize")}
+            subtitle={t("settingsScreen.fontSizeSubtitle")}
+            onPress={() => handleComingSoon(t("settingsScreen.fontSize"))}
           />
         </View>
 
-        {/* ── PRIVACY & SECURITY ────────────────────────────────────── */}
-        <SectionTitle title="PRIVACY & SECURITY" />
+        {/* PRIVACY & SECURITY */}
+        <SectionTitle title={t("settingsScreen.sectionPrivacy")} />
         <View style={[styles.card, { borderColor: border }]}>
           <ToggleRow
             icon="location-outline"
-            label="Location Access"
-            subtitle="Used for nearby farmers and buyers"
+            label={t("settingsScreen.locationAccess")}
+            subtitle={t("settingsScreen.locationAccessSubtitle")}
             value={locationAccess}
             onToggle={setLocationAccess}
           />
           <TapRow
             icon="lock-closed-outline"
-            label="Change PIN"
-            subtitle="Update your login PIN"
-            onPress={() => handleComingSoon("Change PIN")}
+            label={t("settingsScreen.changePin")}
+            subtitle={t("settingsScreen.changePinSubtitle")}
+            onPress={() => handleComingSoon(t("settingsScreen.changePin"))}
           />
           <TapRow
             icon="shield-checkmark-outline"
-            label="Privacy Policy"
-            onPress={() => handleComingSoon("Privacy policy")}
+            label={t("settingsScreen.privacyPolicy")}
+            onPress={() => handleComingSoon(t("settingsScreen.privacyPolicy"))}
           />
         </View>
 
-        {/* ── ACCOUNT ───────────────────────────────────────────────── */}
-        <SectionTitle title="ACCOUNT" />
+        {/* ACCOUNT */}
+        <SectionTitle title={t("settingsScreen.sectionAccount")} />
         <View style={[styles.card, { borderColor: border }]}>
           <TapRow
             icon="person-outline"
-            label="Edit Profile"
-            subtitle="Update name, phone, and location"
-            onPress={() => handleComingSoon("Edit profile")}
+            label={t("settingsScreen.editProfile")}
+            subtitle={t("settingsScreen.editProfileSubtitle")}
+            onPress={() => handleComingSoon(t("settingsScreen.editProfile"))}
           />
           <TapRow
             icon="cloud-download-outline"
-            label="Export My Data"
-            subtitle="Download your account data"
-            onPress={() => handleComingSoon("Data export")}
+            label={t("settingsScreen.exportMyData")}
+            subtitle={t("settingsScreen.exportMyDataSubtitle")}
+            onPress={() => handleComingSoon(t("settingsScreen.exportMyData"))}
           />
           <TapRow
             icon="trash-outline"
-            label="Delete Account"
-            subtitle="Permanently remove your account"
+            label={t("settingsScreen.deleteAccount")}
+            subtitle={t("settingsScreen.deleteAccountSubtitle")}
             onPress={() =>
               Alert.alert(
-                "Delete Account",
-                "This will permanently delete your account and all your data. This cannot be undone.",
+                t("settingsScreen.deleteAccountAlertTitle"),
+                t("settingsScreen.deleteAccountAlertMessage"),
                 [
-                  { text: "Cancel", style: "cancel" },
+                  { text: t("settingsScreen.cancel"), style: "cancel" },
                   {
-                    text: "Delete",
+                    text: t("settingsScreen.delete"),
                     style: "destructive",
-                    onPress: () => handleComingSoon("Account deletion"),
+                    onPress: () =>
+                      handleComingSoon(t("settingsScreen.accountDeletion")),
                   },
                 ],
               )
@@ -243,39 +245,39 @@ const SettingsScreen = ({ navigation }) => {
           />
         </View>
 
-        {/* ── ABOUT ─────────────────────────────────────────────────── */}
-        <SectionTitle title="ABOUT" />
+        {/* ABOUT */}
+        <SectionTitle title={t("settingsScreen.sectionAbout")} />
         <View style={[styles.card, { borderColor: border }]}>
           <TapRow
             icon="information-circle-outline"
-            label="About OmishGo"
-            subtitle="Version 1.0 MVP"
+            label={t("settingsScreen.aboutOmishGo")}
+            subtitle={t("settingsScreen.versionSubtitle")}
             onPress={() =>
               Alert.alert(
-                "OmishGo",
-                "Version 1.0 MVP\n\nBuilt for Ethiopian farmers and buyers.\n\nFarm · Market · Deliver",
+                t("settingsScreen.aboutOmishGoAlertTitle"),
+                t("settingsScreen.aboutOmishGoAlertMessage"),
               )
             }
           />
           <TapRow
             icon="help-circle-outline"
-            label="Help & Support"
+            label={t("settingsScreen.helpAndSupport")}
             onPress={() => navigation?.navigate("Help")}
           />
           <TapRow
             icon="star-outline"
-            label="Rate the App"
-            onPress={() => handleComingSoon("App rating")}
+            label={t("settingsScreen.rateTheApp")}
+            onPress={() => handleComingSoon(t("settingsScreen.rateTheApp"))}
           />
         </View>
 
-        {/* ── Version info ──────────────────────────────────────────── */}
+        {/* Version info */}
         <AppText style={[styles.version, { color: textMuted }]}>
-          OmishGo v1.0 ·{" "}
-          {user?.role
-            ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
-            : ""}{" "}
-          account
+          {t("settingsScreen.versionWithRole", {
+            role: user?.role
+              ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
+              : "",
+          })}
         </AppText>
 
         <View style={{ height: 32 }} />
