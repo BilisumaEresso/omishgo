@@ -71,7 +71,9 @@
     "send": "Send",
     "noMessages": "No messages yet",
     "offlineError": "Cannot send message while offline",
-    "conversations": "Conversations"
+    "conversations": "Conversations",
+    "noConversations": "No Conversations",
+    "startConvoHint":"Start Chatting"
   },
   "buyerDashboard": {
     "title": "Buyer Dashboard",
@@ -398,7 +400,11 @@
     "selectRegionFirstMessage": "Please select a region before choosing a zone.",
     "error": "Error",
     "successMessage": "Your listing was posted successfully.",
-    "defaultErrorMessage": "Something went wrong. Please try again."
+    "defaultErrorMessage": "Something went wrong. Please try again.",
+    "missingWeredaTitle": "Missing Wereda",
+    "missingWeredaMessage": "Please select a wereda.",
+    "selectZoneFirstTitle": "Select Zone First",
+    "selectZoneFirstMessage": "Please select a zone before choosing a wereda."
   },
   "appSidebar": {
     "products": "My Products",

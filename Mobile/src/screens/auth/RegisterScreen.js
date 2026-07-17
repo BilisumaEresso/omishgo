@@ -3,23 +3,23 @@ import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-    Animated,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  Animated,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import AppButton from "../../components/common/AppButton";
 import AppInput from "../../components/common/AppInput";
 import AppText from "../../components/common/AppText";
 import {
-    REGIONS,
-    getWeredaByZone,
-    getZonesByRegion,
+  getLocalizedRegions,
+  getLocalizedZones,
+  getLocalizedWereda,
 } from "../../constants/locations.js";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
@@ -55,8 +55,21 @@ export default function RegisterScreen({ navigation }) {
   const [showZonePicker, setShowZonePicker] = useState(false);
   const [showWeredaPicker, setShowWeredaPicker] = useState(false);
 
-  const availableZones = region ? getZonesByRegion(region) : [];
-  const availableWereda = zone ? getWeredaByZone(region, zone) : [];
+  const lang = i18n.language || "en";
+
+  // Localized location options — `value` stays canonical English (stored/submitted),
+  // `label` is the localized display text. Falls back to English automatically
+  // for any zone/wereda without a translation entry yet.
+  const regionOptions = getLocalizedRegions(lang);
+  const availableZones = region ? getLocalizedZones(region, lang) : [];
+  const availableWereda = zone ? getLocalizedWereda(region, zone, lang) : [];
+
+  // Resolve the currently selected value to its localized display label
+  const regionLabel =
+    regionOptions.find((r) => r.value === region)?.label || region;
+  const zoneLabel = availableZones.find((z) => z.value === zone)?.label || zone;
+  const weredaLabel =
+    availableWereda.find((w) => w.value === wereda)?.label || wereda;
 
   const primary = theme?.colors?.primary || "#2E7D32";
   const textPrimary = theme?.colors?.textPrimary || "#212121";
@@ -394,10 +407,10 @@ export default function RegisterScreen({ navigation }) {
               variant="headingSm"
               style={[styles.sectionTitle, { color: textPrimary }]}
             >
-              Location
+              {t("postProduct.location", { defaultValue: "Location" })}
             </AppText>
 
-            {/* Region Picker */}
+            {/* Region Picker (with scrollable dropdown) */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: textSecondary }]}>
                 {t("auth.regionLabel")}
@@ -415,7 +428,7 @@ export default function RegisterScreen({ navigation }) {
                     flex: 1,
                   }}
                 >
-                  {region || t("auth.regionLabel")}
+                  {regionLabel || t("auth.regionLabel")}
                 </AppText>
                 <Ionicons
                   name={showRegionPicker ? "chevron-up" : "chevron-down"}
@@ -430,24 +443,32 @@ export default function RegisterScreen({ navigation }) {
                     { backgroundColor: surface, borderColor: border },
                   ]}
                 >
-                  {REGIONS.map((r) => (
-                    <TouchableOpacity
-                      key={r}
-                      onPress={() => {
-                        setRegion(r);
-                        setZone("");
-                        setWereda("");
-                        setShowRegionPicker(false);
-                        clearFieldError("region");
-                      }}
-                      style={[
-                        styles.dropdownItem,
-                        { borderBottomColor: border },
-                      ]}
-                    >
-                      <AppText style={{ color: textPrimary }}>{r}</AppText>
-                    </TouchableOpacity>
-                  ))}
+                  <ScrollView
+                    nestedScrollEnabled
+                    style={{ maxHeight: 200 }}
+                    showsVerticalScrollIndicator={true}
+                  >
+                    {regionOptions.map((r) => (
+                      <TouchableOpacity
+                        key={r.value}
+                        onPress={() => {
+                          setRegion(r.value);
+                          setZone("");
+                          setWereda("");
+                          setShowRegionPicker(false);
+                          clearFieldError("region");
+                        }}
+                        style={[
+                          styles.dropdownItem,
+                          { borderBottomColor: border },
+                        ]}
+                      >
+                        <AppText style={{ color: textPrimary }}>
+                          {r.label}
+                        </AppText>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
                 </View>
               )}
               {errors.region && (
@@ -460,7 +481,7 @@ export default function RegisterScreen({ navigation }) {
               )}
             </View>
 
-            {/* Zone Picker */}
+            {/* Zone Picker (scrollable) */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: textSecondary }]}>
                 {t("auth.zoneLabel")}
@@ -482,7 +503,7 @@ export default function RegisterScreen({ navigation }) {
                     flex: 1,
                   }}
                 >
-                  {zone || t("auth.zoneLabel")}
+                  {zoneLabel || t("auth.zoneLabel")}
                 </AppText>
                 <Ionicons
                   name={showZonePicker ? "chevron-up" : "chevron-down"}
@@ -497,23 +518,31 @@ export default function RegisterScreen({ navigation }) {
                     { backgroundColor: surface, borderColor: border },
                   ]}
                 >
-                  {availableZones.map((z) => (
-                    <TouchableOpacity
-                      key={z}
-                      onPress={() => {
-                        setZone(z);
-                        setWereda("");
-                        setShowZonePicker(false);
-                        clearFieldError("zone");
-                      }}
-                      style={[
-                        styles.dropdownItem,
-                        { borderBottomColor: border },
-                      ]}
-                    >
-                      <AppText style={{ color: textPrimary }}>{z}</AppText>
-                    </TouchableOpacity>
-                  ))}
+                  <ScrollView
+                    nestedScrollEnabled
+                    style={{ maxHeight: 200 }}
+                    showsVerticalScrollIndicator={true}
+                  >
+                    {availableZones.map((z) => (
+                      <TouchableOpacity
+                        key={z.value}
+                        onPress={() => {
+                          setZone(z.value);
+                          setWereda("");
+                          setShowZonePicker(false);
+                          clearFieldError("zone");
+                        }}
+                        style={[
+                          styles.dropdownItem,
+                          { borderBottomColor: border },
+                        ]}
+                      >
+                        <AppText style={{ color: textPrimary }}>
+                          {z.label}
+                        </AppText>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
                 </View>
               )}
               {errors.zone && (
@@ -526,7 +555,7 @@ export default function RegisterScreen({ navigation }) {
               )}
             </View>
 
-            {/* Wereda Picker */}
+            {/* Wereda Picker (scrollable) */}
             <View style={styles.inputGroup}>
               <AppText style={[styles.label, { color: textSecondary }]}>
                 Wereda
@@ -548,7 +577,7 @@ export default function RegisterScreen({ navigation }) {
                     flex: 1,
                   }}
                 >
-                  {wereda || "Select Wereda"}
+                  {weredaLabel || "Select Wereda"}
                 </AppText>
                 <Ionicons
                   name={showWeredaPicker ? "chevron-up" : "chevron-down"}
@@ -563,22 +592,30 @@ export default function RegisterScreen({ navigation }) {
                     { backgroundColor: surface, borderColor: border },
                   ]}
                 >
-                  {availableWereda.map((w) => (
-                    <TouchableOpacity
-                      key={w}
-                      onPress={() => {
-                        setWereda(w);
-                        setShowWeredaPicker(false);
-                        clearFieldError("wereda");
-                      }}
-                      style={[
-                        styles.dropdownItem,
-                        { borderBottomColor: border },
-                      ]}
-                    >
-                      <AppText style={{ color: textPrimary }}>{w}</AppText>
-                    </TouchableOpacity>
-                  ))}
+                  <ScrollView
+                    nestedScrollEnabled
+                    style={{ maxHeight: 200 }}
+                    showsVerticalScrollIndicator={true}
+                  >
+                    {availableWereda.map((w) => (
+                      <TouchableOpacity
+                        key={w.value}
+                        onPress={() => {
+                          setWereda(w.value);
+                          setShowWeredaPicker(false);
+                          clearFieldError("wereda");
+                        }}
+                        style={[
+                          styles.dropdownItem,
+                          { borderBottomColor: border },
+                        ]}
+                      >
+                        <AppText style={{ color: textPrimary }}>
+                          {w.label}
+                        </AppText>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
                 </View>
               )}
               {errors.wereda && (

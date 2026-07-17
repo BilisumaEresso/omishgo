@@ -19,169 +19,20 @@ import AppHeader from "../../components/layout/AppHeader";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
+import {
+  getLocalizedRegions,
+  getLocalizedZones,
+  getLocalizedWereda,
+} from "../../constants/locations";
+import {
+  CROP_TYPES,
+  CROP_TYPES_LOCALIZED,
+  DEFAULT_DESCRIPTIONS,
+  DEFAULT_DESCRIPTIONS_LOCALIZED,
+  REFERENCE_PRICES,
+} from "../../constants/crops";
+import { UNITS_LOCALIZED } from "../../constants/units";
 
-// ─── Data Constants ───────────────────────────────────────────────────────────
-const CROP_TYPES = [
-  "Teff",
-  "Wheat",
-  "Barley",
-  "Maize",
-  "Sorghum",
-  "Millet",
-  "Onion",
-  "Tomato",
-  "Potato",
-  "Garlic",
-  "Pepper",
-  "Cabbage",
-  "Lettuce",
-  "Carrot",
-  "Beetroot",
-  "Coffee",
-  "Chat",
-  "Sesame",
-  "Sunflower",
-  "Lentil",
-  "Chickpea",
-  "Bean",
-  "Pea",
-];
-
-const UNITS = [
-  "kg",
-  "quintal",
-  "ton",
-  "bag (50kg)",
-  "bag (100kg)",
-  "crate",
-  "sack",
-];
-
-const UNIT_LABELS = {
-  ton: "ton (kg)",
-};
-
-const REGIONS = [
-  "Addis Ababa",
-  "Oromia",
-  "Amhara",
-  "Tigray",
-  "SNNPR",
-  "Sidama",
-  "Afar",
-  "Somali",
-  "Benishangul-Gumuz",
-  "Gambela",
-  "Harari",
-  "Dire Dawa",
-];
-
-const ZONES_BY_REGION = {
-  Oromia: [
-    "West Hararghe",
-    "East Hararghe",
-    "Jimma",
-    "Bale",
-    "Borena",
-    "West Shewa",
-    "East Shewa",
-    "North Shewa",
-    "South West Shewa",
-    "Guji",
-    "West Guji",
-    "Arsi",
-    "West Arsi",
-    "Illubabor",
-    "Kelem Wallaga",
-    "East Wallaga",
-    "West Wallaga",
-    "Horo Guduru",
-    "Qellem",
-    "Buno Bedele",
-    "Ilu Aba Bora",
-  ],
-  Amhara: [
-    "North Gondar",
-    "South Gondar",
-    "North Wollo",
-    "South Wollo",
-    "Waghimra",
-    "Awi",
-    "West Gojam",
-    "East Gojam",
-    "North Shewa",
-    "Oromia Special Zone",
-  ],
-  SNNPR: [
-    "Sidama",
-    "Wolayita",
-    "Gedeo",
-    "Gurage",
-    "Hadiya",
-    "Kembata",
-    "Dawro",
-    "Gofa",
-    "Bench Sheko",
-    "Gamo",
-  ],
-  Tigray: [
-    "Central Tigray",
-    "Eastern Tigray",
-    "Western Tigray",
-    "Southern Tigray",
-    "North Western Tigray",
-    "South Eastern Tigray",
-  ],
-  "Addis Ababa": ["Addis Ababa City"],
-  Sidama: ["Sidama"],
-  Afar: ["Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5"],
-  Somali: [
-    "Jijiga",
-    "Fafan",
-    "Liben",
-    "Afder",
-    "Doolo",
-    "Shabelle",
-    "Erer",
-    "Siti",
-    "Korahey",
-    "Nogob",
-    "Daawa",
-  ],
-};
-
-const DEFAULT_DESCRIPTIONS = {
-  Teff: "White Teff, freshly harvested. Cleaned and ready for market. Grown without chemical fertilizers.",
-  Wheat:
-    "Red wheat, this season's harvest. Dry and clean. Suitable for flour milling.",
-  Onion: "Red onion, medium to large size. Fresh from the farm. No bruising.",
-  Tomato:
-    "Fresh tomatoes, fully ripe. Harvested this week. Best for immediate purchase.",
-  Maize: "Yellow maize, dried. Clean grain, ready for grinding or direct use.",
-  Potato: "White potato, good size. This season's harvest, dry stored.",
-  Coffee:
-    "Washed Arabica coffee, Grade 2. Dried on raised beds. Excellent cup quality.",
-  Garlic:
-    "White garlic bulbs, dry. Strong aroma. Stored in cool, dry conditions.",
-  Pepper: "Green pepper, fresh. Harvested this week. Uniform size.",
-  Barley:
-    "Barley grain, dried. This season's harvest, clean and stored properly.",
-};
-
-const REFERENCE_PRICES = {
-  Teff: { quintal: 5200, kg: 52 },
-  Wheat: { quintal: 3800, kg: 38 },
-  Maize: { quintal: 2800, kg: 28 },
-  Onion: { quintal: 4500, kg: 45 },
-  Tomato: { quintal: 3800, kg: 38 },
-  Potato: { quintal: 3200, kg: 32 },
-  Coffee: { quintal: 18000, kg: 180 },
-  Garlic: { quintal: 12000, kg: 120 },
-  Barley: { quintal: 3500, kg: 35 },
-  Sesame: { quintal: 9000, kg: 90 },
-};
-
-// ─── Reusable Dropdown Picker ─────────────────────────────────────────────────
 const DropdownPicker = ({
   label,
   value,
@@ -193,6 +44,7 @@ const DropdownPicker = ({
   icon,
   theme,
   placeholder,
+  disabled = false,
 }) => {
   const primary = theme?.colors?.primary || "#2E7D32";
   const surface = theme?.colors?.surface || "#FFF";
@@ -200,9 +52,11 @@ const DropdownPicker = ({
   const textPrimary = theme?.colors?.textPrimary || "#333";
   const textSecondary = theme?.colors?.textSecondary || "#666";
 
+  const safeOptions = Array.isArray(options) ? options : [];
+
   const selectedLabel = (() => {
     if (!value) return null;
-    const found = options.find((opt) =>
+    const found = safeOptions.find((opt) =>
       typeof opt === "string" ? opt === value : opt.value === value,
     );
     return found ? (typeof found === "string" ? found : found.label) : value;
@@ -222,8 +76,8 @@ const DropdownPicker = ({
         {label}
       </AppText>
       <TouchableOpacity
-        onPress={onOpen}
-        activeOpacity={0.8}
+        onPress={disabled ? undefined : onOpen}
+        activeOpacity={disabled ? 1 : 0.8}
         style={{
           flexDirection: "row",
           alignItems: "center",
@@ -234,6 +88,7 @@ const DropdownPicker = ({
           paddingHorizontal: 14,
           paddingVertical: 14,
           backgroundColor: surface,
+          opacity: disabled ? 0.5 : 1,
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
@@ -256,7 +111,7 @@ const DropdownPicker = ({
           color={textSecondary}
         />
       </TouchableOpacity>
-      {visible && (
+      {visible && safeOptions.length > 0 && (
         <View
           style={{
             borderWidth: 1,
@@ -274,7 +129,7 @@ const DropdownPicker = ({
           }}
         >
           <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false}>
-            {options.map((opt) => {
+            {safeOptions.map((opt) => {
               const optValue = typeof opt === "string" ? opt : opt.value;
               const optLabel = typeof opt === "string" ? opt : opt.label;
               return (
@@ -308,13 +163,18 @@ const DropdownPicker = ({
           </ScrollView>
         </View>
       )}
+      {visible && safeOptions.length === 0 && (
+        <AppText style={{ color: textSecondary, fontSize: 13, marginTop: 4 }}>
+          No options available
+        </AppText>
+      )}
     </View>
   );
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function PostProductScreen({ navigation, route }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const prefill = route?.params?.prefill || {};
 
@@ -333,6 +193,7 @@ export default function PostProductScreen({ navigation, route }) {
   const [showUnitPicker, setShowUnitPicker] = useState(false);
   const [showRegionPicker, setShowRegionPicker] = useState(false);
   const [showZonePicker, setShowZonePicker] = useState(false);
+  const [showWeredaPicker, setShowWeredaPicker] = useState(false);
 
   const primary = theme?.colors?.primary || "#2E7D32";
   const warningColor = theme?.colors?.warning || "#F57F17";
@@ -341,26 +202,54 @@ export default function PostProductScreen({ navigation, route }) {
   const textMuted = theme?.colors?.textMuted || "#8FAF8A";
   const background = theme?.colors?.background || "#F9FBF9";
 
-  const unitOptions = UNITS.map((option) =>
-    option === "ton" ? { value: option, label: UNIT_LABELS[option] } : option,
-  );
-  const unitDisplay = UNIT_LABELS[unit] || unit;
+  const lang = i18n.language || "en";
 
-  // Price validation
+  // Build localized crop options – CROP_TYPES must be an array
+  const cropLabels =
+    CROP_TYPES_LOCALIZED?.[lang] || CROP_TYPES_LOCALIZED?.en || {};
+  const cropOptions = (CROP_TYPES || []).map((key) => ({
+    value: key,
+    label: cropLabels[key] || key,
+  }));
+
+  const descriptionTemplates =
+    DEFAULT_DESCRIPTIONS_LOCALIZED?.[lang] ||
+    DEFAULT_DESCRIPTIONS_LOCALIZED?.en ||
+    {};
+
+  // Localized units — keep `value` as the stable key, only `label` is localized
+  const unitLabels = UNITS_LOCALIZED?.[lang] || UNITS_LOCALIZED?.en || {};
+  const unitOptions = Object.entries(unitLabels).map(([key, label]) => ({
+    value: key,
+    label,
+  }));
+  const unitDisplay = unitLabels[unit] || unit;
+
+  // Localized location options (region/zone always populated; wereda depends on zone)
+  const regionOptions = getLocalizedRegions(lang);
+  const availableZones = region ? getLocalizedZones(region, lang) : [];
+  const availableWereda = zone ? getLocalizedWereda(region, zone, lang) : [];
+
+  // Price validation — fully guarded against missing reference data
   useEffect(() => {
     if (!price || !cropType) {
       setPriceWarning("");
+      setPriceSuggestion(null);
       return;
     }
-    const ref = REFERENCE_PRICES[cropType];
-    if (!ref) {
+    const ref = REFERENCE_PRICES?.[cropType];
+    const unitKey = unit === "quintal" ? "quintal" : "kg";
+    const refPrice = ref?.[unitKey];
+    if (!refPrice) {
+      setPriceWarning("");
+      setPriceSuggestion(null);
+      return;
+    }
+    const entered = parseFloat(price);
+    if (isNaN(entered)) {
       setPriceWarning("");
       return;
     }
-    const unitKey = unit === "quintal" ? "quintal" : "kg";
-    const refPrice = ref[unitKey];
-    const entered = parseFloat(price);
-    if (isNaN(entered)) return;
     if (entered < refPrice * 0.6) {
       setPriceWarning(t("postProduct.priceLowWarning", { refPrice, unitKey }));
     } else if (entered > refPrice * 1.6) {
@@ -371,39 +260,37 @@ export default function PostProductScreen({ navigation, route }) {
     setPriceSuggestion(refPrice);
   }, [price, cropType, unit]);
 
-  // Apply incoming prefill values from the dashboard or other routes
+  // Prefill from navigation
   useEffect(() => {
-    if (prefill.cropType) {
-      setCropType(prefill.cropType);
-    }
-    if (prefill.price !== undefined && prefill.price !== null) {
+    if (prefill.cropType) setCropType(prefill.cropType);
+    if (prefill.price !== undefined && prefill.price !== null)
       setPrice(String(prefill.price));
-    }
-    if (prefill.unit) {
-      setUnit(prefill.unit);
-    }
-    if (prefill.region) {
-      setRegion(prefill.region);
-    }
-    if (prefill.zone) {
-      setZone(prefill.zone);
-    }
-    if (prefill.wereda) {
-      setWereda(prefill.wereda);
-    }
+    if (prefill.unit) setUnit(prefill.unit);
+    if (prefill.region) setRegion(prefill.region);
+    if (prefill.zone) setZone(prefill.zone);
+    if (prefill.wereda) setWereda(prefill.wereda);
   }, [prefill]);
 
-  // Default description when crop selected
+  // Localized default description
   useEffect(() => {
-    if (cropType && DEFAULT_DESCRIPTIONS[cropType] && !description) {
-      setDescription(DEFAULT_DESCRIPTIONS[cropType]);
+    if (cropType && !description) {
+      const localizedDesc = descriptionTemplates?.[cropType];
+      const fallbackDesc = DEFAULT_DESCRIPTIONS?.[cropType];
+      if (localizedDesc || fallbackDesc) {
+        setDescription(localizedDesc || fallbackDesc);
+      }
     }
   }, [cropType]);
 
-  // Reset zone when region changes
+  // Reset child fields on parent change
   useEffect(() => {
     setZone("");
+    setWereda("");
   }, [region]);
+
+  useEffect(() => {
+    setWereda("");
+  }, [zone]);
 
   const handleSubmit = async () => {
     if (!cropType.trim()) {
@@ -429,7 +316,6 @@ export default function PostProductScreen({ navigation, route }) {
       );
       return;
     }
-
     if (!region.trim()) {
       Alert.alert(
         t("postProduct.missingLocationTitle"),
@@ -437,11 +323,17 @@ export default function PostProductScreen({ navigation, route }) {
       );
       return;
     }
-
-    if (region && ZONES_BY_REGION[region]?.length && !zone.trim()) {
+    if (availableZones.length > 0 && !zone.trim()) {
       Alert.alert(
         t("postProduct.missingZoneTitle"),
         t("postProduct.missingZoneMessage"),
+      );
+      return;
+    }
+    if (availableWereda.length > 0 && !wereda.trim()) {
+      Alert.alert(
+        t("postProduct.missingWeredaTitle"),
+        t("postProduct.missingWeredaMessage"),
       );
       return;
     }
@@ -461,7 +353,6 @@ export default function PostProductScreen({ navigation, route }) {
           wereda: wereda.trim(),
         },
       });
-
       navigation.navigate("FarmerTabs", {
         successMessage: t("postProduct.successMessage"),
       });
@@ -477,7 +368,9 @@ export default function PostProductScreen({ navigation, route }) {
   };
 
   const isDefaultDescription =
-    cropType && description === DEFAULT_DESCRIPTIONS[cropType];
+    cropType &&
+    (description === DEFAULT_DESCRIPTIONS?.[cropType] ||
+      description === descriptionTemplates?.[cropType]);
 
   return (
     <View style={[styles.container, { backgroundColor: background }]}>
@@ -506,7 +399,7 @@ export default function PostProductScreen({ navigation, route }) {
           <DropdownPicker
             label={t("postProduct.cropType")}
             value={cropType}
-            options={CROP_TYPES}
+            options={cropOptions}
             onSelect={setCropType}
             visible={showCropPicker}
             onOpen={() => setShowCropPicker(true)}
@@ -639,7 +532,7 @@ export default function PostProductScreen({ navigation, route }) {
             <DropdownPicker
               label={t("postProduct.region")}
               value={region}
-              options={REGIONS}
+              options={regionOptions}
               onSelect={setRegion}
               visible={showRegionPicker}
               onOpen={() => setShowRegionPicker(true)}
@@ -654,7 +547,7 @@ export default function PostProductScreen({ navigation, route }) {
             <DropdownPicker
               label={t("postProduct.zone")}
               value={zone}
-              options={region ? ZONES_BY_REGION[region] || [] : []}
+              options={availableZones}
               onSelect={setZone}
               visible={showZonePicker}
               onOpen={() => {
@@ -673,15 +566,32 @@ export default function PostProductScreen({ navigation, route }) {
               placeholder={t("postProduct.selectLabel", {
                 label: t("postProduct.zone"),
               })}
+              disabled={!region}
             />
 
-            <AppText style={[styles.label, { color: textSecondary }]}>
-              {t("postProduct.wereda")}
-            </AppText>
-            <AppInput
-              placeholder={t("postProduct.weredaPlaceholder")}
+            <DropdownPicker
+              label={t("postProduct.wereda")}
               value={wereda}
-              onChangeText={setWereda}
+              options={availableWereda}
+              onSelect={setWereda}
+              visible={showWeredaPicker}
+              onOpen={() => {
+                if (!zone) {
+                  Alert.alert(
+                    t("postProduct.selectZoneFirstTitle"),
+                    t("postProduct.selectZoneFirstMessage"),
+                  );
+                  return;
+                }
+                setShowWeredaPicker(true);
+              }}
+              onClose={() => setShowWeredaPicker(false)}
+              icon="pin-outline"
+              theme={theme}
+              placeholder={t("postProduct.selectLabel", {
+                label: t("postProduct.wereda"),
+              })}
+              disabled={!zone}
             />
           </View>
 
@@ -727,14 +637,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
     paddingTop: 12,
   },
-  section: {
-    marginTop: 8,
-  },
-  sectionTitle: {
-    marginBottom: 12,
-    marginTop: 8,
-  },
-  submitButton: {
-    marginTop: 24,
-  },
+  section: { marginTop: 8 },
+  sectionTitle: { marginBottom: 12, marginTop: 8 },
+  submitButton: { marginTop: 24 },
 });

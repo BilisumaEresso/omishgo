@@ -49,6 +49,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true, // Dev mode: auto-verified. Set to false to require Admin approval in production.
     },
+    rating:{
+      type: Number,
+      default: 3.1,
+    }
   },
   {
     timestamps: true,

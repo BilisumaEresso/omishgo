@@ -1,6 +1,6 @@
 // Mobile/src/screens/buyer/BuyerProfileScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Alert,
@@ -12,10 +12,11 @@ import {
 } from "react-native";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
-import { useSidebar } from "../../context/SidebarContext";
 import api from "../../config/api";
+import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
+import { API_ENDPOINTS } from "../../constants/api";
 
 const LANGUAGES = [
   { code: "en", label: "English", native: "English" },
@@ -30,7 +31,8 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
   const { t, i18n } = useTranslation();
   const [languageOpen, setLanguageOpen] = useState(false);
   const [updatingLang, setUpdatingLang] = useState(false);
-
+  const [saved, setSaved] = useState([]);
+  const [orders, setOrders] = useState([]);
   const primary = theme?.colors?.primary || "#1565C0";
   const primaryContainer = theme?.colors?.primaryContainer || "#E3F2FD";
   const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
@@ -42,10 +44,37 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
   const errorColor = theme?.colors?.error || "#C62828";
   const successColor = theme?.colors?.success || "#2E7D32";
 
+  // KPI data
+  const activeOrders = orders.length;
+  const savedItems = saved.length;
+  const spentAmount = orders.reduce((acc, order) => acc + order.totalPrice, 0);
+
+  console.log("Orders:", orders);
   const currentLang = i18n.language || "en";
   const currentLangLabel =
     LANGUAGES.find((l) => l.code === currentLang)?.native || "English";
-
+  useEffect(() => {
+    const fetchSaved = async () => {
+      try {
+        const res = await api.get(API_ENDPOINTS.saved.list);
+        const fetched = res.data?.data?.products || [];
+        setSaved(fetched);
+      } catch (err) {
+        console.warn("Failed to load saved:", err.message);
+      }
+    };
+    fetchSaved();
+    const fetchOrders = async () => {
+      try {
+        const res = await api.get(API_ENDPOINTS.orders.list);
+        const fetched = res.data?.data?.orders || [];
+        setOrders(fetched);
+      } catch (err) {
+        console.warn("Failed to load orders:", err.message);
+      }
+    };
+    fetchOrders();
+  });
   const getLanguageName = (code) => {
     switch (code) {
       case "am":
@@ -134,7 +163,7 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
         <View style={styles.statsRow}>
           <View style={[styles.statCard, { backgroundColor: surface }]}>
             <AppText style={[styles.statValue, { color: textPrimary }]}>
-              8
+              {activeOrders}
             </AppText>
             <AppText style={[styles.statLabel, { color: textSecondary }]}>
               {t("buyerProfile.statsOrders")}
@@ -142,7 +171,7 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
           </View>
           <View style={[styles.statCard, { backgroundColor: surface }]}>
             <AppText style={[styles.statValue, { color: textPrimary }]}>
-              4
+              {saved.length}
             </AppText>
             <AppText style={[styles.statLabel, { color: textSecondary }]}>
               {t("buyerProfile.statsSaved")}
@@ -150,7 +179,7 @@ const BuyerProfileScreen = ({ navigation, onSwitchTab }) => {
           </View>
           <View style={[styles.statCard, { backgroundColor: surface }]}>
             <AppText style={[styles.statValue, { color: textPrimary }]}>
-              {t("buyerProfile.spentAmount", { amount: "32,400" })}
+              {t("buyerProfile.spentAmount", { amount: spentAmount })}
             </AppText>
             <AppText style={[styles.statLabel, { color: textSecondary }]}>
               {t("buyerProfile.statsSpent")}

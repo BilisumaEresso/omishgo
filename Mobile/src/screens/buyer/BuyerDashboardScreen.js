@@ -139,13 +139,15 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
   const [cartCount, setCartCount] = useState(0);
   const [successMsg, setSuccessMsg] = useState("");
   const [products, setProducts] = useState(mockProducts);
+  const [saved,setSaved] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [farmers, setFarmers] = useState(mockFarmers);
   const [activities, setActivities] = useState(mockActivities);
   const [refreshing, setRefreshing] = useState(false);
 
   // KPI data
-  const activeOrders = 2;
-  const savedItems = 5;
+  const activeOrders = orders.length;
+  const savedItems = saved.length;
 
   const primaryColor = theme?.colors?.primary || "#2E7DFF";
   const textPrimary = theme?.colors?.textPrimary || "#1C2430";
@@ -217,6 +219,27 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
       }
     };
     fetchActivities();
+    const fetchSaved = async () => {
+      try {
+        const res = await api.get(API_ENDPOINTS.saved.list);
+        const fetched = res.data?.data?.products || [];
+        setSaved(fetched);
+      } catch (err) {
+        console.warn("Failed to load saved:", err.message);
+      }
+    }
+    fetchSaved();
+    const fetchOrders = async () => {
+      try {
+        const res = await api.get(API_ENDPOINTS.orders.list);
+        const fetched = res.data?.data?.orders || [];
+        setOrders(fetched);
+      } catch (err) {
+        console.warn("Failed to load orders:", err.message);
+      }
+    }
+    fetchOrders();
+
   }, []);
 
   const handleRefresh = async () => {

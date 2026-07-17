@@ -71,7 +71,9 @@
     "send": "ላክ",
     "noMessages": "እስካሁን ምንም መልዕክት የለም",
     "offlineError": "ከመስመር ውጭ ሆነው መልዕክት መላክ አይችሉም",
-    "conversations": "ውይይት"
+    "conversations": "ውይይት",
+    "noConversations": "እስካሁን ውይይት የለም",
+    "startConvoHint": "ውይይት ጀምር"
   },
   "buyerDashboard": {
     "title": "የገዢ ዳሽቦርድ",
@@ -364,6 +366,10 @@
     "submitErrorMessage": "ማስታወቂያውን መላክ አልተቻለም። እባክዎ እንደገና ይሞክሩ።"
   },
   "postProduct": {
+    "missingWeredaTitle": "ወረዳ ያስፈልጋል",
+    "missingWeredaMessage": "እባክዎ ወረዳ ይምረጡ።",
+    "selectZoneFirstTitle": "ዞን ይምረጡ",
+    "selectZoneFirstMessage": "ወረዳ ከመምረጥዎ በፊት ዞን ይምረጡ።",
     "title": "ምርት ያውጡ",
     "cropType": "የምርት ዓይነት",
     "quantity": "ብዛት",

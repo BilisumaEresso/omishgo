@@ -30,7 +30,7 @@ export const getThread = asyncHandler(async (req, res) => {
   })
     .sort({ createdAt: 1 })
     .populate("senderId", "name phone")
-    .populate("receiverId", "name phone");
+    .populate("receiverId", "name phone"); 
 
   // Mark any unread messages sent TO current user as read
   await Message.updateMany(

@@ -71,7 +71,9 @@
     "send": "Ergi",
     "noMessages": "Hanga ammaa ergaan hin jiru",
     "offlineError": "Oflaayinii yeroo ta'an ergaa erguun hin danda'amu",
-    "conversations": "Dubbiiwwan"
+    "conversations": "Haasaawwan",
+    "noConversations": "Ammatti Hin jiru",
+    "startConvoHint": "Haasaa Jalqabi"
   },
   "buyerDashboard": {
     "title": "Daashboordii Bitaa",
