@@ -88,7 +88,7 @@ export default function RoleSelection({ navigation }) {
 
         if (!request.success) return;
 
-        navigation.navigate("SupplierPending");
+        navigation.navigate("SupplierPending" /* TODO: SupplierPending screen not yet registered */);
 
         return;
       }

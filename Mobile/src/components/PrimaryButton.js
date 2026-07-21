@@ -3,15 +3,7 @@ import { ActivityIndicator, StyleSheet, TouchableOpacity } from "react-native";
 import { getRoleColors } from "../constants/colors";
 import Typography from "./Typography";
 
-/**
- * PrimaryButton - Filled button component
- *
- * Supports:
- * - Loading state with spinner
- * - Disabled state
- * - Role-based accent colors
- * - Custom sizes
- */
+
 
 const styles = StyleSheet.create({
   button: {

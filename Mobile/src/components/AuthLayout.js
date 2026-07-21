@@ -9,16 +9,7 @@ import {
 } from "react-native";
 import { neutralColors } from "../constants/colors";
 
-/**
- * AuthLayout - Layout component for auth screens
- *
- * Supports:
- * - Centered content
- * - Hero image/top section
- * - Safe area aware
- * - Keyboard aware
- * - Scrollable on small screens
- */
+
 
 const styles = StyleSheet.create({
   wrapper: {

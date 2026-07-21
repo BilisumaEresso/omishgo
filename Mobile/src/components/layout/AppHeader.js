@@ -1,11 +1,12 @@
 // src/components/layout/AppHeader.js
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation as useRNNavigation } from "@react-navigation/native";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { Animated, Platform, Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../../hooks/useTheme";
 import AppText from "../common/AppText";
+import { useNotificationStore } from "../../store/notification.store";
 
 const ICON_SIZE = 24;
 const TOUCHABLE_SIZE = 44;
@@ -25,10 +26,22 @@ const AppHeader = ({
   onSearchPress,
   onProfilePress,
   rightComponent,
-  notificationCount = 0,
 }) => {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
+  
+  // Use the new notification store
+  const { unreadCount, fetchNotifications } = useNotificationStore();
+  
+  // Poll notifications when header is mounted and showing notifications
+  useEffect(() => {
+    if (showNotification) {
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 15000); // 15 seconds
+      return () => clearInterval(interval);
+    }
+  }, [showNotification, fetchNotifications]);
+
   let navigation = null;
   try {
     navigation = useRNNavigation();
@@ -167,7 +180,7 @@ const AppHeader = ({
             {showSearch && renderIconButton("search", onSearchPress)}
             {showNotification &&
               renderIconButton("notifications-outline", onNotificationPress, {
-                badge: notificationCount > 0,
+                badge: unreadCount > 0,
               })}
             {showProfile && (
               <Pressable

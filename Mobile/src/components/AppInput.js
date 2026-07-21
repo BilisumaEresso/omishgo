@@ -10,17 +10,7 @@ import {
 import { getRoleColors, neutralColors } from "../constants/colors";
 import Typography from "./Typography";
 
-/**
- * AppInput - Text input component with label, error, and icon support
- *
- * Supports:
- * - Label and error text
- * - Icon prefix/suffix
- * - Password visibility toggle
- * - PIN input mode
- * - Role-based focus color
- * - Error state styling
- */
+
 
 const styles = StyleSheet.create({
   container: {

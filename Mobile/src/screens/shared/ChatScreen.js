@@ -7,6 +7,7 @@ import {
   Animated,
   FlatList,
   Keyboard,
+  Linking,
   Platform,
   StyleSheet,
   TextInput,
@@ -40,7 +41,6 @@ const MessageBubble = ({ message, isMe, showAvatar, avatarLetter, theme }) => {
 
   return (
     <View style={[styles.bubbleRow, isMe ? styles.rowRight : styles.rowLeft]}>
-      {/* Other person’s avatar */}
       {!isMe && showAvatar ? (
         <View style={[styles.avatarSmall, { backgroundColor: primary }]}>
           <AppText style={styles.avatarText}>{avatarLetter}</AppText>
@@ -97,7 +97,7 @@ export default function ChatScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
   const currentUser = useAuthStore((state) => state.user);
 
-  const { userId, userName } = route.params || {};
+  const { userId, userName, phoneNumber } = route.params || {};
 
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
@@ -126,7 +126,6 @@ export default function ChatScreen({ route, navigation }) {
         duration: e.duration || 250,
         useNativeDriver: false,
       }).start();
-      // scroll to bottom after a tiny delay to allow layout to settle
       setTimeout(() => {
         if (flatListRef.current && isAtBottom) {
           flatListRef.current.scrollToEnd({ animated: true });
@@ -305,6 +304,55 @@ export default function ChatScreen({ route, navigation }) {
     );
   };
 
+  // ── Right actions: call + profile ─────────────────────────────────────────
+  const handleCallPress = () => {
+    if (phoneNumber) {
+      const url = `tel:${phoneNumber}`;
+      Linking.canOpenURL(url)
+        .then((supported) => {
+          if (supported) {
+            Linking.openURL(url);
+          } else {
+            // fallback if tel protocol not supported (e.g., simulator)
+            alert(
+              t("chatScreen.callNotSupported") ||
+                "Phone calls are not supported on this device.",
+            );
+          }
+        })
+        .catch(() =>
+          alert(
+            t("common.error") ||
+              "Something went wrong while trying to place the call.",
+          ),
+        );
+    } else {
+      alert(
+        t("chatScreen.callNotAvailable") ||
+          "Phone number not available for this user.",
+      );
+    }
+  };
+
+  const rightActions = (
+    <View style={{ flexDirection: "row", gap: 16, marginRight: 8 }}>
+      <TouchableOpacity onPress={handleCallPress}>
+        <Ionicons name="call-outline" size={22} color={primary} />
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          if (currentUser?.role === "buyer") {
+            navigation.navigate("FarmerProfile", { farmerId: userId });
+          } else {
+            navigation.navigate("BuyerProfile", { buyerId: userId });
+          }
+        }}
+      >
+        <Ionicons name="person-circle-outline" size={24} color={primary} />
+      </TouchableOpacity>
+    </View>
+  );
+
   // ── Loading / error states ────────────────────────────────────────────────
   if (loading) {
     return (
@@ -315,6 +363,7 @@ export default function ChatScreen({ route, navigation }) {
           }
           showBack
           onBackPress={() => navigation.goBack()}
+          rightComponent={rightActions}
         />
         <View style={styles.center}>
           <ActivityIndicator size="large" color={primary} />
@@ -332,6 +381,7 @@ export default function ChatScreen({ route, navigation }) {
           }
           showBack
           onBackPress={() => navigation.goBack()}
+          rightComponent={rightActions}
         />
         <View style={styles.center}>
           <AppText style={{ color: errorColor, textAlign: "center" }}>
@@ -348,6 +398,7 @@ export default function ChatScreen({ route, navigation }) {
         title={userName || t("messaging.unknownUser") || t("chatScreen.title")}
         showBack
         onBackPress={() => navigation.goBack()}
+        rightComponent={rightActions}
       />
 
       {/* Chat list */}
@@ -515,7 +566,6 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     borderTopWidth: 1,
     gap: 8,
-    // paddingBottom is now animated + safe area handled above
   },
   input: {
     flex: 1,

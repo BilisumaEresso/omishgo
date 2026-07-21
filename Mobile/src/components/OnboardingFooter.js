@@ -6,17 +6,7 @@ import PrimaryButton from "./PrimaryButton";
 import SecondaryButton from "./SecondaryButton";
 import Typography from "./Typography";
 
-/**
- * OnboardingFooter - Footer with navigation buttons and progress info
- *
- * Supports:
- * - Next/Continue button
- * - Back button
- * - Skip button (optional)
- * - Step counter display
- * - Role-based colors
- * - Multiple layout variants
- */
+
 
 const styles = StyleSheet.create({
   container: {

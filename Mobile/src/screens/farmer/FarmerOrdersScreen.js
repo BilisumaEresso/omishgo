@@ -173,17 +173,27 @@ const FarmerOrdersScreen = ({ navigation, onSwitchTab }) => {
             </View>
           </View>
 
-          {/* Quantity */}
-          <View style={styles.quantityRow}>
-            <Ionicons
-              name="cube-outline"
-              size={14}
-              color={textMuted}
-              style={{ marginRight: 4 }}
-            />
-            <AppText style={[styles.quantityText, { color: textSecondary }]}>
-              {item.quantity} {item.unit}
-            </AppText>
+          {/* Bottom row: Quantity and Actions */}
+          <View style={[styles.quantityRow, { justifyContent: "space-between" }]}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Ionicons
+                name="cube-outline"
+                size={14}
+                color={textMuted}
+                style={{ marginRight: 4 }}
+              />
+              <AppText style={[styles.quantityText, { color: textSecondary }]}>
+                {item.quantity} {item.unit}
+              </AppText>
+            </View>
+            <TouchableOpacity 
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              onPress={() => navigation?.navigate("Chat", { userId: item.buyerId, userName: item.buyerName })}
+              style={{ flexDirection: "row", alignItems: "center", backgroundColor: primary + "15", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 }}
+            >
+              <Ionicons name="chatbubble-outline" size={14} color={primary} style={{ marginRight: 4 }} />
+              <AppText style={{ color: primary, fontSize: 12, fontWeight: "600" }}>{t("farmerProfile.chatNow") || "Message"}</AppText>
+            </TouchableOpacity>
           </View>
         </View>
       </TouchableOpacity>

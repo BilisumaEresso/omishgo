@@ -4,16 +4,7 @@ import { getRoleColors, neutralColors } from "../constants/colors";
 import { spacing } from "../constants/layout";
 import Typography from "./Typography";
 
-/**
- * SkipButton - Lightweight skip/dismiss button for onboarding
- *
- * Supports:
- * - Text-only style (minimal)
- * - Background variant
- * - Custom label
- * - Role-based color
- * - Size variants
- */
+
 
 const styles = StyleSheet.create({
   button: {

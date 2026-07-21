@@ -71,7 +71,9 @@
     "send": "ላክ",
     "noMessages": "እስካሁን ምንም መልዕክት የለም",
     "offlineError": "ከመስመር ውጭ ሆነው መልዕክት መላክ አይችሉም",
-    "conversations": "ውይይት"
+    "conversations": "ውይይት",
+    "noConversations": "እስካሁን ውይይት የለም",
+    "startConvoHint": "ውይይት ጀምር"
   },
   "buyerDashboard": {
     "title": "የገዢ ዳሽቦርድ",
@@ -154,7 +156,8 @@
     "logoutAlertMessage": "እርግጠኛ ነዎት መውጣት ይፈልጋሉ?",
     "logoutAlertCancel": "ሰርዝ",
     "logoutAlertConfirm": "ውጣ",
-    "menuSettings": "ቅንብሮች"
+    "menuSettings": "ቅንብሮች",
+    "chatNow":"አሁን ተወያይ"
   },
   "buyerSaved": {
     "title": "የተቀመጡ ምርቶች",
@@ -258,7 +261,8 @@
     "farmerNotFound": "አርሶ አደሩ አልተገኘም",
     "goBack": "ወደ ኋላ ተመለስ",
     "activeListings": "ንቁ ማስታወቂያዎች: {{count}}",
-    "emptyListings": "በአሁኑ ጊዜ ምንም ንቁ ማስታወቂያ የለም"
+    "emptyListings": "በአሁኑ ጊዜ ምንም ንቁ ማስታወቂያ የለም",
+    "chatNow":"አሁን ተወያይ"
   },
   "editProduct": {
     "title": "ምርትን ያስተካክሉ",
@@ -364,6 +368,10 @@
     "submitErrorMessage": "ማስታወቂያውን መላክ አልተቻለም። እባክዎ እንደገና ይሞክሩ።"
   },
   "postProduct": {
+    "missingWeredaTitle": "ወረዳ ያስፈልጋል",
+    "missingWeredaMessage": "እባክዎ ወረዳ ይምረጡ።",
+    "selectZoneFirstTitle": "ዞን ይምረጡ",
+    "selectZoneFirstMessage": "ወረዳ ከመምረጥዎ በፊት ዞን ይምረጡ።",
     "title": "ምርት ያውጡ",
     "cropType": "የምርት ዓይነት",
     "quantity": "ብዛት",
@@ -435,7 +443,8 @@
   "chatScreen": {
     "title": "ውይይት",
     "errorLoadMessages": "መልዕክቶችን ማምጣት አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
-    "errorSendMessage": "መልዕክት መላክ አልተቻለም። እባክዎ እንደገና ይሞክሩ።"
+    "errorSendMessage": "መልዕክት መላክ አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
+    "callNotAvailable": "በዚህ ስሪት መደወል አይቻልም።"
   },
   "conversationsScreen": {
     "timeNow": "አሁን",

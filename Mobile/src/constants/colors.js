@@ -1,9 +1,4 @@
-/**
- * OmishGo Color System
- *
- * Neutral palette + role-based accent colors
- * Role colors are accent-only, not primary
- */
+
 
 export const neutralColors = {
   // Backgrounds
@@ -34,10 +29,7 @@ export const neutralColors = {
   disabled: "#D1D5DB",
 };
 
-/**
- * Role-based accent colors
- * Used for highlights, accents, active states
- */
+
 export const roleColors = {
   farmer: {
     primary: "#059669", // Green
@@ -61,11 +53,7 @@ export const roleColors = {
   },
 };
 
-/**
- * Get role-based colors
- * @param {string} role - User role (farmer, buyer, supplier, driver)
- * @returns {object} Role color object
- */
+
 export const getRoleColors = (role = "farmer") => {
   return roleColors[role] || roleColors.farmer;
 };

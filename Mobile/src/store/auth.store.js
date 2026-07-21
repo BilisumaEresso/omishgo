@@ -6,8 +6,7 @@ import { API_BASE_URL } from "../constants/api.js";
 import i18n from "../locales/i18n.js";
 import authService from "../services/auth.service.js";
 import storageService from "../services/storage.service.js";
-
-const isTokenExpired = (token) => {
+const isTokenExpired = token => {
   try {
     const parts = token.split(".");
     if (parts.length !== 3) return true;
@@ -17,8 +16,7 @@ const isTokenExpired = (token) => {
     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
 
     // Polyfill/safe base64 decoding for React Native
-    const chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     let str = base64.replace(/=+$/, "");
     let decoded = "";
     let buffer = 0;
@@ -27,14 +25,13 @@ const isTokenExpired = (token) => {
       const char = str[i];
       const value = chars.indexOf(char);
       if (value === -1) continue;
-      buffer = (buffer << 6) | value;
+      buffer = buffer << 6 | value;
       bits += 6;
       if (bits >= 8) {
         bits -= 8;
-        decoded += String.fromCharCode((buffer >> bits) & 0xff);
+        decoded += String.fromCharCode(buffer >> bits & 0xff);
       }
     }
-
     const payload = JSON.parse(decoded);
     if (!payload.exp) return true;
 
@@ -44,14 +41,8 @@ const isTokenExpired = (token) => {
     return true;
   }
 };
-
-/**
- * Platform-safe storage adapter
- * - Native: AsyncStorage
- * - Web: AsyncStorage fallback (safe wrapper)
- */
 const storage = {
-  getItem: async (key) => {
+  getItem: async key => {
     try {
       const value = await AsyncStorage.getItem(key);
       return value ?? null;
@@ -59,7 +50,6 @@ const storage = {
       return null;
     }
   },
-
   setItem: async (key, value) => {
     try {
       await AsyncStorage.setItem(key, value);
@@ -67,270 +57,276 @@ const storage = {
       // ignore on web fallback issues
     }
   },
-
-  removeItem: async (key) => {
+  removeItem: async key => {
     try {
       await AsyncStorage.removeItem(key);
     } catch (e) {
       // ignore
     }
-  },
+  }
 };
+export const useAuthStore = create(persist((set, get) => ({
+  user: null,
+  token: null,
+  refreshToken: null,
+  language: "en",
+  isAuthenticated: false,
+  isLoading: false,
+  isInitializingAuth: true,
+  error: null,
+  role: null,
+  setLanguage: async language => {
+    const normalized = ["en", "am", "om"].includes(language) ? language : "en";
+    set({
+      language: normalized
+    });
+    try {
+      await i18n.changeLanguage(normalized);
+      await AsyncStorage.setItem("@app_language", normalized);
+    } catch (error) {
+      console.warn("Failed to persist app language", error);
+    }
+  },
+  register: async userData => {
+    set({
+      isLoading: true,
+      error: null
+    });
+    try {
+      // Step 1: Create the account
+      const result = await authService.register(userData);
+      if (!result.success) {
+        set({
+          isLoading: false,
+          error: result.message
+        });
+        return result;
+      }
 
-export const useAuthStore = create(
-  persist(
-    (set, get) => ({
-      user: null,
-      token: null,
-      refreshToken: null,
-      language: "en",
-      isAuthenticated: false,
-      isLoading: false,
+      // Step 2: Immediately log in with the same credentials so the
+      // user lands directly on their role dashboard. RootNavigator will
+      // swap to AppNavigator as soon as isAuthenticated flips to true.
+      const loginResult = await authService.login(userData.phone, userData.pin);
+      if (!loginResult.success) {
+        // Registration worked but auto-login failed — send them to Login screen
+        set({
+          isLoading: false,
+          error: null
+        });
+        return {
+          success: true,
+          autoLoginFailed: true
+        };
+      }
+      await storageService.setToken(loginResult.data.token);
+      await storageService.setUser(loginResult.data.user);
+      set({
+        user: loginResult.data.user,
+        token: loginResult.data.token,
+        role: loginResult.data.user.role,
+        language: loginResult.data.user.preferredLang || "en",
+        isAuthenticated: true,
+        isLoading: false,
+        error: null
+      });
+      return {
+        success: true
+      };
+    } catch (error) {
+      set({
+        isLoading: false,
+        error: error.message
+      });
+      return {
+        success: false,
+        message: error.message
+      };
+    }
+  },
+  login: async (phone, pin) => {
+    set({
+      isLoading: true,
+      error: null
+    });
+    try {
+      const result = await authService.login(phone, pin);
+      if (!result.success) {
+        set({
+          isLoading: false,
+          error: result.message
+        });
+        return result;
+      }
+
+      // Store refreshToken in AsyncStorage (via storageService)
+      await storageService.setToken(result.data.token);
+      if (result.data.refreshToken) {
+        await storageService.setRefreshToken(result.data.refreshToken);
+      }
+      await storageService.setUser(result.data.user);
+      set({
+        user: result.data.user,
+        token: result.data.token,
+        role: result.data.user.role,
+        language: result.data.user.preferredLang || "en",
+        isAuthenticated: true,
+        isLoading: false,
+        error: null
+      });
+      return result;
+    } catch (error) {
+      set({
+        isLoading: false,
+        error: error.message
+      });
+      return {
+        success: false,
+        message: error.message
+      };
+    }
+  },
+  restoreSession: async () => {
+    set({
       isInitializingAuth: true,
-      error: null,
-      role: null,
+      isLoading: true
+    });
+    try {
+      const token = await storageService.getToken();
+      const refreshToken = await storageService.getRefreshToken();
+      const user = await storageService.getUser();
+      if (!token || !user) {
+        const storedLanguage = await AsyncStorage.getItem("@app_language");
+        set({
+          user: null,
+          token: null,
+          refreshToken: null,
+          language: storedLanguage || "en",
+          isAuthenticated: false,
+          isLoading: false,
+          isInitializingAuth: false,
+          error: null,
+          role: null
+        });
+        return false;
+      }
 
-      setLanguage: async (language) => {
-        const normalized = ["en", "am", "om"].includes(language)
-          ? language
-          : "en";
-        set({ language: normalized });
-        try {
-          await i18n.changeLanguage(normalized);
-          await AsyncStorage.setItem("@app_language", normalized);
-        } catch (error) {
-          console.warn("Failed to persist app language", error);
-        }
-      },
-
-      register: async (userData) => {
-        set({ isLoading: true, error: null });
-
-        try {
-          // Step 1: Create the account
-          const result = await authService.register(userData);
-          if (!result.success) {
-            set({ isLoading: false, error: result.message });
-            return result;
-          }
-
-          // Step 2: Immediately log in with the same credentials so the
-          // user lands directly on their role dashboard. RootNavigator will
-          // swap to AppNavigator as soon as isAuthenticated flips to true.
-          const loginResult = await authService.login(
-            userData.phone,
-            userData.pin,
-          );
-          if (!loginResult.success) {
-            // Registration worked but auto-login failed — send them to Login screen
-            set({ isLoading: false, error: null });
-            return { success: true, autoLoginFailed: true };
-          }
-
-          await storageService.setToken(loginResult.data.token);
-          await storageService.setUser(loginResult.data.user);
-
-          set({
-            user: loginResult.data.user,
-            token: loginResult.data.token,
-            role: loginResult.data.user.role,
-            language: loginResult.data.user.preferredLang || "en",
-            isAuthenticated: true,
-            isLoading: false,
-            error: null,
-          });
-
-          return { success: true };
-        } catch (error) {
-          set({ isLoading: false, error: error.message });
-          return { success: false, message: error.message };
-        }
-      },
-
-      login: async (phone, pin) => {
-        set({ isLoading: true, error: null });
-
-        try {
-          const result = await authService.login(phone, pin);
-
-          if (!result.success) {
-            set({ isLoading: false, error: result.message });
-            return result;
-          }
-
-          // Store refreshToken in AsyncStorage (via storageService)
-          await storageService.setToken(result.data.token);
-
-          if (result.data.refreshToken) {
-            await storageService.setRefreshToken(result.data.refreshToken);
-          }
-
-          await storageService.setUser(result.data.user);
-
-          set({
-            user: result.data.user,
-            token: result.data.token,
-            role: result.data.user.role,
-            language: result.data.user.preferredLang || "en",
-            isAuthenticated: true,
-            isLoading: false,
-            error: null,
-          });
-
-          return result;
-        } catch (error) {
-          set({ isLoading: false, error: error.message });
-          return { success: false, message: error.message };
-        }
-      },
-
-      restoreSession: async () => {
-        set({ isInitializingAuth: true, isLoading: true });
-
-        try {
-          const token = await storageService.getToken();
-          const refreshToken = await storageService.getRefreshToken();
-          const user = await storageService.getUser();
-
-          if (!token || !user) {
-            const storedLanguage = await AsyncStorage.getItem("@app_language");
-            set({
-              user: null,
-              token: null,
-              refreshToken: null,
-              language: storedLanguage || "en",
-              isAuthenticated: false,
-              isLoading: false,
-              isInitializingAuth: false,
-              error: null,
-              role: null,
+      // Check if token is expired
+      if (isTokenExpired(token)) {
+        if (refreshToken) {
+          try {
+            const response = await axios.post(`${API_BASE_URL}/api/v1/auth/refresh-token`, {
+              refreshToken
             });
-
-            return false;
-          }
-
-          // Check if token is expired
-          if (isTokenExpired(token)) {
-            if (refreshToken) {
-              console.log("Token expired, attempting silent refresh...");
-              try {
-                const response = await axios.post(
-                  `${API_BASE_URL}/api/v1/auth/refresh-token`,
-                  { refreshToken },
-                );
-
-                if (response.data?.success) {
-                  const { token: newToken, refreshToken: newRefreshToken } =
-                    response.data.data;
-                  await storageService.setToken(newToken);
-                  if (newRefreshToken) {
-                    await storageService.setRefreshToken(newRefreshToken);
-                  }
-
-                  set({
-                    user,
-                    token: newToken,
-                    refreshToken: newRefreshToken || refreshToken,
-                    isAuthenticated: true,
-                    isLoading: false,
-                    isInitializingAuth: false,
-                    error: null,
-                  });
-                  return true;
-                }
-              } catch (refreshErr) {
-                console.error("Silent refresh failed:", refreshErr.message);
+            if (response.data?.success) {
+              const {
+                token: newToken,
+                refreshToken: newRefreshToken
+              } = response.data.data;
+              await storageService.setToken(newToken);
+              if (newRefreshToken) {
+                await storageService.setRefreshToken(newRefreshToken);
               }
+              set({
+                user,
+                token: newToken,
+                refreshToken: newRefreshToken || refreshToken,
+                isAuthenticated: true,
+                isLoading: false,
+                isInitializingAuth: false,
+                error: null
+              });
+              return true;
             }
-
-            // Expiry/refresh failed - clean logout
-            await authService.logout();
-            set({
-              user: null,
-              token: null,
-              refreshToken: null,
-              isAuthenticated: false,
-              isLoading: false,
-              isInitializingAuth: false,
-            });
-            return false;
+          } catch (refreshErr) {
+            console.error("Silent refresh failed:", refreshErr.message);
           }
-
-          // Session token is valid
-          set({
-            user,
-            token,
-            refreshToken,
-            language: user.preferredLang || "en",
-            isAuthenticated: true,
-            isLoading: false,
-            isInitializingAuth: false,
-            error: null,
-          });
-
-          return true;
-        } catch (error) {
-          console.error("Session restore error:", error.message);
-          await authService.logout();
-          set({
-            user: null,
-            token: null,
-            refreshToken: null,
-            isAuthenticated: false,
-            isLoading: false,
-            isInitializingAuth: false,
-          });
-          return false;
         }
-      },
-      // MVP: Removed requestRole and switchRole since users only have a single role
 
-      logout: async () => {
-        set({ isLoading: true });
+        // Expiry/refresh failed - clean logout
+        await authService.logout();
+        set({
+          user: null,
+          token: null,
+          refreshToken: null,
+          isAuthenticated: false,
+          isLoading: false,
+          isInitializingAuth: false
+        });
+        return false;
+      }
 
-        try {
-          await authService.logout();
+      // Session token is valid
+      set({
+        user,
+        token,
+        refreshToken,
+        language: user.preferredLang || "en",
+        isAuthenticated: true,
+        isLoading: false,
+        isInitializingAuth: false,
+        error: null
+      });
+      return true;
+    } catch (error) {
+      console.error("Session restore error:", error.message);
+      await authService.logout();
+      set({
+        user: null,
+        token: null,
+        refreshToken: null,
+        isAuthenticated: false,
+        isLoading: false,
+        isInitializingAuth: false
+      });
+      return false;
+    }
+  },
+  // MVP: Removed requestRole and switchRole since users only have a single role
 
-          set({
-            user: null,
-            token: null,
-            refreshToken: null,
-            isAuthenticated: false,
-            isLoading: false,
-            isInitializingAuth: false,
-            error: null,
-            role: null,
-          });
-
-          return { success: true };
-        } catch (error) {
-          set({ isLoading: false, error: error.message });
-          return { success: false, message: error.message };
-        }
-      },
-
-      clearError: () => set({ error: null }),
-    }),
-    {
-      name: "auth-store",
-
-      /**
-       * IMPORTANT FIX:
-       * Use Zustand built-in JSON storage wrapper
-       * instead of manual JSON parsing
-       */
-      storage: createJSONStorage(() => storage),
-
-      /**
-       * Only persist essential fields
-       */
-      partialize: (state) => ({
-        user: state.user,
-        token: state.token,
-        isAuthenticated: state.isAuthenticated,
-        role: state.role,
-        language: state.language,
-      }),
-    },
-  ),
-);
+  logout: async () => {
+    set({
+      isLoading: true
+    });
+    try {
+      await authService.logout();
+      set({
+        user: null,
+        token: null,
+        refreshToken: null,
+        isAuthenticated: false,
+        isLoading: false,
+        isInitializingAuth: false,
+        error: null,
+        role: null
+      });
+      return {
+        success: true
+      };
+    } catch (error) {
+      set({
+        isLoading: false,
+        error: error.message
+      });
+      return {
+        success: false,
+        message: error.message
+      };
+    }
+  },
+  clearError: () => set({
+    error: null
+  })
+}), {
+  name: "auth-store",
+  storage: createJSONStorage(() => storage),
+  /**
+   * Only persist essential fields
+   */
+  partialize: state => ({
+    user: state.user,
+    token: state.token,
+    isAuthenticated: state.isAuthenticated,
+    role: state.role,
+    language: state.language
+  })
+}));

@@ -1,6 +1,7 @@
 // Mobile/src/screens/farmer/FarmerProfileScreen.js
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useState,useEffect,useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import {
   Alert,
@@ -16,6 +17,7 @@ import api from "../../config/api";
 import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
+import { API_ENDPOINTS } from "../../constants/api";
 
 const LANGUAGES = [
   { code: "en", label: "English", native: "English" },
@@ -30,6 +32,9 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
   const { t, i18n } = useTranslation();
   const [languageOpen, setLanguageOpen] = useState(false);
   const [updatingLang, setUpdatingLang] = useState(false);
+   const [products, setProducts] = useState([]);
+    const [orders, setOrders] = useState([]);
+
 
   // Theme colors
   const primary = theme?.colors?.primary || "#2E7D32";
@@ -46,6 +51,64 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
   const currentLang = i18n.language || "en";
   const currentLangLabel =
     LANGUAGES.find((l) => l.code === currentLang)?.native || "English";
+// Data fetching (unchanged)
+  const fetchProducts = async () => {
+    try {
+      const res = await api.get(API_ENDPOINTS.products.list, {
+        params: { farmerId: user?._id || user?.id },
+      });
+      const raw = res.data?.data?.products || [];
+      setProducts(raw);
+    } catch (e) {
+      console.warn("fetchProducts failed:", e.message);
+      // keep mockProducts as fallback — already set as default state
+    }
+  };
+  const fetchOrders = async () => {
+    try {
+      const res = await api.get(API_ENDPOINTS.orders.list);
+      const raw = res.data?.data?.orders || [];
+      setOrders(
+        raw.map((o) => ({
+          id: o._id,
+          item: `${o.quantity}${o.unit || "kg"} ${o.productId?.cropType || "Product"}`,
+          type: o.productId?.cropType || "—",
+          price: o.priceAtOrder,
+          totalPrice: o.totalPrice,
+          date: new Date(o.createdAt).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }),
+          status:
+            o.status === "in_transit"
+              ? "In Transit"
+              : o.status.charAt(0).toUpperCase() + o.status.slice(1),
+          buyer: o.buyerId?.name || "Buyer",
+          buyerId: o.buyerId?._id,
+          cropType: o.productId?.cropType || "Product",
+          buyerName: o.buyerId?.name || "Buyer",
+        })),
+      );
+    } catch (e) {
+      console.warn("fetchOrders failed:", e.message);
+    }
+  };
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchProducts();
+      fetchOrders();
+    }
+  }, [user?.id]);
+  useFocusEffect(
+    useCallback(() => {
+      if (user?.id) {
+        fetchProducts();
+        fetchOrders();
+      }
+    }, [user?.id]),
+  );
 
   const handleLogout = () => {
     Alert.alert(
@@ -124,7 +187,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
         <View style={styles.statsRow}>
           <View style={[styles.statCard, { backgroundColor: surface }]}>
             <AppText style={[styles.statValue, { color: textPrimary }]}>
-              5
+              {products.length}
             </AppText>
             <AppText style={[styles.statLabel, { color: textSecondary }]}>
               {t("farmerProfile.statsProducts")}
@@ -132,7 +195,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
           </View>
           <View style={[styles.statCard, { backgroundColor: surface }]}>
             <AppText style={[styles.statValue, { color: textPrimary }]}>
-              12
+              {orders.length}
             </AppText>
             <AppText style={[styles.statLabel, { color: textSecondary }]}>
               {t("farmerProfile.statsOrders")}
@@ -140,7 +203,7 @@ const FarmerProfileScreen = ({ navigation, onSwitchTab }) => {
           </View>
           <View style={[styles.statCard, { backgroundColor: surface }]}>
             <AppText style={[styles.statValue, { color: textPrimary }]}>
-              4.8 ⭐
+              {user.rating||"3.1"} ⭐
             </AppText>
             <AppText style={[styles.statLabel, { color: textSecondary }]}>
               {t("farmerProfile.statsRating")}
