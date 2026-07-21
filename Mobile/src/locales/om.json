@@ -401,7 +401,20 @@
     "selectRegionFirstMessage": "Maaloo godina filachuun dura naannoo filadhu.",
     "error": "Dogoggora",
     "successMessage": "Beeksisni kee milkiidhaan maxxanfameera.",
-    "defaultErrorMessage": "Rakkoon uumameera. Irra deebi'ii yaali."
+    "defaultErrorMessage": "Rakkoon uumameera. Irra deebi'ii yaali.",
+    "photos": "Suuraawwan (Kan Gorfamu)",
+    "photosHint": "Bitaan namoonni beeksisa suuraa qabu caalaa amanu. Hanga suuraa 2 dabali.",
+    "addPhoto": "Suura Dabali",
+    "takePhoto": "Suura Kaasi",
+    "chooseFromGallery": "Gaaleerii irraa Filadhu",
+    "cancel": "Haqi",
+    "retry": "Irra Deebi'i Yaali",
+    "photoLimitTitle": "Daangaa Suuraa Geessameera",
+    "photoLimitMessage": "Beeksisa tokko irratti hanga suuraa {{max}} dabaluu ni dandeessa.",
+    "permissionDeniedTitle": "Hayyama Barbaachisaa",
+    "permissionDeniedMessage": "Suura beeksisa keetti dabaluuf OmishGo hayyama kaameeraa/suuraa barbaada.",
+    "photosStillUploadingTitle": "Suurawwan Ammaan Erga jiru",
+    "photosStillUploadingMessage": "Maaloo utuu beeksisa hin maxxansin suurawwan erga xumuramuu eegi."
   },
   "appSidebar": {
     "products": "Oomishaalee Koo",

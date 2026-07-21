@@ -405,7 +405,20 @@
     "selectRegionFirstMessage": "እባክዎ ዞን ከመምረጥዎ በፊት ክልል ይምረጡ።",
     "error": "ስህተት",
     "successMessage": "ማስታወቂያዎ በተሳካ ሁኔታ ወጥቷል።",
-    "defaultErrorMessage": "ችግር አጋጥሟል። እባክዎ እንደገና ይሞክሩ።"
+    "defaultErrorMessage": "ችግር አጋጥሟል። እባክዎ እንደገና ይሞክሩ።",
+    "photos": "ፎቶዎች (የሚመከር)",
+    "photosHint": "ገዢዎች ፎቶ ያለበትን ማስታወቂያ ይበልጥ ያምናሉ። እስከ 2 ፎቶ ይጨምሩ።",
+    "addPhoto": "ፎቶ ጨምር",
+    "takePhoto": "ፎቶ አንሳ",
+    "chooseFromGallery": "ከጋለሪ ይምረጡ",
+    "cancel": "ይቅር",
+    "retry": "እንደገና ሞክር",
+    "photoLimitTitle": "የፎቶ ገደብ ደርሷል",
+    "photoLimitMessage": "በአንድ ማስታወቂያ እስከ {{max}} ፎቶ መጨመር ይችላሉ።",
+    "permissionDeniedTitle": "ፈቃድ ያስፈልጋል",
+    "permissionDeniedMessage": "ፎቶ ለማስታወቂያዎ ለመጨመር OmishGo የካሜራ/የፎቶ ፈቃድ ያስፈልገዋል።",
+    "photosStillUploadingTitle": "ፎቶዎች እየተላኩ ነው",
+    "photosStillUploadingMessage": "እባክዎ ማስታወቂያውን ከማውጣትዎ በፊት ፎቶዎቹ እስኪላኩ ይጠብቁ።"
   },
   "appSidebar": {
     "products": "የእኔ ምርቶች",

@@ -37,6 +37,15 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "OmishGo needs access to your photos so you can add pictures to your product listings.",
+          "cameraPermission": "OmishGo needs access to your camera so you can take a picture of your product to list it."
+        }
+      ]
+    ],
     "extra": {
       "eas": {
         "projectId": "3f79c698-20e2-4cb2-9396-bae293863bd6"
