@@ -61,3 +61,18 @@ export const authorize = (...roles) => {
     next();
   };
 };
+
+/**
+ * Require Admin-verified account for write actions.
+ * Must run after `protect` (so req.user is populated).
+ * Admins are always exempt.
+ */
+export const requireVerified = (req, res, next) => {
+  if (req.user.role === "admin") return next();
+  if (req.user.isVerified !== true) {
+    return next(
+      new ApiError(403, "Your account is pending Admin approval")
+    );
+  }
+  next();
+};

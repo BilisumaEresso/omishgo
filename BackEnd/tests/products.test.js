@@ -41,6 +41,9 @@ describe("Product API", () => {
       .post("/api/v1/auth/login")
       .send({ phone: "0911000001", pin: "1234" });
     farmerToken = loginFarmer.body.data.token;
+    
+    // Auto-verify farmer so they can create products for the tests
+    await User.findByIdAndUpdate(farmerRes.body.data.user.id, { isVerified: true });
 
     // Setup buyer
     await request(app)

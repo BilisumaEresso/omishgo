@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../../middleware/auth.middleware.js";
+import { protect, requireVerified } from "../../middleware/auth.middleware.js";
 import { getThread, sendMessage, getConversations } from "./message.controller.js";
 
 const router = express.Router();
@@ -15,6 +15,6 @@ router.get("/conversations", getConversations);
 router.get("/thread/:userId", getThread);
 
 // POST /api/v1/messages — send a message
-router.post("/", sendMessage);
+router.post("/", requireVerified, sendMessage);
 
 export default router;

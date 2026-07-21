@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import request from "supertest";
 import app from "../src/app.js";
-import Message from "../src/modules/chat/message.model.js";
+import Message from "../src/modules/messages/message.model.js";
 import User from "../src/modules/user/user.model.js";
 
 beforeAll(async () => {
@@ -60,6 +60,10 @@ describe("Messages API", () => {
       .post("/api/v1/auth/login")
       .send({ phone: "0911000002", pin: "1234" });
     user2Token = login2.body.data.token;
+
+    // Auto-verify both users so they can send messages in tests
+    await User.findByIdAndUpdate(user1Id, { isVerified: true });
+    await User.findByIdAndUpdate(user2Id, { isVerified: true });
   });
 
   it("should send a message, encoding Amharic and Afan Oromo text correctly", async () => {
