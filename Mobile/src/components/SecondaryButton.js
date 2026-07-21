@@ -8,15 +8,7 @@ import {
 import { getRoleColors, neutralColors } from "../constants/colors";
 import Typography from "./Typography";
 
-/**
- * SecondaryButton - Outlined button component
- *
- * Supports:
- * - Loading state with spinner
- * - Disabled state
- * - Role-based accent colors
- * - Custom sizes
- */
+
 
 const styles = StyleSheet.create({
   button: {

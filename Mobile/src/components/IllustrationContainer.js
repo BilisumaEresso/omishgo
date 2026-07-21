@@ -3,16 +3,7 @@ import { Image, StyleSheet, View } from "react-native";
 import { getRoleColors } from "../constants/colors";
 import { borderRadius, gaps } from "../constants/layout";
 
-/**
- * IllustrationContainer - Container for onboarding illustrations
- *
- * Supports:
- * - Display large illustrations/images
- * - Background color variants
- * - Aspect ratio preservation
- * - Role-based background tint
- * - Multiple sizes
- */
+
 
 const styles = StyleSheet.create({
   container: {

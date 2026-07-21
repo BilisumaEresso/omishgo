@@ -10,18 +10,7 @@ import {
 import { neutralColors } from "../constants/colors";
 import { gaps, spacing } from "../constants/layout";
 
-/**
- * OnboardingLayout - Main layout wrapper for onboarding flows
- *
- * Supports:
- * - Full-screen onboarding
- * - Safe area aware
- * - Keyboard aware
- * - Scrollable content
- * - Header (progress indicator)
- * - Body (illustration + card)
- * - Footer (navigation buttons)
- */
+
 
 const styles = StyleSheet.create({
   wrapper: {

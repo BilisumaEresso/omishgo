@@ -2,10 +2,7 @@ import React from "react";
 import { StyleSheet, Text } from "react-native";
 import { neutralColors } from "../constants/colors";
 
-/**
- * Typography System
- * Provides consistent text styling across the app
- */
+
 
 const styles = StyleSheet.create({
   title: {
@@ -63,16 +60,7 @@ const styles = StyleSheet.create({
   },
 });
 
-/**
- * Typography Component
- *
- * @param {string} variant - Text style variant (title, subtitle, body, caption, etc.)
- * @param {string} color - Text color override
- * @param {object} style - Additional custom styles
- * @param {any} children - Text content
- * @param {boolean} bold - Bold variant (for body/caption)
- * @param {object} props - Other Text props
- */
+
 export const Typography = React.forwardRef(
   (
     { variant = "body", color, style, bold = false, children, ...props },

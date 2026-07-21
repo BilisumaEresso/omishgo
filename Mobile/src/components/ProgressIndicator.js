@@ -3,15 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { getRoleColors, neutralColors } from "../constants/colors";
 import { spacing } from "../constants/layout";
 
-/**
- * ProgressIndicator - Step progress dots
- *
- * Supports:
- * - Multiple step indicators
- * - Completed, current, and pending states
- * - Role-based accent color for current step
- * - Customizable size and spacing
- */
+
 
 const styles = StyleSheet.create({
   container: {

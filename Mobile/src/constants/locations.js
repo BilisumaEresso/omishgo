@@ -1286,11 +1286,7 @@ export const ZONE_TRANSLATIONS = {
   },
 };
 
-/**
- * Returns [{ value, label }] region options for a given language.
- * `value` is always the canonical English region name (used as the stored
- * value and for lookups into LOCATIONS); `label` is the localized display text.
- */
+
 export const getLocalizedRegions = (lang = "en") => {
   const labels = REGIONS_LOCALIZED[lang] || REGIONS_LOCALIZED.en;
   return REGIONS.map((region) => ({
@@ -1299,10 +1295,7 @@ export const getLocalizedRegions = (lang = "en") => {
   }));
 };
 
-/**
- * Returns [{ value, label }] zone options for a region, localized.
- * Falls back to the English name if no translation exists yet for that zone.
- */
+
 export const getLocalizedZones = (region, lang = "en") => {
   const zones = getZonesByRegion(region);
   if (lang === "en") return zones.map((z) => ({ value: z, label: z }));
@@ -1310,13 +1303,7 @@ export const getLocalizedZones = (region, lang = "en") => {
   return zones.map((z) => ({ value: z, label: dict[z] || z }));
 };
 
-/**
- * Returns [{ value, label }] wereda options for a region+zone.
- * Wereda names are intentionally NOT translated by default (proper place
- * names, hundreds of entries, high risk of inaccurate transliteration).
- * If you later add entries to WEREDA_TRANSLATIONS keyed the same way as
- * ZONE_TRANSLATIONS, they will be picked up automatically.
- */
+
 export const WEREDA_TRANSLATIONS = {
   am: {},
   om: {},

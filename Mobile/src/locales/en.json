@@ -157,7 +157,8 @@
     "logoutAlertMessage": "Are you sure you want to logout?",
     "logoutAlertCancel": "Cancel",
     "logoutAlertConfirm": "Logout",
-    "menuSettings": "Settings"
+    "menuSettings": "Settings",
+    "chatNow":"Chat Now"
   },
   "buyerSaved": {
     "title": "Saved Listings",
@@ -261,7 +262,8 @@
     "farmerNotFound": "Farmer not found",
     "goBack": "Go Back",
     "activeListings": "Active Listings: {{count}}",
-    "emptyListings": "No active listings at the moment"
+    "emptyListings": "No active listings at the moment",
+    "chatNow": "Chat Now"
   },
   "editProduct": {
     "title": "Edit Product",
@@ -442,7 +444,8 @@
   "chatScreen": {
     "title": "Chat",
     "errorLoadMessages": "Could not load messages. Please try again.",
-    "errorSendMessage": "Could not send message. Please try again."
+    "errorSendMessage": "Could not send message. Please try again.",
+    "callNotAvailable": "Calls are not available in this version."
   },
   "conversationsScreen": {
     "timeNow": "now",

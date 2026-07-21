@@ -4,16 +4,7 @@ import { getRoleColors, neutralColors } from "../constants/colors";
 import { borderRadius, gaps, shadows, spacing } from "../constants/layout";
 import Typography from "./Typography";
 
-/**
- * OnboardingCard - Content card for onboarding steps
- *
- * Supports:
- * - Title and description text
- * - Icon or illustration area
- * - Key points/bullets
- * - Role-based accent color
- * - Multiple layout variants
- */
+
 
 const styles = StyleSheet.create({
   card: {

@@ -17,6 +17,7 @@ import NotificationsScreen from "../screens/shared/NotificationsScreen";
 import OrderDetailScreen from "../screens/shared/OrderDetailScreen";
 import EditProductScreen from "../screens/farmer/EditProductScreen";
 import SettingsScreen from "../screens/shared/SettingsScreen";
+import BuyerProfileScreen from "../screens/farmer/BuyerProfileScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -62,6 +63,7 @@ const FarmerNavigator = () => (
     <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
     <Stack.Screen name="EditProduct" component={EditProductScreen} />
     <Stack.Screen name="Settings" component={SettingsScreen} />
+    <Stack.Screen name="BuyerProfile" component={BuyerProfileScreen} />
   </Stack.Navigator>
 );
 

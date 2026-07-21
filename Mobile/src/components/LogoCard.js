@@ -2,15 +2,7 @@ import React from "react";
 import { Image, Platform, StyleSheet, View } from "react-native";
 import { neutralColors } from "../constants/colors";
 
-/**
- * LogoCard - Card component for logo display
- *
- * Supports:
- * - Image/logo display
- * - Subtle shadow elevation
- * - Centered layout
- * - Custom sizing
- */
+
 
 const styles = StyleSheet.create({
   container: {

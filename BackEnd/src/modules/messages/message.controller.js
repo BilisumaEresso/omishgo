@@ -4,7 +4,7 @@ import asyncHandler from "../../utils/asyncHandler.js";
 import sendResponse from "../../utils/sendResponse.js";
 import Notification from "../notification/notification.model.js";
 import User from "../user/user.model.js";
-import Message from "./message.model.js";
+import Message from "./message.model.js"; 
 
 /**
  * @desc    Get thread between current user and another user
@@ -30,7 +30,7 @@ export const getThread = asyncHandler(async (req, res) => {
   })
     .sort({ createdAt: 1 })
     .populate("senderId", "name phone")
-    .populate("receiverId", "name phone"); 
+    .populate("receiverId", "name phone");
 
   // Mark any unread messages sent TO current user as read
   await Message.updateMany(

@@ -8,62 +8,52 @@ import OnboardingFooter from "./OnboardingFooter";
 import OnboardingLayout from "./OnboardingLayout";
 import ProgressIndicator from "./ProgressIndicator";
 import Typography from "./Typography";
-
-/**
- * Onboarding Example Screens
- *
- * These are realistic examples showing how to compose onboarding flows
- * using the onboarding component library.
- *
- * All examples are self-contained and can be copy/pasted into screens.
- */
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: neutralColors.backgroundLight,
+    backgroundColor: neutralColors.backgroundLight
   },
   selectorContainer: {
     padding: spacing.xl,
     borderBottomWidth: 1,
     borderBottomColor: neutralColors.borderLight,
-    backgroundColor: neutralColors.cardBg,
+    backgroundColor: neutralColors.cardBg
   },
   screenButton: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
     backgroundColor: neutralColors.borderLight,
     borderRadius: 8,
-    marginBottom: spacing.md,
+    marginBottom: spacing.md
   },
   screenButtonText: {
-    textAlign: "center",
+    textAlign: "center"
   },
   sectionDivider: {
     height: 1,
     backgroundColor: neutralColors.borderLight,
-    marginVertical: spacing.xl,
+    marginVertical: spacing.xl
   },
   highlightText: {
-    fontWeight: "600",
+    fontWeight: "600"
   },
   featureRow: {
     flexDirection: "row",
     alignItems: "flex-start",
     marginBottom: spacing.md,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.lg
   },
   featureIcon: {
     marginRight: spacing.md,
-    marginTop: 2,
+    marginTop: 2
   },
   featureText: {
-    flex: 1,
+    flex: 1
   },
   roleGrid: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: spacing.lg,
+    marginBottom: spacing.lg
   },
   roleCard: {
     flex: 0.48,
@@ -72,22 +62,22 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     borderWidth: 2,
-    borderColor: neutralColors.borderLight,
+    borderColor: neutralColors.borderLight
   },
   roleCardSelected: {
-    borderWidth: 2,
+    borderWidth: 2
   },
   roleCardText: {
     marginTop: spacing.md,
-    textAlign: "center",
+    textAlign: "center"
   },
   termsContainer: {
     paddingHorizontal: spacing.lg,
-    marginBottom: spacing.xl,
+    marginBottom: spacing.xl
   },
   termsText: {
-    lineHeight: 22,
-  },
+    lineHeight: 22
+  }
 });
 
 // ==============================================================
@@ -96,69 +86,43 @@ const styles = StyleSheet.create({
 export const WelcomeOnboardingScreen = () => {
   const role = "farmer";
   const [currentStep, setCurrentStep] = useState(1);
-
-  return (
-    <OnboardingLayout
-      testID="onboarding-welcome"
-      header={
-        <View style={{ alignItems: "center" }}>
+  return <OnboardingLayout testID="onboarding-welcome" header={<View style={{
+    alignItems: "center"
+  }}>
           <ProgressIndicator currentStep={1} totalSteps={5} role={role} />
-        </View>
-      }
-      illustration={
-        <IllustrationContainer
-          size="large"
-          role={role}
-          accentColor="bright"
-          showOverlay={false}
-        >
-          <View
-            style={{
-              width: 200,
-              height: 200,
-              backgroundColor: getRoleColors(role).light,
-              borderRadius: 12,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Typography
-              variant="title"
-              bold
-              color={getRoleColors(role).primary}
-            >
+        </View>} illustration={<IllustrationContainer size="large" role={role} accentColor="bright" showOverlay={false}>
+          <View style={{
+      width: 200,
+      height: 200,
+      backgroundColor: getRoleColors(role).light,
+      borderRadius: 12,
+      alignItems: "center",
+      justifyContent: "center"
+    }}>
+            <Typography variant="title" bold color={getRoleColors(role).primary}>
               🌾
             </Typography>
           </View>
-        </IllustrationContainer>
-      }
-      content={
-        <View>
-          <Typography
-            variant="title"
-            bold
-            color={neutralColors.textDark}
-            style={{ marginBottom: spacing.md, textAlign: "center" }}
-          >
+        </IllustrationContainer>} content={<View>
+          <Typography variant="title" bold color={neutralColors.textDark} style={{
+      marginBottom: spacing.md,
+      textAlign: "center"
+    }}>
             Welcome to OmishGo
           </Typography>
-          <Typography
-            variant="body"
-            color={neutralColors.textMedium}
-            style={{ textAlign: "center", marginBottom: spacing.lg }}
-          >
+          <Typography variant="body" color={neutralColors.textMedium} style={{
+      textAlign: "center",
+      marginBottom: spacing.lg
+    }}>
             The farmer-first marketplace connecting farmers with buyers and
             suppliers.
           </Typography>
 
           <View style={styles.sectionDivider} />
 
-          <Typography
-            variant="subtitle"
-            bold
-            color={neutralColors.textDark}
-            style={{ marginBottom: spacing.md }}
-          >
+          <Typography variant="subtitle" bold color={neutralColors.textDark} style={{
+      marginBottom: spacing.md
+    }}>
             What you'll do:
           </Typography>
 
@@ -194,20 +158,7 @@ export const WelcomeOnboardingScreen = () => {
               </Typography>
             </View>
           </View>
-        </View>
-      }
-      footer={
-        <OnboardingFooter
-          currentStep={1}
-          totalSteps={5}
-          role={role}
-          onNext={() => setCurrentStep(2)}
-          showSkip={true}
-          testID="welcome-footer"
-        />
-      }
-    />
-  );
+        </View>} footer={<OnboardingFooter currentStep={1} totalSteps={5} role={role} onNext={() => setCurrentStep(2)} showSkip={true} testID="welcome-footer" />} />;
 };
 
 // ==============================================================
@@ -216,64 +167,24 @@ export const WelcomeOnboardingScreen = () => {
 export const FeaturesOnboardingScreen = () => {
   const role = "farmer";
   const [currentStep, setCurrentStep] = useState(2);
-
-  return (
-    <OnboardingLayout
-      testID="onboarding-features"
-      header={
-        <View style={{ alignItems: "center" }}>
-          <ProgressIndicator
-            currentStep={2}
-            totalSteps={5}
-            role={role}
-            size="small"
-          />
-        </View>
-      }
-      illustration={
-        <IllustrationContainer size="medium" role={role} showOverlay={true}>
-          <View
-            style={{
-              width: 150,
-              height: 150,
-              backgroundColor: getRoleColors(role).lighter,
-              borderRadius: 12,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+  return <OnboardingLayout testID="onboarding-features" header={<View style={{
+    alignItems: "center"
+  }}>
+          <ProgressIndicator currentStep={2} totalSteps={5} role={role} size="small" />
+        </View>} illustration={<IllustrationContainer size="medium" role={role} showOverlay={true}>
+          <View style={{
+      width: 150,
+      height: 150,
+      backgroundColor: getRoleColors(role).lighter,
+      borderRadius: 12,
+      alignItems: "center",
+      justifyContent: "center"
+    }}>
             <Typography variant="subtitle" bold>
               📱
             </Typography>
           </View>
-        </IllustrationContainer>
-      }
-      content={
-        <OnboardingCard
-          title="Easy to Use"
-          description="Designed for farmers with any experience level. Simple taps, clear instructions."
-          role={role}
-          points={[
-            "Works offline on slow networks",
-            "Simple Amharic support",
-            "No confusing tech jargon",
-          ]}
-          accentColor="bright"
-        />
-      }
-      footer={
-        <OnboardingFooter
-          currentStep={2}
-          totalSteps={5}
-          role={role}
-          onNext={() => setCurrentStep(3)}
-          onBack={() => setCurrentStep(1)}
-          showSkip={true}
-          testID="features-footer"
-        />
-      }
-    />
-  );
+        </IllustrationContainer>} content={<OnboardingCard title="Easy to Use" description="Designed for farmers with any experience level. Simple taps, clear instructions." role={role} points={["Works offline on slow networks", "Simple Amharic support", "No confusing tech jargon"]} accentColor="bright" />} footer={<OnboardingFooter currentStep={2} totalSteps={5} role={role} onNext={() => setCurrentStep(3)} onBack={() => setCurrentStep(1)} showSkip={true} testID="features-footer" />} />;
 };
 
 // ==============================================================
@@ -283,151 +194,73 @@ export const RoleSelectionOnboardingScreen = () => {
   const role = "farmer";
   const [currentStep, setCurrentStep] = useState(3);
   const [selectedRoles, setSelectedRoles] = useState(["farmer"]);
-
   const roles = ["farmer", "buyer", "supplier", "driver"];
   const roleLabels = {
     farmer: "Farmer",
     buyer: "Buyer",
     supplier: "Supplier",
-    driver: "Driver",
+    driver: "Driver"
   };
-
   const roleDescriptions = {
     farmer: "Manage farm & sell products",
     buyer: "Buy farm products",
     supplier: "Sell farm supplies",
-    driver: "Handle deliveries",
+    driver: "Handle deliveries"
   };
-
-  return (
-    <OnboardingLayout
-      testID="onboarding-roles"
-      header={
-        <View style={{ alignItems: "center" }}>
-          <ProgressIndicator
-            currentStep={3}
-            totalSteps={5}
-            role={role}
-            size="small"
-          />
-        </View>
-      }
-      content={
-        <View>
-          <Typography
-            variant="title"
-            bold
-            color={neutralColors.textDark}
-            style={{ marginBottom: spacing.md }}
-          >
+  return <OnboardingLayout testID="onboarding-roles" header={<View style={{
+    alignItems: "center"
+  }}>
+          <ProgressIndicator currentStep={3} totalSteps={5} role={role} size="small" />
+        </View>} content={<View>
+          <Typography variant="title" bold color={neutralColors.textDark} style={{
+      marginBottom: spacing.md
+    }}>
             What's your role?
           </Typography>
-          <Typography
-            variant="body"
-            color={neutralColors.textMedium}
-            style={{ marginBottom: spacing.lg }}
-          >
+          <Typography variant="body" color={neutralColors.textMedium} style={{
+      marginBottom: spacing.lg
+    }}>
             You can switch roles anytime.
           </Typography>
 
           <View style={styles.roleGrid}>
-            {roles.slice(0, 2).map((r) => (
-              <View
-                key={r}
-                style={[
-                  styles.roleCard,
-                  {
-                    backgroundColor: getRoleColors(r).lighter,
-                    borderColor: selectedRoles.includes(r)
-                      ? getRoleColors(r).primary
-                      : neutralColors.borderLight,
-                  },
-                ]}
-              >
-                <Typography
-                  variant="subtitle"
-                  bold
-                  color={getRoleColors(r).primary}
-                >
+            {roles.slice(0, 2).map(r => <View key={r} style={[styles.roleCard, {
+        backgroundColor: getRoleColors(r).lighter,
+        borderColor: selectedRoles.includes(r) ? getRoleColors(r).primary : neutralColors.borderLight
+      }]}>
+                <Typography variant="subtitle" bold color={getRoleColors(r).primary}>
                   {r === "farmer" && "🌾"}
                   {r === "buyer" && "🛒"}
                   {r === "supplier" && "📦"}
                   {r === "driver" && "🚗"}
                 </Typography>
-                <Typography
-                  variant="body"
-                  bold
-                  color={neutralColors.textDark}
-                  style={styles.roleCardText}
-                >
+                <Typography variant="body" bold color={neutralColors.textDark} style={styles.roleCardText}>
                   {roleLabels[r]}
                 </Typography>
-                <Typography
-                  variant="caption"
-                  color={neutralColors.textMedium}
-                  style={styles.roleCardText}
-                >
+                <Typography variant="caption" color={neutralColors.textMedium} style={styles.roleCardText}>
                   {roleDescriptions[r]}
                 </Typography>
-              </View>
-            ))}
+              </View>)}
           </View>
 
           <View style={styles.roleGrid}>
-            {roles.slice(2).map((r) => (
-              <View
-                key={r}
-                style={[
-                  styles.roleCard,
-                  {
-                    backgroundColor: getRoleColors(r).lighter,
-                    borderColor: selectedRoles.includes(r)
-                      ? getRoleColors(r).primary
-                      : neutralColors.borderLight,
-                  },
-                ]}
-              >
-                <Typography
-                  variant="subtitle"
-                  bold
-                  color={getRoleColors(r).primary}
-                >
+            {roles.slice(2).map(r => <View key={r} style={[styles.roleCard, {
+        backgroundColor: getRoleColors(r).lighter,
+        borderColor: selectedRoles.includes(r) ? getRoleColors(r).primary : neutralColors.borderLight
+      }]}>
+                <Typography variant="subtitle" bold color={getRoleColors(r).primary}>
                   {r === "driver" && "🚗"}
                   {r === "supplier" && "📦"}
                 </Typography>
-                <Typography
-                  variant="body"
-                  bold
-                  color={neutralColors.textDark}
-                  style={styles.roleCardText}
-                >
+                <Typography variant="body" bold color={neutralColors.textDark} style={styles.roleCardText}>
                   {roleLabels[r]}
                 </Typography>
-                <Typography
-                  variant="caption"
-                  color={neutralColors.textMedium}
-                  style={styles.roleCardText}
-                >
+                <Typography variant="caption" color={neutralColors.textMedium} style={styles.roleCardText}>
                   {roleDescriptions[r]}
                 </Typography>
-              </View>
-            ))}
+              </View>)}
           </View>
-        </View>
-      }
-      footer={
-        <OnboardingFooter
-          currentStep={3}
-          totalSteps={5}
-          role={role}
-          onNext={() => setCurrentStep(4)}
-          onBack={() => setCurrentStep(2)}
-          showSkip={true}
-          testID="roles-footer"
-        />
-      }
-    />
-  );
+        </View>} footer={<OnboardingFooter currentStep={3} totalSteps={5} role={role} onNext={() => setCurrentStep(4)} onBack={() => setCurrentStep(2)} showSkip={true} testID="roles-footer" />} />;
 };
 
 // ==============================================================
@@ -437,48 +270,27 @@ export const TermsOnboardingScreen = () => {
   const role = "farmer";
   const [currentStep, setCurrentStep] = useState(4);
   const [agreed, setAgreed] = useState(false);
-
-  return (
-    <OnboardingLayout
-      testID="onboarding-terms"
-      header={
-        <View style={{ alignItems: "center" }}>
-          <ProgressIndicator
-            currentStep={4}
-            totalSteps={5}
-            role={role}
-            size="small"
-          />
-        </View>
-      }
-      content={
-        <View>
-          <Typography
-            variant="title"
-            bold
-            color={neutralColors.textDark}
-            style={{ marginBottom: spacing.md }}
-          >
+  return <OnboardingLayout testID="onboarding-terms" header={<View style={{
+    alignItems: "center"
+  }}>
+          <ProgressIndicator currentStep={4} totalSteps={5} role={role} size="small" />
+        </View>} content={<View>
+          <Typography variant="title" bold color={neutralColors.textDark} style={{
+      marginBottom: spacing.md
+    }}>
             Terms & Conditions
           </Typography>
 
-          <ScrollView
-            style={{
-              height: 200,
-              borderRadius: 8,
-              borderWidth: 1,
-              borderColor: neutralColors.borderLight,
-              paddingHorizontal: spacing.md,
-              paddingVertical: spacing.md,
-              marginBottom: spacing.lg,
-            }}
-            showsVerticalScrollIndicator={true}
-          >
-            <Typography
-              variant="caption"
-              color={neutralColors.textMedium}
-              style={styles.termsText}
-            >
+          <ScrollView style={{
+      height: 200,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: neutralColors.borderLight,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      marginBottom: spacing.lg
+    }} showsVerticalScrollIndicator={true}>
+            <Typography variant="caption" color={neutralColors.textMedium} style={styles.termsText}>
               {`By using OmishGo, you agree to these terms:
 
 1. You provide accurate information
@@ -492,64 +304,31 @@ For full terms, visit omishgo.com/terms`}
             </Typography>
           </ScrollView>
 
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              paddingHorizontal: spacing.lg,
-            }}
-          >
-            <View
-              style={{
-                width: 24,
-                height: 24,
-                borderRadius: 4,
-                borderWidth: 2,
-                borderColor: agreed
-                  ? getRoleColors(role).primary
-                  : neutralColors.borderLight,
-                backgroundColor: agreed
-                  ? getRoleColors(role).lighter
-                  : "transparent",
-                alignItems: "center",
-                justifyContent: "center",
-                marginRight: spacing.md,
-              }}
-            >
-              {agreed && (
-                <Typography
-                  variant="body"
-                  bold
-                  color={getRoleColors(role).primary}
-                >
+          <View style={{
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: spacing.lg
+    }}>
+            <View style={{
+        width: 24,
+        height: 24,
+        borderRadius: 4,
+        borderWidth: 2,
+        borderColor: agreed ? getRoleColors(role).primary : neutralColors.borderLight,
+        backgroundColor: agreed ? getRoleColors(role).lighter : "transparent",
+        alignItems: "center",
+        justifyContent: "center",
+        marginRight: spacing.md
+      }}>
+              {agreed && <Typography variant="body" bold color={getRoleColors(role).primary}>
                   ✓
-                </Typography>
-              )}
+                </Typography>}
             </View>
-            <Typography
-              variant="body"
-              color={neutralColors.textDark}
-              onPress={() => setAgreed(!agreed)}
-            >
+            <Typography variant="body" color={neutralColors.textDark} onPress={() => setAgreed(!agreed)}>
               I agree to terms & conditions
             </Typography>
           </View>
-        </View>
-      }
-      footer={
-        <OnboardingFooter
-          currentStep={4}
-          totalSteps={5}
-          role={role}
-          onNext={() => setCurrentStep(5)}
-          onBack={() => setCurrentStep(3)}
-          nextDisabled={!agreed}
-          showSkip={false}
-          testID="terms-footer"
-        />
-      }
-    />
-  );
+        </View>} footer={<OnboardingFooter currentStep={4} totalSteps={5} role={role} onNext={() => setCurrentStep(5)} onBack={() => setCurrentStep(3)} nextDisabled={!agreed} showSkip={false} testID="terms-footer" />} />;
 };
 
 // ==============================================================
@@ -558,74 +337,44 @@ For full terms, visit omishgo.com/terms`}
 export const CompleteOnboardingScreen = () => {
   const role = "farmer";
   const [currentStep, setCurrentStep] = useState(5);
-
-  return (
-    <OnboardingLayout
-      testID="onboarding-complete"
-      header={
-        <View style={{ alignItems: "center" }}>
-          <ProgressIndicator
-            currentStep={5}
-            totalSteps={5}
-            role={role}
-            size="small"
-          />
-        </View>
-      }
-      illustration={
-        <IllustrationContainer
-          size="large"
-          role={role}
-          accentColor="success"
-          showOverlay={false}
-        >
-          <View
-            style={{
-              width: 120,
-              height: 120,
-              backgroundColor: "#10b981",
-              borderRadius: 60,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Typography
-              variant="title"
-              bold
-              color="white"
-              style={{ fontSize: 48 }}
-            >
+  return <OnboardingLayout testID="onboarding-complete" header={<View style={{
+    alignItems: "center"
+  }}>
+          <ProgressIndicator currentStep={5} totalSteps={5} role={role} size="small" />
+        </View>} illustration={<IllustrationContainer size="large" role={role} accentColor="success" showOverlay={false}>
+          <View style={{
+      width: 120,
+      height: 120,
+      backgroundColor: "#10b981",
+      borderRadius: 60,
+      alignItems: "center",
+      justifyContent: "center"
+    }}>
+            <Typography variant="title" bold color="white" style={{
+        fontSize: 48
+      }}>
               ✓
             </Typography>
           </View>
-        </IllustrationContainer>
-      }
-      content={
-        <View>
-          <Typography
-            variant="title"
-            bold
-            color={neutralColors.textDark}
-            style={{ marginBottom: spacing.md, textAlign: "center" }}
-          >
+        </IllustrationContainer>} content={<View>
+          <Typography variant="title" bold color={neutralColors.textDark} style={{
+      marginBottom: spacing.md,
+      textAlign: "center"
+    }}>
             You're all set!
           </Typography>
-          <Typography
-            variant="body"
-            color={neutralColors.textMedium}
-            style={{ textAlign: "center", marginBottom: spacing.lg }}
-          >
+          <Typography variant="body" color={neutralColors.textMedium} style={{
+      textAlign: "center",
+      marginBottom: spacing.lg
+    }}>
             Welcome to OmishGo. Your account is ready. Let's get started.
           </Typography>
 
           <View style={styles.sectionDivider} />
 
-          <Typography
-            variant="subtitle"
-            bold
-            color={neutralColors.textDark}
-            style={{ marginBottom: spacing.md }}
-          >
+          <Typography variant="subtitle" bold color={neutralColors.textDark} style={{
+      marginBottom: spacing.md
+    }}>
             What's next:
           </Typography>
 
@@ -661,23 +410,7 @@ export const CompleteOnboardingScreen = () => {
               </Typography>
             </View>
           </View>
-        </View>
-      }
-      footer={
-        <OnboardingFooter
-          currentStep={5}
-          totalSteps={5}
-          isLastStep={true}
-          role={role}
-          onNext={() => console.log("Navigate to home")}
-          nextLabel="Get Started"
-          showBack={false}
-          showSkip={false}
-          testID="complete-footer"
-        />
-      }
-    />
-  );
+        </View>} footer={<OnboardingFooter currentStep={5} totalSteps={5} isLastStep={true} role={role} onNext={() => {}} nextLabel="Get Started" showBack={false} showSkip={false} testID="complete-footer" />} />;
 };
 
 // ==============================================================
@@ -685,75 +418,54 @@ export const CompleteOnboardingScreen = () => {
 // ==============================================================
 export const OnboardingExamplesSelector = () => {
   const [selectedScreen, setSelectedScreen] = useState("welcome");
-
   const screens = {
     welcome: {
       label: "Welcome",
-      component: WelcomeOnboardingScreen,
+      component: WelcomeOnboardingScreen
     },
     features: {
       label: "Features",
-      component: FeaturesOnboardingScreen,
+      component: FeaturesOnboardingScreen
     },
     roles: {
       label: "Role Selection",
-      component: RoleSelectionOnboardingScreen,
+      component: RoleSelectionOnboardingScreen
     },
     terms: {
       label: "Terms & Conditions",
-      component: TermsOnboardingScreen,
+      component: TermsOnboardingScreen
     },
     complete: {
       label: "Complete",
-      component: CompleteOnboardingScreen,
-    },
+      component: CompleteOnboardingScreen
+    }
   };
-
   const CurrentScreen = screens[selectedScreen]?.component;
-
-  return (
-    <SafeAreaView style={styles.container}>
+  return <SafeAreaView style={styles.container}>
       <View style={styles.selectorContainer}>
-        <Typography
-          variant="subtitle"
-          bold
-          style={{ marginBottom: spacing.md }}
-        >
+        <Typography variant="subtitle" bold style={{
+        marginBottom: spacing.md
+      }}>
           Onboarding Examples
         </Typography>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {Object.entries(screens).map(([key, { label }]) => (
-            <View key={key} style={{ marginRight: spacing.md }}>
-              <View
-                style={[
-                  styles.screenButton,
-                  {
-                    backgroundColor:
-                      selectedScreen === key
-                        ? getRoleColors("farmer").primary
-                        : neutralColors.borderLight,
-                  },
-                ]}
-              >
-                <Typography
-                  variant="body"
-                  bold
-                  color={
-                    selectedScreen === key ? "white" : neutralColors.textMedium
-                  }
-                  onPress={() => setSelectedScreen(key)}
-                >
+          {Object.entries(screens).map(([key, {
+          label
+        }]) => <View key={key} style={{
+          marginRight: spacing.md
+        }}>
+              <View style={[styles.screenButton, {
+            backgroundColor: selectedScreen === key ? getRoleColors("farmer").primary : neutralColors.borderLight
+          }]}>
+                <Typography variant="body" bold color={selectedScreen === key ? "white" : neutralColors.textMedium} onPress={() => setSelectedScreen(key)}>
                   {label}
                 </Typography>
               </View>
-            </View>
-          ))}
+            </View>)}
         </ScrollView>
       </View>
 
       {CurrentScreen && <CurrentScreen />}
-    </SafeAreaView>
-  );
+    </SafeAreaView>;
 };
-
 export default OnboardingExamplesSelector;

@@ -156,7 +156,8 @@
     "logoutAlertMessage": "Dhuguma bahuu barbaaddaa?",
     "logoutAlertCancel": "Haqi",
     "logoutAlertConfirm": "Bahi",
-    "menuSettings": "Qindaa'inoota"
+    "menuSettings": "Qindaa'inoota",
+    "chatNow": "Amma Barreessif"
   },
   "buyerSaved": {
     "title": "Beeksisawwan Kuufaman",
@@ -260,7 +261,8 @@
     "farmerNotFound": "Qotee bulaan hin argamne",
     "goBack": "Duubatti Deebi'i",
     "activeListings": "Beeksisawwan Aktiivii: {{count}}",
-    "emptyListings": "Yeroo ammaa beeksisni aktiivii ta'e hin jiru"
+    "emptyListings": "Yeroo ammaa beeksisni aktiivii ta'e hin jiru",
+    "chatNow": "Amma Barreessif"
   },
   "editProduct": {
     "title": "Oomisha Sirreessi",
@@ -437,7 +439,8 @@
   "chatScreen": {
     "title": "Haasaa",
     "errorLoadMessages": "Ergaawwan fiduun hin danda'amne. Irra deebi'ii yaali.",
-    "errorSendMessage": "Ergaa erguun hin danda'amne. Irra deebi'ii yaali."
+    "errorSendMessage": "Ergaa erguun hin danda'amne. Irra deebi'ii yaali.",
+    "callNotAvailable": "Maxxansa kanaan bilbiluun hin danda'amu."
   },
   "conversationsScreen": {
     "timeNow": "amma",

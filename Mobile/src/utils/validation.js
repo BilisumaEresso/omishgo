@@ -51,10 +51,7 @@ export const registerSchema = z
 
 // --- Validation helpers ---
 
-/**
- * Validate login form data using Zod.
- * Returns { isValid, errors } where errors is a map of field → message.
- */
+
 export const validateLoginForm = (data) => {
   const result = loginSchema.safeParse(data);
   if (result.success) {
@@ -70,10 +67,7 @@ export const validateLoginForm = (data) => {
   return { isValid: false, errors };
 };
 
-/**
- * Validate register form data using Zod.
- * Returns { isValid, errors } where errors is a map of field → message.
- */
+
 export const validateRegisterForm = (data) => {
   const result = registerSchema.safeParse(data);
   if (result.success) {

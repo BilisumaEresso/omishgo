@@ -63,7 +63,7 @@ const LoginScreen = ({ navigation }) => {
       const result = await login(phone, pin);
       if (!result.success) {
         if (result.errorType === "DEVICE_BLOCKED") {
-          navigation.navigate("DeviceBlocked", { phone });
+          navigation.navigate("DeviceBlocked" /* TODO: DeviceBlocked screen not yet registered */, { phone });
         } else {
           setErrors({ submit: result.message || "Login failed" });
         }

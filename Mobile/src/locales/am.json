@@ -156,7 +156,8 @@
     "logoutAlertMessage": "እርግጠኛ ነዎት መውጣት ይፈልጋሉ?",
     "logoutAlertCancel": "ሰርዝ",
     "logoutAlertConfirm": "ውጣ",
-    "menuSettings": "ቅንብሮች"
+    "menuSettings": "ቅንብሮች",
+    "chatNow":"አሁን ተወያይ"
   },
   "buyerSaved": {
     "title": "የተቀመጡ ምርቶች",
@@ -260,7 +261,8 @@
     "farmerNotFound": "አርሶ አደሩ አልተገኘም",
     "goBack": "ወደ ኋላ ተመለስ",
     "activeListings": "ንቁ ማስታወቂያዎች: {{count}}",
-    "emptyListings": "በአሁኑ ጊዜ ምንም ንቁ ማስታወቂያ የለም"
+    "emptyListings": "በአሁኑ ጊዜ ምንም ንቁ ማስታወቂያ የለም",
+    "chatNow":"አሁን ተወያይ"
   },
   "editProduct": {
     "title": "ምርትን ያስተካክሉ",
@@ -441,7 +443,8 @@
   "chatScreen": {
     "title": "ውይይት",
     "errorLoadMessages": "መልዕክቶችን ማምጣት አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
-    "errorSendMessage": "መልዕክት መላክ አልተቻለም። እባክዎ እንደገና ይሞክሩ።"
+    "errorSendMessage": "መልዕክት መላክ አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
+    "callNotAvailable": "በዚህ ስሪት መደወል አይቻልም።"
   },
   "conversationsScreen": {
     "timeNow": "አሁን",

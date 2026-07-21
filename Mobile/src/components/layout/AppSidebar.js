@@ -1,18 +1,20 @@
 // Mobile/src/components/layout/AppSidebar.js
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
+  Easing,
   Modal,
   Platform,
   Pressable,
   ScrollView,
+  StatusBar,
   StyleSheet,
-  TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
 import { useTheme } from "../../hooks/useTheme";
@@ -20,9 +22,9 @@ import { ROLES } from "../../constants/roles";
 import { useAuthStore } from "../../store/auth.store";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
-const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.78, 300);
+const SCREEN_HEIGHT = Dimensions.get("window").height;
+const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.82, 320);
 
-// ---------- role-based menu items (raw keys for translation) ----------
 const ROLE_MENU_ITEM_KEYS = {
   [ROLES.FARMER]: [
     { key: "products", icon: "leaf-outline", route: "FarmerProducts" },
@@ -49,12 +51,69 @@ const ROLE_MENU_ITEM_KEYS = {
   ],
 };
 
-// ---------- language options ----------
 const LANGUAGES = [
   { code: "en", label: "English", native: "English" },
   { code: "am", label: "አማርኛ", native: "Amharic" },
   { code: "om", label: "Afaan Oromoo", native: "Afan Oromo" },
 ];
+
+// ----- Pressable row with press-scale + ripple-ish opacity -----
+const Row = ({
+  children,
+  onPress,
+  style,
+  accessibilityLabel,
+  accessibilityRole = "button",
+}) => {
+  const scale = useRef(new Animated.Value(1)).current;
+  const bg = useRef(new Animated.Value(0)).current;
+
+  const onIn = () => {
+    Animated.parallel([
+      Animated.spring(scale, {
+        toValue: 0.97,
+        useNativeDriver: true,
+        speed: 40,
+        bounciness: 0,
+      }),
+      Animated.timing(bg, {
+        toValue: 1,
+        duration: 120,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  };
+  const onOut = () => {
+    Animated.parallel([
+      Animated.spring(scale, {
+        toValue: 1,
+        useNativeDriver: true,
+        speed: 30,
+        bounciness: 6,
+      }),
+      Animated.timing(bg, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  };
+
+  return (
+    <Pressable
+      onPressIn={onIn}
+      onPressOut={onOut}
+      onPress={onPress}
+      accessibilityRole={accessibilityRole}
+      accessibilityLabel={accessibilityLabel}
+      style={{ borderRadius: 14 }}
+    >
+      <Animated.View style={[style, { transform: [{ scale }] }]}>
+        {children}
+      </Animated.View>
+    </Pressable>
+  );
+};
 
 const AppSidebar = ({
   visible,
@@ -66,13 +125,16 @@ const AppSidebar = ({
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
   const { logout, user } = useAuthStore();
+  const insets = useSafeAreaInsets();
 
   const slideAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const contentAnim = useRef(new Animated.Value(0)).current;
+  const langAnim = useRef(new Animated.Value(0)).current;
+
   const [showModal, setShowModal] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
 
-  // ---------- translated menu items ----------
   const menuItems = useMemo(() => {
     const rawItems = role ? ROLE_MENU_ITEM_KEYS[role] || [] : [];
     return rawItems.map((item) => ({
@@ -114,104 +176,87 @@ const AppSidebar = ({
       )
     : t("appSidebar.roleUser");
 
-  // ---------- animation ----------
+  const openAnim = () => {
+    Animated.parallel([
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        useNativeDriver: true,
+        damping: 22,
+        stiffness: 180,
+        mass: 0.9,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 260,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(contentAnim, {
+        toValue: 1,
+        duration: 380,
+        delay: 80,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const closeAnim = (cb) => {
+    Animated.parallel([
+      Animated.timing(slideAnim, {
+        toValue: -DRAWER_WIDTH,
+        duration: 220,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(contentAnim, {
+        toValue: 0,
+        duration: 160,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setShowModal(false);
+      setLanguageOpen(false);
+      langAnim.setValue(0);
+      cb && cb();
+    });
+  };
+
   useEffect(() => {
     if (visible) {
       setShowModal(true);
-      Animated.parallel([
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 250,
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 250,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    } else {
-      Animated.parallel([
-        Animated.timing(slideAnim, {
-          toValue: -DRAWER_WIDTH,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        setShowModal(false);
-        setLanguageOpen(false);
-      });
+      requestAnimationFrame(openAnim);
+    } else if (showModal) {
+      closeAnim();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
-  const handleClose = () => {
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: -DRAWER_WIDTH,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setShowModal(false);
-      setLanguageOpen(false);
-      if (onClose) onClose();
-    });
-  };
+  useEffect(() => {
+    Animated.timing(langAnim, {
+      toValue: languageOpen ? 1 : 0,
+      duration: 220,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+  }, [languageOpen, langAnim]);
 
-  const handleItem = (item) => {
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: -DRAWER_WIDTH,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setShowModal(false);
-      setLanguageOpen(false);
-      if (onItemPress) onItemPress(item);
-    });
-  };
-
-  const handleLogout = () => {
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: -DRAWER_WIDTH,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setShowModal(false);
-      setLanguageOpen(false);
-      logout();
-    });
-  };
+  const handleClose = () => closeAnim(() => onClose && onClose());
+  const handleItem = (item) =>
+    closeAnim(() => onItemPress && onItemPress(item));
+  const handleLogout = () => closeAnim(() => logout());
 
   const changeLanguage = (code) => {
     i18n.changeLanguage(code).catch(() => {});
     setLanguageOpen(false);
   };
 
-  // ---------- theme colours ----------
   const primaryColor = theme.colors.primary || "#2E7D32";
   const primaryDark = theme.colors.primaryDark || "#1B5E20";
   const textPrimary = theme.colors.textPrimary || "#1A2E1A";
@@ -219,23 +264,103 @@ const AppSidebar = ({
   const borderColor = theme.colors.border || "#D0E8CE";
   const surface = theme.colors.surface || "#FFFFFF";
   const errorColor = theme.colors.error || "#C62828";
-  const successColor = theme.colors.success || "#2E7D32";
 
-  // ---------- current language display ----------
   const currentLang = i18n.language || "en";
   const currentLangLabel =
     LANGUAGES.find((l) => l.code === currentLang)?.label || "English";
+
+  // staggered entrance for items
+  const itemStyle = (index) => {
+    const translateX = contentAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [-16 - index * 2, 0],
+    });
+    const opacity = contentAnim.interpolate({
+      inputRange: [0, 0.4 + Math.min(index, 8) * 0.05, 1],
+      outputRange: [0, 0.2, 1],
+    });
+    return { opacity, transform: [{ translateX }] };
+  };
+
+  const langHeight = langAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, LANGUAGES.length * 46 + 8],
+  });
+
+  const renderRow = (
+    item,
+    i,
+    { active = false, icon, color, danger = false } = {},
+  ) => (
+    <Animated.View style={itemStyle(i)} key={item.route || item.label}>
+      <Row
+        onPress={item.onPress}
+        accessibilityLabel={item.label}
+        style={[
+          styles.menuItem,
+          active && {
+            backgroundColor: primaryColor + "14",
+          },
+        ]}
+      >
+        <View
+          style={[
+            styles.iconWrap,
+            active && { backgroundColor: primaryColor + "1F" },
+          ]}
+        >
+          <Ionicons
+            name={icon}
+            size={20}
+            color={danger ? errorColor : active ? primaryColor : textSecondary}
+          />
+        </View>
+        <AppText
+          style={[
+            styles.menuLabel,
+            {
+              color: danger ? errorColor : active ? primaryColor : textPrimary,
+              fontWeight: active ? "700" : "500",
+            },
+          ]}
+          numberOfLines={1}
+        >
+          {item.label}
+        </AppText>
+        {active && (
+          <View style={[styles.activeDot, { backgroundColor: primaryColor }]} />
+        )}
+      </Row>
+    </Animated.View>
+  );
 
   return (
     <Modal
       visible={showModal}
       transparent
       animationType="none"
+      statusBarTranslucent
+      navigationBarTranslucent
       onRequestClose={handleClose}
     >
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="light-content"
+      />
       <View style={styles.overlay}>
         {/* Backdrop */}
-        <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]}>
+        <Animated.View
+          style={[
+            styles.backdrop,
+            {
+              opacity: fadeAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 1],
+              }),
+            },
+          ]}
+        >
           <Pressable
             style={{ flex: 1 }}
             onPress={handleClose}
@@ -243,7 +368,7 @@ const AppSidebar = ({
           />
         </Animated.View>
 
-        {/* Drawer */}
+        {/* Drawer — full height, flush to top/bottom */}
         <Animated.View
           style={[
             styles.drawer,
@@ -253,168 +378,203 @@ const AppSidebar = ({
             },
           ]}
         >
-          {/* Profile header with gradient */}
+          {/* Header (extends into status bar area) */}
           <LinearGradient
             colors={[primaryColor, primaryDark]}
-            style={styles.profileHeader}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[styles.profileHeader, { paddingTop: insets.top + 18 }]}
           >
+            {/* subtle decorative orbs */}
+            <View style={styles.orbLarge} pointerEvents="none" />
+            <View style={styles.orbSmall} pointerEvents="none" />
+
             <Pressable
               onPress={() => handleItem({ label: "Profile", route: "Profile" })}
-              style={styles.profilePressable}
+              style={({ pressed }) => [
+                styles.profilePressable,
+                pressed && { opacity: 0.85 },
+              ]}
               accessibilityRole="button"
               accessibilityLabel={t("appSidebar.viewProfile")}
             >
-              <View style={styles.avatar}>
-                <Ionicons name="person" size={32} color={primaryColor} />
+              <View style={styles.avatarRing}>
+                <View style={styles.avatar}>
+                  <Ionicons name="person" size={30} color={primaryColor} />
+                </View>
               </View>
+
               <View style={styles.profileInfo}>
                 <AppText style={styles.userName} numberOfLines={1}>
                   {user?.name || t("appSidebar.fallbackUserName")}
                 </AppText>
                 <View style={styles.rolePill}>
-                  <AppText style={styles.roleText}>{roleDisplay}</AppText>
+                  <View style={styles.roleDot} />
+                  <AppText style={styles.roleText} numberOfLines={1}>
+                    {roleDisplay}
+                  </AppText>
                 </View>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#FFF" />
+
+              <View style={styles.chevronCircle}>
+                <Ionicons name="chevron-forward" size={16} color="#FFF" />
+              </View>
             </Pressable>
           </LinearGradient>
 
-          {/* Scrollable menu area */}
+          {/* Menu */}
           <ScrollView
             style={styles.menuScroll}
             contentContainerStyle={styles.menuContent}
+            showsVerticalScrollIndicator={false}
           >
-            {/* Role-based items */}
-            {menuItems.map((item) => {
-              const isActive = activeRoute === item.route;
-              return (
-                <TouchableOpacity
-                  key={item.label}
-                  style={[
-                    styles.menuItem,
-                    isActive && { backgroundColor: primaryColor + "15" },
-                  ]}
-                  onPress={() => handleItem(item)}
-                  accessibilityRole="button"
-                  accessibilityLabel={item.label}
-                >
-                  <Ionicons
-                    name={item.icon}
-                    size={22}
-                    color={isActive ? primaryColor : textSecondary}
-                  />
-                  <AppText
-                    style={[
-                      styles.menuLabel,
-                      { color: isActive ? primaryColor : textPrimary },
-                    ]}
-                  >
-                    {item.label}
-                  </AppText>
-                </TouchableOpacity>
-              );
-            })}
+            {menuItems.length > 0 && (
+              <AppText style={[styles.sectionLabel, { color: textSecondary }]}>
+                {roleDisplay}
+              </AppText>
+            )}
 
-            {/* Divider */}
+            {menuItems.map((item, i) =>
+              renderRow({ ...item, onPress: () => handleItem(item) }, i, {
+                active: activeRoute === item.route,
+                icon: item.icon,
+              }),
+            )}
+
             <View style={[styles.divider, { backgroundColor: borderColor }]} />
 
-            {/* My Profile, Settings & Help */}
-            {staticItems.map(({ label, route, icon }) => (
-              <TouchableOpacity
-                key={route}
-                style={styles.menuItem}
-                onPress={() => handleItem({ label, route })}
-                accessibilityRole="button"
-                accessibilityLabel={label}
-              >
-                <Ionicons name={icon} size={22} color={textSecondary} />
-                <AppText style={[styles.menuLabel, { color: textPrimary }]}>
-                  {label}
-                </AppText>
-              </TouchableOpacity>
-            ))}
+            <AppText style={[styles.sectionLabel, { color: textSecondary }]}>
+              {t("appSidebar.myProfile")}
+            </AppText>
 
-            {/* Language Picker */}
-            <View style={{ marginVertical: 4 }}>
-              <TouchableOpacity
-                style={styles.menuItem}
-                onPress={() => setLanguageOpen(!languageOpen)}
-                accessibilityRole="button"
+            {staticItems.map(({ label, route, icon }, i) =>
+              renderRow(
+                {
+                  label,
+                  route,
+                  onPress: () => handleItem({ label, route }),
+                },
+                menuItems.length + i,
+                { active: activeRoute === route, icon },
+              ),
+            )}
+
+            {/* Language */}
+            <Animated.View
+              style={[
+                itemStyle(menuItems.length + staticItems.length),
+                { marginTop: 4 },
+              ]}
+            >
+              <Row
+                onPress={() => setLanguageOpen((v) => !v)}
                 accessibilityLabel={t("appSidebar.changeLanguage")}
+                style={styles.menuItem}
               >
-                <Ionicons
-                  name="globe-outline"
-                  size={22}
-                  color={textSecondary}
-                />
+                <View style={styles.iconWrap}>
+                  <Ionicons
+                    name="globe-outline"
+                    size={20}
+                    color={textSecondary}
+                  />
+                </View>
                 <AppText
                   style={[styles.menuLabel, { color: textPrimary, flex: 1 }]}
                 >
                   {currentLangLabel}
                 </AppText>
-                <Ionicons
-                  name={languageOpen ? "chevron-up" : "chevron-down"}
-                  size={18}
-                  color={textSecondary}
-                />
-              </TouchableOpacity>
-              {languageOpen && (
-                <View style={styles.languageSubmenu}>
-                  {LANGUAGES.map((lang) => (
-                    <TouchableOpacity
+                <Animated.View
+                  style={{
+                    transform: [
+                      {
+                        rotate: langAnim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: ["0deg", "180deg"],
+                        }),
+                      },
+                    ],
+                  }}
+                >
+                  <Ionicons
+                    name="chevron-down"
+                    size={18}
+                    color={textSecondary}
+                  />
+                </Animated.View>
+              </Row>
+
+              <Animated.View
+                style={[
+                  styles.languageSubmenu,
+                  {
+                    height: langHeight,
+                    opacity: langAnim,
+                    borderLeftColor: borderColor,
+                  },
+                ]}
+              >
+                {LANGUAGES.map((lang) => {
+                  const active = currentLang === lang.code;
+                  return (
+                    <Pressable
                       key={lang.code}
-                      style={[
-                        styles.languageOption,
-                        currentLang === lang.code && {
-                          backgroundColor: primaryColor + "15",
-                        },
-                      ]}
                       onPress={() => changeLanguage(lang.code)}
                       accessibilityRole="button"
                       accessibilityLabel={lang.native}
+                      style={({ pressed }) => [
+                        styles.languageOption,
+                        active && { backgroundColor: primaryColor + "14" },
+                        pressed && { opacity: 0.7 },
+                      ]}
                     >
                       <AppText
                         style={[
                           styles.languageOptionText,
                           {
-                            color:
-                              currentLang === lang.code
-                                ? primaryColor
-                                : textPrimary,
+                            color: active ? primaryColor : textPrimary,
+                            fontWeight: active ? "700" : "500",
                           },
                         ]}
                       >
                         {lang.native}
                       </AppText>
-                      {currentLang === lang.code && (
+                      {active && (
                         <Ionicons
-                          name="checkmark"
+                          name="checkmark-circle"
                           size={18}
                           color={primaryColor}
                         />
                       )}
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            </View>
+                    </Pressable>
+                  );
+                })}
+              </Animated.View>
+            </Animated.View>
           </ScrollView>
 
-          {/* Logout button (fixed at bottom) */}
+          {/* Footer */}
           <View
-            style={[styles.logoutContainer, { borderTopColor: borderColor }]}
+            style={[
+              styles.logoutContainer,
+              {
+                borderTopColor: borderColor,
+                paddingBottom: Math.max(insets.bottom, 12) + 8,
+              },
+            ]}
           >
-            <TouchableOpacity
-              style={styles.logoutButton}
+            <Row
               onPress={handleLogout}
-              accessibilityRole="button"
               accessibilityLabel={t("appSidebar.logout")}
+              style={[
+                styles.logoutButton,
+                { backgroundColor: errorColor + "10" },
+              ]}
             >
-              <Ionicons name="log-out-outline" size={22} color={errorColor} />
+              <Ionicons name="log-out-outline" size={20} color={errorColor} />
               <AppText style={[styles.logoutLabel, { color: errorColor }]}>
                 {t("appSidebar.logout")}
               </AppText>
-            </TouchableOpacity>
+            </Row>
             <AppText style={[styles.version, { color: textSecondary }]}>
               v1.0.0
             </AppText>
@@ -432,93 +592,169 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.3)",
+    backgroundColor: "rgba(10, 20, 12, 0.45)",
   },
   drawer: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
     width: DRAWER_WIDTH,
     height: "100%",
+    borderTopRightRadius: 24,
+    borderBottomRightRadius: 24,
+    overflow: "hidden",
     ...Platform.select({
       ios: {
         shadowColor: "#000",
-        shadowOffset: { width: 2, height: 0 },
-        shadowOpacity: 0.15,
-        shadowRadius: 12,
+        shadowOffset: { width: 4, height: 0 },
+        shadowOpacity: 0.22,
+        shadowRadius: 24,
       },
-      android: { elevation: 20 },
+      android: { elevation: 24 },
     }),
   },
+
+  // Header
   profileHeader: {
-    paddingTop: Platform.OS === "android" ? 40 : 60,
-    paddingBottom: 20,
-    paddingHorizontal: 16,
+    paddingBottom: 22,
+    paddingHorizontal: 18,
+    overflow: "hidden",
+  },
+  orbLarge: {
+    position: "absolute",
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    top: -60,
+    right: -60,
+  },
+  orbSmall: {
+    position: "absolute",
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: "rgba(255,255,255,0.06)",
+    bottom: -30,
+    left: -20,
   },
   profilePressable: {
     flexDirection: "row",
     alignItems: "center",
   },
+  avatarRing: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    borderWidth: 1.5,
+    borderColor: "rgba(255,255,255,0.4)",
+    padding: 3,
+    marginRight: 14,
+  },
   avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    flex: 1,
+    borderRadius: 28,
     backgroundColor: "#FFF",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 14,
   },
-  profileInfo: {
-    flex: 1,
-    justifyContent: "center",
-  },
+  profileInfo: { flex: 1, justifyContent: "center" },
   userName: {
     fontSize: 17,
     fontWeight: "700",
     color: "#FFF",
-    marginBottom: 4,
+    marginBottom: 6,
+    letterSpacing: 0.2,
   },
   rolePill: {
-    backgroundColor: "rgba(255,255,255,0.25)",
-    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.22)",
+    borderRadius: 999,
     paddingHorizontal: 10,
-    paddingVertical: 2,
+    paddingVertical: 3,
     alignSelf: "flex-start",
   },
+  roleDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#B9F6CA",
+    marginRight: 6,
+  },
   roleText: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: 11,
+    fontWeight: "700",
     color: "#FFF",
-    letterSpacing: 0.5,
+    letterSpacing: 0.6,
+    textTransform: "uppercase",
   },
-  menuScroll: {
-    flex: 1,
+  chevronCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "rgba(255,255,255,0.18)",
+    alignItems: "center",
+    justifyContent: "center",
   },
+
+  // Menu
+  menuScroll: { flex: 1 },
   menuContent: {
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 12,
     flexGrow: 1,
+  },
+  sectionLabel: {
+    fontSize: 10.5,
+    fontWeight: "700",
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+    paddingHorizontal: 12,
+    marginTop: 6,
+    marginBottom: 8,
   },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 12,
+    paddingVertical: 11,
+    paddingHorizontal: 10,
     marginBottom: 2,
+    borderRadius: 14,
+  },
+  iconWrap: {
+    width: 36,
+    height: 36,
     borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
   },
   menuLabel: {
-    fontSize: 15,
-    fontWeight: "500",
-    marginLeft: 14,
+    fontSize: 14.5,
     flex: 1,
+    letterSpacing: 0.1,
+  },
+  activeDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginLeft: 6,
   },
   divider: {
-    height: 1,
-    marginVertical: 8,
+    height: StyleSheet.hairlineWidth,
+    marginVertical: 12,
     marginHorizontal: 12,
   },
+
+  // Language
   languageSubmenu: {
-    marginLeft: 36,
+    marginLeft: 30,
     marginTop: 4,
-    marginBottom: 8,
+    borderLeftWidth: 1,
+    paddingLeft: 8,
+    overflow: "hidden",
   },
   languageOption: {
     flexDirection: "row",
@@ -526,33 +762,37 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 10,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     marginBottom: 2,
   },
   languageOptionText: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: 13.5,
   },
+
+  // Footer
   logoutContainer: {
-    borderTopWidth: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    paddingBottom: Platform.OS === "ios" ? 20 : 14,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 14,
+    paddingTop: 12,
   },
   logoutButton: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 6,
+    justifyContent: "center",
+    paddingVertical: 12,
+    borderRadius: 14,
   },
   logoutLabel: {
-    fontSize: 15,
-    fontWeight: "600",
-    marginLeft: 14,
+    fontSize: 14.5,
+    fontWeight: "700",
+    marginLeft: 10,
+    letterSpacing: 0.3,
   },
   version: {
-    fontSize: 11,
+    fontSize: 10.5,
     textAlign: "center",
-    marginTop: 8,
+    marginTop: 10,
+    letterSpacing: 1,
   },
 });
 

@@ -1,25 +1,4 @@
-/**
- * OmishGo Foundation Components
- *
- * Reusable, presentation-only components for auth & onboarding screens
- *
- * Auth Components:
- * import {
- *   AuthLayout,
- *   PrimaryButton,
- *   AppInput,
- *   Typography,
- * } from '@/components';
- *
- * Onboarding Components:
- * import {
- *   OnboardingLayout,
- *   ProgressIndicator,
- *   OnboardingCard,
- *   OnboardingFooter,
- *   SkipButton,
- * } from '@/components';
- */
+
 
 // Core Auth Components
 export { default as AppInput } from "./AppInput";
@@ -82,18 +61,6 @@ export { default as LoadingIndicator } from "./common/LoadingIndicator.js";
 export { default as ScreenWrapper } from "./common/ScreenWrapper.js";
 
 // Layout Components
-export { default as AuthLayout } from "./layout/AuthLayout.js";
+// export { default as AuthLayout } from "./layout/AuthLayout.js";
 
-/**
- * MIGRATION GUIDE
- *
- * Old → New
- *
- * AppButton → PrimaryButton (filled) or SecondaryButton (outlined)
- * AppInput → AppInput (improved version, same name)
- * AppText → Typography (with variants)
- * AppCard → LogoCard (for auth, or create domain-specific cards)
- * ScreenWrapper → AuthLayout (for auth screens)
- *
- * See AUTH_COMPONENTS_GUIDE.md for complete documentation
- */
+

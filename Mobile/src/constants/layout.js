@@ -1,8 +1,4 @@
-/**
- * OmishGo Layout & Spacing System
- *
- * Consistent spacing utilities for auth components
- */
+
 
 export const spacing = {
   xs: 4,

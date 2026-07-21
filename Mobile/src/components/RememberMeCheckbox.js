@@ -4,15 +4,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { getRoleColors, neutralColors } from "../constants/colors";
 import Typography from "./Typography";
 
-/**
- * RememberMeCheckbox - Custom checkbox component
- *
- * Supports:
- * - Checked/unchecked state
- * - Custom label
- * - Role-based accent color
- * - Touch feedback
- */
+
 
 const styles = StyleSheet.create({
   container: {
