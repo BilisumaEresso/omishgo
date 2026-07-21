@@ -1,6 +1,7 @@
 import express from "express";
 import { protect } from "../../middleware/auth.middleware.js";
 import validate from "../../middleware/validate.middleware.js";
+import { authLimiter } from "../../middleware/rateLimiter.middleware.js";
 import {
   getMe,
   login,
@@ -13,8 +14,8 @@ import { loginValidation, registerValidation } from "./auth.validation.js";
 const router = express.Router();
 
 // Public routes
-router.post("/register", validate(registerValidation), register);
-router.post("/login", validate(loginValidation), login);
+router.post("/register", authLimiter, validate(registerValidation), register);
+router.post("/login", authLimiter, validate(loginValidation), login);
 
 // Protected routes
 router.use(protect);

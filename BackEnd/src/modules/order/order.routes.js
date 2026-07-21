@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../../middleware/auth.middleware.js";
+import { protect, requireVerified } from "../../middleware/auth.middleware.js";
 import {
   createOrder,
   getMyOrders,
@@ -16,7 +16,7 @@ router.use(protect);
 router.get("/", getMyOrders);
 
 // POST /api/v1/orders          → buyer places an order
-router.post("/", createOrder);
+router.post("/", requireVerified, createOrder);
 
 // GET  /api/v1/orders/:id      → get a single order
 router.get("/:id", getOrderById);

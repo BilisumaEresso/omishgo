@@ -1,6 +1,6 @@
 import express from "express";
 import { ROLES } from "../../constants/roles.js";
-import { authorize, protect } from "../../middleware/auth.middleware.js";
+import { authorize, protect, requireVerified } from "../../middleware/auth.middleware.js";
 import {
   createProduct,
   deleteProduct,
@@ -25,12 +25,12 @@ router.get("/:id", getProductById);
 
 // ─── Protected routes ─────────────────────────────────────────────────────────
 // POST — farmer creates a listing
-router.post("/", protect, authorize(ROLES.FARMER), createProduct);
+router.post("/", protect, authorize(ROLES.FARMER), requireVerified, createProduct);
 
 // PUT — farmer updates their own listing
-router.put("/:id", protect, authorize(ROLES.FARMER), updateProduct);
+router.put("/:id", protect, authorize(ROLES.FARMER), requireVerified, updateProduct);
 
 // DELETE — farmer deletes their own listing
-router.delete("/:id", protect, authorize(ROLES.FARMER), deleteProduct);
+router.delete("/:id", protect, authorize(ROLES.FARMER), requireVerified, deleteProduct);
 
 export default router;

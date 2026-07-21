@@ -16,14 +16,16 @@ export const API_ENDPOINTS = {
     login: "/api/v1/auth/login",
     me: "/api/v1/auth/me",
     logout: "/api/v1/auth/logout",
-    requestDeviceMove: "/api/v1/auth/request-device-move",
-    confirmDeviceMove: "/api/v1/auth/confirm-device-move",
+    // Disabled for MVP — see BackEnd/docs/POST_MVP_BACKLOG.md
+    // requestDeviceMove: "/api/v1/auth/request-device-move",
+    // confirmDeviceMove: "/api/v1/auth/confirm-device-move",
   },
-  role: {
-    myRoles: "/api/v1/roles/my-roles",
-    requestRole: "/api/v1/roles/request-role",
-    switchRole: "/api/v1/roles/switch-role",
-  },
+  // Disabled for MVP — see BackEnd/docs/POST_MVP_BACKLOG.md
+  // role: {
+  //   myRoles: "/api/v1/roles/my-roles",
+  //   requestRole: "/api/v1/roles/request-role",
+  //   switchRole: "/api/v1/roles/switch-role",
+  // },
   products: {
     list: "/api/v1/products",
     detail: (id) => `/api/v1/products/${id}`,

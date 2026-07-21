@@ -24,28 +24,7 @@ const generateToken = (id, role) => {
   };
 
   return jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN || "7d",
-    algorithm: "HS256",
-  });
-};
-
-export const generateRefreshToken = (id, role) => {
-  if (!process.env.JWT_SECRET) {
-    throw new Error(
-      "JWT_SECRET environment variable is not defined. Cannot generate tokens.",
-    );
-  }
-
-  const payload = {
-    sub: id,
-    role,
-    type: "refresh",
-    iss: "omishgo-backend",
-    aud: "omishgo-app",
-  };
-
-  return jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: "30d",
+    expiresIn: process.env.JWT_EXPIRES_IN || "30d",
     algorithm: "HS256",
   });
 };
