@@ -68,7 +68,6 @@ const storage = {
 export const useAuthStore = create(persist((set, get) => ({
   user: null,
   token: null,
-  refreshToken: null,
   language: "en",
   isAuthenticated: false,
   isLoading: false,
@@ -160,9 +159,6 @@ export const useAuthStore = create(persist((set, get) => ({
 
       // Store refreshToken in AsyncStorage (via storageService)
       await storageService.setToken(result.data.token);
-      if (result.data.refreshToken) {
-        await storageService.setRefreshToken(result.data.refreshToken);
-      }
       await storageService.setUser(result.data.user);
       set({
         user: result.data.user,
@@ -192,14 +188,12 @@ export const useAuthStore = create(persist((set, get) => ({
     });
     try {
       const token = await storageService.getToken();
-      const refreshToken = await storageService.getRefreshToken();
       const user = await storageService.getUser();
       if (!token || !user) {
         const storedLanguage = await AsyncStorage.getItem("@app_language");
         set({
           user: null,
           token: null,
-          refreshToken: null,
           language: storedLanguage || "en",
           isAuthenticated: false,
           isLoading: false,
@@ -212,42 +206,11 @@ export const useAuthStore = create(persist((set, get) => ({
 
       // Check if token is expired
       if (isTokenExpired(token)) {
-        if (refreshToken) {
-          try {
-            const response = await axios.post(`${API_BASE_URL}/api/v1/auth/refresh-token`, {
-              refreshToken
-            });
-            if (response.data?.success) {
-              const {
-                token: newToken,
-                refreshToken: newRefreshToken
-              } = response.data.data;
-              await storageService.setToken(newToken);
-              if (newRefreshToken) {
-                await storageService.setRefreshToken(newRefreshToken);
-              }
-              set({
-                user,
-                token: newToken,
-                refreshToken: newRefreshToken || refreshToken,
-                isAuthenticated: true,
-                isLoading: false,
-                isInitializingAuth: false,
-                error: null
-              });
-              return true;
-            }
-          } catch (refreshErr) {
-            console.error("Silent refresh failed:", refreshErr.message);
-          }
-        }
-
-        // Expiry/refresh failed - clean logout
+        // Expiry - clean logout
         await authService.logout();
         set({
           user: null,
           token: null,
-          refreshToken: null,
           isAuthenticated: false,
           isLoading: false,
           isInitializingAuth: false
@@ -259,7 +222,6 @@ export const useAuthStore = create(persist((set, get) => ({
       set({
         user,
         token,
-        refreshToken,
         language: user.preferredLang || "en",
         isAuthenticated: true,
         isLoading: false,
@@ -273,7 +235,6 @@ export const useAuthStore = create(persist((set, get) => ({
       set({
         user: null,
         token: null,
-        refreshToken: null,
         isAuthenticated: false,
         isLoading: false,
         isInitializingAuth: false
@@ -292,7 +253,6 @@ export const useAuthStore = create(persist((set, get) => ({
       set({
         user: null,
         token: null,
-        refreshToken: null,
         isAuthenticated: false,
         isLoading: false,
         isInitializingAuth: false,
