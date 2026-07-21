@@ -10,6 +10,7 @@ import notificationRouter from "./modules/notification/notification.routes.js";
 import orderRouter from "./modules/order/order.routes.js";
 import productRouter from "./modules/product/product.routes.js";
 import savedRouter from "./modules/saved/saved.routes.js";
+import uploadRouter from "./modules/upload/upload.routes.js";
 import userRouter from "./modules/user/user.routes.js";
 
 const app = express();
@@ -29,6 +30,7 @@ app.use("/api/v1/orders", orderRouter);
 app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/notifications", notificationRouter);
 app.use("/api/v1/saved", savedRouter);
+app.use("/api/v1/upload", uploadRouter);
 app.use("/api/v1/users", userRouter);
 
 app.use(notFoundMiddleware);

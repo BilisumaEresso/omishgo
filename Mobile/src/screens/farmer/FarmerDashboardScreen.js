@@ -6,7 +6,6 @@ import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import AgriPriceChangeWidget from "../../components/common/AgriPriceChangeWidget";
 import AppText from "../../components/common/AppText";
-import AddProductModal from "../../components/farmer/AddProductModal";
 import MarketTrendsList from "../../components/farmer/MarketTrendsList";
 import QuickActionsGrid from "../../components/farmer/QuickActionsGrid";
 import DashboardLayout from "../../components/layout/DashBoardLayout";
@@ -79,7 +78,6 @@ export default function FarmerDashboardScreen({
   const error = theme?.colors?.error || "#C62828";
   const [products, setProducts] = useState(mockProducts);
   const [orders, setOrders] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [refreshing, setRefreshing] = useState(false);
@@ -168,15 +166,6 @@ export default function FarmerDashboardScreen({
   };
 
   // ---------- missing functions (unchanged) ----------
-  const handleAddProduct = newProduct => {
-    const product = {
-      /* ... unchanged ... */
-    };
-    setProducts([product, ...products]);
-    setModalVisible(false);
-    setSuccessMsg(t("farmerDashboard.productAddedSuccess"));
-    setTimeout(() => setSuccessMsg(""), 3000);
-  };
   const markOrderCompleted = orderId => {
     /* ... unchanged ... */
   };
@@ -341,7 +330,6 @@ export default function FarmerDashboardScreen({
         price: trendingPrice
       }
     })} bottom={28} />
-      <AddProductModal visible={modalVisible} onClose={() => setModalVisible(false)} onSubmit={handleAddProduct} />
     </>;
 }
 const styles = StyleSheet.create({

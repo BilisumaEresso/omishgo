@@ -1,8 +1,11 @@
 // src/screens/farmer/PostProductScreen.js
 import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -19,6 +22,7 @@ import AppHeader from "../../components/layout/AppHeader";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
+import uploadService from "../../services/upload.service";
 import {
   getLocalizedRegions,
   getLocalizedZones,
@@ -172,6 +176,117 @@ const DropdownPicker = ({
   );
 };
 
+const MAX_PHOTOS = 2;
+
+// Up to 2 photo slots: pick from camera/gallery, upload to Cloudinary
+// immediately, show progress, and let the farmer remove/retry.
+const PhotoSlots = ({ photos, onAdd, onRemove, onRetry, theme, t }) => {
+  const primary = theme?.colors?.primary || "#2E7D32";
+  const surface = theme?.colors?.surface || "#FFF";
+  const border = theme?.colors?.border || "#DDD";
+  const textSecondary = theme?.colors?.textSecondary || "#666";
+  const errorColor = theme?.colors?.error || "#C62828";
+
+  const slots = [...photos];
+  while (slots.length < MAX_PHOTOS) slots.push(null);
+
+  return (
+    <View style={{ flexDirection: "row", gap: 12, marginTop: 8 }}>
+      {slots.map((photo, index) => {
+        if (!photo) {
+          return (
+            <TouchableOpacity
+              key={`empty-${index}`}
+              onPress={() => onAdd(index)}
+              style={{
+                width: 96,
+                height: 96,
+                borderRadius: 12,
+                borderWidth: 1.5,
+                borderStyle: "dashed",
+                borderColor: border,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: surface,
+              }}
+            >
+              <Ionicons name="camera-outline" size={26} color={textSecondary} />
+              <AppText style={{ fontSize: 11, color: textSecondary, marginTop: 4 }}>
+                {t("postProduct.addPhoto")}
+              </AppText>
+            </TouchableOpacity>
+          );
+        }
+
+        return (
+          <View
+            key={photo.uri}
+            style={{
+              width: 96,
+              height: 96,
+              borderRadius: 12,
+              overflow: "hidden",
+              borderWidth: 1,
+              borderColor: border,
+            }}
+          >
+            <Image
+              source={{ uri: photo.uri }}
+              style={{ width: "100%", height: "100%" }}
+              resizeMode="cover"
+            />
+            {photo.uploading && (
+              <View
+                style={{
+                  ...StyleSheet.absoluteFillObject,
+                  backgroundColor: "rgba(0,0,0,0.35)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <ActivityIndicator color="#FFF" />
+              </View>
+            )}
+            {photo.error && !photo.uploading && (
+              <TouchableOpacity
+                onPress={() => onRetry(index)}
+                style={{
+                  ...StyleSheet.absoluteFillObject,
+                  backgroundColor: "rgba(0,0,0,0.55)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Ionicons name="refresh" size={20} color="#FFF" />
+                <AppText style={{ fontSize: 10, color: "#FFF", marginTop: 2 }}>
+                  {t("postProduct.retry")}
+                </AppText>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              onPress={() => onRemove(index)}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              style={{
+                position: "absolute",
+                top: 4,
+                right: 4,
+                backgroundColor: "rgba(0,0,0,0.6)",
+                borderRadius: 10,
+                width: 20,
+                height: 20,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Ionicons name="close" size={13} color="#FFF" />
+            </TouchableOpacity>
+          </View>
+        );
+      })}
+    </View>
+  );
+};
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function PostProductScreen({ navigation, route }) {
   const { t, i18n } = useTranslation();
@@ -183,6 +298,8 @@ export default function PostProductScreen({ navigation, route }) {
   const [unit, setUnit] = useState("kg");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
+  // Each item: { uri, url, uploading, error }. url is set once Cloudinary upload succeeds.
+  const [photos, setPhotos] = useState([]);
   const [region, setRegion] = useState("");
   const [zone, setZone] = useState("");
   const [wereda, setWereda] = useState("");
@@ -292,6 +409,90 @@ export default function PostProductScreen({ navigation, route }) {
     setWereda("");
   }, [zone]);
 
+  // Upload a freshly-picked asset to Cloudinary and update its slot with
+  // the resulting URL (or an error flag the farmer can retry from).
+  const uploadPhotoAt = async (uri, asset) => {
+    setPhotos((prev) =>
+      prev.map((p) => (p.uri === uri ? { ...p, uploading: true, error: false } : p)),
+    );
+
+    const result = await uploadService.uploadImage(asset);
+
+    setPhotos((prev) =>
+      prev.map((p) =>
+        p.uri === uri
+          ? result.success
+            ? { ...p, uploading: false, error: false, url: result.url }
+            : { ...p, uploading: false, error: true }
+          : p,
+      ),
+    );
+  };
+
+  const launchPicker = async (source) => {
+    if (photos.length >= MAX_PHOTOS) {
+      Alert.alert(
+        t("postProduct.photoLimitTitle"),
+        t("postProduct.photoLimitMessage", { max: MAX_PHOTOS }),
+      );
+      return;
+    }
+
+    const permission =
+      source === "camera"
+        ? await ImagePicker.requestCameraPermissionsAsync()
+        : await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert(
+        t("postProduct.permissionDeniedTitle"),
+        t("postProduct.permissionDeniedMessage"),
+      );
+      return;
+    }
+
+    const pickerOptions = {
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.7,
+    };
+
+    const result =
+      source === "camera"
+        ? await ImagePicker.launchCameraAsync(pickerOptions)
+        : await ImagePicker.launchImageLibraryAsync(pickerOptions);
+
+    if (result.canceled || !result.assets?.length) return;
+
+    const asset = result.assets[0];
+    setPhotos((prev) => [...prev, { uri: asset.uri, url: null, uploading: true, error: false }]);
+    uploadPhotoAt(asset.uri, asset);
+  };
+
+  const handleAddPhoto = () => {
+    Alert.alert(
+      t("postProduct.addPhoto"),
+      undefined,
+      [
+        { text: t("postProduct.takePhoto"), onPress: () => launchPicker("camera") },
+        { text: t("postProduct.chooseFromGallery"), onPress: () => launchPicker("gallery") },
+        { text: t("postProduct.cancel"), style: "cancel" },
+      ],
+      { cancelable: true },
+    );
+  };
+
+  const handleRemovePhoto = (index) => {
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleRetryPhoto = (index) => {
+    const photo = photos[index];
+    if (!photo) return;
+    uploadPhotoAt(photo.uri, { uri: photo.uri });
+  };
+
   const handleSubmit = async () => {
     if (!cropType.trim()) {
       Alert.alert(
@@ -337,15 +538,24 @@ export default function PostProductScreen({ navigation, route }) {
       );
       return;
     }
+    if (photos.some((p) => p.uploading)) {
+      Alert.alert(
+        t("postProduct.photosStillUploadingTitle"),
+        t("postProduct.photosStillUploadingMessage"),
+      );
+      return;
+    }
 
     setLoading(true);
     try {
+      const photoUrls = photos.filter((p) => p.url).map((p) => p.url);
       await api.post(API_ENDPOINTS.products.create, {
         cropType: cropType.trim(),
         quantity: qtyNum,
         unit: unit.trim() || "kg",
         price: priceNum,
         description: description.trim(),
+        photos: photoUrls,
         location: {
           region: region.trim(),
           zone: zone.trim(),
@@ -519,6 +729,22 @@ export default function PostProductScreen({ navigation, route }) {
               {t("postProduct.defaultDescriptionHint")}
             </AppText>
           )}
+
+          {/* Photos Section */}
+          <AppText style={[styles.label, { color: textSecondary }]}>
+            {t("postProduct.photos")}
+          </AppText>
+          <AppText style={{ color: textMuted, fontSize: 12, marginBottom: 4 }}>
+            {t("postProduct.photosHint")}
+          </AppText>
+          <PhotoSlots
+            photos={photos}
+            onAdd={handleAddPhoto}
+            onRemove={handleRemovePhoto}
+            onRetry={handleRetryPhoto}
+            theme={theme}
+            t={t}
+          />
 
           {/* Location Section */}
           <View style={styles.section}>

@@ -34,6 +34,9 @@ export const API_ENDPOINTS = {
     delete: (id) => `/api/v1/products/${id}`,
     analytics: "/api/v1/products/analytics",
   },
+  upload: {
+    image: "/api/v1/upload/image",
+  },
   messages: {
     thread: (userId) => `/api/v1/messages/thread/${userId}`,
     send: "/api/v1/messages",

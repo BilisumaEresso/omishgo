@@ -1,3 +1,4 @@
+import { MulterError } from "multer";
 import { ZodError } from "zod";
 
 import ApiError from "../utils/ApiError.js";
@@ -34,6 +35,27 @@ const errorMiddleware = (error, req, res, next) => {
       success: false,
       message: error.message,
       errors: error.errors || null,
+    });
+  }
+
+  /*
+   |--------------------------------------------------------------------------
+   | Multer (file upload) Error
+   |--------------------------------------------------------------------------
+   */
+
+  if (error instanceof MulterError) {
+    const message =
+      error.code === "LIMIT_FILE_SIZE"
+        ? "Image is too large (max 5MB)"
+        : error.code === "LIMIT_FILE_COUNT"
+          ? "Too many images (max 2 per listing)"
+          : "Image upload failed";
+
+    return sendResponse(res, {
+      statusCode: 400,
+      success: false,
+      message,
     });
   }
 

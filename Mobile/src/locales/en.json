@@ -406,7 +406,20 @@
     "missingWeredaTitle": "Missing Wereda",
     "missingWeredaMessage": "Please select a wereda.",
     "selectZoneFirstTitle": "Select Zone First",
-    "selectZoneFirstMessage": "Please select a zone before choosing a wereda."
+    "selectZoneFirstMessage": "Please select a zone before choosing a wereda.",
+    "photos": "Photos (recommended)",
+    "photosHint": "Buyers trust listings with photos more. Add up to 2.",
+    "addPhoto": "Add Photo",
+    "takePhoto": "Take Photo",
+    "chooseFromGallery": "Choose from Gallery",
+    "cancel": "Cancel",
+    "retry": "Retry",
+    "photoLimitTitle": "Photo Limit Reached",
+    "photoLimitMessage": "You can add up to {{max}} photos per listing.",
+    "permissionDeniedTitle": "Permission Needed",
+    "permissionDeniedMessage": "OmishGo needs camera/photo access to add a picture to your listing.",
+    "photosStillUploadingTitle": "Photos Still Uploading",
+    "photosStillUploadingMessage": "Please wait for your photos to finish uploading before posting."
   },
   "appSidebar": {
     "products": "My Products",
