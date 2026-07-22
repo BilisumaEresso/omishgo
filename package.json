@@ -1,0 +1,35 @@
+{
+  "name": "omishgo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "OmishGo monorepo root. Each app (BackEnd, Mobile, AdminWeb) keeps its own package.json, node_modules, and lockfile — these scripts just forward into them with --prefix, so nothing about how each app installs or runs changes. This is NOT npm workspaces; each app is still independently installable/deployable.",
+  "engines": {
+    "node": ">=20.19.4"
+  },
+  "scripts": {
+    "install:all": "npm install --prefix BackEnd && npm install --prefix Mobile && npm install --prefix AdminWeb",
+    "postinstall": "npm run install:all",
+
+    "backend": "npm run start --prefix BackEnd",
+    "backend:prod": "npm run start:prod --prefix BackEnd",
+    "backend:test": "npm test --prefix BackEnd",
+
+    "mobile": "npm run start --prefix Mobile",
+    "mobile:android": "npm run android --prefix Mobile",
+    "mobile:ios": "npm run ios --prefix Mobile",
+    "mobile:web": "npm run web --prefix Mobile",
+
+    "web": "npm run dev --prefix AdminWeb",
+    "web:build": "npm run build --prefix AdminWeb",
+    "web:preview": "npm run preview --prefix AdminWeb",
+    "web:lint": "npm run lint --prefix AdminWeb",
+
+    "dev": "concurrently -n BACKEND,WEB -c green,cyan \"npm:backend\" \"npm:web\"",
+
+    "clean": "rimraf BackEnd/node_modules Mobile/node_modules AdminWeb/node_modules node_modules"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "rimraf": "^6.0.1"
+  }
+}
