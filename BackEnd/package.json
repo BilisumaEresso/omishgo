@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "test": "cross-env NODE_ENV=test JWT_SECRET=testsecret NODE_OPTIONS='--experimental-vm-modules' jest --forceExit --detectOpenHandles",
-    "start": "nodemon src/index.js"
+    "start": "nodemon src/index.js",
+    "start:prod": "node src/index.js"
   },
   "keywords": [],
   "author": "",
