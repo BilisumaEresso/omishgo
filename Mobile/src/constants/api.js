@@ -1,11 +1,14 @@
 // Backend API endpoints
-// Update BASE_URL for your environment:
-// - Localhost (iOS Simulator): http://localhost:5000
-// - Localhost (Android Emulator): http://10.0.2.2:5000
-// - Localhost (Physical Android Device): http://<YOUR_PC_IP>:5000
-// - Production: https://api.omishgo.com
-
-export const API_BASE_URL = "https://omishgo.onrender.com";
+//
+// Base URL resolves in this order:
+//   1. EXPO_PUBLIC_API_URL, if set (via Mobile/.env — see .env.example for
+//      the localhost / emulator / physical-device values to use during
+//      local development)
+//   2. The deployed production backend, as a safe default for anyone who
+//      hasn't set up a local backend (including a fresh EAS build with no
+//      env configured — it will correctly hit the real API out of the box)
+export const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL || "https://omishgo.onrender.com";
 
 export const API_ENDPOINTS = {
   // Check
