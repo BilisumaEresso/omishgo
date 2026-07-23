@@ -28,7 +28,7 @@ export const RootNavigator = () => {
 
   useEffect(() => {
     if (!isReady) return;
-    const timer = setTimeout(() => setShowSplash(false), 2000);
+    const timer = setTimeout(() => setShowSplash(false), 4000);
     return () => clearTimeout(timer);
   }, [isReady]);
 

@@ -1,28 +1,40 @@
-// src/screens/auth/RegisterScreen.js
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Animated,
+  Easing,
   Image,
   KeyboardAvoidingView,
+  LayoutAnimation,
   Platform,
-  ScrollView,
+  Pressable,
   StatusBar,
   StyleSheet,
   TouchableOpacity,
+  UIManager,
   View,
 } from "react-native";
 import AppButton from "../../components/common/AppButton";
 import AppInput from "../../components/common/AppInput";
 import AppText from "../../components/common/AppText";
+import ErrorBanner from "../../components/common/ErrorBanner";
+import LocationPicker from "../../components/common/LocationPicker";
+import SelectableChip from "../../components/common/SelectableChip";
 import {
   getLocalizedRegions,
-  getLocalizedZones,
   getLocalizedWereda,
+  getLocalizedZones,
 } from "../../constants/locations.js";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
+
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const LANGUAGE_OPTIONS = [
   { code: "en", label: "English" },
@@ -30,13 +42,18 @@ const LANGUAGE_OPTIONS = [
   { code: "om", label: "Afaan Oromoo" },
 ];
 
+// Number of staggered form rows (0-9) + 1 dedicated footer row (index 10)
+const ROW_COUNT = 10;
+const FOOTER_ROW_INDEX = ROW_COUNT; // 10
+
 export default function RegisterScreen({ navigation }) {
   const { theme } = useTheme();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const register = useAuthStore((state) => state.register);
   const setAppLanguage = useAuthStore((state) => state.setLanguage);
   const currentLanguage = useAuthStore((state) => state.language);
 
+  // Form state
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [pin, setPin] = useState("");
@@ -45,9 +62,7 @@ export default function RegisterScreen({ navigation }) {
   const [region, setRegion] = useState("");
   const [zone, setZone] = useState("");
   const [wereda, setWereda] = useState("");
-  const [preferredLang, setPreferredLang] = useState(
-    currentLanguage || i18n.language || "en",
-  );
+  const [preferredLang, setPreferredLang] = useState(currentLanguage || "en");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [registerError, setRegisterError] = useState("");
@@ -55,16 +70,11 @@ export default function RegisterScreen({ navigation }) {
   const [showZonePicker, setShowZonePicker] = useState(false);
   const [showWeredaPicker, setShowWeredaPicker] = useState(false);
 
-  const lang = i18n.language || "en";
-
-  // Localized location options — `value` stays canonical English (stored/submitted),
-  // `label` is the localized display text. Falls back to English automatically
-  // for any zone/wereda without a translation entry yet.
+  const lang = "en"; // can be dynamic: i18n.language || "en"
   const regionOptions = getLocalizedRegions(lang);
   const availableZones = region ? getLocalizedZones(region, lang) : [];
   const availableWereda = zone ? getLocalizedWereda(region, zone, lang) : [];
 
-  // Resolve the currently selected value to its localized display label
   const regionLabel =
     regionOptions.find((r) => r.value === region)?.label || region;
   const zoneLabel = availableZones.find((z) => z.value === zone)?.label || zone;
@@ -78,24 +88,134 @@ export default function RegisterScreen({ navigation }) {
   const surface = theme?.colors?.surface || "#FFFFFF";
   const border = theme?.colors?.border || "#E0E0E0";
   const errorColor = theme?.colors?.error || "#C62828";
+  const spacingXxxl = theme?.spacing?.xxxl ?? 32;
 
+  // Scroll animations
   const scrollY = useRef(new Animated.Value(0)).current;
+
   const logoScale = scrollY.interpolate({
     inputRange: [0, 150],
-    outputRange: [1, 0.6],
+    outputRange: [1, 0.55],
     extrapolate: "clamp",
   });
+
+  const logoTranslateY = scrollY.interpolate({
+    inputRange: [0, 150],
+    outputRange: [0, -20],
+    extrapolate: "clamp",
+  });
+
+  const logoOpacity = scrollY.interpolate({
+    inputRange: [0, 180],
+    outputRange: [1, 0.85],
+    extrapolate: "clamp",
+  });
+
+  // Entrance animations
+  const heroAnim = useRef(new Animated.Value(0)).current;
+  // +1 extra slot for the footer row (login link row)
+  const rows = useRef(
+    [...Array(ROW_COUNT + 1)].map(() => new Animated.Value(0)),
+  ).current;
+  const shakeX = useRef(new Animated.Value(0)).current;
+  const ctaScale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.spring(heroAnim, {
+        toValue: 1,
+        useNativeDriver: true,
+        speed: 12,
+        bounciness: 8,
+      }),
+      Animated.stagger(
+        60,
+        rows.map((v) =>
+          Animated.timing(v, {
+            toValue: 1,
+            duration: 380,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+          }),
+        ),
+      ),
+    ]).start();
+  }, []);
+
+  useEffect(() => {
+    if (currentLanguage) setPreferredLang(currentLanguage);
+  }, [currentLanguage]);
 
   const clearFieldError = (field) => {
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
     if (registerError) setRegisterError("");
   };
 
-  useEffect(() => {
-    if (currentLanguage) {
-      setPreferredLang(currentLanguage);
+  const shake = () => {
+    shakeX.setValue(0);
+    Animated.sequence([
+      Animated.timing(shakeX, {
+        toValue: 8,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeX, {
+        toValue: -8,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeX, {
+        toValue: 6,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeX, {
+        toValue: -4,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeX, {
+        toValue: 0,
+        duration: 45,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const pressIn = () =>
+    Animated.spring(ctaScale, {
+      toValue: 0.97,
+      useNativeDriver: true,
+      speed: 40,
+      bounciness: 0,
+    }).start();
+  const pressOut = () =>
+    Animated.spring(ctaScale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 20,
+      bounciness: 8,
+    }).start();
+
+  const smoothLayout = () =>
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
+  const togglePicker = (which) => {
+    smoothLayout();
+    if (which === "region") {
+      setShowRegionPicker((v) => !v);
+      setShowZonePicker(false);
+      setShowWeredaPicker(false);
+    } else if (which === "zone") {
+      setShowZonePicker((v) => !v);
+      setShowRegionPicker(false);
+      setShowWeredaPicker(false);
+    } else {
+      setShowWeredaPicker((v) => !v);
+      setShowRegionPicker(false);
+      setShowZonePicker(false);
     }
-  }, [currentLanguage]);
+  };
 
   const handleLanguageSelect = async (code) => {
     setPreferredLang(code);
@@ -111,12 +231,16 @@ export default function RegisterScreen({ navigation }) {
     if (!region.trim()) newErrors.region = "Region is required.";
     if (!zone.trim()) newErrors.zone = "Zone is required.";
     if (!wereda.trim()) newErrors.wereda = "Wereda is required.";
+    smoothLayout();
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleRegister = async () => {
-    if (!validate()) return;
+    if (!validate()) {
+      shake();
+      return;
+    }
     setLoading(true);
     setRegisterError("");
     try {
@@ -134,37 +258,49 @@ export default function RegisterScreen({ navigation }) {
         preferredLang,
       });
       if (!result.success) {
+        shake();
         setRegisterError(
-          result.message ||
-            t("auth.registerError") ||
-            "Registration failed. Try again.",
+          result.message || t("auth.registerError") || "Registration failed.",
         );
         return;
       }
       await setAppLanguage(preferredLang);
-      if (result.autoLoginFailed) {
-        navigation.replace("Login");
-      }
+      if (result.autoLoginFailed) navigation.replace("Login");
     } catch (error) {
+      shake();
       setRegisterError(
         error.message ||
           t("auth.registrationFailed") ||
-          "Something went wrong. Please try again.",
+          "Something went wrong.",
       );
     } finally {
       setLoading(false);
     }
   };
 
+  const rowStyle = (i) => ({
+    opacity: rows[i],
+    transform: [
+      {
+        translateY: rows[i].interpolate({
+          inputRange: [0, 1],
+          outputRange: [14, 0],
+        }),
+      },
+    ],
+  });
+
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      {/* Header with back arrow */}
       <View
         style={[
           styles.header,
           {
             backgroundColor: surface,
             borderBottomColor: border,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowRadius: 8,
             paddingTop:
               Platform.OS === "android"
                 ? (StatusBar.currentHeight || 24) + 12
@@ -175,7 +311,6 @@ export default function RegisterScreen({ navigation }) {
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backBtn}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <Ionicons name="arrow-back" size={24} color={primary} />
         </TouchableOpacity>
@@ -189,40 +324,55 @@ export default function RegisterScreen({ navigation }) {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.flex}
       >
-        <ScrollView
+        <Animated.ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          onScroll={(e) => scrollY.setValue(e.nativeEvent.contentOffset.y)}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: true },
+          )}
           scrollEventThrottle={16}
         >
-          {/* Logo */}
-          <View style={styles.logoWrapper}>
-            <Animated.View style={{ transform: [{ scale: logoScale }] }}>
-              <Image
-                source={require("../../../assets/logo.png")}
-                style={styles.logo}
-                resizeMode="contain"
-              />
-            </Animated.View>
-          </View>
-
-          <AppText
-            variant="headingLg"
-            style={[styles.title, { color: textPrimary }]}
+          <Animated.View
+            style={[
+              styles.logoWrapper,
+              {
+                opacity: Animated.multiply(logoOpacity, heroAnim),
+                transform: [
+                  { translateY: logoTranslateY },
+                  { scale: Animated.multiply(logoScale, heroAnim) },
+                ],
+              },
+            ]}
           >
-            {t("auth.registerTitle")}
-          </AppText>
-          <AppText
-            variant="bodyMd"
-            style={[styles.subtitle, { color: textSecondary }]}
-          >
-            {t("auth.registerSubtitle")}
-          </AppText>
+            <Image
+              source={require("../../../assets/logo.png")}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+          </Animated.View>
 
-          <View style={styles.form}>
-            {/* Full Name */}
-            <View style={styles.inputGroup}>
+          <Animated.View style={{ opacity: heroAnim }}>
+            <AppText
+              variant="headingLg"
+              style={[styles.title, { color: textPrimary }]}
+            >
+              {t("auth.registerTitle")}
+            </AppText>
+            <AppText
+              variant="bodyMd"
+              style={[styles.subtitle, { color: textSecondary }]}
+            >
+              {t("auth.registerSubtitle")}
+            </AppText>
+          </Animated.View>
+
+          <Animated.View
+            style={[styles.form, { transform: [{ translateX: shakeX }] }]}
+          >
+            {/* Name */}
+            <Animated.View style={[styles.inputGroup, rowStyle(0)]}>
               <AppText style={[styles.label, { color: textSecondary }]}>
                 {t("auth.nameLabel")}
               </AppText>
@@ -237,17 +387,12 @@ export default function RegisterScreen({ navigation }) {
                 style={errors.name ? { borderColor: errorColor } : {}}
               />
               {errors.name && (
-                <View style={styles.errorRow}>
-                  <Ionicons name="alert-circle" size={14} color={errorColor} />
-                  <AppText style={[styles.errorText, { color: errorColor }]}>
-                    {errors.name}
-                  </AppText>
-                </View>
+                <ErrorRow message={errors.name} errorColor={errorColor} />
               )}
-            </View>
+            </Animated.View>
 
             {/* Phone */}
-            <View style={styles.inputGroup}>
+            <Animated.View style={[styles.inputGroup, rowStyle(1)]}>
               <AppText style={[styles.label, { color: textSecondary }]}>
                 {t("auth.phoneLabel")}
               </AppText>
@@ -263,17 +408,12 @@ export default function RegisterScreen({ navigation }) {
                 style={errors.phone ? { borderColor: errorColor } : {}}
               />
               {errors.phone && (
-                <View style={styles.errorRow}>
-                  <Ionicons name="alert-circle" size={14} color={errorColor} />
-                  <AppText style={[styles.errorText, { color: errorColor }]}>
-                    {errors.phone}
-                  </AppText>
-                </View>
+                <ErrorRow message={errors.phone} errorColor={errorColor} />
               )}
-            </View>
+            </Animated.View>
 
             {/* PIN */}
-            <View style={styles.inputGroup}>
+            <Animated.View style={[styles.inputGroup, rowStyle(2)]}>
               <AppText style={[styles.label, { color: textSecondary }]}>
                 {t("auth.pinLabel")}
               </AppText>
@@ -291,345 +431,141 @@ export default function RegisterScreen({ navigation }) {
                 style={errors.pin ? { borderColor: errorColor } : {}}
               />
               {errors.pin && (
-                <View style={styles.errorRow}>
-                  <Ionicons name="alert-circle" size={14} color={errorColor} />
-                  <AppText style={[styles.errorText, { color: errorColor }]}>
-                    {errors.pin}
-                  </AppText>
-                </View>
+                <ErrorRow message={errors.pin} errorColor={errorColor} />
               )}
-            </View>
+            </Animated.View>
 
             {/* Role */}
-            <View style={styles.inputGroup}>
+            <Animated.View style={[styles.inputGroup, rowStyle(3)]}>
               <AppText style={[styles.label, { color: textSecondary }]}>
                 {t("auth.roleLabel")}
               </AppText>
               <View style={styles.roleContainer}>
-                <TouchableOpacity
-                  style={[
-                    styles.roleBtn,
-                    {
-                      borderColor: role === "farmer" ? primary : border,
-                      backgroundColor:
-                        role === "farmer" ? primary + "15" : "transparent",
-                    },
-                  ]}
+                <SelectableChip
+                  active={role === "farmer"}
                   onPress={() => setRole("farmer")}
-                  activeOpacity={0.8}
-                >
-                  <Ionicons
-                    name="leaf"
-                    size={18}
-                    color={role === "farmer" ? primary : textSecondary}
-                  />
-                  <AppText
-                    style={[
-                      styles.roleText,
-                      { color: role === "farmer" ? primary : textSecondary },
-                    ]}
-                  >
-                    {t("auth.roleFarmer")}
-                  </AppText>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.roleBtn,
-                    {
-                      borderColor: role === "buyer" ? primary : border,
-                      backgroundColor:
-                        role === "buyer" ? primary + "15" : "transparent",
-                    },
-                  ]}
+                  icon="leaf"
+                  label={t("auth.roleFarmer")}
+                  primary={primary}
+                  border={border}
+                  textSecondary={textSecondary}
+                />
+                <SelectableChip
+                  active={role === "buyer"}
                   onPress={() => setRole("buyer")}
-                  activeOpacity={0.8}
-                >
-                  <Ionicons
-                    name="cart"
-                    size={18}
-                    color={role === "buyer" ? primary : textSecondary}
-                  />
-                  <AppText
-                    style={[
-                      styles.roleText,
-                      { color: role === "buyer" ? primary : textSecondary },
-                    ]}
-                  >
-                    {t("auth.roleBuyer")}
-                  </AppText>
-                </TouchableOpacity>
+                  icon="cart"
+                  label={t("auth.roleBuyer")}
+                  primary={primary}
+                  border={border}
+                  textSecondary={textSecondary}
+                />
               </View>
-            </View>
+            </Animated.View>
 
-            {/* Language Picker */}
-            <View style={styles.inputGroup}>
+            {/* Language */}
+            <Animated.View style={[styles.inputGroup, rowStyle(4)]}>
               <AppText style={[styles.label, { color: textSecondary }]}>
                 {t("auth.langLabel")}
               </AppText>
               <View style={styles.languageContainer}>
-                {LANGUAGE_OPTIONS.map((option) => (
-                  <TouchableOpacity
-                    key={option.code}
-                    style={[
-                      styles.languageBtn,
-                      {
-                        borderColor:
-                          preferredLang === option.code ? primary : border,
-                        backgroundColor:
-                          preferredLang === option.code
-                            ? primary + "15"
-                            : "transparent",
-                      },
-                    ]}
-                    onPress={() => handleLanguageSelect(option.code)}
-                    activeOpacity={0.8}
-                  >
-                    <AppText
-                      style={[
-                        styles.languageText,
-                        {
-                          color:
-                            preferredLang === option.code
-                              ? primary
-                              : textSecondary,
-                        },
-                      ]}
-                    >
-                      {option.label}
-                    </AppText>
-                  </TouchableOpacity>
+                {LANGUAGE_OPTIONS.map((opt) => (
+                  <SelectableChip
+                    key={opt.code}
+                    active={preferredLang === opt.code}
+                    onPress={() => handleLanguageSelect(opt.code)}
+                    label={opt.label}
+                    primary={primary}
+                    border={border}
+                    textSecondary={textSecondary}
+                  />
                 ))}
               </View>
-            </View>
+            </Animated.View>
 
             {/* Location Section */}
-            <AppText
-              variant="headingSm"
-              style={[styles.sectionTitle, { color: textPrimary }]}
-            >
-              {t("postProduct.location", { defaultValue: "Location" })}
-            </AppText>
-
-            {/* Region Picker (with scrollable dropdown) */}
-            <View style={styles.inputGroup}>
-              <AppText style={[styles.label, { color: textSecondary }]}>
-                {t("auth.regionLabel")}
-              </AppText>
-              <TouchableOpacity
-                onPress={() => setShowRegionPicker(!showRegionPicker)}
-                style={[
-                  styles.pickerButton,
-                  { borderColor: errors.region ? errorColor : border },
-                ]}
+            <Animated.View style={rowStyle(5)}>
+              <AppText
+                variant="headingSm"
+                style={[styles.sectionTitle, { color: textPrimary }]}
               >
-                <AppText
-                  style={{
-                    color: region ? textPrimary : textSecondary,
-                    flex: 1,
-                  }}
-                >
-                  {regionLabel || t("auth.regionLabel")}
-                </AppText>
-                <Ionicons
-                  name={showRegionPicker ? "chevron-up" : "chevron-down"}
-                  size={20}
-                  color={primary}
-                />
-              </TouchableOpacity>
-              {showRegionPicker && (
-                <View
-                  style={[
-                    styles.dropdownContainer,
-                    { backgroundColor: surface, borderColor: border },
-                  ]}
-                >
-                  <ScrollView
-                    nestedScrollEnabled
-                    style={{ maxHeight: 200 }}
-                    showsVerticalScrollIndicator={true}
-                  >
-                    {regionOptions.map((r) => (
-                      <TouchableOpacity
-                        key={r.value}
-                        onPress={() => {
-                          setRegion(r.value);
-                          setZone("");
-                          setWereda("");
-                          setShowRegionPicker(false);
-                          clearFieldError("region");
-                        }}
-                        style={[
-                          styles.dropdownItem,
-                          { borderBottomColor: border },
-                        ]}
-                      >
-                        <AppText style={{ color: textPrimary }}>
-                          {r.label}
-                        </AppText>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
-              )}
-              {errors.region && (
-                <View style={styles.errorRow}>
-                  <Ionicons name="alert-circle" size={14} color={errorColor} />
-                  <AppText style={[styles.errorText, { color: errorColor }]}>
-                    {errors.region}
-                  </AppText>
-                </View>
-              )}
-            </View>
-
-            {/* Zone Picker (scrollable) */}
-            <View style={styles.inputGroup}>
-              <AppText style={[styles.label, { color: textSecondary }]}>
-                {t("auth.zoneLabel")}
+                {t("postProduct.location", { defaultValue: "Location" })}
               </AppText>
-              <TouchableOpacity
-                onPress={() => setShowZonePicker(!showZonePicker)}
+            </Animated.View>
+
+            {/* Region */}
+            <Animated.View style={[styles.inputGroup, rowStyle(6)]}>
+              <LocationPicker
+                label={t("auth.regionLabel")}
+                value={region}
+                displayLabel={regionLabel}
+                options={regionOptions}
+                onSelect={(val) => {
+                  setRegion(val);
+                  setZone("");
+                  setWereda("");
+                  clearFieldError("region");
+                }}
+                visible={showRegionPicker}
+                onToggle={() => togglePicker("region")}
+                disabled={false}
+                error={errors.region}
+                primary={primary}
+                border={border}
+                textPrimary={textPrimary}
+                textSecondary={textSecondary}
+                errorColor={errorColor}
+              />
+            </Animated.View>
+
+            {/* Zone */}
+            <Animated.View style={[styles.inputGroup, rowStyle(7)]}>
+              <LocationPicker
+                label={t("auth.zoneLabel")}
+                value={zone}
+                displayLabel={zoneLabel}
+                options={availableZones}
+                onSelect={(val) => {
+                  setZone(val);
+                  setWereda("");
+                  clearFieldError("zone");
+                }}
+                visible={showZonePicker}
+                onToggle={() => togglePicker("zone")}
                 disabled={!region}
-                style={[
-                  styles.pickerButton,
-                  {
-                    borderColor: errors.zone ? errorColor : border,
-                    opacity: region ? 1 : 0.5,
-                  },
-                ]}
-              >
-                <AppText
-                  style={{
-                    color: zone ? textPrimary : textSecondary,
-                    flex: 1,
-                  }}
-                >
-                  {zoneLabel || t("auth.zoneLabel")}
-                </AppText>
-                <Ionicons
-                  name={showZonePicker ? "chevron-up" : "chevron-down"}
-                  size={20}
-                  color={primary}
-                />
-              </TouchableOpacity>
-              {showZonePicker && availableZones.length > 0 && (
-                <View
-                  style={[
-                    styles.dropdownContainer,
-                    { backgroundColor: surface, borderColor: border },
-                  ]}
-                >
-                  <ScrollView
-                    nestedScrollEnabled
-                    style={{ maxHeight: 200 }}
-                    showsVerticalScrollIndicator={true}
-                  >
-                    {availableZones.map((z) => (
-                      <TouchableOpacity
-                        key={z.value}
-                        onPress={() => {
-                          setZone(z.value);
-                          setWereda("");
-                          setShowZonePicker(false);
-                          clearFieldError("zone");
-                        }}
-                        style={[
-                          styles.dropdownItem,
-                          { borderBottomColor: border },
-                        ]}
-                      >
-                        <AppText style={{ color: textPrimary }}>
-                          {z.label}
-                        </AppText>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
-              )}
-              {errors.zone && (
-                <View style={styles.errorRow}>
-                  <Ionicons name="alert-circle" size={14} color={errorColor} />
-                  <AppText style={[styles.errorText, { color: errorColor }]}>
-                    {errors.zone}
-                  </AppText>
-                </View>
-              )}
-            </View>
+                error={errors.zone}
+                primary={primary}
+                border={border}
+                textPrimary={textPrimary}
+                textSecondary={textSecondary}
+                errorColor={errorColor}
+              />
+            </Animated.View>
 
-            {/* Wereda Picker (scrollable) */}
-            <View style={styles.inputGroup}>
-              <AppText style={[styles.label, { color: textSecondary }]}>
-                Wereda
-              </AppText>
-              <TouchableOpacity
-                onPress={() => setShowWeredaPicker(!showWeredaPicker)}
+            {/* Wereda */}
+            <Animated.View style={[styles.inputGroup, rowStyle(8)]}>
+              <LocationPicker
+                label="Wereda"
+                value={wereda}
+                displayLabel={weredaLabel}
+                options={availableWereda}
+                onSelect={(val) => {
+                  setWereda(val);
+                  clearFieldError("wereda");
+                }}
+                visible={showWeredaPicker}
+                onToggle={() => togglePicker("wereda")}
                 disabled={!zone}
-                style={[
-                  styles.pickerButton,
-                  {
-                    borderColor: errors.wereda ? errorColor : border,
-                    opacity: zone ? 1 : 0.5,
-                  },
-                ]}
-              >
-                <AppText
-                  style={{
-                    color: wereda ? textPrimary : textSecondary,
-                    flex: 1,
-                  }}
-                >
-                  {weredaLabel || "Select Wereda"}
-                </AppText>
-                <Ionicons
-                  name={showWeredaPicker ? "chevron-up" : "chevron-down"}
-                  size={20}
-                  color={primary}
-                />
-              </TouchableOpacity>
-              {showWeredaPicker && availableWereda.length > 0 && (
-                <View
-                  style={[
-                    styles.dropdownContainer,
-                    { backgroundColor: surface, borderColor: border },
-                  ]}
-                >
-                  <ScrollView
-                    nestedScrollEnabled
-                    style={{ maxHeight: 200 }}
-                    showsVerticalScrollIndicator={true}
-                  >
-                    {availableWereda.map((w) => (
-                      <TouchableOpacity
-                        key={w.value}
-                        onPress={() => {
-                          setWereda(w.value);
-                          setShowWeredaPicker(false);
-                          clearFieldError("wereda");
-                        }}
-                        style={[
-                          styles.dropdownItem,
-                          { borderBottomColor: border },
-                        ]}
-                      >
-                        <AppText style={{ color: textPrimary }}>
-                          {w.label}
-                        </AppText>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
-              )}
-              {errors.wereda && (
-                <View style={styles.errorRow}>
-                  <Ionicons name="alert-circle" size={14} color={errorColor} />
-                  <AppText style={[styles.errorText, { color: errorColor }]}>
-                    {errors.wereda}
-                  </AppText>
-                </View>
-              )}
-            </View>
+                error={errors.wereda}
+                primary={primary}
+                border={border}
+                textPrimary={textPrimary}
+                textSecondary={textSecondary}
+                errorColor={errorColor}
+              />
+            </Animated.View>
 
             {/* Email */}
-            <View style={styles.inputGroup}>
+            <Animated.View style={[styles.inputGroup, rowStyle(9)]}>
               <AppText style={[styles.label, { color: textSecondary }]}>
                 {t("auth.emailLabel")}
               </AppText>
@@ -641,46 +577,78 @@ export default function RegisterScreen({ navigation }) {
                 onChangeText={setEmail}
                 leftIcon="mail-outline"
               />
-            </View>
+            </Animated.View>
 
             {registerError ? (
-              <View
-                style={[
-                  styles.errorBanner,
-                  { backgroundColor: errorColor + "15" },
-                ]}
-              >
-                <Ionicons name="alert-circle" size={16} color={errorColor} />
-                <AppText
-                  style={[styles.errorBannerText, { color: errorColor }]}
-                >
-                  {registerError}
-                </AppText>
-              </View>
+              <ErrorBanner message={registerError} errorColor={errorColor} />
             ) : null}
 
-            <AppButton
-              title={loading ? t("common.loading") : t("auth.registerBtn")}
-              onPress={handleRegister}
-              loading={loading}
-              disabled={loading}
-              fullWidth
-              style={styles.loginButton}
-            />
-
-            <TouchableOpacity
-              style={styles.linkButton}
-              onPress={() => navigation.navigate("Login")}
-              activeOpacity={0.7}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            <Animated.View
+              style={{ transform: [{ scale: ctaScale }], marginTop: 24 }}
             >
-              <AppText style={[styles.linkText, { color: primary }]}>
-                {t("auth.hasAccount")} {t("auth.loginBtn")}
+              <Pressable
+                onPressIn={pressIn}
+                onPressOut={pressOut}
+                onPress={handleRegister}
+                disabled={loading}
+              >
+                <AppButton
+                  title={loading ? t("common.loading") : t("auth.registerBtn")}
+                  onPress={handleRegister}
+                  loading={loading}
+                  disabled={loading}
+                  fullWidth
+                />
+              </Pressable>
+            </Animated.View>
+
+            <Animated.View
+              style={[
+                rowStyle(FOOTER_ROW_INDEX),
+                {
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  marginTop: spacingXxxl,
+                },
+              ]}
+            >
+              <AppText variant="bodyMd" style={{ color: textSecondary }}>
+                {t("auth.hasAccount")}
               </AppText>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
+              <Pressable
+                onPress={() => navigation.navigate("Login")}
+                hitSlop={10}
+              >
+                <AppText
+                  variant="bodyMd"
+                  style={{ color: primary, fontWeight: "700", marginLeft: 4 }}
+                >
+                  {t("auth.loginBtn")}
+                </AppText>
+              </Pressable>
+            </Animated.View>
+          </Animated.View>
+        </Animated.ScrollView>
       </KeyboardAvoidingView>
+    </View>
+  );
+}
+
+// Small error row component (inline for simplicity)
+function ErrorRow({ message, errorColor }) {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 4,
+        gap: 4,
+      }}
+    >
+      <Ionicons name="alert-circle" size={14} color={errorColor} />
+      <AppText style={{ fontSize: 12, flex: 1, color: errorColor }}>
+        {message}
+      </AppText>
     </View>
   );
 }
@@ -694,6 +662,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
+    zIndex: 10,
   },
   backBtn: {
     width: 40,
@@ -702,115 +671,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 8,
   },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingBottom: 40,
-  },
-  logoWrapper: {
-    alignItems: "center",
-    marginTop: 24,
-    marginBottom: 20,
-  },
-  logo: {
-    width: 180,
-    height: 180,
-  },
-  title: {
-    textAlign: "center",
-    fontWeight: "700",
-    marginBottom: 8,
-  },
-  subtitle: {
-    textAlign: "center",
-    marginBottom: 24,
-  },
+  scrollContent: { flexGrow: 1, paddingHorizontal: 24, paddingBottom: 40 },
+  logoWrapper: { alignItems: "center", marginTop: 24, marginBottom: 20 },
+  logo: { width: 180, height: 180 },
+  title: { textAlign: "center", fontWeight: "700", marginBottom: 8 },
+  subtitle: { textAlign: "center", marginBottom: 24 },
   form: { gap: 4 },
   inputGroup: { marginBottom: 12 },
-  label: {
-    fontSize: 14,
-    fontWeight: "500",
-    marginBottom: 4,
-  },
-  errorRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 4,
-    gap: 4,
-  },
-  errorText: { fontSize: 12, flex: 1 },
-  errorBanner: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-    borderRadius: 8,
-    gap: 6,
-    marginTop: 8,
-    marginBottom: 8,
-  },
-  errorBannerText: { fontSize: 13, flex: 1 },
-  roleContainer: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 8,
-  },
-  roleBtn: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    gap: 8,
-  },
-  roleText: { fontWeight: "600", fontSize: 15 },
-  languageContainer: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 8,
-  },
-  languageBtn: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 1.5,
-  },
-  languageText: {
-    fontWeight: "600",
-    fontSize: 13,
-  },
-  sectionTitle: {
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  pickerButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    marginTop: 8,
-  },
-  dropdownContainer: {
-    borderRadius: 8,
-    borderWidth: 1,
-    maxHeight: 200,
-    marginTop: 4,
-    overflow: "hidden",
-  },
-  dropdownItem: {
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  loginButton: { marginTop: 24 },
-  linkButton: {
-    alignItems: "center",
-    marginTop: 20,
-  },
+  label: { fontSize: 14, fontWeight: "500", marginBottom: 4 },
+  roleContainer: { flexDirection: "row", gap: 12, marginTop: 8 },
+  languageContainer: { flexDirection: "row", gap: 12, marginTop: 8 },
+  sectionTitle: { marginTop: 16, marginBottom: 8 },
+  linkButton: { alignItems: "center", marginTop: 20 },
   linkText: { fontWeight: "600", fontSize: 14 },
 });
