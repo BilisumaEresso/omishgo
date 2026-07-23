@@ -1,14 +1,26 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
+import { Platform } from "react-native";
 
 const STORAGE_KEYS = {
   TOKEN: "omishgo_token",
   USER: "omishgo_user",
 };
 
+// The JWT grants API access, so it belongs in the OS-encrypted keychain/
+// keystore (SecureStore), not plaintext AsyncStorage — a lost/rooted
+// device or a plain file-system read shouldn't hand over a working
+// session token. SecureStore has no web implementation, so web (Expo web
+// target only — not used for the pilot, but keeps `npm run mobile:web`
+// from crashing) falls back to AsyncStorage.
+const isWeb = Platform.OS === "web";
+
 const storage = {
   async getToken() {
     try {
-      return await AsyncStorage.getItem(STORAGE_KEYS.TOKEN);
+      return isWeb
+        ? await AsyncStorage.getItem(STORAGE_KEYS.TOKEN)
+        : await SecureStore.getItemAsync(STORAGE_KEYS.TOKEN);
     } catch (error) {
       console.error("Error getting token:", error);
       return null;
@@ -17,7 +29,11 @@ const storage = {
 
   async setToken(token) {
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, token);
+      if (isWeb) {
+        await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, token);
+      } else {
+        await SecureStore.setItemAsync(STORAGE_KEYS.TOKEN, token);
+      }
     } catch (error) {
       console.error("Error setting token:", error);
     }
@@ -25,7 +41,11 @@ const storage = {
 
   async removeToken() {
     try {
-      await AsyncStorage.removeItem(STORAGE_KEYS.TOKEN);
+      if (isWeb) {
+        await AsyncStorage.removeItem(STORAGE_KEYS.TOKEN);
+      } else {
+        await SecureStore.deleteItemAsync(STORAGE_KEYS.TOKEN);
+      }
     } catch (error) {
       console.error("Error removing token:", error);
     }
@@ -59,10 +79,8 @@ const storage = {
 
   async clear() {
     try {
-      await AsyncStorage.multiRemove([
-        STORAGE_KEYS.TOKEN,
-        STORAGE_KEYS.USER,
-      ]);
+      await this.removeToken();
+      await AsyncStorage.removeItem(STORAGE_KEYS.USER);
     } catch (error) {
       console.error("Error clearing storage:", error);
     }

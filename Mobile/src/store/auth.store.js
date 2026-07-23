@@ -280,11 +280,14 @@ export const useAuthStore = create(persist((set, get) => ({
   name: "auth-store",
   storage: createJSONStorage(() => storage),
   /**
-   * Only persist essential fields
+   * Only persist non-sensitive fields. `token` and `user` are deliberately
+   * excluded: they already live in storageService (the token via
+   * expo-secure-store), and restoreSession() reconstructs both from there
+   * on every app start. Persisting them here too would mean a second,
+   * plaintext copy of the session token sitting in AsyncStorage — exactly
+   * what moving to SecureStore was meant to avoid.
    */
   partialize: state => ({
-    user: state.user,
-    token: state.token,
     isAuthenticated: state.isAuthenticated,
     role: state.role,
     language: state.language
