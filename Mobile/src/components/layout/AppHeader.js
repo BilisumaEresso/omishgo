@@ -1,8 +1,15 @@
 // src/components/layout/AppHeader.js
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation as useRNNavigation } from "@react-navigation/native";
-import { useRef, useEffect } from "react";
-import { Animated, Platform, Pressable, StyleSheet, View } from "react-native";
+import { useEffect, useRef } from "react";
+import {
+  Animated,
+  Easing,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../../hooks/useTheme";
 import AppText from "../common/AppText";
@@ -11,6 +18,124 @@ import { useNotificationStore } from "../../store/notification.store";
 const ICON_SIZE = 24;
 const TOUCHABLE_SIZE = 44;
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
+
+// ---- Individual icon button: own animated state, so buttons never interfere ----
+const HeaderIconButton = ({
+  iconName,
+  onPress,
+  color,
+  accessibilityLabel,
+  badgeCount = 0,
+  showBadge = false,
+  badgeColor,
+  surfaceColor,
+}) => {
+  const scale = useRef(new Animated.Value(1)).current;
+  const highlight = useRef(new Animated.Value(0)).current;
+  const badgePulse = useRef(new Animated.Value(0)).current;
+  const prevBadgeVisible = useRef(showBadge);
+
+  useEffect(() => {
+    if (showBadge && !prevBadgeVisible.current) {
+      badgePulse.setValue(0);
+      Animated.timing(badgePulse, {
+        toValue: 1,
+        duration: 500,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }).start();
+    }
+    prevBadgeVisible.current = showBadge;
+  }, [showBadge, badgePulse]);
+
+  const onIn = () => {
+    Animated.parallel([
+      Animated.spring(scale, {
+        toValue: 0.9,
+        useNativeDriver: true,
+        speed: 60,
+        bounciness: 6,
+      }),
+      Animated.timing(highlight, {
+        toValue: 1,
+        duration: 120,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  };
+
+  const onOut = () => {
+    Animated.parallel([
+      Animated.spring(scale, {
+        toValue: 1,
+        useNativeDriver: true,
+        speed: 40,
+        bounciness: 8,
+      }),
+      Animated.timing(highlight, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  };
+
+  const displayCount =
+    badgeCount > 99 ? "99+" : badgeCount > 0 ? String(badgeCount) : null;
+
+  return (
+    <Pressable
+      onPress={onPress}
+      hitSlop={HIT_SLOP}
+      onPressIn={onIn}
+      onPressOut={onOut}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+    >
+      <Animated.View
+        style={[
+          styles.iconButton,
+          {
+            backgroundColor: highlight.interpolate({
+              inputRange: [0, 1],
+              outputRange: ["rgba(0,0,0,0)", `${color}14`],
+            }),
+          },
+        ]}
+      >
+        <Animated.View style={{ transform: [{ scale }] }}>
+          <Ionicons name={iconName} size={ICON_SIZE} color={color} />
+          {showBadge && (
+            <Animated.View
+              style={[
+                styles.badge,
+                displayCount && styles.badgeWide,
+                {
+                  backgroundColor: badgeColor,
+                  borderColor: surfaceColor,
+                  transform: [
+                    {
+                      scale: badgePulse.interpolate({
+                        inputRange: [0, 0.5, 1],
+                        outputRange: [1, 1.4, 1],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              {displayCount && (
+                <AppText style={styles.badgeText} numberOfLines={1}>
+                  {displayCount}
+                </AppText>
+              )}
+            </Animated.View>
+          )}
+        </Animated.View>
+      </Animated.View>
+    </Pressable>
+  );
+};
 
 const AppHeader = ({
   title,
@@ -29,19 +154,20 @@ const AppHeader = ({
 }) => {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
-  
-  // Use the new notification store
+
   const { unreadCount, fetchNotifications } = useNotificationStore();
-  
-  // Poll notifications when header is mounted and showing notifications
+
   useEffect(() => {
     if (showNotification) {
       fetchNotifications();
-      const interval = setInterval(fetchNotifications, 15000); // 15 seconds
+      const interval = setInterval(fetchNotifications, 15000);
       return () => clearInterval(interval);
     }
   }, [showNotification, fetchNotifications]);
 
+  // NOTE: try/catch here intentionally guards against rendering outside a
+  // NavigationContainer (e.g. in isolated screen previews/tests). The hook
+  // itself is still called unconditionally on every render.
   let navigation = null;
   try {
     navigation = useRNNavigation();
@@ -52,56 +178,62 @@ const AppHeader = ({
   const secondaryTextColor = theme?.colors?.textSecondary || "#757575";
   const surfaceColor = theme?.colors?.surface || "#FFFFFF";
   const borderColor = theme?.colors?.border || "#E0E0E0";
+  const notificationColor = theme?.colors?.notification || "#FF3B30";
 
-  // ---- Pro touch feedback (scale + opacity) ----
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-  const animatePressIn = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 0.93,
-      useNativeDriver: true,
-      speed: 100,
-      bounciness: 10,
-    }).start();
-  };
-  const animatePressOut = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 100,
-      bounciness: 10,
-    }).start();
-  };
+  // Subtle entrance for title/subtitle on every mount (screen transition)
+  const titleOpacity = useRef(new Animated.Value(0)).current;
+  const titleTranslate = useRef(new Animated.Value(-6)).current;
 
-  // Renders an icon button with optional badge dot
-  const renderIconButton = (iconName, onPress, { badge = false } = {}) => (
-    <Pressable
-      onPress={onPress}
-      hitSlop={HIT_SLOP}
-      onPressIn={animatePressIn}
-      onPressOut={animatePressOut}
-      accessibilityRole="button"
-      accessibilityLabel={iconName}
-      style={({ pressed }) => [
-        styles.iconButton,
-        { opacity: pressed ? 0.6 : 1 },
-      ]}
-    >
-      <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-        <Ionicons name={iconName} size={ICON_SIZE} color={textColor} />
-        {badge && (
-          <View
-            style={[
-              styles.badge,
-              {
-                backgroundColor: theme?.colors?.notification || "#FF3B30",
-                borderColor: surfaceColor,
-              },
-            ]}
-          />
-        )}
-      </Animated.View>
-    </Pressable>
-  );
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(titleOpacity, {
+        toValue: 1,
+        duration: 260,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(titleTranslate, {
+        toValue: 0,
+        duration: 260,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [titleOpacity, titleTranslate]);
+
+  const profileScale = useRef(new Animated.Value(1)).current;
+  const profileHighlight = useRef(new Animated.Value(0)).current;
+
+  const onProfileIn = () => {
+    Animated.parallel([
+      Animated.spring(profileScale, {
+        toValue: 0.9,
+        useNativeDriver: true,
+        speed: 60,
+        bounciness: 6,
+      }),
+      Animated.timing(profileHighlight, {
+        toValue: 1,
+        duration: 120,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  };
+  const onProfileOut = () => {
+    Animated.parallel([
+      Animated.spring(profileScale, {
+        toValue: 1,
+        useNativeDriver: true,
+        speed: 40,
+        bounciness: 8,
+      }),
+      Animated.timing(profileHighlight, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  };
 
   return (
     <View
@@ -118,8 +250,8 @@ const AppHeader = ({
             ios: {
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.06,
-              shadowRadius: 8,
+              shadowOpacity: 0.07,
+              shadowRadius: 10,
             },
             android: {
               elevation: 4,
@@ -130,26 +262,41 @@ const AppHeader = ({
     >
       {/* ---- Left section ---- */}
       <View style={styles.left}>
-        {showBack &&
-          renderIconButton(
-            "arrow-back",
-            onBackPress || (() => navigation?.goBack()),
-          )}
-        {showMenu &&
-          renderIconButton(
-            "menu",
-            onMenuPress || (() => navigation?.openDrawer?.()),
-          )}
+        {showBack && (
+          <HeaderIconButton
+            iconName="arrow-back"
+            color={textColor}
+            accessibilityLabel="Go back"
+            onPress={onBackPress || (() => navigation?.goBack())}
+          />
+        )}
+        {showMenu && (
+          <HeaderIconButton
+            iconName="menu"
+            color={textColor}
+            accessibilityLabel="Open menu"
+            onPress={onMenuPress || (() => navigation?.openDrawer?.())}
+          />
+        )}
 
-        <View
+        <Animated.View
           style={[
             styles.titleContainer,
-            { marginLeft: showBack || showMenu ? 14 : 0 },
+            {
+              marginLeft: showBack || showMenu ? 14 : 0,
+              opacity: titleOpacity,
+              transform: [{ translateY: titleTranslate }],
+            },
           ]}
         >
           <AppText
             variant="headingMd"
-            style={{ fontSize: 18, fontWeight: "700", color: textColor }}
+            style={{
+              fontSize: 18,
+              fontWeight: "700",
+              color: textColor,
+              letterSpacing: 0.1,
+            }}
             numberOfLines={1}
           >
             {title}
@@ -160,7 +307,7 @@ const AppHeader = ({
               style={{
                 fontSize: 13,
                 color: secondaryTextColor,
-                opacity: 0.7,
+                opacity: 0.75,
                 marginTop: 2,
               }}
               numberOfLines={1}
@@ -168,7 +315,7 @@ const AppHeader = ({
               {subtitle}
             </AppText>
           ) : null}
-        </View>
+        </Animated.View>
       </View>
 
       {/* ---- Right section ---- */}
@@ -177,34 +324,61 @@ const AppHeader = ({
           rightComponent
         ) : (
           <>
-            {showSearch && renderIconButton("search", onSearchPress)}
-            {showNotification &&
-              renderIconButton("notifications-outline", onNotificationPress, {
-                badge: unreadCount > 0,
-              })}
+            {showSearch && (
+              <HeaderIconButton
+                iconName="search"
+                color={textColor}
+                accessibilityLabel="Search"
+                onPress={onSearchPress}
+              />
+            )}
+            {showNotification && (
+              <HeaderIconButton
+                iconName="notifications-outline"
+                color={textColor}
+                accessibilityLabel={
+                  unreadCount > 0
+                    ? `Notifications, ${unreadCount} unread`
+                    : "Notifications"
+                }
+                onPress={onNotificationPress}
+                showBadge={unreadCount > 0}
+                badgeCount={unreadCount}
+                badgeColor={notificationColor}
+                surfaceColor={surfaceColor}
+              />
+            )}
             {showProfile && (
               <Pressable
                 onPress={onProfilePress}
                 hitSlop={HIT_SLOP}
-                onPressIn={animatePressIn}
-                onPressOut={animatePressOut}
-                style={({ pressed }) => [
-                  styles.avatarButton,
-                  { opacity: pressed ? 0.6 : 1 },
-                ]}
+                onPressIn={onProfileIn}
+                onPressOut={onProfileOut}
                 accessibilityRole="button"
                 accessibilityLabel="Profile"
               >
                 <Animated.View
                   style={[
-                    styles.avatar,
+                    styles.avatarButton,
                     {
-                      backgroundColor: primaryColor,
-                      transform: [{ scale: scaleAnim }],
+                      backgroundColor: profileHighlight.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ["rgba(0,0,0,0)", `${primaryColor}14`],
+                      }),
                     },
                   ]}
                 >
-                  <Ionicons name="person" size={18} color="#fff" />
+                  <Animated.View
+                    style={[
+                      styles.avatar,
+                      {
+                        backgroundColor: primaryColor,
+                        transform: [{ scale: profileScale }],
+                      },
+                    ]}
+                  >
+                    <Ionicons name="person" size={18} color="#fff" />
+                  </Animated.View>
                 </Animated.View>
               </Pressable>
             )}
@@ -238,21 +412,36 @@ const styles = StyleSheet.create({
   iconButton: {
     width: TOUCHABLE_SIZE,
     height: TOUCHABLE_SIZE,
+    borderRadius: TOUCHABLE_SIZE / 2,
     alignItems: "center",
     justifyContent: "center",
   },
   badge: {
     position: "absolute",
-    top: 2,
-    right: 2,
-    width: 10,
+    top: -2,
+    right: -4,
+    minWidth: 10,
     height: 10,
     borderRadius: 5,
     borderWidth: 1.5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badgeWide: {
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    paddingHorizontal: 3,
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 9,
+    fontWeight: "700",
   },
   avatarButton: {
     width: TOUCHABLE_SIZE,
     height: TOUCHABLE_SIZE,
+    borderRadius: TOUCHABLE_SIZE / 2,
     alignItems: "center",
     justifyContent: "center",
   },

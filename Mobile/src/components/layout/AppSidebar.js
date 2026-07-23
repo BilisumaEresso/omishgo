@@ -1,12 +1,27 @@
 // Mobile/src/components/layout/AppSidebar.js
+//
+// IMPORTANT INTEGRATION NOTE:
+// This component no longer uses React Native's <Modal>. It renders as a
+// normal absolutely-positioned overlay so touches work on the very first
+// tap (native Modals on Android can silently eat the first touch after
+// opening — that was the cause of the "works on second press" bug) and so
+// it can detect edge swipes coming from underlying screens.
+// Because of this, mount <AppSidebar /> as a sibling AFTER your main
+// navigator in the root tree (e.g. in App.js), not inside a single screen.
+// Wire the new `onSwipeOpen` prop to the same function your hamburger
+// button uses, e.g.:
+//   <AppSidebar visible={visible} onClose={closeSidebar} onSwipeOpen={openSidebar} ... />
+
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  Alert,
   Animated,
+  BackHandler,
   Dimensions,
   Easing,
-  Modal,
+  PanResponder,
   Platform,
   Pressable,
   ScrollView,
@@ -22,8 +37,11 @@ import { ROLES } from "../../constants/roles";
 import { useAuthStore } from "../../store/auth.store";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
-const SCREEN_HEIGHT = Dimensions.get("window").height;
 const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.82, 320);
+
+const EDGE_ZONE_WIDTH = 24;
+const SWIPE_OPEN_THRESHOLD = 45;
+const SWIPE_CLOSE_THRESHOLD = 45;
 
 const ROLE_MENU_ITEM_KEYS = {
   [ROLES.FARMER]: [
@@ -57,13 +75,14 @@ const LANGUAGES = [
   { code: "om", label: "Afaan Oromoo", native: "Afan Oromo" },
 ];
 
-// ----- Pressable row with press-scale + ripple-ish opacity -----
+// ----- Pressable row with press-scale + a real (now wired-up) press tint -----
 const Row = ({
   children,
   onPress,
   style,
   accessibilityLabel,
   accessibilityRole = "button",
+  pressTint = "rgba(0,0,0,0.045)",
 }) => {
   const scale = useRef(new Animated.Value(1)).current;
   const bg = useRef(new Animated.Value(0)).current;
@@ -109,6 +128,20 @@ const Row = ({
       style={{ borderRadius: 14 }}
     >
       <Animated.View style={[style, { transform: [{ scale }] }]}>
+        {/* Press-tint overlay — previously tracked but never rendered */}
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            StyleSheet.absoluteFillObject,
+            {
+              borderRadius: 14,
+              backgroundColor: bg.interpolate({
+                inputRange: [0, 1],
+                outputRange: ["rgba(0,0,0,0)", pressTint],
+              }),
+            },
+          ]}
+        />
         {children}
       </Animated.View>
     </Pressable>
@@ -118,6 +151,7 @@ const Row = ({
 const AppSidebar = ({
   visible,
   onClose,
+  onSwipeOpen,
   role,
   onItemPress,
   activeRoute = "",
@@ -134,6 +168,12 @@ const AppSidebar = ({
 
   const [showModal, setShowModal] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
+
+  // Refs so PanResponder closures (created once) always see fresh values
+  const showModalRef = useRef(showModal);
+  useEffect(() => {
+    showModalRef.current = showModal;
+  }, [showModal]);
 
   const menuItems = useMemo(() => {
     const rawItems = role ? ROLE_MENU_ITEM_KEYS[role] || [] : [];
@@ -248,28 +288,62 @@ const AppSidebar = ({
   }, [languageOpen, langAnim]);
 
   const handleClose = () => closeAnim(() => onClose && onClose());
+  const handleCloseRef = useRef(handleClose);
+  useEffect(() => {
+    handleCloseRef.current = handleClose;
+  });
+
   const handleItem = (item) =>
     closeAnim(() => onItemPress && onItemPress(item));
-  const handleLogout = () => closeAnim(() => logout());
+
+  const performLogout = () => closeAnim(() => logout());
+
+  const confirmLogout = () => {
+    Alert.alert(
+      t("appSidebar.logoutConfirmTitle", "Log out?"),
+      t(
+        "appSidebar.logoutConfirmMessage",
+        "Are you sure you want to log out of your account?",
+      ),
+      [
+        { text: t("appSidebar.cancel", "Cancel"), style: "cancel" },
+        {
+          text: t("appSidebar.logout"),
+          style: "destructive",
+          onPress: performLogout,
+        },
+      ],
+    );
+  };
+
+  // Android hardware back button closes the drawer instead of the screen
+  useEffect(() => {
+    if (!showModal) return undefined;
+    const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+      handleClose();
+      return true;
+    });
+    return () => sub.remove();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showModal]);
 
   const changeLanguage = (code) => {
     i18n.changeLanguage(code).catch(() => {});
     setLanguageOpen(false);
   };
 
-  const primaryColor = theme.colors.primary || "#2E7D32";
-  const primaryDark = theme.colors.primaryDark || "#1B5E20";
-  const textPrimary = theme.colors.textPrimary || "#1A2E1A";
-  const textSecondary = theme.colors.textSecondary || "#4A6741";
-  const borderColor = theme.colors.border || "#D0E8CE";
-  const surface = theme.colors.surface || "#FFFFFF";
-  const errorColor = theme.colors.error || "#C62828";
+  const primaryColor = theme?.colors?.primary || "#2E7D32";
+  const primaryDark = theme?.colors?.primaryDark || "#1B5E20";
+  const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
+  const textSecondary = theme?.colors?.textSecondary || "#4A6741";
+  const borderColor = theme?.colors?.border || "#D0E8CE";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const errorColor = theme?.colors?.error || "#C62828";
 
   const currentLang = i18n.language || "en";
   const currentLangLabel =
     LANGUAGES.find((l) => l.code === currentLang)?.label || "English";
 
-  // staggered entrance for items
   const itemStyle = (index) => {
     const translateX = contentAnim.interpolate({
       inputRange: [0, 1],
@@ -286,6 +360,41 @@ const AppSidebar = ({
     inputRange: [0, 1],
     outputRange: [0, LANGUAGES.length * 46 + 8],
   });
+
+  // ---- Swipe-to-open (edge zone, only active while closed) ----
+  const edgeResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => !showModalRef.current,
+      onMoveShouldSetPanResponder: (evt, gestureState) =>
+        !showModalRef.current &&
+        gestureState.dx > 8 &&
+        Math.abs(gestureState.dy) < 30,
+      onPanResponderRelease: (evt, gestureState) => {
+        if (gestureState.dx > SWIPE_OPEN_THRESHOLD) {
+          onSwipeOpen && onSwipeOpen();
+        }
+      },
+    }),
+  ).current;
+
+  // ---- Swipe-to-close (over the backdrop, while open) ----
+  const backdropResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (evt, gestureState) =>
+        Math.abs(gestureState.dx) > 6 &&
+        Math.abs(gestureState.dx) > Math.abs(gestureState.dy),
+      onPanResponderRelease: (evt, gestureState) => {
+        const moved = Math.abs(gestureState.dx) + Math.abs(gestureState.dy);
+        if (gestureState.dx < -SWIPE_CLOSE_THRESHOLD) {
+          handleCloseRef.current();
+        } else if (moved < 6) {
+          // treated as a plain tap outside the drawer
+          handleCloseRef.current();
+        }
+      },
+    }),
+  ).current;
 
   const renderRow = (
     item,
@@ -335,259 +444,268 @@ const AppSidebar = ({
   );
 
   return (
-    <Modal
-      visible={showModal}
-      transparent
-      animationType="none"
-      statusBarTranslucent
-      navigationBarTranslucent
-      onRequestClose={handleClose}
-    >
-      <StatusBar
-        translucent
-        backgroundColor="transparent"
-        barStyle="light-content"
-      />
-      <View style={styles.overlay}>
-        {/* Backdrop */}
-        <Animated.View
-          style={[
-            styles.backdrop,
-            {
-              opacity: fadeAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, 1],
-              }),
-            },
-          ]}
-        >
-          <Pressable
-            style={{ flex: 1 }}
-            onPress={handleClose}
-            accessibilityLabel={t("appSidebar.closeMenu")}
+    <View style={styles.rootOverlay} pointerEvents="box-none">
+      {/* Only render status bar override while the drawer is actually open */}
+      {showModal && (
+        <StatusBar
+          translucent
+          backgroundColor="transparent"
+          barStyle="light-content"
+        />
+      )}
+
+      {/* Thin edge strip to catch swipe-open gestures when closed */}
+      {!showModal && (
+        <View
+          style={styles.edgeZone}
+          {...edgeResponder.panHandlers}
+          pointerEvents="box-only"
+        />
+      )}
+
+      {showModal && (
+        <View style={styles.overlay} pointerEvents="auto">
+          {/* Backdrop — tap or swipe-left to close */}
+          <Animated.View
+            style={[styles.backdrop, { opacity: fadeAnim }]}
+            {...backdropResponder.panHandlers}
           />
-        </Animated.View>
 
-        {/* Drawer — full height, flush to top/bottom */}
-        <Animated.View
-          style={[
-            styles.drawer,
-            {
-              backgroundColor: surface,
-              transform: [{ translateX: slideAnim }],
-            },
-          ]}
-        >
-          {/* Header (extends into status bar area) */}
-          <LinearGradient
-            colors={[primaryColor, primaryDark]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={[styles.profileHeader, { paddingTop: insets.top + 18 }]}
-          >
-            {/* subtle decorative orbs */}
-            <View style={styles.orbLarge} pointerEvents="none" />
-            <View style={styles.orbSmall} pointerEvents="none" />
-
-            <Pressable
-              onPress={() => handleItem({ label: "Profile", route: "Profile" })}
-              style={({ pressed }) => [
-                styles.profilePressable,
-                pressed && { opacity: 0.85 },
-              ]}
-              accessibilityRole="button"
-              accessibilityLabel={t("appSidebar.viewProfile")}
-            >
-              <View style={styles.avatarRing}>
-                <View style={styles.avatar}>
-                  <Ionicons name="person" size={30} color={primaryColor} />
-                </View>
-              </View>
-
-              <View style={styles.profileInfo}>
-                <AppText style={styles.userName} numberOfLines={1}>
-                  {user?.name || t("appSidebar.fallbackUserName")}
-                </AppText>
-                <View style={styles.rolePill}>
-                  <View style={styles.roleDot} />
-                  <AppText style={styles.roleText} numberOfLines={1}>
-                    {roleDisplay}
-                  </AppText>
-                </View>
-              </View>
-
-              <View style={styles.chevronCircle}>
-                <Ionicons name="chevron-forward" size={16} color="#FFF" />
-              </View>
-            </Pressable>
-          </LinearGradient>
-
-          {/* Menu */}
-          <ScrollView
-            style={styles.menuScroll}
-            contentContainerStyle={styles.menuContent}
-            showsVerticalScrollIndicator={false}
-          >
-            {menuItems.length > 0 && (
-              <AppText style={[styles.sectionLabel, { color: textSecondary }]}>
-                {roleDisplay}
-              </AppText>
-            )}
-
-            {menuItems.map((item, i) =>
-              renderRow({ ...item, onPress: () => handleItem(item) }, i, {
-                active: activeRoute === item.route,
-                icon: item.icon,
-              }),
-            )}
-
-            <View style={[styles.divider, { backgroundColor: borderColor }]} />
-
-            <AppText style={[styles.sectionLabel, { color: textSecondary }]}>
-              {t("appSidebar.myProfile")}
-            </AppText>
-
-            {staticItems.map(({ label, route, icon }, i) =>
-              renderRow(
-                {
-                  label,
-                  route,
-                  onPress: () => handleItem({ label, route }),
-                },
-                menuItems.length + i,
-                { active: activeRoute === route, icon },
-              ),
-            )}
-
-            {/* Language */}
-            <Animated.View
-              style={[
-                itemStyle(menuItems.length + staticItems.length),
-                { marginTop: 4 },
-              ]}
-            >
-              <Row
-                onPress={() => setLanguageOpen((v) => !v)}
-                accessibilityLabel={t("appSidebar.changeLanguage")}
-                style={styles.menuItem}
-              >
-                <View style={styles.iconWrap}>
-                  <Ionicons
-                    name="globe-outline"
-                    size={20}
-                    color={textSecondary}
-                  />
-                </View>
-                <AppText
-                  style={[styles.menuLabel, { color: textPrimary, flex: 1 }]}
-                >
-                  {currentLangLabel}
-                </AppText>
-                <Animated.View
-                  style={{
-                    transform: [
-                      {
-                        rotate: langAnim.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: ["0deg", "180deg"],
-                        }),
-                      },
-                    ],
-                  }}
-                >
-                  <Ionicons
-                    name="chevron-down"
-                    size={18}
-                    color={textSecondary}
-                  />
-                </Animated.View>
-              </Row>
-
-              <Animated.View
-                style={[
-                  styles.languageSubmenu,
-                  {
-                    height: langHeight,
-                    opacity: langAnim,
-                    borderLeftColor: borderColor,
-                  },
-                ]}
-              >
-                {LANGUAGES.map((lang) => {
-                  const active = currentLang === lang.code;
-                  return (
-                    <Pressable
-                      key={lang.code}
-                      onPress={() => changeLanguage(lang.code)}
-                      accessibilityRole="button"
-                      accessibilityLabel={lang.native}
-                      style={({ pressed }) => [
-                        styles.languageOption,
-                        active && { backgroundColor: primaryColor + "14" },
-                        pressed && { opacity: 0.7 },
-                      ]}
-                    >
-                      <AppText
-                        style={[
-                          styles.languageOptionText,
-                          {
-                            color: active ? primaryColor : textPrimary,
-                            fontWeight: active ? "700" : "500",
-                          },
-                        ]}
-                      >
-                        {lang.native}
-                      </AppText>
-                      {active && (
-                        <Ionicons
-                          name="checkmark-circle"
-                          size={18}
-                          color={primaryColor}
-                        />
-                      )}
-                    </Pressable>
-                  );
-                })}
-              </Animated.View>
-            </Animated.View>
-          </ScrollView>
-
-          {/* Footer */}
-          <View
+          {/* Drawer */}
+          <Animated.View
             style={[
-              styles.logoutContainer,
+              styles.drawer,
               {
-                borderTopColor: borderColor,
-                paddingBottom: Math.max(insets.bottom, 12) + 8,
+                backgroundColor: surface,
+                transform: [{ translateX: slideAnim }],
               },
             ]}
           >
-            <Row
-              onPress={handleLogout}
-              accessibilityLabel={t("appSidebar.logout")}
+            <LinearGradient
+              colors={[primaryColor, primaryDark]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.profileHeader, { paddingTop: insets.top + 18 }]}
+            >
+              <View style={styles.orbLarge} pointerEvents="none" />
+              <View style={styles.orbSmall} pointerEvents="none" />
+
+              <Pressable
+                onPress={() =>
+                  handleItem({ label: "Profile", route: "Profile" })
+                }
+                style={({ pressed }) => [
+                  styles.profilePressable,
+                  pressed && { opacity: 0.85 },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel={t("appSidebar.viewProfile")}
+              >
+                <View style={styles.avatarRing}>
+                  <View style={styles.avatar}>
+                    <Ionicons name="person" size={30} color={primaryColor} />
+                  </View>
+                </View>
+
+                <View style={styles.profileInfo}>
+                  <AppText style={styles.userName} numberOfLines={1}>
+                    {user?.name || t("appSidebar.fallbackUserName")}
+                  </AppText>
+                  <View style={styles.rolePill}>
+                    <View style={styles.roleDot} />
+                    <AppText style={styles.roleText} numberOfLines={1}>
+                      {roleDisplay}
+                    </AppText>
+                  </View>
+                </View>
+
+                <View style={styles.chevronCircle}>
+                  <Ionicons name="chevron-forward" size={16} color="#FFF" />
+                </View>
+              </Pressable>
+            </LinearGradient>
+
+            <ScrollView
+              style={styles.menuScroll}
+              contentContainerStyle={styles.menuContent}
+              showsVerticalScrollIndicator={false}
+            >
+              {menuItems.length > 0 && (
+                <AppText
+                  style={[styles.sectionLabel, { color: textSecondary }]}
+                >
+                  {roleDisplay}
+                </AppText>
+              )}
+
+              {menuItems.map((item, i) =>
+                renderRow({ ...item, onPress: () => handleItem(item) }, i, {
+                  active: activeRoute === item.route,
+                  icon: item.icon,
+                }),
+              )}
+
+              <View
+                style={[styles.divider, { backgroundColor: borderColor }]}
+              />
+
+              <AppText style={[styles.sectionLabel, { color: textSecondary }]}>
+                {t("appSidebar.myProfile")}
+              </AppText>
+
+              {staticItems.map(({ label, route, icon }, i) =>
+                renderRow(
+                  {
+                    label,
+                    route,
+                    onPress: () => handleItem({ label, route }),
+                  },
+                  menuItems.length + i,
+                  { active: activeRoute === route, icon },
+                ),
+              )}
+
+              {/* Language */}
+              <Animated.View
+                style={[
+                  itemStyle(menuItems.length + staticItems.length),
+                  { marginTop: 4 },
+                ]}
+              >
+                <Row
+                  onPress={() => setLanguageOpen((v) => !v)}
+                  accessibilityLabel={t("appSidebar.changeLanguage")}
+                  style={styles.menuItem}
+                >
+                  <View style={styles.iconWrap}>
+                    <Ionicons
+                      name="globe-outline"
+                      size={20}
+                      color={textSecondary}
+                    />
+                  </View>
+                  <AppText
+                    style={[styles.menuLabel, { color: textPrimary, flex: 1 }]}
+                  >
+                    {currentLangLabel}
+                  </AppText>
+                  <Animated.View
+                    style={{
+                      transform: [
+                        {
+                          rotate: langAnim.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: ["0deg", "180deg"],
+                          }),
+                        },
+                      ],
+                    }}
+                  >
+                    <Ionicons
+                      name="chevron-down"
+                      size={18}
+                      color={textSecondary}
+                    />
+                  </Animated.View>
+                </Row>
+
+                <Animated.View
+                  style={[
+                    styles.languageSubmenu,
+                    {
+                      height: langHeight,
+                      opacity: langAnim,
+                      borderLeftColor: borderColor,
+                    },
+                  ]}
+                >
+                  {LANGUAGES.map((lang) => {
+                    const active = currentLang === lang.code;
+                    return (
+                      <Pressable
+                        key={lang.code}
+                        onPress={() => changeLanguage(lang.code)}
+                        accessibilityRole="button"
+                        accessibilityLabel={lang.native}
+                        style={({ pressed }) => [
+                          styles.languageOption,
+                          active && { backgroundColor: primaryColor + "14" },
+                          pressed && { opacity: 0.7 },
+                        ]}
+                      >
+                        <AppText
+                          style={[
+                            styles.languageOptionText,
+                            {
+                              color: active ? primaryColor : textPrimary,
+                              fontWeight: active ? "700" : "500",
+                            },
+                          ]}
+                        >
+                          {lang.native}
+                        </AppText>
+                        {active && (
+                          <Ionicons
+                            name="checkmark-circle"
+                            size={18}
+                            color={primaryColor}
+                          />
+                        )}
+                      </Pressable>
+                    );
+                  })}
+                </Animated.View>
+              </Animated.View>
+            </ScrollView>
+
+            <View
               style={[
-                styles.logoutButton,
-                { backgroundColor: errorColor + "10" },
+                styles.logoutContainer,
+                {
+                  borderTopColor: borderColor,
+                  paddingBottom: Math.max(insets.bottom, 12) + 8,
+                },
               ]}
             >
-              <Ionicons name="log-out-outline" size={20} color={errorColor} />
-              <AppText style={[styles.logoutLabel, { color: errorColor }]}>
-                {t("appSidebar.logout")}
+              <Row
+                onPress={confirmLogout}
+                accessibilityLabel={t("appSidebar.logout")}
+                style={[
+                  styles.logoutButton,
+                  { backgroundColor: errorColor + "10" },
+                ]}
+              >
+                <Ionicons name="log-out-outline" size={20} color={errorColor} />
+                <AppText style={[styles.logoutLabel, { color: errorColor }]}>
+                  {t("appSidebar.logout")}
+                </AppText>
+              </Row>
+              <AppText style={[styles.version, { color: textSecondary }]}>
+                v1.0.0
               </AppText>
-            </Row>
-            <AppText style={[styles.version, { color: textSecondary }]}>
-              v1.0.0
-            </AppText>
-          </View>
-        </Animated.View>
-      </View>
-    </Modal>
+            </View>
+          </Animated.View>
+        </View>
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  rootOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 9999,
+    elevation: Platform.OS === "android" ? 9999 : 0,
+  },
+  edgeZone: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: EDGE_ZONE_WIDTH,
+  },
   overlay: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     flexDirection: "row",
   },
   backdrop: {
@@ -615,7 +733,6 @@ const styles = StyleSheet.create({
     }),
   },
 
-  // Header
   profileHeader: {
     paddingBottom: 22,
     paddingHorizontal: 18,
@@ -699,7 +816,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  // Menu
   menuScroll: { flex: 1 },
   menuContent: {
     paddingVertical: 14,
@@ -722,6 +838,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 2,
     borderRadius: 14,
+    overflow: "hidden",
   },
   iconWrap: {
     width: 36,
@@ -748,7 +865,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
   },
 
-  // Language
   languageSubmenu: {
     marginLeft: 30,
     marginTop: 4,
@@ -769,7 +885,6 @@ const styles = StyleSheet.create({
     fontSize: 13.5,
   },
 
-  // Footer
   logoutContainer: {
     borderTopWidth: StyleSheet.hairlineWidth,
     paddingHorizontal: 14,
@@ -781,6 +896,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 12,
     borderRadius: 14,
+    overflow: "hidden",
   },
   logoutLabel: {
     fontSize: 14.5,

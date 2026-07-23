@@ -189,7 +189,7 @@ export default function FarmerDashboardScreen({
       <DashboardLayout title={t("farmerDashboard.title")} subtitle={t("farmerDashboard.subtitle", {
       greeting: greetingText,
       name: user?.name || t("farmerDashboard.fallbackName")
-    })} role="farmer" scrollable={true} showMenu={true} onMenuPress={() => openSidebar(true)} showNotification={true} notificationCount={0} onNotificationPress={() => navigation.navigate("Notifications")} refreshing={refreshing} onRefresh={handleRefresh} notificationMessage={successMsg} onDismissNotification={() => setSuccessMsg("")} contentPaddingHorizontal={12}>
+    })} role="farmer" scrollable={true} showMenu={true} onMenuPress={() => openSidebar(true)} showNotification={true} notificationCount={0} onNotificationPress={() => navigation.navigate("Notifications")} refreshing={refreshing} onRefresh={handleRefresh} notificationMessage={successMsg} onDismissNotification={() => setSuccessMsg("")} contentPaddingHorizontal={12} navigation={navigation}>
         {/* ---- Summary KPIs ---- */}
         <View style={styles.summaryRow}>
           <SummaryCard icon="cart-outline" label={t("farmerDashboard.todaySales")} value={todaySales} color={warning} onPress={() => onSwitchTab?.("Orders")} />

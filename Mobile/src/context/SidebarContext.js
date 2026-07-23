@@ -27,6 +27,7 @@ export function SidebarProvider({ children, role, navigation, onSwitchTab }) {
       <AppSidebar
         visible={visible}
         onClose={closeSidebar}
+        onSwipeOpen={openSidebar}
         role={role}
         onItemPress={handleItemPress}
       />
