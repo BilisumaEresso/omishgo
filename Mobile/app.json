@@ -1,14 +1,8 @@
 {
-  "build": {
-    "preview": {
-      "android": {
-        "buildType": "apk"
-      }
-    }
-  },
   "expo": {
-    "name": "Mobile",
-    "slug": "Mobile",
+    "name": "OmishGo",
+    "slug": "omishgo",
+    "description": "Connecting Ethiopian farmers directly with buyers.",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,18 +15,18 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "no",
+      "bundleIdentifier": "com.bilisuma.omishgo",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.bilisuma.Mobile"
+      "package": "com.bilisuma.omishgo"
     },
     "web": {
       "favicon": "./assets/favicon.png"
