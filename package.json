@@ -13,6 +13,7 @@
     "backend": "npm run start --prefix BackEnd",
     "backend:prod": "npm run start:prod --prefix BackEnd",
     "backend:test": "npm test --prefix BackEnd",
+    "backend:seed": "npm run seed --prefix BackEnd",
 
     "mobile": "npm run start --prefix Mobile",
     "mobile:android": "npm run android --prefix Mobile",

@@ -21,6 +21,7 @@ import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 import { ProductCard } from "../../components/common/ProductCard";
 import { useSavedStore } from "../../store/saved.store";
+import browseCacheService from "../../services/browseCache.service";
 
 // ─── Crop filter values (English, used for data matching) ─────────────────────
 const CROP_VALUES = [
@@ -46,6 +47,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
+  const [isFromCache, setIsFromCache] = useState(false);
 
   // UI states
   const [search, setSearch] = useState("");
@@ -90,13 +92,25 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
     setError("");
     try {
       const res = await api.get(API_ENDPOINTS.products.list);
-      setAllProducts(res.data?.data?.products || []);
+      const products = res.data?.data?.products || [];
+      setAllProducts(products);
+      setIsFromCache(false);
+      browseCacheService.set(products);
     } catch (err) {
-      setError(
-        err?.response?.data?.message ||
-          err.message ||
-          "Failed to load products",
-      );
+      // Likely offline or a flaky 3G connection — fall back to whatever
+      // we last successfully fetched instead of showing a dead end.
+      const cached = await browseCacheService.get();
+      if (cached?.products?.length) {
+        setAllProducts(cached.products);
+        setIsFromCache(true);
+        setError("");
+      } else {
+        setError(
+          err?.response?.data?.message ||
+            err.message ||
+            "Failed to load products",
+        );
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -211,6 +225,26 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
           </TouchableOpacity>
         ) : null}
       </View>
+
+      {isFromCache && (
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 6,
+            marginHorizontal: 16,
+            marginBottom: 8,
+            padding: 8,
+            borderRadius: 10,
+            backgroundColor: (theme?.colors?.warning || "#F57F17") + "20",
+          }}
+        >
+          <Ionicons name="cloud-offline-outline" size={14} color={theme?.colors?.warning || "#F57F17"} />
+          <AppText style={{ color: theme?.colors?.warning || "#F57F17", fontSize: 12 }}>
+            {t("browse.offlineBanner")}
+          </AppText>
+        </View>
+      )}
 
       {/* Insights banner */}
       <View style={styles.insightsRow}>

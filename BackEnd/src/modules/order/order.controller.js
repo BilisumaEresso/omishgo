@@ -39,19 +39,53 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, "You cannot order your own product");
   }
 
+  // Reserve the stock atomically: the filter re-checks status/quantity at
+  // write time (not just at the read above), so two buyers racing to order
+  // the last of a listing can't both pass validation and oversell it. If
+  // this doesn't match, someone else bought it in the gap since our read.
+  const reserved = await Product.findOneAndUpdate(
+    { _id: productId, status: "active", quantity: { $gte: quantity } },
+    [
+      { $set: { quantity: { $subtract: ["$quantity", quantity] } } },
+      {
+        $set: {
+          status: { $cond: [{ $lte: ["$quantity", 0] }, "sold", "$status"] },
+        },
+      },
+    ],
+    { new: true },
+  );
+
+  if (!reserved) {
+    throw new ApiError(
+      409,
+      "This listing's available quantity just changed — please refresh and try again",
+    );
+  }
+
   const totalPrice = product.price * quantity;
 
-  const order = await Order.create({
-    buyerId: req.user._id,
-    farmerId: product.farmerId._id,
-    productId: product._id,
-    cropType: product.cropType,
-    quantity,
-    unit: product.unit,
-    pricePerUnit: product.price,
-    totalPrice,
-    note: note || "",
-  });
+  let order;
+  try {
+    order = await Order.create({
+      buyerId: req.user._id,
+      farmerId: product.farmerId._id,
+      productId: product._id,
+      cropType: product.cropType,
+      quantity,
+      unit: product.unit,
+      pricePerUnit: product.price,
+      totalPrice,
+      note: note || "",
+    });
+  } catch (err) {
+    // Compensate: the order never got created, so give the reserved stock back.
+    await Product.findByIdAndUpdate(productId, [
+      { $set: { quantity: { $add: ["$quantity", quantity] } } },
+      { $set: { status: { $cond: [{ $gt: ["$quantity", 0] }, "active", "$status"] } } },
+    ]);
+    throw err;
+  }
 
   // Populate for the response
   const populated = await Order.findById(order._id)
@@ -180,6 +214,21 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
 
   order.status = status;
   await order.save();
+
+  // Stock was reserved (decremented) the moment this order was created —
+  // give it back if the order never went through. Handles cancellation
+  // from either "pending" or "confirmed" (both are reachable per the
+  // transition tables above).
+  if (status === "cancelled") {
+    await Product.findByIdAndUpdate(order.productId, [
+      { $set: { quantity: { $add: ["$quantity", order.quantity] } } },
+      {
+        $set: {
+          status: { $cond: [{ $gt: ["$quantity", 0] }, "active", "$status"] },
+        },
+      },
+    ]);
+  }
 
   const updated = await Order.findById(order._id)
     .populate("buyerId", "name phone")

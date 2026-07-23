@@ -16,6 +16,7 @@ import { useAuthStore } from "../../store/auth.store";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useSidebar } from "../../context/SidebarContext";
+import draftsService from "../../services/drafts.service";
 const {
   width: SCREEN_WIDTH
 } = Dimensions.get("window");
@@ -79,6 +80,7 @@ export default function FarmerDashboardScreen({
   const [products, setProducts] = useState(mockProducts);
   const [orders, setOrders] = useState([]);
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [draftCount, setDraftCount] = useState(0);
   const [successMsg, setSuccessMsg] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const [orderError, setOrderError] = useState("");
@@ -155,6 +157,7 @@ export default function FarmerDashboardScreen({
       fetchProducts();
       fetchOrders();
     }
+    draftsService.count().then(setDraftCount);
   }, [user?.id]));
   const todaySales = orders.filter(o => new Date(o.date) >= new Date(Date.now() - 86400000)).length;
   const activeOrders = orders.filter(o => o.status !== "Completed" && o.status !== "cancelled").length;
@@ -204,6 +207,27 @@ export default function FarmerDashboardScreen({
 
         {/* ---- Quick Actions ---- */}
         <QuickActionsGrid productCount={products.length} onAddPress={() => navigation.navigate("PostProduct")} onOrdersPress={() => onSwitchTab?.("Orders")} onProductsPress={() => onSwitchTab?.("Products")} onTrainingPress={() => {}} />
+
+        {draftCount > 0 && (
+          <TouchableOpacity
+            onPress={() => navigation.navigate("MyDrafts")}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+              marginTop: 10,
+              padding: 12,
+              borderRadius: 12,
+              backgroundColor: (warning || "#F57F17") + "20",
+            }}
+          >
+            <Ionicons name="cloud-offline-outline" size={18} color={warning} />
+            <AppText style={{ flex: 1, color: warning, fontSize: 13 }}>
+              {t("farmerDashboard.draftsBannerMessage", { count: draftCount })}
+            </AppText>
+            <Ionicons name="chevron-forward" size={16} color={warning} />
+          </TouchableOpacity>
+        )}
 
         {/* ---- Shortcut row ---- */}
         <View style={styles.shortcutRow}>
