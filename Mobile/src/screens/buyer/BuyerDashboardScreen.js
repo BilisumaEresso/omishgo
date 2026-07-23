@@ -301,7 +301,7 @@ export default function BuyerDashboardScreen({
   return <>
       <DashboardLayout title={t("buyerDashboard.title")} subtitle={t("buyerDashboard.welcomeMessage", {
       name: user?.name || ""
-    })} role="buyer" scrollable={true} showMenu={true} onMenuPress={openSidebar} refreshing={refreshing} onRefresh={handleRefresh} notificationMessage={successMsg} onDismissNotification={() => setSuccessMsg("")} contentPaddingHorizontal={12}>
+    })} role="buyer" scrollable={true} showMenu={true} onMenuPress={openSidebar} refreshing={refreshing} onRefresh={handleRefresh} notificationMessage={successMsg} onDismissNotification={() => setSuccessMsg("")} contentPaddingHorizontal={12} navigation={navigation}>
         {/* KPI Cards */}
         <View style={styles.summaryRow}>
           <SummaryCard icon="cart-outline" label={t("buyerDashboard.activeOrders")} value={activeOrders} color="#FF9800" onPress={() => onSwitchTab?.("Orders")} />
