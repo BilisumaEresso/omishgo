@@ -235,7 +235,8 @@
     "statusInTransit": "Deemaa Jira",
     "statusDelivered": "Gahameera",
     "statusCompleted": "Xumurameera",
-    "statusCancelled": "Haqameera"
+    "statusCancelled": "Haqameera",
+    "draftsBannerMessage": "Beeksisni {{count}} oflaayiniidhaan ol kaa'ameera — ilaaluu fi ergaaf tuqi"
   },
   "farmerProfile": {
     "title": "Pirofaayilii Koo",
@@ -414,7 +415,28 @@
     "permissionDeniedTitle": "Hayyama Barbaachisaa",
     "permissionDeniedMessage": "Suura beeksisa keetti dabaluuf OmishGo hayyama kaameeraa/suuraa barbaada.",
     "photosStillUploadingTitle": "Suurawwan Ammaan Erga jiru",
-    "photosStillUploadingMessage": "Maaloo utuu beeksisa hin maxxansin suurawwan erga xumuramuu eegi."
+    "photosStillUploadingMessage": "Maaloo utuu beeksisa hin maxxansin suurawwan erga xumuramuu eegi.",
+    "photoErrorTitle": "Suura Erguun Hin Milkoofne",
+    "photoErrorMessage": "Suurri tokko ykn caalu erguun hin milkoofne. Utuu hin maxxansin suura tuqi deebi'ii yaali ykn haqi.",
+    "willUploadLater": "Boodarra ni ergama",
+    "saveDraft": "Qopheessaa Ol Kaa'i",
+    "savedAsDraftMessage": "Akka qopheessaatti ol kaa'ameera — interneetiin yeroo argamu ofumaan maxxanfama. Qopheessaawwan Koo ilaali.",
+    "offlineBanner": "Interneetii ala jirta. Beeksisni kun akka qopheessaatti ol kaa'amee interneetiin yeroo argamu ofumaan maxxanfama."
+  },
+  "myDrafts": {
+    "title": "Qopheessaawwan Koo",
+    "empty": "Qopheessaan oflaayinii hin jiru. Wanti ati oflaayiniidhaan ol kaatu hundi asitti argama.",
+    "untitled": "Beeksisa maqaa hin qabne",
+    "savedOffline": "Oflaayiniidhaan ol kaa'ameera — ofumaan ni ergama",
+    "lastErrorPrefix": "Yaalii ergaa dhumaa hin milkoofne:",
+    "syncAll": "Hunda Amma Ergi",
+    "syncAllDone": "Qopheessaawwan kee ergaan xumurameera.",
+    "syncSuccessTitle": "Ergameera",
+    "syncSuccessMessage": "Qopheessaan milkaa'inaan maxxanfameera.",
+    "syncFailedTitle": "Ergaan Hin Milkoofne",
+    "deleteTitle": "Qopheessaa Haquu?",
+    "deleteMessage": "Qopheessaan kun guutummaatti haqama, hin maxxanfamu.",
+    "delete": "Haqi"
   },
   "appSidebar": {
     "products": "Oomishaalee Koo",

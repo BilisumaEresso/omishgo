@@ -23,6 +23,8 @@ import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 import uploadService from "../../services/upload.service";
+import draftsService from "../../services/drafts.service";
+import { isConnected, subscribeToConnectivity } from "../../utils/connectivity";
 import {
   getLocalizedRegions,
   getLocalizedZones,
@@ -263,6 +265,27 @@ const PhotoSlots = ({ photos, onAdd, onRemove, onRetry, theme, t }) => {
                 </AppText>
               </TouchableOpacity>
             )}
+            {photo.offline && !photo.uploading && !photo.error && (
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: 4,
+                  left: 4,
+                  backgroundColor: "rgba(0,0,0,0.6)",
+                  borderRadius: 8,
+                  paddingHorizontal: 6,
+                  paddingVertical: 2,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 3,
+                }}
+              >
+                <Ionicons name="cloud-offline-outline" size={11} color="#FFF" />
+                <AppText style={{ fontSize: 9, color: "#FFF" }}>
+                  {t("postProduct.willUploadLater")}
+                </AppText>
+              </View>
+            )}
             <TouchableOpacity
               onPress={() => onRemove(index)}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -298,8 +321,12 @@ export default function PostProductScreen({ navigation, route }) {
   const [unit, setUnit] = useState("kg");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-  // Each item: { uri, url, uploading, error }. url is set once Cloudinary upload succeeds.
+  // Each item: { uri, url, uploading, error, offline }. url is set once
+  // Cloudinary upload succeeds. offline:true means "picked while offline,
+  // will upload automatically once the draft is synced" (distinct from
+  // error, which means a real upload attempt failed while online).
   const [photos, setPhotos] = useState([]);
+  const [isOnline, setIsOnline] = useState(true);
   const [region, setRegion] = useState("");
   const [zone, setZone] = useState("");
   const [wereda, setWereda] = useState("");
@@ -346,6 +373,14 @@ export default function PostProductScreen({ navigation, route }) {
   const regionOptions = getLocalizedRegions(lang);
   const availableZones = region ? getLocalizedZones(region, lang) : [];
   const availableWereda = zone ? getLocalizedWereda(region, zone, lang) : [];
+
+  // Track connectivity so photo picking and submit can branch to the
+  // offline draft path instead of failing outright.
+  useEffect(() => {
+    isConnected().then(setIsOnline);
+    const unsubscribe = subscribeToConnectivity(setIsOnline);
+    return unsubscribe;
+  }, []);
 
   // Price validation — fully guarded against missing reference data
   useEffect(() => {
@@ -413,7 +448,9 @@ export default function PostProductScreen({ navigation, route }) {
   // the resulting URL (or an error flag the farmer can retry from).
   const uploadPhotoAt = async (uri, asset) => {
     setPhotos((prev) =>
-      prev.map((p) => (p.uri === uri ? { ...p, uploading: true, error: false } : p)),
+      prev.map((p) =>
+        p.uri === uri ? { ...p, uploading: true, error: false, offline: false } : p,
+      ),
     );
 
     const result = await uploadService.uploadImage(asset);
@@ -466,6 +503,17 @@ export default function PostProductScreen({ navigation, route }) {
     if (result.canceled || !result.assets?.length) return;
 
     const asset = result.assets[0];
+
+    if (!isOnline) {
+      // Don't even attempt the network call — just record it as a photo
+      // that will upload once this draft gets synced.
+      setPhotos((prev) => [
+        ...prev,
+        { uri: asset.uri, url: null, uploading: false, error: false, offline: true },
+      ]);
+      return;
+    }
+
     setPhotos((prev) => [...prev, { uri: asset.uri, url: null, uploading: true, error: false }]);
     uploadPhotoAt(asset.uri, asset);
   };
@@ -538,39 +586,75 @@ export default function PostProductScreen({ navigation, route }) {
       );
       return;
     }
-    if (photos.some((p) => p.uploading)) {
+    if (isOnline && photos.some((p) => p.uploading)) {
       Alert.alert(
         t("postProduct.photosStillUploadingTitle"),
         t("postProduct.photosStillUploadingMessage"),
       );
       return;
     }
+    if (isOnline && photos.some((p) => p.error)) {
+      Alert.alert(
+        t("postProduct.photoErrorTitle"),
+        t("postProduct.photoErrorMessage"),
+      );
+      return;
+    }
+
+    const payload = {
+      cropType: cropType.trim(),
+      quantity: qtyNum,
+      unit: unit.trim() || "kg",
+      price: priceNum,
+      description: description.trim(),
+      location: {
+        region: region.trim(),
+        zone: zone.trim(),
+        kebele: "",
+        wereda: wereda.trim(),
+      },
+    };
+
+    const saveAsDraft = async () => {
+      await draftsService.save({
+        id: `draft_${Date.now()}`,
+        ...payload,
+        photos: photos.map((p) => ({ uri: p.uri, url: p.url || null })),
+        createdAt: Date.now(),
+        syncError: null,
+      });
+      navigation.navigate("FarmerTabs", {
+        successMessage: t("postProduct.savedAsDraftMessage"),
+      });
+    };
+
+    // Offline at submit time: don't even attempt the network call — go
+    // straight to the local draft, which MyDraftsScreen will sync later.
+    if (!isOnline) {
+      setLoading(true);
+      try {
+        await saveAsDraft();
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
 
     setLoading(true);
     try {
       const photoUrls = photos.filter((p) => p.url).map((p) => p.url);
-      await api.post(API_ENDPOINTS.products.create, {
-        cropType: cropType.trim(),
-        quantity: qtyNum,
-        unit: unit.trim() || "kg",
-        price: priceNum,
-        description: description.trim(),
-        photos: photoUrls,
-        location: {
-          region: region.trim(),
-          zone: zone.trim(),
-          kebele: "",
-          wereda: wereda.trim(),
-        },
-      });
+      await api.post(API_ENDPOINTS.products.create, { ...payload, photos: photoUrls });
       navigation.navigate("FarmerTabs", {
         successMessage: t("postProduct.successMessage"),
       });
     } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        err.message ||
-        t("postProduct.defaultErrorMessage");
+      // Connectivity dropped between opening this screen and submitting —
+      // treat it the same as the offline path instead of just erroring out.
+      if (!err?.response) {
+        await saveAsDraft();
+        return;
+      }
+      const msg = err?.response?.data?.message || t("postProduct.defaultErrorMessage");
       Alert.alert(t("postProduct.error"), msg);
     } finally {
       setLoading(false);
@@ -594,6 +678,26 @@ export default function PostProductScreen({ navigation, route }) {
         showBack={true}
         onBackPress={() => navigation.goBack()}
       />
+
+      {!isOnline && (
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 6,
+            marginHorizontal: 16,
+            marginTop: 8,
+            padding: 10,
+            borderRadius: 10,
+            backgroundColor: (theme?.colors?.warning || "#F57F17") + "20",
+          }}
+        >
+          <Ionicons name="cloud-offline-outline" size={16} color={theme?.colors?.warning || "#F57F17"} />
+          <AppText style={{ color: theme?.colors?.warning || "#F57F17", fontSize: 12, flex: 1 }}>
+            {t("postProduct.offlineBanner")}
+          </AppText>
+        </View>
+      )}
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -823,7 +927,11 @@ export default function PostProductScreen({ navigation, route }) {
 
           <AppButton
             title={
-              loading ? t("postProduct.posting") : t("postProduct.postListing")
+              loading
+                ? t("postProduct.posting")
+                : !isOnline
+                  ? t("postProduct.saveDraft")
+                  : t("postProduct.postListing")
             }
             onPress={handleSubmit}
             loading={loading}

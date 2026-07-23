@@ -235,7 +235,8 @@
     "statusInTransit": "በመንገድ ላይ",
     "statusDelivered": "ደርሷል",
     "statusCompleted": "ተጠናቋል",
-    "statusCancelled": "ተሰርዟል"
+    "statusCancelled": "ተሰርዟል",
+    "draftsBannerMessage": "{{count}} ማስታወቂያ(ዎች) ከመስመር ውጭ ተቀምጠዋል — ለማየትና ለመላክ ይንኩ"
   },
   "farmerProfile": {
     "title": "የእኔ መገለጫ",
@@ -418,7 +419,28 @@
     "permissionDeniedTitle": "ፈቃድ ያስፈልጋል",
     "permissionDeniedMessage": "ፎቶ ለማስታወቂያዎ ለመጨመር OmishGo የካሜራ/የፎቶ ፈቃድ ያስፈልገዋል።",
     "photosStillUploadingTitle": "ፎቶዎች እየተላኩ ነው",
-    "photosStillUploadingMessage": "እባክዎ ማስታወቂያውን ከማውጣትዎ በፊት ፎቶዎቹ እስኪላኩ ይጠብቁ።"
+    "photosStillUploadingMessage": "እባክዎ ማስታወቂያውን ከማውጣትዎ በፊት ፎቶዎቹ እስኪላኩ ይጠብቁ።",
+    "photoErrorTitle": "የፎቶ መላክ አልተሳካም",
+    "photoErrorMessage": "አንድ ወይም ከዚያ በላይ ፎቶዎች መላክ አልተሳካላቸውም። ከማውጣትዎ በፊት ፎቶውን ይንኩ ወይም ያስወግዱት።",
+    "willUploadLater": "በኋላ ይላካል",
+    "saveDraft": "ረቂቅ አስቀምጥ",
+    "savedAsDraftMessage": "እንደ ረቂቅ ተቀምጧል — ኢንተርኔት ሲኖር በራሱ ይወጣል። ረቂቆቼን ይመልከቱ።",
+    "offlineBanner": "ከመስመር ውጭ ነዎት። ይህ ማስታወቂያ እንደ ረቂቅ ይቀመጣል እና ኢንተርኔት ሲኖር በራሱ ይወጣል።"
+  },
+  "myDrafts": {
+    "title": "ረቂቆቼ",
+    "empty": "ከመስመር ውጭ የተቀመጡ ረቂቆች የለም። ከመስመር ውጭ ሆነው የሚያስቀምጡት ማንኛውም ነገር እዚህ ይታያል።",
+    "untitled": "ያልተሰየመ ማስታወቂያ",
+    "savedOffline": "ከመስመር ውጭ ተቀምጧል — በራሱ ይላካል",
+    "lastErrorPrefix": "የመጨረሻው መላክ አልተሳካም:",
+    "syncAll": "ሁሉንም አሁን ላክ",
+    "syncAllDone": "ረቂቆችዎን መላክ ተጠናቅቋል።",
+    "syncSuccessTitle": "ተልኳል",
+    "syncSuccessMessage": "ረቂቁ በተሳካ ሁኔታ ወጥቷል።",
+    "syncFailedTitle": "መላክ አልተሳካም",
+    "deleteTitle": "ረቂቁ ይሰረዝ?",
+    "deleteMessage": "ይህ ረቂቅ ለዘላለም ይሰረዛል እና አይወጣም።",
+    "delete": "ሰርዝ"
   },
   "appSidebar": {
     "products": "የእኔ ምርቶች",

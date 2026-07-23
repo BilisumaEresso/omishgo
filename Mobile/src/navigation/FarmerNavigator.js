@@ -10,6 +10,7 @@ import FarmerOrdersScreen from "../screens/farmer/FarmerOrdersScreen";
 import FarmerProductsScreen from "../screens/farmer/FarmerProductsScreen";
 import FarmerProfileScreen from "../screens/farmer/FarmerProfileScreen";
 import PostProductScreen from "../screens/farmer/PostProductScreen";
+import MyDraftsScreen from "../screens/farmer/MyDraftsScreen";
 import ChatScreen from "../screens/shared/ChatScreen";
 import ConversationsScreen from "../screens/shared/ConversationsScreen";
 import HelpScreen from "../screens/shared/HelpScreen";
@@ -56,6 +57,7 @@ const FarmerNavigator = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="FarmerTabs" component={FarmerTabShell} />
     <Stack.Screen name="PostProduct" component={PostProductScreen} />
+    <Stack.Screen name="MyDrafts" component={MyDraftsScreen} />
     <Stack.Screen name="Conversations" component={ConversationsScreen} />
     <Stack.Screen name="Chat" component={ChatScreen} />
     <Stack.Screen name="Help" component={HelpScreen} />

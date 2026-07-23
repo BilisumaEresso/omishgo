@@ -236,7 +236,8 @@
     "statusInTransit": "In Transit",
     "statusDelivered": "Delivered",
     "statusCompleted": "Completed",
-    "statusCancelled": "Cancelled"
+    "statusCancelled": "Cancelled",
+    "draftsBannerMessage": "{{count}} listing(s) saved offline — tap to view and sync"
   },
   "farmerProfile": {
     "title": "My Profile",
@@ -419,7 +420,28 @@
     "permissionDeniedTitle": "Permission Needed",
     "permissionDeniedMessage": "OmishGo needs camera/photo access to add a picture to your listing.",
     "photosStillUploadingTitle": "Photos Still Uploading",
-    "photosStillUploadingMessage": "Please wait for your photos to finish uploading before posting."
+    "photosStillUploadingMessage": "Please wait for your photos to finish uploading before posting.",
+    "photoErrorTitle": "Photo Upload Failed",
+    "photoErrorMessage": "One or more photos failed to upload. Tap a photo to retry, or remove it, before posting.",
+    "willUploadLater": "Will upload later",
+    "saveDraft": "Save Draft",
+    "savedAsDraftMessage": "Saved as a draft — it'll post automatically once you're back online. See My Drafts.",
+    "offlineBanner": "You're offline. This listing will be saved as a draft and posted automatically once you're back online."
+  },
+  "myDrafts": {
+    "title": "My Drafts",
+    "empty": "No offline drafts. Anything you save while offline will show up here.",
+    "untitled": "Untitled listing",
+    "savedOffline": "Saved offline — will sync automatically",
+    "lastErrorPrefix": "Last sync attempt failed:",
+    "syncAll": "Sync All Now",
+    "syncAllDone": "Finished syncing your drafts.",
+    "syncSuccessTitle": "Synced",
+    "syncSuccessMessage": "Draft posted successfully.",
+    "syncFailedTitle": "Sync Failed",
+    "deleteTitle": "Delete Draft?",
+    "deleteMessage": "This draft will be permanently removed and won't be posted.",
+    "delete": "Delete"
   },
   "appSidebar": {
     "products": "My Products",
