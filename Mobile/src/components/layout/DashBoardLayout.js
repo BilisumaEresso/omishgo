@@ -1,12 +1,7 @@
 // src/components/layout/DashboardLayout.js
-import {
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { useTranslation } from "react-i18next";
+import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
+import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 import AppHeader from "./AppHeader";
 
@@ -23,39 +18,26 @@ const DashboardLayout = ({
   onDismissNotification,
   contentPaddingHorizontal = 16,
   contentPaddingVertical = 12,
+  navigation,
   ...headerProps
 }) => {
   const { theme } = useTheme();
   const primaryColor = theme?.colors?.primary || "#4CAF50";
   const backgroundColor = theme?.colors?.background || "#F8F9FA";
   const successColor = theme?.colors?.success || "#2e7d32";
+  const { t } = useTranslation();
+  const { openSidebar } = useSidebar();
 
   return (
     <View style={[styles.flex, { backgroundColor }]}>
-      {showHeader && (
-        <AppHeader
-          title={title}
-          subtitle={subtitle}
-          {...headerProps} // notificationCount, showBack, etc. passed through
-        />
-      )}
-
-      {notificationMessage ? (
-        <View
-          style={[styles.notificationBanner, { backgroundColor: successColor }]}
-        >
-          <Text style={styles.notificationText}>{notificationMessage}</Text>
-          {onDismissNotification && (
-            <TouchableOpacity
-              onPress={onDismissNotification}
-              style={styles.dismissBtn}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Text style={styles.dismissText}>✕</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      ) : null}
+      <AppHeader
+        title={t("browse.title")}
+        showMenu={true}
+        showNotification={true}
+        notificationCount={0}
+        onMenuPress={openSidebar}
+        onNotificationPress={() => navigation.navigate("Notifications")}
+      />
 
       <View style={styles.content}>
         {scrollable ? (
