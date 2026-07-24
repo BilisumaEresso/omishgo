@@ -4,6 +4,12 @@
     "slug": "omishgo",
     "description": "Connecting Ethiopian farmers directly with buyers.",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d588ec61-6d4b-4746-b80a-b5aee290ea59"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
