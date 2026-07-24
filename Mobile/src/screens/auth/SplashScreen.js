@@ -331,7 +331,7 @@ export default function SplashScreen() {
         >
           <Image
             accessibilityRole="image"
-            source={require("../../../assets/logo.png")}
+            source={require("../../assets/images/logo.png")}
             style={styles.logo}
             resizeMode="contain"
           />

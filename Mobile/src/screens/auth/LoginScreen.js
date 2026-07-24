@@ -234,7 +234,7 @@ const LoginScreen = ({ navigation }) => {
     <AuthLayout
       title={t("auth.loginTitle")}
       subtitle={t("auth.loginSubtitle")}
-      logoSource={require("../../../assets/logo.png")}
+      logoSource={require("../../assets/images/logo.png")}
       showBack={false}
       // If AuthLayout supports these, they'll animate the logo/title.
       // Safe to ignore if not — layout will just render normally.
