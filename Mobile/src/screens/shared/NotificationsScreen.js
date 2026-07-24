@@ -1,7 +1,7 @@
 // src/screens/shared/NotificationsScreen.js
 import { useCallback } from "react";
 import { View, FlatList, StyleSheet, TouchableOpacity, Pressable } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import api from "../../config/api";

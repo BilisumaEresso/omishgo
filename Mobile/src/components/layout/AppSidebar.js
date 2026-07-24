@@ -12,7 +12,7 @@
 // button uses, e.g.:
 //   <AppSidebar visible={visible} onClose={closeSidebar} onSwipeOpen={openSidebar} ... />
 
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {

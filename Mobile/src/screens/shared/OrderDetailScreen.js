@@ -1,7 +1,7 @@
 // src/screens/shared/OrderDetailScreen.js
 import { useMemo, useState } from "react";
 import { View, ScrollView, StyleSheet, TouchableOpacity, Linking, Alert, ActivityIndicator } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";

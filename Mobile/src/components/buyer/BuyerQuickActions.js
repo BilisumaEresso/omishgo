@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View, TextInput, TouchableOpacity, StyleSheet, Text } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTheme } from "../../hooks/useTheme";
 const DEFAULT_SUGGESTIONS = ["Tomato", "Teff", "Onion", "Garlic", "Potato", "Coffee"];
 export default function BuyerQuickActions({

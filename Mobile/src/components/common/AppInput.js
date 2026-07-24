@@ -1,7 +1,7 @@
 // src/components/common/AppInput.js
 import { useState } from "react";
 import { View, TextInput, Pressable, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import AppText from "./AppText";
 import { useTheme } from "../../hooks/useTheme";
 const AppInput = ({

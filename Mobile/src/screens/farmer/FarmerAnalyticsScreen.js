@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 import { useTranslation } from "react-i18next";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import AppText from "../../components/common/AppText";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
