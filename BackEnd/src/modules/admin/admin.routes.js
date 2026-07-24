@@ -5,9 +5,10 @@ import {
   getUsers,
   approveUser,
   rejectUser,
-  getPendingProducts,
+  getAllProducts,
   approveProduct,
   rejectProduct,
+  getAllOrders,
 } from "./admin.controller.js";
 
 const router = express.Router();
@@ -22,8 +23,11 @@ router.put("/users/:id/approve", approveUser);
 router.put("/users/:id/reject", rejectUser);
 
 // Product approvals
-router.get("/products", getPendingProducts);
+router.get("/products", getAllProducts);
 router.put("/products/:id/approve", approveProduct);
 router.put("/products/:id/reject", rejectProduct);
+
+// Orders
+router.get("/orders", getAllOrders);
 
 export default router;

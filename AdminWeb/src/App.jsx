@@ -6,8 +6,12 @@ import {
   Routes,
 } from "react-router-dom";
 import "./App.css";
+import AdminLayout from "./layout/AdminLayout";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
+import Users from "./pages/Users";
+import Orders from "./pages/Orders";
+import Products from "./pages/Products";
 import api from "./services/api";
 import { useAuthStore } from "./store/auth.store";
 
@@ -36,11 +40,45 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
+        
+        {/* Protected Admin Routes wrapped in AdminLayout */}
         <Route
           path="/"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <AdminLayout>
+                <Dashboard />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <Users />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <Orders />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/products"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <Products />
+              </AdminLayout>
             </ProtectedRoute>
           }
         />

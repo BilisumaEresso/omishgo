@@ -15,8 +15,7 @@
 // Safe to re-run: if a phone number already exists, that admin is
 // skipped rather than erroring out or creating a duplicate.
 
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 import mongoose from "mongoose";
 import connectDB from "../src/config/mongoDb.js";

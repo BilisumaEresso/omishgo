@@ -1,48 +1,17 @@
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
-import { useAuthStore } from "../store/auth.store";
-
-const styles = {
-  container: { display: "flex", minHeight: "100vh", fontFamily: "sans-serif", backgroundColor: "#f4f7f6" },
-  sidebar: { width: "250px", backgroundColor: "#fff", borderRight: "1px solid #e0e0e0", padding: "20px" },
-  logo: { fontSize: "24px", fontWeight: "bold", marginBottom: "40px" },
-  logoWhite: { color: "#333" },
-  logoGreen: { color: "#2E7D32" },
-  nav: { listStyle: "none", padding: 0 },
-  navItem: { padding: "12px 16px", cursor: "pointer", borderRadius: "8px", color: "#555", marginBottom: "8px" },
-  navItemActive: { backgroundColor: "#E8F5E9", color: "#2E7D32", fontWeight: "bold" },
-  main: { flex: 1, padding: "30px", overflowY: "auto" },
-  header: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" },
-  title: { fontSize: "28px", margin: 0, color: "#333" },
-  logoutBtn: { padding: "8px 16px", backgroundColor: "#fff", border: "1px solid #ddd", borderRadius: "6px", cursor: "pointer" },
-  metricRow: { display: "flex", gap: "20px", marginBottom: "30px", flexWrap: "wrap" },
-  metricCard: { flex: 1, minWidth: "200px", backgroundColor: "#fff", padding: "20px", borderRadius: "10px", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" },
-  metricNumber: { fontSize: "32px", fontWeight: "bold", color: "#2E7D32", marginBottom: "8px" },
-  metricLabel: { color: "#666", fontSize: "14px" },
-  twoCols: { display: "flex", gap: "20px", flexWrap: "wrap" },
-  tableCard: { flex: 1, minWidth: "300px", backgroundColor: "#fff", padding: "20px", borderRadius: "10px", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" },
-  tableTitle: { fontSize: "18px", fontWeight: "bold", marginBottom: "16px", color: "#333" },
-  table: { width: "100%", borderCollapse: "collapse", textAlign: "left" },
-  th: { padding: "12px 8px", borderBottom: "2px solid #eee", color: "#666", fontSize: "14px" },
-  td: { padding: "12px 8px", borderBottom: "1px solid #eee", fontSize: "14px", color: "#333" },
-  loading: { fontSize: "18px", color: "#666" },
-  error: { color: "red", marginBottom: "20px" },
-  btnApprove: { padding: "6px 12px", backgroundColor: "#2E7D32", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" },
-  badge: { padding: "4px 8px", borderRadius: "12px", fontSize: "12px", fontWeight: "bold" },
-};
 
 const Dashboard = () => {
   const [data, setData] = useState({ users: [], products: [], orders: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { logout } = useAuthStore();
 
   const fetchData = async () => {
     try {
       const [usersRes, productsRes, ordersRes] = await Promise.all([
         api.get("/admin/users").catch(() => ({ data: { data: { users: [] } } })),
-        api.get("/products").catch(() => ({ data: { data: { products: [] } } })),
-        api.get("/orders/admin/all").catch(() => ({ data: { data: { orders: [] } } })),
+        api.get("/admin/products").catch(() => ({ data: { data: { products: [] } } })),
+        api.get("/admin/orders").catch(() => ({ data: { data: { orders: [] } } })),
       ]);
 
       setData({
@@ -62,142 +31,144 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  const handleApprove = async (userId) => {
-    try {
-      await api.patch(`/admin/users/${userId}/approve`, { approved: true });
-      fetchData();
-    } catch (err) {
-      alert("Could not approve user.");
-    }
-  };
-
-  const getStatusColor = (status) => {
+  const getStatusStyle = (status) => {
     switch (status) {
-      case "pending": return { bg: "#FFF3E0", text: "#E65100" };
-      case "confirmed": return { bg: "#E3F2FD", text: "#1565C0" };
-      case "delivered": return { bg: "#E8F5E9", text: "#2E7D32" };
-      default: return { bg: "#F5F5F5", text: "#616161" };
+      case "pending": return "bg-orange-100 text-orange-800";
+      case "confirmed": return "bg-blue-100 text-blue-800";
+      case "delivered": return "bg-green-100 text-green-800";
+      case "cancelled": return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
     }
   };
 
   if (loading) {
-    return (
-      <div style={styles.container}>
-        <div style={styles.main}>
-          <div style={styles.loading}>Loading dashboard...</div>
-        </div>
-      </div>
-    );
+    return <div className="text-lg text-text-secondary">Loading dashboard...</div>;
   }
 
   const { users, products, orders } = data;
-  const pendingOrders = orders.filter((o) => o.status === "pending").length;
+  const pendingOrders = orders.filter((o) => o.status === "pending");
+  const pendingUsers = users.filter((u) => !u.isVerified);
+  
+  // Identify stuck orders (pending for more than 48 hours)
+  const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
+  const stuckOrders = pendingOrders.filter(o => new Date(o.createdAt) < twoDaysAgo);
 
   return (
-    <div style={styles.container}>
-      <div style={styles.sidebar}>
-        <div style={styles.logo}>
-          <span style={styles.logoWhite}>Omish</span>
-          <span style={styles.logoGreen}>Go</span>
-        </div>
-        <ul style={styles.nav}>
-          <li style={{ ...styles.navItem, ...styles.navItemActive }}>Dashboard</li>
-          <li style={styles.navItem}>Users</li>
-          <li style={styles.navItem}>Orders</li>
-          <li style={styles.navItem}>Products</li>
-        </ul>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-text-primary">Dashboard</h1>
       </div>
 
-      <div style={styles.main}>
-        <div style={styles.header}>
-          <h1 style={styles.title}>Dashboard</h1>
-          <button style={styles.logoutBtn} onClick={logout}>Logout</button>
+      {error && <div className="text-red-500 mb-4">{error}</div>}
+      
+      {/* Alerts */}
+      {(pendingUsers.length > 0 || stuckOrders.length > 0) && (
+        <div className="flex flex-col gap-3 mb-6">
+          {pendingUsers.length > 0 && (
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md">
+              <div className="flex">
+                <div className="ml-3">
+                  <p className="text-sm text-yellow-700">
+                    <span className="font-bold">{pendingUsers.length}</span> users pending approval.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          {stuckOrders.length > 0 && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+              <div className="flex">
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">
+                    <span className="font-bold">{stuckOrders.length}</span> orders stuck in pending for over 48 hours.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
+      )}
 
-        {error && <div style={styles.error}>{error}</div>}
-
-        <div style={styles.metricRow}>
-          <div style={styles.metricCard}>
-            <div style={styles.metricNumber}>{users.length}</div>
-            <div style={styles.metricLabel}>Total Users</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricNumber}>{products.length}</div>
-            <div style={styles.metricLabel}>Total Products</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricNumber}>{orders.length}</div>
-            <div style={styles.metricLabel}>Total Orders</div>
-          </div>
-          <div style={styles.metricCard}>
-            <div style={styles.metricNumber}>{pendingOrders}</div>
-            <div style={styles.metricLabel}>Pending Orders</div>
-          </div>
+      {/* Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-surface p-6 rounded-xl shadow-sm border border-border">
+          <div className="text-4xl font-bold text-primary mb-2">{users.length}</div>
+          <div className="text-sm text-text-secondary uppercase tracking-wider font-semibold">Total Users</div>
         </div>
+        <div className="bg-surface p-6 rounded-xl shadow-sm border border-border">
+          <div className="text-4xl font-bold text-primary mb-2">{products.length}</div>
+          <div className="text-sm text-text-secondary uppercase tracking-wider font-semibold">Total Products</div>
+        </div>
+        <div className="bg-surface p-6 rounded-xl shadow-sm border border-border">
+          <div className="text-4xl font-bold text-primary mb-2">{orders.length}</div>
+          <div className="text-sm text-text-secondary uppercase tracking-wider font-semibold">Total Orders</div>
+        </div>
+        <div className="bg-surface p-6 rounded-xl shadow-sm border border-border">
+          <div className="text-4xl font-bold text-orange-600 mb-2">{pendingOrders.length}</div>
+          <div className="text-sm text-text-secondary uppercase tracking-wider font-semibold">Pending Orders</div>
+        </div>
+      </div>
 
-        <div style={styles.twoCols}>
-          <div style={styles.tableCard}>
-            <div style={styles.tableTitle}>Recent Users</div>
-            <table style={styles.table}>
+      {/* Tables */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-surface p-6 rounded-xl shadow-sm border border-border">
+          <h2 className="text-xl font-bold text-text-primary mb-4">Recent Users</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
               <thead>
                 <tr>
-                  <th style={styles.th}>Name</th>
-                  <th style={styles.th}>Role</th>
-                  <th style={styles.th}>Status</th>
-                  <th style={styles.th}>Action</th>
+                  <th className="py-3 px-4 border-b-2 border-gray-100 text-sm font-semibold text-text-secondary">Name</th>
+                  <th className="py-3 px-4 border-b-2 border-gray-100 text-sm font-semibold text-text-secondary">Role</th>
+                  <th className="py-3 px-4 border-b-2 border-gray-100 text-sm font-semibold text-text-secondary">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {users.slice(0, 5).map((u) => (
-                  <tr key={u._id}>
-                    <td style={styles.td}>{u.name || "N/A"}</td>
-                    <td style={styles.td}>{u.role}</td>
-                    <td style={styles.td}>
-                      {u.isApproved ? "Approved" : "Pending"}
-                    </td>
-                    <td style={styles.td}>
-                      {!u.isApproved && (
-                        <button style={styles.btnApprove} onClick={() => handleApprove(u._id)}>
-                          Approve
-                        </button>
-                      )}
+                  <tr key={u._id} className="hover:bg-gray-50">
+                    <td className="py-3 px-4 border-b border-gray-100 text-sm text-text-primary">{u.name || "N/A"}</td>
+                    <td className="py-3 px-4 border-b border-gray-100 text-sm text-text-primary capitalize">{u.role}</td>
+                    <td className="py-3 px-4 border-b border-gray-100 text-sm">
+                      <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                        u.isVerified ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                      }`}>
+                        {u.isVerified ? "Approved" : "Pending"}
+                      </span>
                     </td>
                   </tr>
                 ))}
                 {users.length === 0 && (
-                  <tr><td colSpan="4" style={styles.td}>No users found.</td></tr>
+                  <tr><td colSpan="3" className="py-4 text-center text-text-secondary text-sm">No users found.</td></tr>
                 )}
               </tbody>
             </table>
           </div>
+        </div>
 
-          <div style={styles.tableCard}>
-            <div style={styles.tableTitle}>Recent Orders</div>
-            <table style={styles.table}>
+        <div className="bg-surface p-6 rounded-xl shadow-sm border border-border">
+          <h2 className="text-xl font-bold text-text-primary mb-4">Recent Orders</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
               <thead>
                 <tr>
-                  <th style={styles.th}>ID</th>
-                  <th style={styles.th}>Total</th>
-                  <th style={styles.th}>Status</th>
+                  <th className="py-3 px-4 border-b-2 border-gray-100 text-sm font-semibold text-text-secondary">ID</th>
+                  <th className="py-3 px-4 border-b-2 border-gray-100 text-sm font-semibold text-text-secondary">Total</th>
+                  <th className="py-3 px-4 border-b-2 border-gray-100 text-sm font-semibold text-text-secondary">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {orders.slice(0, 5).map((o) => {
-                  const sColor = getStatusColor(o.status);
-                  return (
-                    <tr key={o._id}>
-                      <td style={styles.td}>{o._id.slice(-6)}</td>
-                      <td style={styles.td}>ETB {o.totalPrice}</td>
-                      <td style={styles.td}>
-                        <span style={{ ...styles.badge, backgroundColor: sColor.bg, color: sColor.text }}>
-                          {o.status.toUpperCase()}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {orders.slice(0, 5).map((o) => (
+                  <tr key={o._id} className="hover:bg-gray-50">
+                    <td className="py-3 px-4 border-b border-gray-100 text-sm font-mono text-text-primary">{o._id.slice(-6)}</td>
+                    <td className="py-3 px-4 border-b border-gray-100 text-sm font-medium text-text-primary">ETB {o.totalPrice}</td>
+                    <td className="py-3 px-4 border-b border-gray-100 text-sm">
+                      <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${getStatusStyle(o.status)}`}>
+                        {o.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
                 {orders.length === 0 && (
-                  <tr><td colSpan="3" style={styles.td}>No orders found.</td></tr>
+                  <tr><td colSpan="3" className="py-4 text-center text-text-secondary text-sm">No orders found.</td></tr>
                 )}
               </tbody>
             </table>

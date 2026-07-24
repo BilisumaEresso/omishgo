@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://omishgo.onrender.com/api/v1", // Adjust to actual backend URL in production
+  baseURL: import.meta.env.VITE_API_URL || "https://omishgo.onrender.com/api/v1", // Adjust to actual backend URL in production
   headers: {
     "Content-Type": "application/json",
   },

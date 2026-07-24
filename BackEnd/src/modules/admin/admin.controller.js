@@ -2,8 +2,8 @@ import asyncHandler from "../../utils/asyncHandler.js";
 import sendResponse from "../../utils/sendResponse.js";
 import ApiError from "../../utils/ApiError.js";
 import User from "../user/user.model.js";
+import Order from "../order/order.model.js";
 import Product from "../product/product.model.js";
-
 /**
  * @desc    Get all users (with optional filters)
  * @route   GET /api/admin/users
@@ -56,16 +56,42 @@ export const rejectUser = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Get pending products
+ * @desc    Get all products (with optional filters)
  * @route   GET /api/admin/products
  * @access  Private (Admin only)
  */
-export const getPendingProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({ status: "pending" })
-    .populate("farmerId", "name phone location")
-    .sort("createdAt");
+export const getAllProducts = asyncHandler(async (req, res) => {
+  const { status, cropType } = req.query;
+  const query = {};
 
-  sendResponse(res, { statusCode: 200, message: "Pending products retrieved", data: { products } });
+  if (status) query.status = status;
+  if (cropType) query.cropType = { $regex: cropType, $options: "i" };
+
+  const products = await Product.find(query)
+    .populate("farmerId", "name phone location")
+    .sort("-createdAt");
+
+  sendResponse(res, { statusCode: 200, message: "Products retrieved", data: { products } });
+});
+
+/**
+ * @desc    Get all orders (with optional filters)
+ * @route   GET /api/admin/orders
+ * @access  Private (Admin only)
+ */
+export const getAllOrders = asyncHandler(async (req, res) => {
+  const { status } = req.query;
+  const query = {};
+
+  if (status) query.status = status;
+
+  const orders = await Order.find(query)
+    .populate("buyerId", "name phone")
+    .populate("farmerId", "name phone")
+    .populate("productId", "cropType price unit")
+    .sort("-createdAt");
+
+  sendResponse(res, { statusCode: 200, message: "Orders retrieved", data: { orders } });
 });
 
 /**
