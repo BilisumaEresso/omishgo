@@ -5,6 +5,30 @@ import Product from "../product/product.model.js";
 import Order from "./order.model.js";
 
 /**
+ * Helper: atomically restore stock after a cancelled or failed order.
+ * Uses $inc to add back the quantity, then conditionally flips status
+ * back to "active" if the product was marked "sold".
+ *
+ * This replaces the previous aggregation-pipeline approach
+ * (`findByIdAndUpdate(id, [ { $set: ... } ])`) which is incompatible
+ * with Mongoose 9's default update casting — Mongoose tried to cast
+ * the array as a regular update document and threw
+ * "you can't add array…".
+ */
+async function restoreStock(productId, quantity) {
+  const updated = await Product.findByIdAndUpdate(
+    productId,
+    { $inc: { quantity } },
+    { new: true },
+  );
+  // If the product was marked "sold" and now has stock again, flip to active.
+  if (updated && updated.status === "sold" && updated.quantity > 0) {
+    updated.status = "active";
+    await updated.save();
+  }
+}
+
+/**
  * @desc    Create a new order (buyer places an order)
  * @route   POST /api/v1/orders
  * @access  Private (Buyer)
@@ -43,16 +67,12 @@ export const createOrder = asyncHandler(async (req, res) => {
   // write time (not just at the read above), so two buyers racing to order
   // the last of a listing can't both pass validation and oversell it. If
   // this doesn't match, someone else bought it in the gap since our read.
+  //
+  // Uses $inc (standard update) instead of an aggregation pipeline array,
+  // which Mongoose 9 cannot cast and rejects with "you can't add array…".
   const reserved = await Product.findOneAndUpdate(
     { _id: productId, status: "active", quantity: { $gte: quantity } },
-    [
-      { $set: { quantity: { $subtract: ["$quantity", quantity] } } },
-      {
-        $set: {
-          status: { $cond: [{ $lte: ["$quantity", 0] }, "sold", "$status"] },
-        },
-      },
-    ],
+    { $inc: { quantity: -quantity } },
     { new: true },
   );
 
@@ -61,6 +81,12 @@ export const createOrder = asyncHandler(async (req, res) => {
       409,
       "This listing's available quantity just changed — please refresh and try again",
     );
+  }
+
+  // If quantity hit zero, mark as sold
+  if (reserved.quantity <= 0) {
+    reserved.status = "sold";
+    await reserved.save();
   }
 
   const totalPrice = product.price * quantity;
@@ -80,10 +106,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     });
   } catch (err) {
     // Compensate: the order never got created, so give the reserved stock back.
-    await Product.findByIdAndUpdate(productId, [
-      { $set: { quantity: { $add: ["$quantity", quantity] } } },
-      { $set: { status: { $cond: [{ $gt: ["$quantity", 0] }, "active", "$status"] } } },
-    ]);
+    await restoreStock(productId, quantity);
     throw err;
   }
 
@@ -220,14 +243,7 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   // from either "pending" or "confirmed" (both are reachable per the
   // transition tables above).
   if (status === "cancelled") {
-    await Product.findByIdAndUpdate(order.productId, [
-      { $set: { quantity: { $add: ["$quantity", order.quantity] } } },
-      {
-        $set: {
-          status: { $cond: [{ $gt: ["$quantity", 0] }, "active", "$status"] },
-        },
-      },
-    ]);
+    await restoreStock(order.productId, order.quantity);
   }
 
   const updated = await Order.findById(order._id)
