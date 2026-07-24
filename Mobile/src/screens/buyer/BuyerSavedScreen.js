@@ -1,5 +1,5 @@
 // Mobile/src/screens/buyer/BuyerSavedScreen.js
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,

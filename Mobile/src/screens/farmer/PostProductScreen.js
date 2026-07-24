@@ -1,5 +1,5 @@
 // src/screens/farmer/PostProductScreen.js
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
 import {

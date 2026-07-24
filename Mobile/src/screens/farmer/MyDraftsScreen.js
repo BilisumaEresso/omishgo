@@ -1,5 +1,5 @@
 // Mobile/src/screens/farmer/MyDraftsScreen.js
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useCallback, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import {

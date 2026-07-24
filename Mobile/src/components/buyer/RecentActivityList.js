@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 import AppCard from "../common/AppCard";

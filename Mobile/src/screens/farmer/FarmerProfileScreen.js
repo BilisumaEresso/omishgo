@@ -1,5 +1,5 @@
 // Mobile/src/screens/farmer/FarmerProfileScreen.js
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState,useEffect,useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";

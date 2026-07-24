@@ -1,7 +1,7 @@
 // src/components/common/ErrorMessage.js
 import "react";
 import { View, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import AppText from "./AppText";
 import AppButton from "./AppButton";
 import { useTheme } from "../../hooks/useTheme";

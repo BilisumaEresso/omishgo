@@ -12,14 +12,6 @@ export { default as Typography } from "./Typography";
 // Onboarding Components
 export { default as IllustrationContainer } from "./IllustrationContainer";
 export { default as OnboardingCard } from "./OnboardingCard";
-export {
-  CompleteOnboardingScreen,
-  FeaturesOnboardingScreen,
-  OnboardingExamplesSelector,
-  RoleSelectionOnboardingScreen,
-  TermsOnboardingScreen,
-  WelcomeOnboardingScreen,
-} from "./OnboardingExamples";
 export { default as OnboardingFooter } from "./OnboardingFooter";
 export { default as OnboardingLayout } from "./OnboardingLayout";
 export { default as ProgressIndicator } from "./ProgressIndicator";

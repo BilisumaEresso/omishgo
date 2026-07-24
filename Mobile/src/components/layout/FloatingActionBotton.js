@@ -1,7 +1,7 @@
 // src/components/layout/FloatingActionButton.js
 import { useRef } from "react";
 import { Pressable, StyleSheet, Animated } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTheme } from "../../hooks/useTheme";
 const FloatingActionButton = ({
   icon = "add",

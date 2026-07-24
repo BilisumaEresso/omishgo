@@ -1,5 +1,5 @@
 // Mobile/src/screens/shared/SettingsScreen.js
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
 import { Alert, ScrollView, StyleSheet, Switch, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";

@@ -1,5 +1,5 @@
 // Mobile/src/screens/buyer/BuyerProfileScreen.js
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";

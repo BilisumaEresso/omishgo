@@ -1,5 +1,5 @@
 // src/components/layout/AppHeader.js
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation as useRNNavigation } from "@react-navigation/native";
 import { useEffect, useRef } from "react";
 import {
