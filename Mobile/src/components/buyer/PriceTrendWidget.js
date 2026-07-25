@@ -1,438 +1,388 @@
+// src/components/buyer/PriceTrendWidget.js
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 import {
   Animated,
   Easing,
-  Pressable,
+  ScrollView,
   StyleSheet,
-  useColorScheme,
+  TouchableOpacity,
   View,
 } from "react-native";
-import { useTheme } from "../../hooks/useTheme";
-import AppCard from "../common/AppCard";
 import AppText from "../common/AppText";
+import { useTheme } from "../../hooks/useTheme";
 
-const DEFAULT_DATA_KEYS = [
-  { key: "dayMon", fallback: "Mon", value: 0.42 },
-  { key: "dayTue", fallback: "Tue", value: 0.65 },
-  { key: "dayWed", fallback: "Wed", value: 0.51 },
-  { key: "dayThu", fallback: "Thu", value: 0.78 },
-  { key: "dayToday", fallback: "Today", value: 0.92 },
+const COMMODITY_TRENDS = [
+  {
+    id: "onion",
+    crop: "Red Onion",
+    price: 4500,
+    unit: "q",
+    change: "+5.8%",
+    isPositive: true,
+    market: "Adama Market Hub",
+    insight: "Onion prices are up +5.8% this week due to high demand in central regional markets.",
+    data: [
+      { label: "Mon", value: 3800 },
+      { label: "Tue", value: 4100 },
+      { label: "Wed", value: 4000 },
+      { label: "Thu", value: 4300 },
+      { label: "Today", value: 4500 },
+    ],
+  },
+  {
+    id: "teff",
+    crop: "White Teff",
+    price: 5200,
+    unit: "q",
+    change: "+3.2%",
+    isPositive: true,
+    market: "Debre Zeit Grain Hub",
+    insight: "Teff prices remain steady with good grain supply from East Shewa.",
+    data: [
+      { label: "Mon", value: 4900 },
+      { label: "Tue", value: 5000 },
+      { label: "Wed", value: 5100 },
+      { label: "Thu", value: 5150 },
+      { label: "Today", value: 5200 },
+    ],
+  },
+  {
+    id: "tomato",
+    crop: "Fresh Tomato",
+    price: 3800,
+    unit: "q",
+    change: "-2.4%",
+    isPositive: false,
+    market: "Ziway Terminal",
+    insight: "Recent harvest arrivals in Ziway have slightly lowered tomato prices.",
+    data: [
+      { label: "Mon", value: 4200 },
+      { label: "Tue", value: 4000 },
+      { label: "Wed", value: 3900 },
+      { label: "Thu", value: 3850 },
+      { label: "Today", value: 3800 },
+    ],
+  },
+  {
+    id: "garlic",
+    crop: "Garlic",
+    price: 12000,
+    unit: "q",
+    change: "+8.5%",
+    isPositive: true,
+    market: "Bishoftu Market",
+    insight: "Strong demand from food processors is driving garlic prices higher.",
+    data: [
+      { label: "Mon", value: 10500 },
+      { label: "Tue", value: 11000 },
+      { label: "Wed", value: 11400 },
+      { label: "Thu", value: 11800 },
+      { label: "Today", value: 12000 },
+    ],
+  },
 ];
 
-export default function PriceTrendWidget({
-  price = 12050,
-  change = "+4.2%",
-  currency = "ETB",
-  title,
-  marketLabel,
-  data: dataProp,
-  onPress,
-}) {
-  const { t } = useTranslation();
+export default function PriceTrendWidget({ onPressAnalytics }) {
   const { theme } = useTheme();
-  const scheme = useColorScheme();
+  const [selectedCropId, setSelectedCropId] = useState("onion");
 
-  const primary = theme?.colors?.primary || "#2563EB";
-  const success = theme?.colors?.success || "#16A34A";
-  const danger = theme?.colors?.danger || "#EF4444";
-  const surface = theme?.colors?.surface || "#FFFFFF";
-  const text = theme?.colors?.text || "#1F2937";
-  const textMuted = theme?.colors?.textMuted || "#6B7280";
-  const isDark = scheme === "dark";
-
-  const isPositive = useMemo(
-    () => !String(change).trim().startsWith("-"),
-    [change],
-  );
-  const trendColor = isPositive ? success : danger;
-
-  const data = useMemo(
-    () =>
-      dataProp ||
-      DEFAULT_DATA_KEYS.map((d) => ({
-        label: t(d.key, d.fallback),
-        value: d.value,
-      })),
-    [dataProp, t],
+  const activeCommodity = useMemo(
+    () => COMMODITY_TRENDS.find((c) => c.id === selectedCropId) || COMMODITY_TRENDS[0],
+    [selectedCropId]
   );
 
-  const maxValue = useMemo(() => {
-    const max = Math.max(...data.map((d) => d.value));
-    return max > 0 ? max : 1;
-  }, [data]);
+  const primaryColor = theme?.colors?.primary || "#1565C0";
+  const surfaceColor = theme?.colors?.surface || "#FFFFFF";
+  const textColor = theme?.colors?.textPrimary || "#0F172A";
+  const textMuted = theme?.colors?.textSecondary || "#64748B";
+  const successColor = "#10B981";
+  const dangerColor = "#EF4444";
 
-  // Animated values
-  const cardOpacity = useRef(new Animated.Value(0)).current;
-  const cardTranslateY = useRef(new Animated.Value(16)).current;
-  const badgeScale = useRef(new Animated.Value(0)).current;
-  const pulseAnim = useRef(new Animated.Value(0)).current;
-  const pressScale = useRef(new Animated.Value(1)).current;
   const priceAnim = useRef(new Animated.Value(0)).current;
-
-  const barAnims = useRef(data.map(() => new Animated.Value(0))).current;
-
   const [displayPrice, setDisplayPrice] = useState("0");
 
+  const maxValue = useMemo(() => {
+    const max = Math.max(...activeCommodity.data.map((d) => d.value));
+    return max > 0 ? max : 1;
+  }, [activeCommodity]);
+
   useEffect(() => {
-    const numericPrice = Number(String(price).replace(/[^0-9.-]/g, "")) || 0;
+    priceAnim.setValue(activeCommodity.price * 0.75);
+    Animated.timing(priceAnim, {
+      toValue: activeCommodity.price,
+      duration: 500,
+      useNativeDriver: false,
+      easing: Easing.out(Easing.cubic),
+    }).start();
 
-    // Staggered entrance
-    Animated.parallel([
-      Animated.timing(cardOpacity, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-        easing: Easing.out(Easing.cubic),
-      }),
-      Animated.timing(cardTranslateY, {
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: true,
-        easing: Easing.out(Easing.cubic),
-      }),
-      Animated.timing(badgeScale, {
-        toValue: 1,
-        duration: 400,
-        delay: 250,
-        useNativeDriver: true,
-        easing: Easing.out(Easing.back(1.6)),
-      }),
-      Animated.timing(priceAnim, {
-        toValue: numericPrice,
-        duration: 900,
-        delay: 150,
-        useNativeDriver: false,
-        easing: Easing.out(Easing.cubic),
-      }),
-    ]).start();
-   const priceListener = priceAnim.addListener(({ value }) => {
-     setDisplayPrice(String(Math.round(value)));
-   });
-
-    // Bars grow with stagger
-    Animated.stagger(
-      80,
-      barAnims.map((anim) =>
-        Animated.timing(anim, {
-          toValue: 1,
-          duration: 700,
-          delay: 200,
-          useNativeDriver: true,
-          easing: Easing.out(Easing.cubic),
-        }),
-      ),
-    ).start();
-
-    // Pulse loop
-    const pulseLoop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 900,
-          useNativeDriver: true,
-          easing: Easing.out(Easing.quad),
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 0,
-          duration: 900,
-          useNativeDriver: true,
-          easing: Easing.in(Easing.quad),
-        }),
-      ]),
-    );
-    pulseLoop.start();
+    const listener = priceAnim.addListener(({ value }) => {
+      setDisplayPrice(Math.round(value).toLocaleString());
+    });
 
     return () => {
-      pulseLoop.stop();
-      priceAnim.removeListener(priceListener);
+      priceAnim.removeListener(listener);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [price]);
-
-  const handlePressIn = () => {
-    if (!onPress) return;
-    Animated.spring(pressScale, {
-      toValue: 0.98,
-      useNativeDriver: true,
-      speed: 50,
-      bounciness: 4,
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    if (!onPress) return;
-    Animated.spring(pressScale, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 50,
-      bounciness: 4,
-    }).start();
-  };
-
-  const resolvedTitle = title || t("priceTrend", "Price Trend");
-  const resolvedMarketLabel =
-    marketLabel || t("marketLabel", "Global market index");
-
-  const CardWrapper = onPress ? Pressable : View;
+  }, [selectedCropId, activeCommodity, priceAnim]);
 
   return (
-    <Animated.View
-      style={[
-        styles.wrapper,
-        {
-          opacity: cardOpacity,
-          transform: [{ translateY: cardTranslateY }, { scale: pressScale }],
-        },
-      ]}
-    >
-      <CardWrapper
-        onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        accessibilityRole={onPress ? "button" : undefined}
-        accessibilityLabel={`${resolvedTitle}, ${currency} ${displayPrice}, ${change}`}
-      >
-        <AppCard style={[styles.card, { backgroundColor: surface }]}>
-          {/* Header */}
-          <View style={styles.header}>
-            <View style={styles.titleRow}>
-              <View
-                style={[styles.iconPill, { backgroundColor: `${primary}15` }]}
-              >
-                <Ionicons name="trending-up" size={18} color={primary} />
-              </View>
-              <View style={styles.titleText}>
-                <AppText
-                  variant="body"
-                  style={[styles.title, { color: text }]}
-                  numberOfLines={1}
-                >
-                  {resolvedTitle}
-                </AppText>
-                <AppText
-                  variant="caption"
-                  style={[styles.marketLabel, { color: textMuted }]}
-                  numberOfLines={1}
-                >
-                  {resolvedMarketLabel}
-                </AppText>
-              </View>
-            </View>
+    <View style={styles.outerContainer}>
+      <View style={[styles.card, { backgroundColor: surfaceColor }]}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <AppText style={[styles.title, { color: textColor }]}>Price Trends</AppText>
+            <AppText style={[styles.subtitle, { color: textMuted }]}>{activeCommodity.market}</AppText>
+          </View>
 
-            <Animated.View
+          <View
+            style={[
+              styles.changeBadge,
+              {
+                backgroundColor: activeCommodity.isPositive
+                  ? "rgba(16, 185, 129, 0.1)"
+                  : "rgba(239, 68, 68, 0.1)",
+              },
+            ]}
+          >
+            <Ionicons
+              name={activeCommodity.isPositive ? "trending-up" : "trending-down"}
+              size={14}
+              color={activeCommodity.isPositive ? successColor : dangerColor}
+            />
+            <AppText
               style={[
-                styles.badge,
-                {
-                  backgroundColor: `${trendColor}15`,
-                  transform: [{ scale: badgeScale }],
-                },
+                styles.changeText,
+                { color: activeCommodity.isPositive ? successColor : dangerColor },
               ]}
             >
-              <Ionicons
-                name={isPositive ? "arrow-up" : "arrow-down"}
-                size={11}
-                color={trendColor}
-                style={styles.badgeIcon}
-              />
-              <AppText
-                variant="caption"
-                style={[styles.badgeText, { color: trendColor }]}
-              >
-                {change}
-              </AppText>
-            </Animated.View>
-          </View>
-
-          {/* Price row */}
-          <View style={styles.priceRow}>
-            <View style={styles.liveDot}>
-              <View style={[styles.dot, { backgroundColor: primary }]} />
-              <Animated.View
-                style={[
-                  styles.pulseRing,
-                  {
-                    backgroundColor: primary,
-                    opacity: pulseAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0.5, 0],
-                    }),
-                    transform: [
-                      {
-                        scale: pulseAnim.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [1, 2.2],
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              />
-            </View>
-            <AppText variant="heading" style={[styles.price, { color: text }]}>
-              {currency} {displayPrice}
+              {activeCommodity.change} (7d)
             </AppText>
           </View>
+        </View>
 
-          {/* Chart */}
-          <View style={styles.chart}>
-            {data.map((point, index) => {
-              const barHeight = Math.max(14, (point.value / maxValue) * 80);
+        {/* Commodity Selector Pills */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.cropScroll}
+          contentContainerStyle={styles.cropContent}
+        >
+          {COMMODITY_TRENDS.map((item) => {
+            const isSelected = item.id === selectedCropId;
+            return (
+              <TouchableOpacity
+                key={item.id}
+                style={[
+                  styles.cropPill,
+                  isSelected && { backgroundColor: primaryColor, borderColor: primaryColor },
+                ]}
+                onPress={() => setSelectedCropId(item.id)}
+                activeOpacity={0.8}
+              >
+                <AppText
+                  style={[
+                    styles.cropPillText,
+                    isSelected && styles.selectedCropPillText,
+                  ]}
+                >
+                  {item.crop}
+                </AppText>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
 
-              return (
-                <View key={`${point.label}-${index}`} style={styles.barColumn}>
+        {/* Price Display */}
+        <View style={styles.priceRow}>
+          <AppText style={styles.priceNumber}>ETB {displayPrice}</AppText>
+          <AppText style={styles.unitText}>/ quintal (100 kg)</AppText>
+        </View>
+
+        {/* Simple Bar Chart */}
+        <View style={styles.chartContainer}>
+          {activeCommodity.data.map((point) => {
+            const heightPercent = Math.min(100, Math.max(20, (point.value / maxValue) * 100));
+            const isToday = point.label === "Today";
+
+            return (
+              <View key={point.label} style={styles.barCol}>
+                <View style={styles.barTrack}>
                   <View
                     style={[
-                      styles.barTrack,
-                      { backgroundColor: isDark ? `${primary}10` : "#F1F5F9" },
+                      styles.barFill,
+                      {
+                        height: `${heightPercent}%`,
+                        backgroundColor: isToday ? primaryColor : primaryColor + "40",
+                      },
                     ]}
-                  >
-                    <Animated.View
-                      style={[
-                        styles.barFill,
-                        {
-                          height: barHeight,
-                          backgroundColor: primary,
-                          borderRadius: barHeight / 2,
-                          transformOrigin: "bottom",
-                          transform: [{ scaleY: barAnims[index] }],
-                          opacity: barAnims[index].interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [0.6, 1],
-                          }),
-                        },
-                      ]}
-                    />
-                  </View>
-                  <AppText
-                    variant="caption"
-                    style={[styles.axisLabel, { color: textMuted }]}
-                    numberOfLines={1}
-                  >
-                    {point.label}
-                  </AppText>
+                  />
                 </View>
-              );
-            })}
-          </View>
-        </AppCard>
-      </CardWrapper>
-    </Animated.View>
+                <AppText
+                  style={[
+                    styles.axisLabel,
+                    isToday && { color: primaryColor, fontWeight: "700" },
+                  ]}
+                >
+                  {point.label}
+                </AppText>
+              </View>
+            );
+          })}
+        </View>
+
+        {/* Simple Insight & Analytics Footer */}
+        <View style={styles.footer}>
+          <AppText style={styles.insightText} numberOfLines={2}>
+            💡 {activeCommodity.insight}
+          </AppText>
+
+          {onPressAnalytics && (
+            <TouchableOpacity
+              style={styles.analyticsBtn}
+              onPress={onPressAnalytics}
+              activeOpacity={0.8}
+            >
+              <AppText style={[styles.analyticsBtnText, { color: primaryColor }]}>
+                View Full Market Analysis
+              </AppText>
+              <Ionicons name="arrow-forward" size={14} color={primaryColor} />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
+  outerContainer: {
     width: "100%",
+    marginBottom: 20,
   },
   card: {
-    padding: 30,
-    borderRadius: 24,
+    borderRadius: 20,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
   },
   header: {
     flexDirection: "row",
-    alignItems: "flex-start",
     justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  titleRow: {
-    flex: 1,
-    flexDirection: "row",
     alignItems: "center",
-    marginRight: 12,
-  },
-  iconPill: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  titleText: {
-    flexShrink: 1,
-    justifyContent: "center",
+    marginBottom: 14,
   },
   title: {
-    fontSize: 16,
-    fontWeight: "600",
-    lineHeight: 20,
+    fontSize: 17,
+    fontWeight: "700",
   },
-  marketLabel: {
+  subtitle: {
     fontSize: 12,
     marginTop: 2,
   },
-  badge: {
+  changeBadge: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 20,
+    paddingVertical: 5,
+    borderRadius: 10,
+    gap: 4,
   },
-  badgeIcon: {
-    marginRight: 3,
-  },
-  badgeText: {
-    fontWeight: "700",
+  changeText: {
     fontSize: 12,
+    fontWeight: "700",
+  },
+  cropScroll: {
+    marginBottom: 14,
+  },
+  cropContent: {
+    gap: 8,
+  },
+  cropPill: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 18,
+    backgroundColor: "#F8FAFC",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  cropPillText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#475569",
+  },
+  selectedCropPillText: {
+    color: "#FFFFFF",
+    fontWeight: "700",
   },
   priceRow: {
     flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 24,
+    alignItems: "baseline",
+    marginBottom: 14,
   },
-  liveDot: {
-    width: 12,
-    height: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 10,
+  priceNumber: {
+    fontSize: 26,
+    fontWeight: "800",
+    color: "#0F172A",
+    letterSpacing: -0.5,
   },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    zIndex: 2,
+  unitText: {
+    fontSize: 13,
+    color: "#64748B",
+    fontWeight: "500",
+    marginLeft: 4,
   },
-  pulseRing: {
-    position: "absolute",
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    zIndex: 1,
-  },
-  price: {
-    fontSize: 32,
-    fontWeight: "700",
-    letterSpacing: -0.5,padding:5
-  },
-  chart: {
+  chartContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     alignItems: "flex-end",
-    height: 110,
-    paddingTop: 8,
+    height: 90,
+    marginBottom: 14,
   },
-  barColumn: {
+  barCol: {
     flex: 1,
     alignItems: "center",
-    marginHorizontal: 6,
+    height: "100%",
+    justifyContent: "flex-end",
   },
   barTrack: {
-    width: "100%",
-    height: 80,
-    borderRadius: 16,
+    width: 20,
+    height: 70,
+    backgroundColor: "#F1F5F9",
+    borderRadius: 10,
     justifyContent: "flex-end",
-    alignItems: "center",
     overflow: "hidden",
   },
   barFill: {
-    width: 12,
+    width: "100%",
+    borderRadius: 10,
   },
   axisLabel: {
-    marginTop: 8,
+    marginTop: 6,
     fontSize: 11,
+    color: "#64748B",
     fontWeight: "500",
+  },
+  footer: {
+    borderTopWidth: 1,
+    borderTopColor: "#F1F5F9",
+    paddingTop: 12,
+    gap: 10,
+  },
+  insightText: {
+    fontSize: 12,
+    color: "#334155",
+    lineHeight: 17,
+  },
+  analyticsBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+    paddingVertical: 2,
+  },
+  analyticsBtnText: {
+    fontSize: 13,
+    fontWeight: "700",
   },
 });

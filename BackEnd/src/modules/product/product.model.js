@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import crypto from "crypto";
 
 const productSchema = new mongoose.Schema(
   {
@@ -50,6 +51,11 @@ const productSchema = new mongoose.Schema(
       },
       default: "active",
     },
+    customId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
   },
   {
     timestamps: true,
@@ -58,6 +64,12 @@ const productSchema = new mongoose.Schema(
 
 // Index for the most common public query: active listings by cropType + region
 productSchema.index({ status: 1, cropType: 1, "location.region": 1 });
+
+productSchema.pre("save", function () {
+  if (this.isNew && !this.customId) {
+    this.customId = `PRD-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
+  }
+});
 
 const Product = mongoose.model("Product", productSchema);
 

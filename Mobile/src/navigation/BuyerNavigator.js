@@ -18,6 +18,8 @@ import NotificationsScreen from "../screens/shared/NotificationsScreen";
 import OrderDetailScreen from "../screens/shared/OrderDetailScreen";
 import SettingsScreen from "../screens/shared/SettingsScreen";
 
+import BuyerMarketAnalyticsScreen from "../screens/buyer/BuyerMarketAnalyticsScreen";
+
 const Stack = createNativeStackNavigator();
 
 const TAB_SCREENS = {
@@ -62,6 +64,7 @@ const BuyerNavigator = () => (
     <Stack.Screen name="Help" component={HelpScreen} />
     <Stack.Screen name="Notifications" component={NotificationsScreen} />
     <Stack.Screen name="Settings" component={SettingsScreen} />
+    <Stack.Screen name="MarketAnalytics" component={BuyerMarketAnalyticsScreen} />
   </Stack.Navigator>
 );
 

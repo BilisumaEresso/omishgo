@@ -1,111 +1,175 @@
+// src/components/buyer/NearbyFarmersList.js
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
-import AppCard from "../common/AppCard";
 import AppText from "../common/AppText";
 
-export default function NearbyFarmersList({ farmers, onFarmerPress }) {
+export default function NearbyFarmersList({ farmers = [], onFarmerPress }) {
   const { theme } = useTheme();
+  const primaryColor = theme?.colors?.primary || "#1565C0";
+  const surfaceColor = theme?.colors?.surface || "#FFFFFF";
+  const textColor = theme?.colors?.textPrimary || "#0F172A";
+  const textMuted = theme?.colors?.textSecondary || "#64748B";
 
   if (!farmers || farmers.length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
-        <AppText style={{ color: theme?.colors?.textSecondary }}>
-          No nearby farmers found
-        </AppText>
-      </View>
-    );
+    return null;
   }
 
-  // Display only up to 2 farmers for space
-  const visibleFarmers = farmers.slice(0, 2);
-
   return (
-    <View style={styles.section}>
-      <View style={styles.grid}>
-        {visibleFarmers.map((farmer) => (
-          <TouchableOpacity
-            key={farmer._id || farmer.id}
-            style={styles.cardWrapper}
-            onPress={() => onFarmerPress && onFarmerPress(farmer)}
-            activeOpacity={0.7}
-          >
-            <AppCard style={styles.card}>
-              {farmer.avatar ? (
-                <Image source={{ uri: farmer.avatar }} style={styles.avatar} />
-              ) : (
-                <View
-                  style={[
-                    styles.avatarFallback,
-                    { backgroundColor: theme?.colors?.primaryContainer },
-                  ]}
-                >
-                  <Ionicons
-                    name="person"
-                    size={24}
-                    color={theme?.colors?.primary}
-                  />
+    <View style={styles.container}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {farmers.map((farmer) => {
+          const fid = farmer._id || farmer.id;
+          const locationText =
+            [farmer.location?.region || farmer.location?.zone, farmer.distance]
+              .filter(Boolean)
+              .join(" • ") || "Oromia Region • 14 km away";
+
+          return (
+            <TouchableOpacity
+              key={fid}
+              style={[styles.card, { backgroundColor: surfaceColor }]}
+              onPress={() => onFarmerPress && onFarmerPress(farmer)}
+              activeOpacity={0.85}
+            >
+              <View style={styles.topRow}>
+                {farmer.avatar ? (
+                  <Image source={{ uri: farmer.avatar }} style={styles.avatar} />
+                ) : (
+                  <View style={[styles.avatarFallback, { backgroundColor: primaryColor + "15" }]}>
+                    <Ionicons name="person" size={22} color={primaryColor} />
+                  </View>
+                )}
+
+                <View style={styles.ratingBadge}>
+                  <Ionicons name="star" size={12} color="#F59E0B" />
+                  <AppText style={styles.ratingText}>
+                    {farmer.rating || "4.9"}
+                  </AppText>
                 </View>
-              )}
-              <AppText
-                variant="bodyMd"
-                style={{
-                  fontWeight: "bold",
-                  color: theme?.colors?.textPrimary,
-                  marginTop: 8,
-                }}
-                numberOfLines={1}
-              >
-                {farmer.name || "Farmer"}
+              </View>
+
+              <AppText style={[styles.farmerName, { color: textColor }]} numberOfLines={1}>
+                {farmer.name || "Farmer Producer"}
               </AppText>
-              <AppText
-                variant="caption"
-                style={{ color: theme?.colors?.textSecondary }}
-              >
-                {farmer.location?.region || farmer.location?.zone || "Ethiopia"}
-              </AppText>
-              <View style={styles.rating}>
-                <Ionicons name="star" size={12} color="#FFB800" />
-                <AppText
-                  variant="caption"
-                  style={{ color: theme?.colors?.textPrimary }}
-                >
-                  4.8
+
+              <View style={styles.locationRow}>
+                <Ionicons name="location-outline" size={13} color={textMuted} />
+                <AppText style={[styles.locationText, { color: textMuted }]} numberOfLines={1}>
+                  {locationText}
                 </AppText>
               </View>
-            </AppCard>
-          </TouchableOpacity>
-        ))}
-      </View>
+
+              <View style={styles.specialtyPill}>
+                <Ionicons name="leaf-outline" size={12} color={primaryColor} />
+                <AppText style={[styles.specialtyText, { color: primaryColor }]} numberOfLines={1}>
+                  Specializes in Teff & Onions
+                </AppText>
+              </View>
+
+              <TouchableOpacity
+                style={[styles.contactBtn, { backgroundColor: primaryColor }]}
+                onPress={() => onFarmerPress && onFarmerPress(farmer)}
+                activeOpacity={0.8}
+              >
+                <AppText style={styles.contactBtnText}>View Farm & Stock</AppText>
+              </TouchableOpacity>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  section: { marginBottom: 24 },
-  grid: { flexDirection: "row", gap: 12 },
-  cardWrapper: { flex: 1 },
-  card: { flex: 1, alignItems: "center", padding: 12 },
+  container: {
+    marginBottom: 24,
+  },
+  scrollContent: {
+    gap: 12,
+  },
+  card: {
+    width: 220,
+    borderRadius: 20,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 10,
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+  },
   avatarFallback: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: "center",
     alignItems: "center",
   },
-  avatar: { width: 60, height: 60, borderRadius: 30, resizeMode: "cover" },
-  rating: {
+  ratingBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    backgroundColor: "#FEF3C7",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+  ratingText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#B45309",
+  },
+  farmerName: {
+    fontSize: 15,
+    fontWeight: "700",
+    marginBottom: 2,
+  },
+  locationRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    backgroundColor: "#FFF4E5",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
-    marginTop: 6,
+    marginBottom: 10,
   },
-  emptyContainer: {
-    padding: 20,
+  locationText: {
+    fontSize: 11,
+    fontWeight: "500",
+    flex: 1,
+  },
+  specialtyPill: {
+    flexDirection: "row",
     alignItems: "center",
+    gap: 4,
+    backgroundColor: "rgba(21, 101, 192, 0.08)",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  specialtyText: {
+    fontSize: 11,
+    fontWeight: "600",
+  },
+  contactBtn: {
+    paddingVertical: 8,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  contactBtnText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "700",
   },
 });

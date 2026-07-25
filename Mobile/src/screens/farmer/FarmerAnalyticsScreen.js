@@ -1,4 +1,5 @@
-// Mobile/src/screens/farmer/FarmerAnalyticsScreen.js
+// src/screens/farmer/FarmerAnalyticsScreen.js
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,17 +8,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useTranslation } from "react-i18next";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import AppText from "../../components/common/AppText";
+import AppHeader from "../../components/layout/AppHeader";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
-import AppHeader from "../../components/layout/AppHeader";
 import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 
-const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
-  const { t } = useTranslation();
+export default function FarmerAnalyticsScreen({ navigation }) {
   const { theme } = useTheme();
   const { openSidebar } = useSidebar();
   const [data, setData] = useState(null);
@@ -27,88 +25,56 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
     api
       .get(API_ENDPOINTS.products.analytics)
       .then((res) => setData(res.data?.data || null))
-      .catch((err) => console.warn("Analytics fetch:", err.message))
+      .catch((err) => console.warn("Farmer Analytics fetch error:", err.message))
       .finally(() => setLoading(false));
   }, []);
 
-  // Extract theme colors with fallbacks
-  const primary = theme?.colors?.primary || "#2E7D32";
+  const primaryColor = theme?.colors?.primary || "#2E7D32";
   const primaryContainer = theme?.colors?.primaryContainer || "#E8F5E9";
+  const surfaceColor = theme?.colors?.surface || "#FFFFFF";
+  const backgroundColor = theme?.colors?.background || "#F9FBF9";
   const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
   const textSecondary = theme?.colors?.textSecondary || "#4A6741";
   const textMuted = theme?.colors?.textMuted || "#8FAF8A";
-  const background = theme?.colors?.background || "#F9FBF9";
-  const surface = theme?.colors?.surface || "#FFFFFF";
   const border = theme?.colors?.border || "#D0E8CE";
-  const successColor = theme?.colors?.success || "#2E7D32";
-  const errorColor = theme?.colors?.error || "#C62828";
-  const warningColor = theme?.colors?.warning || "#F9A825";
+  const successColor = "#2E7D32";
+  const errorColor = "#C62828";
+  const warningColor = "#F9A825";
 
-  // ---------- This Week Stats (yours) ----------
-  const weeklyStats = [
-    {
-      label: t("farmerAnalytics.totalProducts"),
-      value: data?.totalProducts ?? 0,
-    },
-    {
-      label: t("farmerAnalytics.totalRevenue"),
-      value: data?.totalRevenue ?? 0,
-    },
-    { label: t("farmerAnalytics.totalOrders"), value: data?.totalOrders ?? 0 },
-    { label: t("farmerAnalytics.delivered"), value: data?.delivered ?? 0 },
-    { label: t("farmerAnalytics.pending"), value: data?.pending ?? 0 },
+  // Farmer metrics
+  const farmerMetrics = [
+    { label: "Active Listings", value: data?.totalProducts ?? 8, icon: "cube-outline" },
+    { label: "Total Revenue", value: data?.totalRevenue ? `ETB ${data.totalRevenue}` : "ETB 142.5k", icon: "cash-outline" },
+    { label: "Orders Delivered", value: data?.delivered ?? 34, icon: "checkmark-circle-outline" },
+    { label: "Pending Orders", value: data?.pending ?? 5, icon: "time-outline" },
   ];
 
-  // ---------- Market Pulse (overall market snapshot) ----------
-  const marketPulse = data?.marketPulse || {
-    activeBuyers: 1240,
-    marketsTracked: 12,
-    avgPriceChange: "+6.4%",
-    topMover: t("farmerAnalytics.cropOnion"),
-  };
-
-  // ---------- Top Crops by Demand (yours) ----------
-  const topCrops = data?.topCrops || [
-    { _id: t("farmerAnalytics.noDataYet"), orders: 1 },
+  // Market Prices in Quintal (q)
+  const marketPrices = data?.marketPrices || [
+    { crop: "Red Onion", price: 4500, unit: "q", trend: "up", change: "+5.8%", market: "Adama Market" },
+    { crop: "White Teff", price: 5200, unit: "q", trend: "up", change: "+3.2%", market: "Debre Zeit" },
+    { crop: "Fresh Tomato", price: 3800, unit: "q", trend: "down", change: "-2.4%", market: "Ziway" },
+    { crop: "Garlic", price: 12000, unit: "q", trend: "up", change: "+8.5%", market: "Bishoftu" },
+    { crop: "Wheat", price: 4100, unit: "q", trend: "neutral", change: "0.0%", market: "Arsi" },
+    { crop: "Coffee Beans", price: 9600, unit: "q", trend: "up", change: "+4.1%", market: "Harar" },
   ];
-  const maxOrders = Math.max(...topCrops.map((c) => c.orders), 1);
 
-  // ---------- Demand by Location ----------
+  // Regional Buyer Demand Heatmap
   const locationDemand = data?.locationDemand || [
-    {
-      city: "Addis Ababa",
-      demandLevel: "high",
-      demandScore: 92,
-      topCrop: t("farmerAnalytics.cropTeff"),
-    },
-    {
-      city: "Harar",
-      demandLevel: "high",
-      demandScore: 85,
-      topCrop: t("farmerAnalytics.cropCoffee"),
-    },
-    {
-      city: "Adama",
-      demandLevel: "medium",
-      demandScore: 63,
-      topCrop: t("farmerAnalytics.cropOnion"),
-    },
-    {
-      city: "Bishoftu",
-      demandLevel: "medium",
-      demandScore: 58,
-      topCrop: t("farmerAnalytics.cropWheat"),
-    },
+    { city: "Addis Ababa", demandLevel: "high", demandScore: 94, topCrop: "White Teff", activeBuyers: 420 },
+    { city: "Adama Hub", demandLevel: "high", demandScore: 88, topCrop: "Red Onion", activeBuyers: 310 },
+    { city: "Harar Terminal", demandLevel: "high", demandScore: 82, topCrop: "Coffee Beans", activeBuyers: 185 },
+    { city: "Bishoftu", demandLevel: "medium", demandScore: 65, topCrop: "Garlic", activeBuyers: 140 },
   ];
-  const maxDemandScore = Math.max(
-    ...locationDemand.map((l) => l.demandScore),
-    1,
-  );
 
-  const overallMarketStats = data?.overallMarketStats || {
-    totalVolume: "48,300 q",
-    activeMarkets: 12,
-    mostActiveRegion: "Addis Ababa",
+  const handleSellPress = (cropItem) => {
+    navigation?.navigate("PostProduct", {
+      prefill: {
+        cropType: cropItem.crop,
+        price: cropItem.price,
+        unit: "q",
+      },
+    });
   };
 
   const getDemandColor = (level) => {
@@ -117,453 +83,197 @@ const FarmerAnalyticsScreen = ({ navigation, onSwitchTab }) => {
     return textMuted;
   };
 
-  const getDemandLabel = (level) => {
-    if (level === "high") return t("farmerAnalytics.demandHigh", "High demand");
-    if (level === "medium")
-      return t("farmerAnalytics.demandMedium", "Medium demand");
-    return t("farmerAnalytics.demandLow", "Low demand");
-  };
-
-  // ---------- Market Prices Today (expanded, actionable) ----------
-  const marketPrices = data?.marketPrices || [
-    { crop: t("farmerAnalytics.cropTeff"), price: "5,200", trend: "up" },
-    { crop: t("farmerAnalytics.cropOnion"), price: "4,500", trend: "up" },
-    { crop: t("farmerAnalytics.cropTomato"), price: "3,800", trend: "down" },
-    { crop: t("farmerAnalytics.cropWheat"), price: "4,100", trend: "neutral" },
-    { crop: t("farmerAnalytics.cropMaize"), price: "3,300", trend: "up" },
-    { crop: t("farmerAnalytics.cropCoffee"), price: "9,600", trend: "up" },
-    { crop: t("farmerAnalytics.cropChickpea"), price: "6,750", trend: "down" },
-    { crop: t("farmerAnalytics.cropBarley"), price: "3,950", trend: "neutral" },
-  ];
-
-  const getTrendArrow = (trend) => {
-    if (trend === "up") return "↑";
-    if (trend === "down") return "↓";
-    return "→";
-  };
-
-  const getTrendColor = (trend) => {
-    if (trend === "up") return successColor;
-    if (trend === "down") return errorColor;
-    return textMuted;
-  };
-
-  const handleSellPress = (trendItem) => {
-    const priceNum = trendItem.price
-      ? parseInt(trendItem.price.replace(/[^0-9]/g, ""), 10)
-      : null;
-    navigation.navigate("PostProduct", {
-      prefill: {
-        cropType: trendItem.crop,
-        price: priceNum,
-        unit: "kg",
-      },
-    });
-  };
-
-  // ---------- Weekly Price Trend (aggregate, mini bar chart) ----------
-  const weeklyTrend = data?.weeklyTrend || [
-    { label: t("farmerAnalytics.dayMon", "Mon"), value: 62 },
-    { label: t("farmerAnalytics.dayTue", "Tue"), value: 68 },
-    { label: t("farmerAnalytics.dayWed", "Wed"), value: 58 },
-    { label: t("farmerAnalytics.dayThu", "Thu"), value: 74 },
-    { label: t("farmerAnalytics.dayFri", "Fri"), value: 80 },
-    { label: t("farmerAnalytics.dayToday", "Today"), value: 91 },
-  ];
-  const maxTrendValue = Math.max(...weeklyTrend.map((d) => d.value), 1);
-
-  // ---------- Insight tips ----------
-  const insights = data?.insights || [
-    {
-      icon: "bulb-outline",
-      text: t(
-        "farmerAnalytics.insightOnion",
-        "Onion prices are rising — consider selling this week.",
-      ),
-    },
-    {
-      icon: "location-outline",
-      text: t(
-        "farmerAnalytics.insightHarar",
-        "Coffee demand is highest in Harar right now.",
-      ),
-    },
-  ];
-
   return (
-    <View style={[styles.screen, { backgroundColor: background }]}>
+    <View style={[styles.screen, { backgroundColor }]}>
       <AppHeader
-        title={t("farmerAnalytics.title")}
+        title="Market Insights & Sales"
+        subtitle="Wholesale market rates per quintal (100 kg)"
         showMenu={true}
-        showNotification={true}
-        notificationCount={0}
         onMenuPress={openSidebar}
-        onNotificationPress={() => navigation.navigate("Notifications")}
+        showNotification={true}
+        onNotificationPress={() => navigation?.navigate("Notifications")}
       />
 
-      {loading && (
+      {loading ? (
         <View style={styles.loadingWrap}>
-          <ActivityIndicator size="large" color={primary} />
+          <ActivityIndicator size="large" color={primaryColor} />
         </View>
-      )}
-
-      {!loading && (
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* This Week Section */}
+      ) : (
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          {/* 1. Store Performance Grid */}
           <AppText style={[styles.sectionTitle, { color: textPrimary }]}>
-            {t("farmerAnalytics.thisWeek")}
+            Your Store Performance
           </AppText>
-          <View style={styles.statsRow}>
-            {weeklyStats.map((stat, index) => (
-              <View
-                key={index}
-                style={[styles.statCard, { backgroundColor: primaryContainer }]}
-              >
-                <AppText style={[styles.statValue, { color: primary }]}>
-                  {stat.value}
-                </AppText>
-                <AppText style={[styles.statLabel, { color: textSecondary }]}>
-                  {stat.label}
-                </AppText>
+          <View style={styles.metricsGrid}>
+            {farmerMetrics.map((item, idx) => (
+              <View key={idx} style={[styles.metricCard, { backgroundColor: primaryContainer }]}>
+                <Ionicons name={item.icon} size={20} color={primaryColor} style={{ marginBottom: 6 }} />
+                <AppText style={[styles.metricVal, { color: primaryColor }]}>{item.value}</AppText>
+                <AppText style={[styles.metricLabel, { color: textSecondary }]}>{item.label}</AppText>
               </View>
             ))}
           </View>
 
-          {/* Market Pulse */}
-          <AppText
-            style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}
-          >
-            {t("farmerAnalytics.marketPulse", "Market Pulse")}
-          </AppText>
-          <View
-            style={[
-              styles.pulseCard,
-              { backgroundColor: surface, borderColor: border },
-            ]}
-          >
-            <View style={styles.pulseRow}>
-              <View style={styles.pulseItem}>
-                <Ionicons name="people-outline" size={18} color={primary} />
-                <AppText style={[styles.pulseValue, { color: textPrimary }]}>
-                  {marketPulse.activeBuyers}
-                </AppText>
-                <AppText style={[styles.pulseLabel, { color: textMuted }]}>
-                  {t("farmerAnalytics.activeBuyers", "Active buyers")}
-                </AppText>
-              </View>
-              <View
-                style={[styles.pulseDivider, { backgroundColor: border }]}
-              />
-              <View style={styles.pulseItem}>
-                <Ionicons name="storefront-outline" size={18} color={primary} />
-                <AppText style={[styles.pulseValue, { color: textPrimary }]}>
-                  {marketPulse.marketsTracked}
-                </AppText>
-                <AppText style={[styles.pulseLabel, { color: textMuted }]}>
-                  {t("farmerAnalytics.marketsTracked", "Markets tracked")}
-                </AppText>
-              </View>
-              <View
-                style={[styles.pulseDivider, { backgroundColor: border }]}
-              />
-              <View style={styles.pulseItem}>
-                <Ionicons
-                  name="trending-up-outline"
-                  size={18}
-                  color={successColor}
-                />
-                <AppText style={[styles.pulseValue, { color: successColor }]}>
-                  {marketPulse.avgPriceChange}
-                </AppText>
-                <AppText style={[styles.pulseLabel, { color: textMuted }]}>
-                  {t("farmerAnalytics.avgPriceChange", "Avg. price change")}
-                </AppText>
-              </View>
-            </View>
-            <View style={[styles.topMoverRow, { borderTopColor: border }]}>
-              <Ionicons name="flame-outline" size={16} color={warningColor} />
-              <AppText style={[styles.topMoverText, { color: textSecondary }]}>
-                {t("farmerAnalytics.topMover", "Top mover today")}:{" "}
-                <AppText style={{ color: textPrimary, fontWeight: "700" }}>
-                  {marketPulse.topMover}
-                </AppText>
+          {/* 2. Market Rates & Quick Sell */}
+          <View style={styles.sectionHeaderRow}>
+            <AppText style={[styles.sectionTitle, { color: textPrimary }]}>
+              Market Rates per Quintal
+            </AppText>
+            <TouchableOpacity
+              onPress={() => navigation?.navigate("PostProduct")}
+              activeOpacity={0.8}
+            >
+              <AppText style={[styles.addListingBtnText, { color: primaryColor }]}>
+                + Post Listing
               </AppText>
-            </View>
+            </TouchableOpacity>
           </View>
 
-          {/* Top Crops by Demand */}
-          <AppText
-            style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}
-          >
-            {t("farmerAnalytics.topCropsByDemand")}
-          </AppText>
-          <View style={styles.cropsContainer}>
-            {topCrops.map((crop, index) => (
-              <View key={index} style={styles.cropRow}>
-                <AppText style={[styles.cropName, { color: textPrimary }]}>
-                  {crop._id}
-                </AppText>
-                <View
-                  style={[styles.barContainer, { backgroundColor: border }]}
-                >
-                  <View
-                    style={[
-                      styles.bar,
-                      {
-                        backgroundColor: primary,
-                        width: `${(crop.orders / maxOrders) * 100}%`,
-                      },
-                    ]}
-                  />
-                </View>
-                <AppText style={[styles.percentText, { color: textPrimary }]}>
-                  {crop.orders}
-                </AppText>
-              </View>
-            ))}
-          </View>
-
-          {/* Demand by Location */}
-          <AppText
-            style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}
-          >
-            {t("farmerAnalytics.demandByLocation", "Demand by Location")}
-          </AppText>
-
-          <View
-            style={[
-              styles.overallStatsCard,
-              { backgroundColor: primaryContainer },
-            ]}
-          >
-            <View style={styles.overallStatItem}>
-              <AppText style={[styles.overallStatValue, { color: primary }]}>
-                {overallMarketStats.totalVolume}
-              </AppText>
-              <AppText
-                style={[styles.overallStatLabel, { color: textSecondary }]}
-              >
-                {t("farmerAnalytics.totalVolume", "Total volume traded")}
-              </AppText>
-            </View>
-            <View style={styles.overallStatItem}>
-              <AppText style={[styles.overallStatValue, { color: primary }]}>
-                {overallMarketStats.activeMarkets}
-              </AppText>
-              <AppText
-                style={[styles.overallStatLabel, { color: textSecondary }]}
-              >
-                {t("farmerAnalytics.activeMarkets", "Active markets")}
-              </AppText>
-            </View>
-            <View style={styles.overallStatItem}>
-              <AppText
-                style={[styles.overallStatValue, { color: primary }]}
-                numberOfLines={1}
-              >
-                {overallMarketStats.mostActiveRegion}
-              </AppText>
-              <AppText
-                style={[styles.overallStatLabel, { color: textSecondary }]}
-              >
-                {t("farmerAnalytics.mostActiveRegion", "Most active region")}
-              </AppText>
-            </View>
-          </View>
-
-          <View style={styles.locationsGrid}>
-            {locationDemand.map((loc, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.locationCard,
-                  { backgroundColor: surface, borderColor: border },
-                ]}
-              >
-                <View style={styles.locationHeaderRow}>
-                  <Ionicons name="location" size={16} color={primary} />
-                  <AppText
-                    style={[styles.locationName, { color: textPrimary }]}
-                    numberOfLines={1}
-                  >
-                    {loc.city}
-                  </AppText>
-                </View>
-
-                <View
-                  style={[
-                    styles.demandBadge,
-                    { backgroundColor: getDemandColor(loc.demandLevel) + "1A" },
-                  ]}
-                >
-                  <AppText
-                    style={[
-                      styles.demandBadgeText,
-                      { color: getDemandColor(loc.demandLevel) },
-                    ]}
-                  >
-                    {getDemandLabel(loc.demandLevel)}
-                  </AppText>
-                </View>
-
-                <View
-                  style={[styles.locationBarTrack, { backgroundColor: border }]}
-                >
-                  <View
-                    style={[
-                      styles.locationBarFill,
-                      {
-                        backgroundColor: getDemandColor(loc.demandLevel),
-                        width: `${(loc.demandScore / maxDemandScore) * 100}%`,
-                      },
-                    ]}
-                  />
-                </View>
-
-                <AppText
-                  style={[styles.locationTopCrop, { color: textMuted }]}
-                  numberOfLines={1}
-                >
-                  {t("farmerAnalytics.mostWanted", "Most wanted")}:{" "}
-                  {loc.topCrop}
-                </AppText>
-              </View>
-            ))}
-          </View>
-
-          {/* Weekly Price Trend (mini chart) */}
-          <AppText
-            style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}
-          >
-            {t("farmerAnalytics.weeklyPriceTrend", "Weekly Price Trend")}
-          </AppText>
-          <View
-            style={[
-              styles.trendCard,
-              { backgroundColor: surface, borderColor: border },
-            ]}
-          >
-            <View style={styles.trendChart}>
-              {weeklyTrend.map((point, index) => {
-                const barHeight = Math.max(
-                  6,
-                  (point.value / maxTrendValue) * 70,
-                );
-                const isLast = index === weeklyTrend.length - 1;
-                return (
-                  <View key={index} style={styles.trendColumn}>
-                    <View style={styles.trendTrack}>
-                      <View
-                        style={[
-                          styles.trendBar,
-                          {
-                            height: barHeight,
-                            backgroundColor: isLast ? primary : primary + "55",
-                          },
-                        ]}
-                      />
-                    </View>
-                    <AppText style={[styles.trendLabel, { color: textMuted }]}>
-                      {point.label}
-                    </AppText>
-                  </View>
-                );
-              })}
-            </View>
-          </View>
-
-          {/* Market Prices Today */}
-          <AppText
-            style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}
-          >
-            {t("farmerAnalytics.marketPricesToday")}
-          </AppText>
-          <View style={[styles.pricesCard, { backgroundColor: surface }]}>
-            {marketPrices.map((item, index) => {
-              const arrow = getTrendArrow(item.trend);
-              const arrowColor = getTrendColor(item.trend);
+          <View style={[styles.pricesCard, { backgroundColor: surfaceColor, borderColor: border }]}>
+            {marketPrices.map((item, idx) => {
+              const isUp = item.trend === "up";
+              const isDown = item.trend === "down";
               return (
                 <View
-                  key={index}
-                  style={[
-                    styles.priceRow,
-                    index !== marketPrices.length - 1 && {
-                      borderBottomWidth: 1,
-                      borderBottomColor: border,
-                    },
-                  ]}
+                  key={item.crop}
+                  style={[styles.priceRow, idx < marketPrices.length - 1 && { borderBottomWidth: 1, borderBottomColor: border }]}
                 >
-                  <AppText
-                    style={[styles.priceCropName, { color: textPrimary }]}
-                    numberOfLines={1}
-                  >
-                    {item.crop}
-                  </AppText>
-                  <View style={styles.priceRight}>
-                    <View style={styles.priceValueCol}>
-                      <AppText
-                        style={[styles.priceValue, { color: textPrimary }]}
-                      >
-                        {item.price} ETB/q
-                      </AppText>
-                      <View style={styles.priceArrowRow}>
-                        <AppText
-                          style={[styles.priceArrow, { color: arrowColor }]}
-                        >
-                          {arrow}
-                        </AppText>
-                      </View>
-                    </View>
-                    <TouchableOpacity
-                      style={[styles.sellButton, { backgroundColor: primary }]}
-                      activeOpacity={0.8}
-                      onPress={() => handleSellPress(item)}
-                    >
-                      <AppText style={styles.sellButtonText}>
-                        {t("farmerAnalytics.sell", "Sell")}
-                      </AppText>
-                    </TouchableOpacity>
+                  <View style={styles.priceLeft}>
+                    <AppText style={[styles.cropTitle, { color: textPrimary }]}>{item.crop}</AppText>
+                    <AppText style={[styles.marketName, { color: textMuted }]}>{item.market}</AppText>
                   </View>
+
+                  <View style={styles.priceCenter}>
+                    <AppText style={[styles.priceText, { color: textPrimary }]}>
+                      ETB {item.price.toLocaleString()} / q
+                    </AppText>
+                    <View style={styles.trendPillRow}>
+                      <Ionicons
+                        name={isUp ? "arrow-up" : isDown ? "arrow-down" : "remove"}
+                        size={12}
+                        color={isUp ? successColor : isDown ? errorColor : textMuted}
+                      />
+                      <AppText
+                        style={[
+                          styles.trendText,
+                          { color: isUp ? successColor : isDown ? errorColor : textMuted },
+                        ]}
+                      >
+                        {item.change}
+                      </AppText>
+                    </View>
+                  </View>
+
+                  <TouchableOpacity
+                    style={[styles.sellBtn, { backgroundColor: primaryColor }]}
+                    onPress={() => handleSellPress(item)}
+                    activeOpacity={0.85}
+                  >
+                    <AppText style={styles.sellBtnText}>Sell Harvest</AppText>
+                  </TouchableOpacity>
                 </View>
               );
             })}
           </View>
 
-          {/* Insights */}
-          <AppText
-            style={[styles.sectionTitle, { color: textPrimary, marginTop: 8 }]}
-          >
-            {t("farmerAnalytics.insights", "Insights for You")}
+          {/* 3. Regional Buyer Demand */}
+          <AppText style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}>
+            Buyer Demand by Location
           </AppText>
-          <View style={styles.insightsContainer}>
-            {insights.map((insight, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.insightCard,
-                  { backgroundColor: primaryContainer },
-                ]}
-              >
-                <Ionicons name={insight.icon} size={18} color={primary} />
-                <AppText style={[styles.insightText, { color: textPrimary }]}>
-                  {insight.text}
-                </AppText>
-              </View>
-            ))}
+          <View style={styles.locationGrid}>
+            {locationDemand.map((loc) => {
+              const badgeColor = getDemandColor(loc.demandLevel);
+              return (
+                <View key={loc.city} style={[styles.locationCard, { backgroundColor: surfaceColor, borderColor: border }]}>
+                  <View style={styles.locationTopRow}>
+                    <View style={styles.cityRow}>
+                      <Ionicons name="location-outline" size={16} color={primaryColor} />
+                      <AppText style={[styles.cityName, { color: textPrimary }]}>{loc.city}</AppText>
+                    </View>
+                    <View style={[styles.demandBadge, { backgroundColor: badgeColor + "18" }]}>
+                      <AppText style={[styles.demandText, { color: badgeColor }]}>
+                        {loc.demandLevel.toUpperCase()} DEMAND
+                      </AppText>
+                    </View>
+                  </View>
+
+                  <View style={styles.progressTrack}>
+                    <View style={[styles.progressFill, { backgroundColor: badgeColor, width: `${loc.demandScore}%` }]} />
+                  </View>
+
+                  <View style={styles.locationFooterRow}>
+                    <AppText style={styles.topCropText}>Top Wanted: {loc.topCrop}</AppText>
+                    <AppText style={styles.buyersCountText}>{loc.activeBuyers} Buyers</AppText>
+                  </View>
+
+                  <TouchableOpacity
+                    style={[styles.targetMarketBtn, { borderColor: primaryColor }]}
+                    onPress={() =>
+                      navigation?.navigate("PostProduct", {
+                        prefill: { cropType: loc.topCrop, unit: "q" },
+                      })
+                    }
+                    activeOpacity={0.8}
+                  >
+                    <AppText style={[styles.targetMarketText, { color: primaryColor }]}>
+                      Target This Market
+                    </AppText>
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
           </View>
 
-          {/* Footer Note */}
-          <AppText style={[styles.footerNote, { color: textMuted }]}>
-            {t("farmerAnalytics.referencePrices")}
+          {/* 4. Actionable Market Tips */}
+          <AppText style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}>
+            Market Tips
           </AppText>
+          <View style={styles.advisoryList}>
+            <View style={[styles.advisoryCard, { backgroundColor: primaryContainer }]}>
+              <View style={styles.advisoryTop}>
+                <Ionicons name="bulb-outline" size={20} color={primaryColor} />
+                <AppText style={[styles.advisoryTitle, { color: textPrimary }]}>
+                  Onion Price Rise in Adama
+                </AppText>
+              </View>
+              <AppText style={[styles.advisoryBody, { color: textSecondary }]}>
+                Wholesale onion prices are up +5.8% (ETB 4,500 / quintal) in East Shewa. Post your harvest today to secure good prices.
+              </AppText>
+              <TouchableOpacity
+                style={[styles.advisoryActionBtn, { backgroundColor: primaryColor }]}
+                onPress={() => navigation?.navigate("PostProduct", { prefill: { cropType: "Red Onion", price: 4500, unit: "q" } })}
+                activeOpacity={0.85}
+              >
+                <AppText style={styles.advisoryActionText}>Post Onion Listing →</AppText>
+              </TouchableOpacity>
+            </View>
+
+            <View style={[styles.advisoryCard, { backgroundColor: "#FEF3C7" }]}>
+              <View style={styles.advisoryTop}>
+                <Ionicons name="location-outline" size={20} color="#D97706" />
+                <AppText style={[styles.advisoryTitle, { color: "#78350F" }]}>
+                  High Demand for Coffee in Harar
+                </AppText>
+              </View>
+              <AppText style={[styles.advisoryBody, { color: "#92400E" }]}>
+                185 buyers are searching for Coffee Beans in Harar. List your stock to get instant buyer orders.
+              </AppText>
+              <TouchableOpacity
+                style={[styles.advisoryActionBtn, { backgroundColor: "#D97706" }]}
+                onPress={() => navigation?.navigate("PostProduct", { prefill: { cropType: "Coffee Beans", price: 9600, unit: "q" } })}
+                activeOpacity={0.85}
+              >
+                <AppText style={styles.advisoryActionText}>Post Coffee Listing →</AppText>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={{ height: 40 }} />
         </ScrollView>
       )}
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   screen: {
@@ -573,307 +283,198 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingTop: 80,
   },
   scrollContent: {
-    paddingTop: 16,
-    paddingBottom: 40,
     paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 30,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "700",
     marginBottom: 12,
   },
-
-  // This week
-  statsRow: {
+  sectionHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 22,
+    marginBottom: 10,
+  },
+  addListingBtnText: {
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  metricsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    marginBottom: 4,
+    gap: 10,
   },
-  statCard: {
-    width: "31%",
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 4,
-    alignItems: "center",
-    marginBottom: 8,
+  metricCard: {
+    width: "48%",
+    padding: 14,
+    borderRadius: 16,
   },
-  statValue: {
-    fontSize: 22,
-    fontWeight: "700",
-    marginBottom: 4,
+  metricVal: {
+    fontSize: 20,
+    fontWeight: "800",
   },
-  statLabel: {
+  metricLabel: {
     fontSize: 12,
     fontWeight: "500",
-  },
-
-  // Market pulse
-  pulseCard: {
-    borderRadius: 14,
-    borderWidth: 1,
-    paddingTop: 16,
-    paddingHorizontal: 8,
-  },
-  pulseRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  pulseItem: {
-    flex: 1,
-    alignItems: "center",
-    paddingHorizontal: 4,
-  },
-  pulseDivider: {
-    width: 1,
-    height: 50,
-  },
-  pulseValue: {
-    fontSize: 16,
-    fontWeight: "700",
-    marginTop: 6,
-  },
-  pulseLabel: {
-    fontSize: 11,
-    fontWeight: "500",
     marginTop: 2,
-    textAlign: "center",
   },
-  topMoverRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderTopWidth: 1,
-    marginTop: 14,
-    paddingVertical: 12,
-    paddingHorizontal: 4,
-  },
-  topMoverText: {
-    fontSize: 13,
-    marginLeft: 8,
-    flexShrink: 1,
-  },
-
-  // Crops by demand
-  cropsContainer: {
-    marginBottom: 8,
-  },
-  cropRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 14,
-  },
-  cropName: {
-    width: 70,
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  barContainer: {
-    flex: 1,
-    height: 10,
-    borderRadius: 5,
-    marginHorizontal: 10,
-    overflow: "hidden",
-  },
-  bar: {
-    height: "100%",
-    borderRadius: 5,
-  },
-  percentText: {
-    width: 40,
-    textAlign: "right",
-    fontSize: 14,
-    fontWeight: "700",
-  },
-
-  // Overall market stats strip
-  overallStatsCard: {
-    flexDirection: "row",
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 8,
-    marginBottom: 12,
-  },
-  overallStatItem: {
-    flex: 1,
-    alignItems: "center",
-    paddingHorizontal: 4,
-  },
-  overallStatValue: {
-    fontSize: 15,
-    fontWeight: "700",
-  },
-  overallStatLabel: {
-    fontSize: 11,
-    fontWeight: "500",
-    marginTop: 2,
-    textAlign: "center",
-  },
-
-  // Location demand cards
-  locationsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  locationCard: {
-    width: "48%",
-    borderRadius: 12,
-    borderWidth: 1,
-    padding: 12,
-    marginBottom: 12,
-  },
-  locationHeaderRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  locationName: {
-    fontSize: 14,
-    fontWeight: "700",
-    marginLeft: 4,
-    flexShrink: 1,
-  },
-  demandBadge: {
-    alignSelf: "flex-start",
-    borderRadius: 20,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    marginBottom: 8,
-  },
-  demandBadgeText: {
-    fontSize: 11,
-    fontWeight: "700",
-  },
-  locationBarTrack: {
-    height: 8,
-    borderRadius: 4,
-    overflow: "hidden",
-    marginBottom: 8,
-  },
-  locationBarFill: {
-    height: "100%",
-    borderRadius: 4,
-  },
-  locationTopCrop: {
-    fontSize: 11,
-    fontWeight: "500",
-  },
-
-  // Weekly trend chart
-  trendCard: {
-    borderRadius: 14,
-    borderWidth: 1,
-    padding: 16,
-    marginBottom: 4,
-  },
-  trendChart: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    height: 100,
-  },
-  trendColumn: {
-    flex: 1,
-    alignItems: "center",
-    marginHorizontal: 4,
-  },
-  trendTrack: {
-    height: 70,
-    width: "100%",
-    justifyContent: "flex-end",
-    alignItems: "center",
-  },
-  trendBar: {
-    width: 10,
-    borderRadius: 5,
-  },
-  trendLabel: {
-    marginTop: 6,
-    fontSize: 10,
-    fontWeight: "500",
-  },
-
-  // Prices today
   pricesCard: {
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    borderRadius: 20,
+    borderWidth: 1,
+    padding: 6,
   },
   priceRow: {
     flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
   },
-  priceCropName: {
-    fontSize: 14,
-    fontWeight: "600",
+  priceLeft: {
     flex: 1,
-    marginRight: 8,
   },
-  priceRight: {
-    flexDirection: "row",
-    alignItems: "center",
+  cropTitle: {
+    fontSize: 15,
+    fontWeight: "700",
   },
-  priceValueCol: {
+  marketName: {
+    fontSize: 11,
+    marginTop: 2,
+  },
+  priceCenter: {
     alignItems: "flex-end",
-    marginRight: 10,
+    marginRight: 12,
   },
-  priceValue: {
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  priceArrowRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  priceArrow: {
+  priceText: {
     fontSize: 14,
     fontWeight: "700",
   },
-  sellButton: {
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+  trendPillRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+    marginTop: 2,
   },
-  sellButtonText: {
+  trendText: {
+    fontSize: 11,
+    fontWeight: "700",
+  },
+  sellBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+  },
+  sellBtnText: {
     color: "#FFFFFF",
     fontSize: 12,
     fontWeight: "700",
   },
-
-  // Insights
-  insightsContainer: {
-    marginBottom: 8,
+  locationGrid: {
+    gap: 12,
   },
-  insightCard: {
+  locationCard: {
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 14,
+  },
+  locationTopRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
-    borderRadius: 12,
-    padding: 12,
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  cityRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  cityName: {
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  demandBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  demandText: {
+    fontSize: 10,
+    fontWeight: "800",
+  },
+  progressTrack: {
+    height: 6,
+    backgroundColor: "#F1F5F9",
+    borderRadius: 3,
+    overflow: "hidden",
+    marginVertical: 10,
+  },
+  progressFill: {
+    height: "100%",
+    borderRadius: 3,
+  },
+  locationFooterRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 10,
   },
-  insightText: {
-    flex: 1,
-    fontSize: 13,
-    fontWeight: "500",
-    marginLeft: 8,
-    lineHeight: 18,
-  },
-
-  footerNote: {
+  topCropText: {
     fontSize: 12,
-    textAlign: "center",
-    marginTop: 8,
+    color: "#64748B",
+    fontWeight: "500",
+  },
+  buyersCountText: {
+    fontSize: 12,
+    color: "#0F172A",
+    fontWeight: "700",
+  },
+  targetMarketBtn: {
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingVertical: 8,
+    alignItems: "center",
+  },
+  targetMarketText: {
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  advisoryList: {
+    gap: 12,
+  },
+  advisoryCard: {
+    padding: 16,
+    borderRadius: 18,
+  },
+  advisoryTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 6,
+  },
+  advisoryTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  advisoryBody: {
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 12,
+  },
+  advisoryActionBtn: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 12,
+  },
+  advisoryActionText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "700",
   },
 });
-
-export default FarmerAnalyticsScreen;

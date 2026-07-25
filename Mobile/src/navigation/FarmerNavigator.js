@@ -66,6 +66,7 @@ const FarmerNavigator = () => (
     <Stack.Screen name="EditProduct" component={EditProductScreen} />
     <Stack.Screen name="Settings" component={SettingsScreen} />
     <Stack.Screen name="BuyerProfile" component={BuyerProfileScreen} />
+    <Stack.Screen name="MarketAnalytics" component={FarmerAnalyticsScreen} />
   </Stack.Navigator>
 );
 

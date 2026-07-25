@@ -8,7 +8,7 @@
 //      hasn't set up a local backend (including a fresh EAS build with no
 //      env configured — it will correctly hit the real API out of the box)
 export const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL || "https://omishgo.onrender.com";
+  process.env.EXPO_PUBLIC_API_URL || "https://localhost:5000";
 
 export const API_ENDPOINTS = {
   // Check
@@ -71,5 +71,10 @@ export const API_ENDPOINTS = {
   users: {
     detail: (id) => `/api/v1/users/${id}`,
     activities: "/api/v1/users/me/activities",
+  },
+  sourcing: {
+    createRequest: "/api/v1/sourcing/request",
+    listRequests: "/api/v1/sourcing/requests",
+    respond: (id) => `/api/v1/sourcing/requests/${id}/respond`,
   },
 };

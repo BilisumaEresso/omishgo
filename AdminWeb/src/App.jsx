@@ -10,8 +10,14 @@ import AdminLayout from "./layout/AdminLayout";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Users from "./pages/Users";
-import Orders from "./pages/Orders";
+import UserDetail from "./pages/UserDetail";
 import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
+import Orders from "./pages/Orders";
+import Analytics from "./pages/Analytics";
+import Announcements from "./pages/Announcements";
+import AuditLog from "./pages/AuditLog";
+import OrderDetail from "./pages/OrderDetail";
 import api from "./services/api";
 import { useAuthStore } from "./store/auth.store";
 
@@ -78,6 +84,66 @@ function App() {
             <ProtectedRoute>
               <AdminLayout>
                 <Products />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/products/:id"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <ProductDetail />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <Analytics />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/announcements"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <Announcements />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/audit-logs"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <AuditLog />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users/:id"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <UserDetail />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orders/:id"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <OrderDetail />
               </AdminLayout>
             </ProtectedRoute>
           }

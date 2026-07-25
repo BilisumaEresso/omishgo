@@ -31,13 +31,16 @@ const DashboardLayout = ({
   return (
     <View style={[styles.flex, { backgroundColor }]}>
       <AppHeader
-        title={t("browse.title")}
+        title={title || t("browse.title")}
         showMenu={true}
         showNotification={true}
         notificationCount={0}
         onMenuPress={openSidebar}
-        onNotificationPress={() => navigation.navigate("Notifications")}
+        onNotificationPress={() => navigation?.navigate("Notifications")}
       />
+
+      {/* Fixed Floating Header (Search Bar) */}
+      {headerProps?.fixedHeader || null}
 
       <View style={styles.content}>
         {scrollable ? (

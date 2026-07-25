@@ -21,6 +21,15 @@ const messageSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    sourcingRequestData: {
+      sourcingRequestId: { type: mongoose.Schema.Types.ObjectId, ref: "SourcingRequest" },
+      cropType: String,
+      quantity: Number,
+      unit: { type: String, default: "q" },
+      targetPrice: Number,
+      deliveryRegion: String,
+      status: { type: String, enum: ["pending", "accepted", "rejected", "matched_listing"], default: "pending" },
+    },
   },
   {
     timestamps: true,

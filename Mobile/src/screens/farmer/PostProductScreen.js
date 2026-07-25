@@ -415,6 +415,7 @@ export default function PostProductScreen({ navigation, route }) {
   // Prefill from navigation
   useEffect(() => {
     if (prefill.cropType) setCropType(prefill.cropType);
+    if (prefill.quantity) setQuantity(String(prefill.quantity));
     if (prefill.price !== undefined && prefill.price !== null)
       setPrice(String(prefill.price));
     if (prefill.unit) setUnit(prefill.unit);
@@ -643,7 +644,15 @@ export default function PostProductScreen({ navigation, route }) {
     setLoading(true);
     try {
       const photoUrls = photos.filter((p) => p.url).map((p) => p.url);
-      await api.post(API_ENDPOINTS.products.create, { ...payload, photos: photoUrls });
+      const res = await api.post(API_ENDPOINTS.products.create, { ...payload, photos: photoUrls });
+      if (prefill.sourcingRequestId) {
+        try {
+          await api.post(API_ENDPOINTS.sourcing.respond(prefill.sourcingRequestId), {
+            action: "accepted",
+            productId: res.data?.data?.product?._id,
+          });
+        } catch (_) {}
+      }
       navigation.navigate("FarmerTabs", {
         successMessage: t("postProduct.successMessage"),
       });

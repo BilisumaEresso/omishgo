@@ -52,11 +52,24 @@ const orderSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    customId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    }
   },
   {
     timestamps: true,
   },
 );
+
+import crypto from "crypto";
+
+orderSchema.pre("save", function () {
+  if (this.isNew && !this.customId) {
+    this.customId = `ORD-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
+  }
+});
 
 // Indexes for the most common queries
 orderSchema.index({ buyerId: 1, status: 1 });

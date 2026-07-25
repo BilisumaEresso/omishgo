@@ -1,7 +1,10 @@
 import ApiError from "../../utils/ApiError.js";
 import asyncHandler from "../../utils/asyncHandler.js";
 import sendResponse from "../../utils/sendResponse.js";
+import Message from "../messages/message.model.js";
+import Notification from "../notification/notification.model.js";
 import Order from "../order/order.model.js";
+import SourcingRequest from "../sourcing/sourcing.model.js";
 import Product from "./product.model.js";
 
 /**
@@ -94,6 +97,48 @@ export const createProduct = asyncHandler(async (req, res) => {
     location: location || {},
     status: status || "active",
   });
+
+  // Proactively check if any active buyer SourcingRequest matches this new product
+  try {
+    const matchingRequests = await SourcingRequest.find({
+      cropType: { $regex: new RegExp(cropType, "i") },
+      status: "active",
+    });
+
+    for (const reqItem of matchingRequests) {
+      if (reqItem.buyerId.toString() === req.user._id.toString()) continue;
+
+      const farmerName = req.user.name || "Farmer";
+      const autoMsg = `👋 Hi! I just posted a new listing for ${cropType} (${quantity} ${unit || "q"} at ETB ${price}/${unit || "q"}) that matches your bulk sourcing request!`;
+
+      await Message.create({
+        senderId: req.user._id,
+        receiverId: reqItem.buyerId,
+        content: autoMsg,
+        sourcingRequestData: {
+          sourcingRequestId: reqItem._id,
+          cropType,
+          quantity,
+          unit: unit || "q",
+          targetPrice: price,
+          deliveryRegion: location?.region || "Ethiopia",
+          status: "matched_listing",
+        },
+      });
+
+      try {
+        await Notification.create({
+          userId: reqItem.buyerId,
+          type: "sourcing_match",
+          message: `Farmer ${farmerName} listed ${cropType} matching your bulk request!`,
+          relatedId: product._id.toString(),
+          isRead: false,
+        });
+      } catch (_) {}
+    }
+  } catch (err) {
+    console.warn("Auto-match sourcing check error:", err.message);
+  }
 
   return sendResponse(res, {
     statusCode: 201,

@@ -52,6 +52,11 @@ const userSchema = new mongoose.Schema(
     rating:{
       type: Number,
       default: 3.1,
+    },
+    customId: {
+      type: String,
+      unique: true,
+      sparse: true,
     }
   },
   {
@@ -59,7 +64,14 @@ const userSchema = new mongoose.Schema(
   },
 );
 
+import crypto from "crypto";
+
 userSchema.pre("save", function () {
+  if (this.isNew && !this.customId) {
+    const prefix = this.role === ROLES.BUYER ? "BYR" : "FMR";
+    this.customId = `${prefix}-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
+  }
+  
   if (this.email === "") {
     this.email = undefined;
   }
