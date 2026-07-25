@@ -8,7 +8,7 @@
 //      hasn't set up a local backend (including a fresh EAS build with no
 //      env configured — it will correctly hit the real API out of the box)
 export const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL || "https://localhost:5000";
+  process.env.EXPO_PUBLIC_API_URL || "https://omishgo.onrender.com";
 
 export const API_ENDPOINTS = {
   // Check

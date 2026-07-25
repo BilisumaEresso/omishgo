@@ -1,71 +1,37 @@
 // Mobile/src/screens/buyer/BuyerOrdersScreen.js
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
-  FlatList,
-  RefreshControl,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import { useTranslation } from "react-i18next";
 import AppText from "../../components/common/AppText";
-import AppButton from "../../components/common/AppButton";
-import AppHeader from "../../components/layout/AppHeader";
-import { useSidebar } from "../../context/SidebarContext";
+import DashboardLayout from "../../components/layout/DashBoardLayout";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 
-const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
+export default function BuyerOrdersScreen({ navigation, onSwitchTab }) {
   const { t } = useTranslation();
   const { theme } = useTheme();
+
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
-  const [activeFilter, setActiveFilter] = useState(t("buyerOrders.filterAll"));
-  const { openSidebar } = useSidebar();
+  const [activeFilter, setActiveFilter] = useState("All");
 
-  // Translated filter tabs
-  const filterTabs = useMemo(
-    () => [
-      t("buyerOrders.filterAll"),
-      t("buyerOrders.filterPending"),
-      t("buyerOrders.filterConfirmed"),
-      t("buyerOrders.filterDelivered"),
-      t("buyerOrders.filterCancelled"),
-    ],
-    [t],
-  );
+  const filterTabs = ["All", "Pending", "Confirmed", "In Transit", "Delivered", "Cancelled"];
 
-  // Translated status labels
-  const statusLabel = useMemo(
-    () => ({
-      pending: t("buyerOrders.statusPending"),
-      confirmed: t("buyerOrders.statusConfirmed"),
-      in_transit: t("buyerOrders.statusInTransit"),
-      delivered: t("buyerOrders.statusDelivered"),
-      cancelled: t("buyerOrders.statusCancelled"),
-    }),
-    [t],
-  );
-
-  // Extract theme colors with fallbacks
-  const primary = theme?.colors?.primary || "#1565C0";
-  const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
-  const textSecondary = theme?.colors?.textSecondary || "#4A6080";
-  const background = theme?.colors?.background || "#F5F8FF";
-  const surface = theme?.colors?.surface || "#FFFFFF";
-  const border = theme?.colors?.border || "#D0DEF5";
-  const success = theme?.colors?.success || "#2E7D32";
-  const info = theme?.colors?.info || "#1565C0";
-  const warning = theme?.colors?.warning || "#EF6C00";
-  const errorColor = theme?.colors?.error || "#C62828";
-  const textMuted = theme?.colors?.textMuted || "#8FA3BE";
+  const primaryColor = theme?.colors?.primary || "#1565C0";
+  const surfaceColor = theme?.colors?.surface || "#FFFFFF";
+  const textPrimary = theme?.colors?.textPrimary || "#0F172A";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
 
   const fetchOrders = async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -74,218 +40,91 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
     try {
       const res = await api.get(API_ENDPOINTS.orders.list);
       const raw = res.data?.data?.orders || [];
-      // Normalize for display
+
       const normalized = raw.map((o) => ({
         id: o._id,
-        cropType: o.cropType,
-        quantity: o.quantity,
-        unit: o.unit || t("buyerOrders.unitKg"),
-        totalPrice: o.totalPrice,
-        farmerName: o.farmerId?.name || t("buyerOrders.unknownFarmer"),
+        cropType: o.cropType || "Agricultural Produce",
+        quantity: o.quantity || 1,
+        unit: o.unit || "q",
+        totalPrice: o.totalPrice || 0,
+        farmerName: o.farmerId?.name || "Verified Producer",
         farmerId: o.farmerId?._id,
-        status: statusLabel[o.status] || o.status,
-        rawStatus: o.status,
-        orderedDate: new Date(o.createdAt).toLocaleDateString("en-GB", {
+        status: (o.status || "pending").replace("_", " "),
+        rawStatus: o.status || "pending",
+        orderedDate: new Date(o.createdAt || Date.now()).toLocaleDateString("en-GB", {
           day: "numeric",
           month: "short",
           year: "numeric",
         }),
         _raw: o,
       }));
+
       setOrders(normalized);
     } catch (err) {
-      setError(
-        err?.response?.data?.message ||
-          err.message ||
-          t("buyerOrders.errorLoadOrders"),
-      );
+      setError(err?.response?.data?.message || err.message || "Failed to load orders");
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
 
-  // Refresh every time screen comes into focus
   useFocusEffect(
     useCallback(() => {
       fetchOrders();
-    }, []),
+    }, [])
   );
 
-  // Status badge colors
-  const getStatusColor = (status) => {
-    switch (status) {
-      case t("buyerOrders.statusPending"):
-        return { bg: warning + "18", text: warning };
-      case t("buyerOrders.statusConfirmed"):
-        return { bg: info + "18", text: info };
-      case t("buyerOrders.statusInTransit"):
-        return { bg: primary + "18", text: primary };
-      case t("buyerOrders.statusDelivered"):
-        return { bg: success + "18", text: success };
-      case t("buyerOrders.statusCancelled"):
-        return { bg: errorColor + "18", text: errorColor };
+  const getStatusStyle = (rawStatus) => {
+    switch (rawStatus) {
+      case "pending":
+        return { bg: "#FEF3C7", text: "#B45309" };
+      case "confirmed":
+        return { bg: "#E0F2FE", text: "#0284C7" };
+      case "in_transit":
+        return { bg: "#EFF6FF", text: "#1D4ED8" };
+      case "delivered":
+      case "completed":
+        return { bg: "#ECFDF5", text: "#059669" };
+      case "cancelled":
+        return { bg: "#FEF2F2", text: "#DC2626" };
       default:
-        return { bg: textMuted + "18", text: textMuted };
+        return { bg: "#F1F5F9", text: "#64748B" };
     }
   };
 
-  const filteredOrders =
-    activeFilter === t("buyerOrders.filterAll")
-      ? orders
-      : orders.filter((o) => o.status === activeFilter);
-
-  const renderOrderCard = ({ item }) => {
-    const statusColors = getStatusColor(item.status);
-    const isActive =
-      item.rawStatus === "pending" ||
-      item.rawStatus === "confirmed" ||
-      item.rawStatus === "in_transit";
-
-    return (
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={() =>
-          navigation?.navigate("OrderDetail", {
-            order: item._raw,
-            role: "buyer",
-          })
-        }
-      >
-        <View style={[styles.card, { backgroundColor: surface }]}>
-          <View style={styles.cardRow}>
-            {/* Crop info */}
-            <View style={{ flex: 1 }}>
-              <AppText style={[styles.cropName, { color: textPrimary }]}>
-                {item.cropType}{" "}
-                <AppText
-                  style={{
-                    fontWeight: "400",
-                    fontSize: 14,
-                    color: textSecondary,
-                  }}
-                >
-                  ({item.quantity} {item.unit})
-                </AppText>
-              </AppText>
-              <AppText style={[styles.subText, { color: textSecondary }]}>
-                {item.farmerName} • {item.orderedDate}
-              </AppText>
-            </View>
-
-            {/* Price and badge */}
-            <View style={{ alignItems: "flex-end" }}>
-              <AppText style={[styles.price, { color: primary }]}>
-                {item.totalPrice?.toLocaleString()}
-              </AppText>
-              <View
-                style={[styles.badge, { backgroundColor: statusColors.bg }]}
-              >
-                <AppText
-                  style={[styles.badgeText, { color: statusColors.text }]}
-                >
-                  {item.status}
-                </AppText>
-              </View>
-            </View>
-          </View>
-
-          {/* Message button for active orders */}
-          {isActive && (
-            <TouchableOpacity
-              style={[styles.messageButton, { borderColor: primary }]}
-              onPress={() =>
-                navigation?.navigate("Chat", {
-                  userId: item.farmerId,
-                  userName: item.farmerName,
-                })
-              }
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name="chatbubble-outline"
-                size={14}
-                color={primary}
-                style={{ marginRight: 6 }}
-              />
-              <AppText style={[styles.messageButtonText, { color: primary }]}>
-                {t("buyerOrders.messageFarmer")}
-              </AppText>
-            </TouchableOpacity>
-          )}
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
-  const renderEmpty = () => (
-    <View style={styles.emptyContainer}>
-      <Ionicons
-        name="cube-outline"
-        size={48}
-        color={textSecondary}
-        style={{ marginBottom: 12 }}
-      />
-      <AppText style={[styles.emptyText, { color: textSecondary }]}>
-        {activeFilter === t("buyerOrders.filterAll")
-          ? t("buyerOrders.emptyNoOrders")
-          : t("buyerOrders.emptyNoFilterOrders", {
-              filter: activeFilter.toLowerCase(),
-            })}
-      </AppText>
-      {activeFilter === t("buyerOrders.filterAll") && (
-        <TouchableOpacity
-          onPress={() => onSwitchTab?.("Marketplace")}
-          style={[styles.browseBtn, { backgroundColor: primary }]}
-        >
-          <AppText style={{ color: "#fff", fontWeight: "700", fontSize: 14 }}>
-            {t("buyerOrders.browseMarketplace")}
-          </AppText>
-        </TouchableOpacity>
-      )}
-    </View>
-  );
+  const filteredOrders = useMemo(() => {
+    if (activeFilter === "All") return orders;
+    return orders.filter((o) => o.status.toLowerCase() === activeFilter.toLowerCase());
+  }, [orders, activeFilter]);
 
   return (
-    <View style={[styles.screen, { backgroundColor: background }]}>
-      <AppHeader
-        title={t("buyerOrders.title")}
-        showMenu={true}
-        showNotification={true}
-        notificationCount={0}
-        onMenuPress={openSidebar}
-        onNotificationPress={() => navigation.navigate("Notifications")}
-      />
-
-      {/* Filter tabs */}
-      <View style={styles.filterContainer}>
+    <DashboardLayout
+      role="buyer"
+      title="My Orders & Deliveries"
+      showBack={false}
+      onRefresh={() => fetchOrders(true)}
+      refreshing={refreshing}
+    >
+      {/* Category Tabs */}
+      <View style={styles.filterSection}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.filterScroll}
         >
           {filterTabs.map((tab) => {
-            const isActive = activeFilter === tab;
+            const active = activeFilter === tab;
             return (
               <TouchableOpacity
                 key={tab}
                 style={[
                   styles.filterTab,
-                  {
-                    backgroundColor: isActive ? primary : "transparent",
-                    borderColor: isActive ? primary : border,
-                  },
+                  active && { backgroundColor: primaryColor, borderColor: primaryColor },
                 ]}
                 onPress={() => setActiveFilter(tab)}
+                activeOpacity={0.8}
               >
-                <AppText
-                  style={[
-                    styles.filterText,
-                    {
-                      color: isActive ? surface : textSecondary,
-                    },
-                  ]}
-                >
+                <AppText style={[styles.filterTabText, active && styles.activeFilterText]}>
                   {tab}
                 </AppText>
               </TouchableOpacity>
@@ -294,145 +133,245 @@ const BuyerOrdersScreen = ({ navigation, onSwitchTab }) => {
         </ScrollView>
       </View>
 
-      {/* Loading state */}
+      {/* Orders List */}
       {loading ? (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color={primary} />
+        <View style={styles.centerLoading}>
+          <ActivityIndicator size="large" color={primaryColor} />
+          <AppText style={{ marginTop: 8, color: textSecondary }}>Loading your orders...</AppText>
         </View>
-      ) : error ? (
-        <View style={styles.center}>
-          <AppText style={{ color: errorColor, marginBottom: 12 }}>
-            {error}
+      ) : filteredOrders.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Ionicons name="cube-outline" size={48} color="#94A3B8" />
+          <AppText style={styles.emptyTitle}>No Orders Found</AppText>
+          <AppText style={styles.emptySub}>
+            You have no {activeFilter !== "All" ? activeFilter.toLowerCase() : ""} orders yet. Explore produce listings in the marketplace to place an order.
           </AppText>
-          <AppButton
-            title={t("buyerOrders.retry")}
-            onPress={() => fetchOrders()}
-          />
+          <TouchableOpacity
+            style={[styles.browseBtn, { backgroundColor: primaryColor }]}
+            onPress={() => onSwitchTab?.("Marketplace")}
+            activeOpacity={0.85}
+          >
+            <AppText style={styles.browseBtnText}>Browse Marketplace</AppText>
+          </TouchableOpacity>
         </View>
       ) : (
-        /* Orders list */
-        <FlatList
-          data={filteredOrders}
-          keyExtractor={(item) => item.id}
-          renderItem={renderOrderCard}
-          ListEmptyComponent={renderEmpty}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={() => fetchOrders(true)}
-              colors={[primary]}
-            />
-          }
-        />
+        <View style={styles.ordersGrid}>
+          {filteredOrders.map((item) => {
+            const statusStyle = getStatusStyle(item.rawStatus);
+            const isActive = item.rawStatus === "pending" || item.rawStatus === "confirmed" || item.rawStatus === "in_transit";
+
+            return (
+              <TouchableOpacity
+                key={item.id}
+                style={[styles.card, { backgroundColor: surfaceColor }]}
+                activeOpacity={0.85}
+                onPress={() =>
+                  navigation?.navigate("OrderDetail", {
+                    order: item._raw,
+                    role: "buyer",
+                  })
+                }
+              >
+                <View style={styles.cardHeader}>
+                  <View style={styles.cropTitleWrap}>
+                    <AppText style={[styles.cropTitle, { color: textPrimary }]}>
+                      {item.cropType}
+                    </AppText>
+                    <AppText style={styles.farmerSub}>
+                      {item.farmerName} • {item.orderedDate}
+                    </AppText>
+                  </View>
+
+                  <View style={[styles.statusPill, { backgroundColor: statusStyle.bg }]}>
+                    <AppText style={[styles.statusText, { color: statusStyle.text }]}>
+                      {item.status.toUpperCase()}
+                    </AppText>
+                  </View>
+                </View>
+
+                <View style={styles.priceRow}>
+                  <View>
+                    <AppText style={styles.metaLabel}>Order Volume</AppText>
+                    <AppText style={styles.metaValue}>
+                      {item.quantity} {item.unit}
+                    </AppText>
+                  </View>
+
+                  <View style={{ alignItems: "flex-end" }}>
+                    <AppText style={styles.metaLabel}>Total Price</AppText>
+                    <AppText style={[styles.priceValue, { color: primaryColor }]}>
+                      ETB {Number(item.totalPrice).toLocaleString()}
+                    </AppText>
+                  </View>
+                </View>
+
+                {isActive && (
+                  <View style={styles.cardFooter}>
+                    <TouchableOpacity
+                      style={[styles.chatBtn, { borderColor: primaryColor }]}
+                      onPress={() =>
+                        navigation?.navigate("Chat", {
+                          userId: item.farmerId,
+                          userName: item.farmerName,
+                        })
+                      }
+                      activeOpacity={0.8}
+                    >
+                      <Ionicons name="chatbubble-ellipses-outline" size={15} color={primaryColor} />
+                      <AppText style={[styles.chatBtnText, { color: primaryColor }]}>
+                        Message Farmer Producer
+                      </AppText>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       )}
-    </View>
+
+      <View style={{ height: 80 }} />
+    </DashboardLayout>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  filterContainer: {
-    paddingVertical: 12,
-    paddingLeft: 16,
+  filterSection: {
+    marginBottom: 16,
   },
   filterScroll: {
-    paddingRight: 16,
+    gap: 8,
   },
   filterTab: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 8,
+    borderRadius: 18,
+    backgroundColor: "#FFFFFF",
     borderWidth: 1,
+    borderColor: "#E2E8F0",
   },
-  filterText: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  listContent: {
-    paddingTop: 8,
-    paddingBottom: 20,
-    flexGrow: 1,
-  },
-  card: {
-    borderRadius: 12,
-    padding: 14,
-    marginHorizontal: 16,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  cardRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  cropName: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  subText: {
-    fontSize: 13,
-    marginTop: 4,
-  },
-  price: {
-    fontSize: 15,
-    fontWeight: "700",
-    marginBottom: 4,
-  },
-  badge: {
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  messageButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    marginTop: 12,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-    borderWidth: 1,
-  },
-  messageButtonText: {
+  filterTabText: {
     fontSize: 13,
     fontWeight: "600",
+    color: "#475569",
   },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingBottom: 60,
+  activeFilterText: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+  },
+  ordersGrid: {
     gap: 12,
   },
-  emptyText: {
-    fontSize: 16,
+  card: {
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 12,
+  },
+  cropTitleWrap: {
+    flex: 1,
+    marginRight: 8,
+  },
+  cropTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+  },
+  farmerSub: {
+    fontSize: 12,
+    color: "#64748B",
+    marginTop: 2,
+  },
+  statusPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+  statusText: {
+    fontSize: 11,
+    fontWeight: "800",
+  },
+  priceRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#F8FAFC",
+    padding: 12,
+    borderRadius: 14,
+  },
+  metaLabel: {
+    fontSize: 11,
+    color: "#64748B",
     fontWeight: "500",
+  },
+  metaValue: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginTop: 2,
+  },
+  priceValue: {
+    fontSize: 17,
+    fontWeight: "800",
+    marginTop: 2,
+  },
+  cardFooter: {
+    marginTop: 12,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#F1F5F9",
+  },
+  chatBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1.5,
+  },
+  chatBtnText: {
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  centerLoading: {
+    padding: 40,
+    alignItems: "center",
+  },
+  emptyContainer: {
+    padding: 30,
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginTop: 10,
+  },
+  emptySub: {
+    fontSize: 12,
+    color: "#64748B",
     textAlign: "center",
+    marginTop: 4,
+    marginBottom: 16,
   },
   browseBtn: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 10,
-    marginTop: 4,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 12,
   },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 32,
+  browseBtnText: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "700",
   },
 });
-
-export default BuyerOrdersScreen;

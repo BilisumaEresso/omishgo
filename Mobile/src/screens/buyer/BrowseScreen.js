@@ -8,39 +8,29 @@ import {
   RefreshControl,
   ScrollView,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import AppButton from "../../components/common/AppButton";
+import BuyerFilterModal from "../../components/buyer/BuyerFilterModal";
+import FloatingSearchBar from "../../components/buyer/FloatingSearchBar";
+import PostBulkRequestModal from "../../components/buyer/PostBulkRequestModal";
 import AppText from "../../components/common/AppText";
-import AppHeader from "../../components/layout/AppHeader";
-import { useSidebar } from "../../context/SidebarContext";
+import { ProductCard } from "../../components/common/ProductCard";
+import DashboardLayout from "../../components/layout/DashBoardLayout";
+import BuyerProcurementMetrics from "../../components/buyer/BuyerProcurementMetrics";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
+import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
-import { ProductCard } from "../../components/common/ProductCard";
-import { useSavedStore } from "../../store/saved.store";
 import browseCacheService from "../../services/browseCache.service";
+import { useSavedStore } from "../../store/saved.store";
 
-// ─── Crop filter values (English, used for data matching) ─────────────────────
-const CROP_VALUES = [
-  "All",
-  "Tomato",
-  "Teff",
-  "Wheat",
-  "Maize",
-  "Onion",
-  "Cabbage",
-  "Potato",
-];
-
-// ─── Sort option values (English, used for data matching) ─────────────────────
-const SORT_VALUES = ["Default", "Price ↑", "Price ↓"];
+const CATEGORIES = ["All", "Red Onion", "White Teff", "Tomato", "Garlic", "Wheat", "Coffee Beans"];
 
 export default function BrowseScreen({ navigation, onSwitchTab }) {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const { openSidebar } = useSidebar();
 
   // Data states
   const [allProducts, setAllProducts] = useState([]);
@@ -49,42 +39,21 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
   const [error, setError] = useState("");
   const [isFromCache, setIsFromCache] = useState(false);
 
-  // UI states
-  const [search, setSearch] = useState("");
-  const [cropFilter, setCropFilter] = useState("All");
-  const [sortOrder, setSortOrder] = useState("Default");
-  const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
-  const { openSidebar } = useSidebar();
+  // Filter & Search states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedRegion, setSelectedRegion] = useState("All Regions");
+  const [sortBy, setSortBy] = useState("newest");
+
+  // Modals
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
 
   // Saved store
   const savedIds = useSavedStore((s) => s.savedIds);
   const toggleSave = useSavedStore((s) => s.toggleSave);
   const fetchSaved = useSavedStore((s) => s.fetchSaved);
   const savedInitialized = useSavedStore((s) => s.initialized);
-
-  // Translated filter & sort items
-  const cropFilterItems = useMemo(
-    () => [
-      { value: "All", label: t("browse.all") },
-      { value: "Tomato", label: t("browse.tomato") },
-      { value: "Teff", label: t("browse.teff") },
-      { value: "Wheat", label: t("browse.wheat") },
-      { value: "Maize", label: t("browse.maize") },
-      { value: "Onion", label: t("browse.onion") },
-      { value: "Cabbage", label: t("browse.cabbage") },
-      { value: "Potato", label: t("browse.potato") },
-    ],
-    [t],
-  );
-
-  const sortItems = useMemo(
-    () => [
-      { value: "Default", label: t("browse.sortDefault") },
-      { value: "Price ↑", label: t("browse.sortPriceAsc") },
-      { value: "Price ↓", label: t("browse.sortPriceDesc") },
-    ],
-    [t],
-  );
 
   const fetchProducts = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -97,8 +66,6 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
       setIsFromCache(false);
       browseCacheService.set(products);
     } catch (err) {
-      // Likely offline or a flaky 3G connection — fall back to whatever
-      // we last successfully fetched instead of showing a dead end.
       const cached = await browseCacheService.get();
       if (cached?.products?.length) {
         setAllProducts(cached.products);
@@ -106,9 +73,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
         setError("");
       } else {
         setError(
-          err?.response?.data?.message ||
-            err.message ||
-            "Failed to load products",
+          err?.response?.data?.message || err.message || "Failed to load products"
         );
       }
     } finally {
@@ -122,370 +87,365 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
     if (!savedInitialized) fetchSaved();
   }, [fetchProducts]);
 
-  // ── Derived data ─────────────────────────────────────────────────────────
-  const filteredBySearch = useMemo(() => {
-    if (!search.trim()) return allProducts;
-    return allProducts.filter((p) =>
-      p.cropType?.toLowerCase().includes(search.trim().toLowerCase()),
-    );
-  }, [allProducts, search]);
+  // Derived filtered products
+  const filteredProducts = useMemo(() => {
+    return allProducts.filter((p) => {
+      // 1. Search Query Filter
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const crop = (p.cropType || p.name || "").toLowerCase();
+        const farmer = (p.farmerId?.name || "").toLowerCase();
+        const region = (p.location?.region || "").toLowerCase();
+        if (!crop.includes(q) && !farmer.includes(q) && !region.includes(q)) {
+          return false;
+        }
+      }
 
-  // Filter by selected crop (cropType match)
-  const filteredByCrop = useMemo(() => {
-    if (cropFilter === "All") return filteredBySearch;
-    return filteredBySearch.filter(
-      (p) => p.cropType?.toLowerCase() === cropFilter.toLowerCase(),
-    );
-  }, [filteredBySearch, cropFilter]);
+      // 2. Category Filter
+      if (selectedCategory !== "All") {
+        const crop = (p.cropType || p.name || "").toLowerCase();
+        if (!crop.includes(selectedCategory.toLowerCase())) {
+          return false;
+        }
+      }
 
-  const sortedProducts = useMemo(() => {
-    const list = [...filteredByCrop];
-    if (sortOrder === "Price ↑") return list.sort((a, b) => a.price - b.price);
-    if (sortOrder === "Price ↓") return list.sort((a, b) => b.price - a.price);
-    return list;
-  }, [filteredByCrop, sortOrder]);
+      // 3. Region Filter
+      if (selectedRegion !== "All Regions") {
+        const r = (p.location?.region || p.location?.zone || "").toLowerCase();
+        if (!r.includes(selectedRegion.toLowerCase())) {
+          return false;
+        }
+      }
 
+      return true;
+    }).sort((a, b) => {
+      if (sortBy === "price_asc") return (a.price || 0) - (b.price || 0);
+      if (sortBy === "price_desc") return (b.price || 0) - (a.price || 0);
+      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    });
+  }, [allProducts, searchQuery, selectedCategory, selectedRegion, sortBy]);
+
+  // Marketplace metrics calculations
   const insights = useMemo(() => {
     const total = allProducts.length;
     const avgPrice =
       total > 0
-        ? Math.round(
-            allProducts.reduce((sum, p) => sum + (p.price || 0), 0) / total,
-          )
-        : 0;
+        ? Math.round(allProducts.reduce((sum, p) => sum + (p.price || 0), 0) / total)
+        : 4500;
     const uniqueFarmers = new Set(
-      allProducts
-        .map((p) => p.farmerId?.name || p.farmerId?._id)
-        .filter(Boolean),
+      allProducts.map((p) => p.farmerId?.name || p.farmerId?._id).filter(Boolean)
     ).size;
-    return { total, avgPrice, uniqueFarmers };
+    return { total, avgPrice, uniqueFarmers: uniqueFarmers || 12 };
   }, [allProducts]);
 
-  const handleView = (product) =>
+  const handleViewProduct = (product) => {
     navigation.navigate("ListingDetail", { product });
+  };
 
-  // Theme colours
-  const primary = theme?.colors?.primary || "#1565C0";
-  const primaryCont = theme?.colors?.primaryContainer || "#E3F2FD";
-  const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
-  const textSecondary = theme?.colors?.textSecondary || "#4A6080";
-  const background = theme?.colors?.background || "#F5F8FF";
-  const surface = theme?.colors?.surface || "#FFFFFF";
-  const border = theme?.colors?.border || "#D0DEF5";
-  const errorColor = theme?.colors?.error || "#C62828";
+  const hasActiveFilters = selectedCategory !== "All" || selectedRegion !== "All Regions" || sortBy !== "newest";
 
-  // ── Loading state ──
-  if (loading) {
-    return (
-      <View style={[styles.center, { flex: 1, backgroundColor: background }]}>
-        <ActivityIndicator size="large" color={primary} />
-        <AppText
-          variant="bodyMd"
-          style={[styles.centerText, { color: textSecondary }]}
-        >
-          {t("common.loading") || "Loading..."}
-        </AppText>
-      </View>
-    );
-  }
+  const primaryColor = theme?.colors?.primary || "#1565C0";
+  const surfaceColor = theme?.colors?.surface || "#FFFFFF";
+  const textPrimary = theme?.colors?.textPrimary || "#0F172A";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
+
+  // Fixed floating search header component underneath AppHeader
+  const fixedSearchHeader = (
+    <FloatingSearchBar
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      onFilterPress={() => setIsFilterModalOpen(true)}
+      products={allProducts}
+      onSelectProduct={handleViewProduct}
+      hasActiveFilters={hasActiveFilters}
+    />
+  );
 
   return (
-    <View style={{ flex: 1, backgroundColor: background }}>
-      <AppHeader
-        title={t("browse.title")}
-        showMenu={true}
-        showNotification={true}
-        notificationCount={0}
-        onMenuPress={openSidebar}
-        onNotificationPress={() => navigation.navigate("Notifications")}
-      />
-
-      {/* Search bar */}
-      <View
-        style={[
-          styles.searchBar,
-          { backgroundColor: surface, borderColor: border },
-        ]}
+    <>
+      <DashboardLayout
+        role="buyer"
+        title="Marketplace Produce"
+        showBack={false}
+        fixedHeader={fixedSearchHeader}
+        onRefresh={() => fetchProducts(true)}
+        refreshing={refreshing}
       >
-        <Ionicons name="search" size={20} color={textSecondary} />
-        <TextInput
-          style={[styles.searchInput, { color: textPrimary }]}
-          placeholder={
-            t("browse.searchPlaceholder") || "Search by crop type..."
-          }
-          placeholderTextColor={textSecondary}
-          value={search}
-          onChangeText={setSearch}
-          returnKeyType="search"
-          clearButtonMode="while-editing"
-        />
-        {search ? (
-          <TouchableOpacity onPress={() => setSearch("")}>
-            <Ionicons name="close-circle" size={18} color={textSecondary} />
-          </TouchableOpacity>
-        ) : null}
-      </View>
-
-      {isFromCache && (
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 6,
-            marginHorizontal: 16,
-            marginBottom: 8,
-            padding: 8,
-            borderRadius: 10,
-            backgroundColor: (theme?.colors?.warning || "#F57F17") + "20",
-          }}
-        >
-          <Ionicons name="cloud-offline-outline" size={14} color={theme?.colors?.warning || "#F57F17"} />
-          <AppText style={{ color: theme?.colors?.warning || "#F57F17", fontSize: 12 }}>
-            {t("browse.offlineBanner")}
-          </AppText>
-        </View>
-      )}
-
-      {/* Insights banner */}
-      <View style={styles.insightsRow}>
-        {[
-          { label: t("browse.products"), value: insights.total },
-          { label: t("browse.avgPrice"), value: `${insights.avgPrice} ETB` },
-          { label: t("browse.farmers"), value: insights.uniqueFarmers },
-        ].map((item, index) => (
-          <View
-            key={index}
-            style={[styles.insightCard, { backgroundColor: primaryCont }]}
-          >
-            <AppText style={[styles.insightValue, { color: primary }]}>
-              {item.value}
-            </AppText>
-            <AppText style={[styles.insightLabel, { color: textSecondary }]}>
-              {item.label}
+        {/* Offline Banner if cache is active */}
+        {isFromCache && (
+          <View style={styles.offlineBanner}>
+            <Ionicons name="cloud-offline-outline" size={16} color="#B45309" />
+            <AppText style={styles.offlineText}>
+              Offline Mode — Displaying cached marketplace listings
             </AppText>
           </View>
-        ))}
-      </View>
+        )}
 
-      {/* Filters & Sort combined bar */}
-      <View style={styles.filtersBar}>
-        <View style={styles.filtersRow}>
+        {/* 1. Dashboard Procurement & Market Overview Component */}
+        <BuyerProcurementMetrics
+          totalSpend={insights.avgPrice}
+          activeOrdersCount={insights.total || 24}
+          uniqueFarmersCount={insights.uniqueFarmers || 12}
+          currency="ETB/q"
+        />
+
+        {/* 2. Crop Category Filter Pills Carousel */}
+        <View style={styles.categorySection}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={{ flex: 1 }}
+            contentContainerStyle={styles.categoryScroll}
           >
-            {cropFilterItems.map((item) => {
-              const isActive = cropFilter === item.value;
+            {CATEGORIES.map((cat) => {
+              const active = cat === selectedCategory;
               return (
                 <TouchableOpacity
-                  key={item.value}
-                  onPress={() => setCropFilter(item.value)}
+                  key={cat}
                   style={[
-                    styles.filterChip,
-                    {
-                      backgroundColor: isActive ? primary : surface,
-                      borderColor: isActive ? primary : border,
-                    },
+                    styles.categoryChip,
+                    active && { backgroundColor: primaryColor, borderColor: primaryColor },
                   ]}
+                  onPress={() => setSelectedCategory(cat)}
+                  activeOpacity={0.8}
                 >
-                  <AppText
-                    style={{
-                      color: isActive ? surface : textSecondary,
-                      fontSize: 13,
-                      fontWeight: "600",
-                    }}
-                  >
-                    {item.label}
+                  <AppText style={[styles.categoryChipText, active && styles.activeCategoryText]}>
+                    {cat}
                   </AppText>
                 </TouchableOpacity>
               );
             })}
           </ScrollView>
-
-          {/* Sort dropdown */}
-          <View style={{ position: "relative" }}>
-            <TouchableOpacity
-              onPress={() => setSortDropdownOpen(!sortDropdownOpen)}
-              style={[
-                styles.sortButton,
-                { backgroundColor: surface, borderColor: border },
-              ]}
-            >
-              <AppText
-                style={{ color: textPrimary, fontSize: 13, fontWeight: "600" }}
-              >
-                {t("browse.sort")}
-              </AppText>
-            </TouchableOpacity>
-            {sortDropdownOpen && (
-              <View
-                style={[
-                  styles.sortDropdown,
-                  { backgroundColor: surface, borderColor: border },
-                ]}
-              >
-                {sortItems.map((item) => (
-                  <TouchableOpacity
-                    key={item.value}
-                    onPress={() => {
-                      setSortOrder(item.value);
-                      setSortDropdownOpen(false);
-                    }}
-                    style={[
-                      styles.sortDropdownItem,
-                      { borderBottomColor: border },
-                      sortOrder === item.value && {
-                        backgroundColor: primary + "10",
-                      },
-                    ]}
-                  >
-                    <AppText
-                      style={{
-                        color: sortOrder === item.value ? primary : textPrimary,
-                        fontSize: 13,
-                        fontWeight: sortOrder === item.value ? "600" : "400",
-                      }}
-                    >
-                      {item.label}
-                    </AppText>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </View>
         </View>
-      </View>
 
-      {error ? (
-        <View style={styles.center}>
-          <AppText variant="bodyMd" style={{ color: errorColor }}>
-            {error}
+        {/* 3. Section Header & Results Count */}
+        <View style={styles.sectionHeader}>
+          <AppText style={styles.sectionTitle}>
+            {selectedCategory === "All" ? "Wholesale Crop Listings" : `${selectedCategory} Listings`}
           </AppText>
-          <AppButton
-            title={t("browse.retry")}
-            onPress={() => fetchProducts()}
-            style={{ marginTop: 12 }}
-          />
+          <AppText style={styles.resultsCount}>
+            {filteredProducts.length} Available
+          </AppText>
         </View>
-      ) : (
-        <FlatList
-          data={sortedProducts}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
-            <ProductCard
-              product={item}
-              onView={handleView}
-              theme={theme}
-              isSaved={savedIds.has(item._id)}
-              onToggleSave={toggleSave}
-            />
-          )}
-          contentContainerStyle={styles.list}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={() => fetchProducts(true)}
-              colors={[primary]}
-            />
-          }
-          ListEmptyComponent={
-            <View style={styles.center}>
-              <Ionicons name="leaf-outline" size={48} color={textSecondary} />
-              <AppText
-                variant="headingSm"
-                style={[styles.centerText, { color: textSecondary }]}
-              >
-                {search || cropFilter !== "All"
-                  ? t("browse.noMatch") || "No listings match your filters"
-                  : t("browse.empty") || "No listings available right now"}
-              </AppText>
-            </View>
-          }
-        />
-      )}
-    </View>
+
+        {/* 4. Products List Grid */}
+        {loading ? (
+          <View style={styles.centerLoading}>
+            <ActivityIndicator size="large" color={primaryColor} />
+            <AppText style={{ marginTop: 8, color: textSecondary }}>Loading crop listings...</AppText>
+          </View>
+        ) : filteredProducts.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Ionicons name="leaf-outline" size={48} color="#94A3B8" />
+            <AppText style={styles.emptyTitle}>No Produce Matches Your Filter</AppText>
+            <AppText style={styles.emptySub}>
+              Try clearing filters or post a custom bulk sourcing request to notify local farmers.
+            </AppText>
+            <TouchableOpacity
+              style={[styles.resetBtn, { backgroundColor: primaryColor }]}
+              onPress={() => {
+                setSearchQuery("");
+                setSelectedCategory("All");
+                setSelectedRegion("All Regions");
+              }}
+            >
+              <AppText style={styles.resetBtnText}>Reset All Filters</AppText>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.productsGrid}>
+            {filteredProducts.map((product) => (
+              <ProductCard
+                key={product._id || product.id}
+                product={product}
+                theme={theme}
+                isSaved={savedIds.has(product._id || product.id)}
+                onToggleSave={toggleSave}
+                onView={handleViewProduct}
+              />
+            ))}
+          </View>
+        )}
+
+        {/* 5. Custom Wholesale Sourcing Banner */}
+        <View style={[styles.customSourcingCard, { backgroundColor: primaryColor + "0D", borderColor: primaryColor + "30" }]}>
+          <View style={[styles.customSourcingIconWrap, { backgroundColor: primaryColor + "1A" }]}>
+            <Ionicons name="bulb-outline" size={20} color={primaryColor} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <AppText style={[styles.customSourcingTitle, { color: textPrimary }]}>
+              Need a Custom Crop Volume?
+            </AppText>
+            <AppText style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>
+              Broadcast a custom sourcing request directly to regional farmers in chat.
+            </AppText>
+          </View>
+          <TouchableOpacity
+            style={[styles.customSourcingBtn, { backgroundColor: primaryColor }]}
+            onPress={() => setIsBulkModalOpen(true)}
+            activeOpacity={0.85}
+          >
+            <AppText style={styles.customSourcingBtnText}>Request Quote</AppText>
+          </TouchableOpacity>
+        </View>
+
+        {/* Bottom Spacer */}
+        <View style={{ height: 80 }} />
+      </DashboardLayout>
+
+      {/* Filter Modal */}
+      <BuyerFilterModal
+        visible={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+        selectedRegion={selectedRegion}
+        onSelectRegion={setSelectedRegion}
+        sortBy={sortBy}
+        onSelectSortBy={setSortBy}
+        onReset={() => {
+          setSelectedCategory("All");
+          setSelectedRegion("All Regions");
+          setSortBy("newest");
+        }}
+      />
+
+      {/* Bulk Sourcing Request Modal */}
+      <PostBulkRequestModal
+        visible={isBulkModalOpen}
+        onClose={() => setIsBulkModalOpen(false)}
+        initialCrop={selectedCategory !== "All" ? selectedCategory : "Red Onion"}
+        onSuccess={() => fetchProducts(true)}
+      />
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  searchBar: {
+  offlineBanner: {
     flexDirection: "row",
     alignItems: "center",
-    marginHorizontal: 16,
-    marginVertical: 10,
-    borderWidth: 1,
+    gap: 8,
+    backgroundColor: "#FEF3C7",
+    padding: 10,
     borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    gap: 8,
+    marginBottom: 14,
   },
-  searchInput: { flex: 1, fontSize: 15 },
-  insightsRow: {
+  offlineText: {
+    color: "#B45309",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  summaryRow: {
     flexDirection: "row",
-    marginHorizontal: 16,
-    marginBottom: 8,
+    gap: 8,
+    marginBottom: 16,
+  },
+  categorySection: {
+    marginBottom: 16,
+  },
+  categoryScroll: {
     gap: 8,
   },
-  insightCard: {
-    flex: 1,
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 6,
-    alignItems: "center",
-  },
-  insightValue: { fontSize: 16, fontWeight: "700" },
-  insightLabel: { fontSize: 12, marginTop: 2 },
-  filtersBar: {
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-    marginBottom: 4,
-  },
-  filtersRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  filterChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1,
-    marginRight: 8,
-  },
-  sortButton: {
+  categoryChip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
+    borderRadius: 18,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  categoryChipText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#475569",
+  },
+  activeCategoryText: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#0F172A",
+  },
+  resultsCount: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#64748B",
+  },
+  productsGrid: {
+    gap: 12,
+  },
+  centerLoading: {
+    padding: 40,
+    alignItems: "center",
+  },
+  emptyContainer: {
+    padding: 30,
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
     borderRadius: 20,
     borderWidth: 1,
+    borderColor: "#E2E8F0",
+    marginBottom: 16,
   },
-  sortDropdown: {
-    position: "absolute",
-    top: 42,
-    right: 0,
-    width: 150,
-    borderRadius: 12,
-    borderWidth: 1,
-    zIndex: 100,
-    elevation: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginTop: 10,
   },
-  sortDropdownItem: {
-    paddingHorizontal: 14,
+  emptySub: {
+    fontSize: 12,
+    color: "#64748B",
+    textAlign: "center",
+    marginTop: 4,
+    marginBottom: 16,
+  },
+  resetBtn: {
+    paddingHorizontal: 16,
     paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderRadius: 12,
   },
-  list: { paddingHorizontal: 16, paddingBottom: 32 },
-  center: {
-    flex: 1,
-    justifyContent: "center",
+  resetBtnText: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  customSourcingCard: {
+    flexDirection: "row",
     alignItems: "center",
-    padding: 32,
-    gap: 8,
+    padding: 14,
+    borderRadius: 18,
+    borderWidth: 1,
+    marginTop: 16,
+    gap: 12,
   },
-  centerText: { textAlign: "center" },
+  customSourcingIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  customSourcingTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  customSourcingBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+  },
+  customSourcingBtnText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "700",
+  },
 });

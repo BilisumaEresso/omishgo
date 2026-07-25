@@ -2,520 +2,354 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../../components/common/AppText";
-import AppHeader from "../../components/layout/AppHeader";
+import DashboardLayout from "../../components/layout/DashBoardLayout";
 import api from "../../config/api";
-import { useSidebar } from "../../context/SidebarContext";
+import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
-import { API_ENDPOINTS } from "../../constants/api";
-const LANGUAGES = [{
-  code: "en",
-  label: "English",
-  native: "English"
-}, {
-  code: "am",
-  label: "አማርኛ",
-  native: "Amharic"
-}, {
-  code: "om",
-  label: "Afaan Oromoo",
-  native: "Afan Oromo"
-}];
-const BuyerProfileScreen = ({
-  navigation,
-  onSwitchTab
-}) => {
-  const {
-    theme
-  } = useTheme();
-  const {
-    user,
-    logout,
-    setLanguage
-  } = useAuthStore();
-  const {
-    openSidebar
-  } = useSidebar();
-  const {
-    t,
-    i18n
-  } = useTranslation();
-  const [languageOpen, setLanguageOpen] = useState(false);
-  const [updatingLang, setUpdatingLang] = useState(false);
-  const [saved, setSaved] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const primary = theme?.colors?.primary || "#1565C0";
-  const primaryContainer = theme?.colors?.primaryContainer || "#E3F2FD";
-  const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
-  const textSecondary = theme?.colors?.textSecondary || "#4A6080";
-  const textMuted = theme?.colors?.textMuted || "#8FA3BE";
-  const background = theme?.colors?.background || "#F5F8FF";
-  const surface = theme?.colors?.surface || "#FFFFFF";
-  const border = theme?.colors?.border || "#D0DEF5";
-  const errorColor = theme?.colors?.error || "#C62828";
-  const successColor = theme?.colors?.success || "#2E7D32";
 
-  // KPI data
-  const activeOrders = orders.length;
-  const savedItems = saved.length;
-  const spentAmount = orders.reduce((acc, order) => acc + order.totalPrice, 0);
+const LANGUAGES = [
+  { code: "en", label: "English", native: "English" },
+  { code: "am", label: "አማርኛ", native: "Amharic" },
+  { code: "om", label: "Afaan Oromoo", native: "Afan Oromo" },
+];
+
+export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
+  const { theme } = useTheme();
+  const { user, logout, setLanguage } = useAuthStore();
+  const { t, i18n } = useTranslation();
+
+  const [savedCount, setSavedCount] = useState(0);
+  const [ordersCount, setOrdersCount] = useState(0);
+  const [totalSpent, setTotalSpent] = useState(0);
+  const [languageOpen, setLanguageOpen] = useState(false);
+
+  const primaryColor = theme?.colors?.primary || "#1565C0";
+  const surfaceColor = theme?.colors?.surface || "#FFFFFF";
+  const textPrimary = theme?.colors?.textPrimary || "#0F172A";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
+
   const currentLang = i18n.language || "en";
-  const currentLangLabel = LANGUAGES.find(l => l.code === currentLang)?.native || "English";
+  const currentLangObj = LANGUAGES.find((l) => l.code === currentLang) || LANGUAGES[0];
+
   useEffect(() => {
-    const fetchSaved = async () => {
+    const fetchUserData = async () => {
       try {
-        const res = await api.get(API_ENDPOINTS.saved.list);
-        const fetched = res.data?.data?.products || [];
-        setSaved(fetched);
-      } catch (err) {
-        console.warn("Failed to load saved:", err.message);
-      }
-    };
-    fetchSaved();
-    const fetchOrders = async () => {
+        const savedRes = await api.get(API_ENDPOINTS.saved.list);
+        const savedList = savedRes.data?.data?.products || [];
+        setSavedCount(savedList.length);
+      } catch (_) {}
+
       try {
-        const res = await api.get(API_ENDPOINTS.orders.list);
-        const fetched = res.data?.data?.orders || [];
-        setOrders(fetched);
-      } catch (err) {
-        console.warn("Failed to load orders:", err.message);
-      }
+        const ordersRes = await api.get(API_ENDPOINTS.orders.list);
+        const orderList = ordersRes.data?.data?.orders || [];
+        setOrdersCount(orderList.length);
+        const spent = orderList.reduce((acc, o) => acc + (o.totalPrice || 0), 0);
+        setTotalSpent(spent);
+      } catch (_) {}
     };
-    fetchOrders();
-  });
-  const getLanguageName = code => {
-    switch (code) {
-      case "am":
-        return "Amharic";
-      case "om":
-        return "Afan Oromo";
-      case "en":
-      default:
-        return "English";
-    }
-  };
+
+    fetchUserData();
+  }, []);
+
   const handleLogout = () => {
-    Alert.alert(t("buyerProfile.logoutAlertTitle"), t("buyerProfile.logoutAlertMessage"), [{
-      text: t("buyerProfile.logoutAlertCancel"),
-      style: "cancel"
-    }, {
-      text: t("buyerProfile.logoutAlertConfirm"),
-      style: "destructive",
-      onPress: () => logout()
-    }]);
+    Alert.alert("Sign Out", "Are you sure you want to log out of OmishGo?", [
+      { text: "Cancel", style: "cancel" },
+      { text: "Log Out", style: "destructive", onPress: () => logout() },
+    ]);
   };
-  const handleChangeLanguage = async code => {
-    if (code === currentLang || updatingLang) return;
-    setUpdatingLang(true);
+
+  const handleChangeLanguage = async (code) => {
     try {
       await i18n.changeLanguage(code);
       if (setLanguage) setLanguage(code);
-      api.patch("/api/v1/auth/me/language", {
-        preferredLang: code
-      }).catch(() => {});
-    } catch (err) {
-      console.warn("Language change failed:", err);
-    } finally {
-      setUpdatingLang(false);
       setLanguageOpen(false);
-    }
+    } catch (_) {}
   };
-  const userName = user?.name || t("buyerProfile.fallbackName");
-  const phone = user?.phone || "+251 900 000000";
-  const location = user?.location || {
-    region: "Addis Ababa",
-    zone: "Bole"
-  };
-  const isVerified = user?.isVerified ?? true;
-  return <View style={[styles.screen, {
-    backgroundColor: background
-  }]}>
-      <AppHeader title={t("buyerProfile.title")} showMenu showNotification notificationCount={0} onMenuPress={openSidebar} onNotificationPress={() => navigation.navigate("Notifications")} />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Profile Hero */}
-        <View style={styles.heroSection}>
-          <View style={[styles.avatar, {
-          backgroundColor: primary
-        }]}>
-            <Ionicons name="person" size={40} color="#FFFFFF" />
-          </View>
-          <AppText style={[styles.name, {
-          color: textPrimary
-        }]}>
-            {userName}
-          </AppText>
-          <View style={[styles.rolePill, {
-          backgroundColor: primaryContainer
-        }]}>
-            <AppText style={[styles.roleText, {
-            color: primary
-          }]}>
-              {t("buyerProfile.roleBuyer")}
-            </AppText>
-          </View>
-          <AppText style={[styles.phoneNumber, {
-          color: textSecondary
-        }]}>
-            {phone}
-          </AppText>
+  return (
+    <DashboardLayout role="buyer" title="Buyer Account" showBack={false}>
+      {/* Profile Header Card */}
+      <View style={[styles.profileHeaderCard, { backgroundColor: surfaceColor }]}>
+        <View style={[styles.avatar, { backgroundColor: primaryColor }]}>
+          <Ionicons name="person" size={36} color="#FFFFFF" />
         </View>
 
-        {/* Stats Row */}
-        <View style={styles.statsRow}>
-          <View style={[styles.statCard, {
-          backgroundColor: surface
-        }]}>
-            <AppText style={[styles.statValue, {
-            color: textPrimary
-          }]}>
-              {activeOrders}
-            </AppText>
-            <AppText style={[styles.statLabel, {
-            color: textSecondary
-          }]}>
-              {t("buyerProfile.statsOrders")}
-            </AppText>
-          </View>
-          <View style={[styles.statCard, {
-          backgroundColor: surface
-        }]}>
-            <AppText style={[styles.statValue, {
-            color: textPrimary
-          }]}>
-              {saved.length}
-            </AppText>
-            <AppText style={[styles.statLabel, {
-            color: textSecondary
-          }]}>
-              {t("buyerProfile.statsSaved")}
-            </AppText>
-          </View>
-          <View style={[styles.statCard, {
-          backgroundColor: surface
-        }]}>
-            <AppText style={[styles.statValue, {
-            color: textPrimary
-          }]}>
-              {t("buyerProfile.spentAmount", {
-              amount: spentAmount
-            })}
-            </AppText>
-            <AppText style={[styles.statLabel, {
-            color: textSecondary
-          }]}>
-              {t("buyerProfile.statsSpent")}
-            </AppText>
-          </View>
-        </View>
-
-        {/* Account Info Section */}
-        <AppText style={[styles.sectionTitle, {
-        color: textPrimary
-      }]}>
-          {t("buyerProfile.sectionAccountInfo")}
+        <AppText style={[styles.userName, { color: textPrimary }]}>
+          {user?.name || "Wholesale Buyer"}
         </AppText>
-        <View style={[styles.infoCard, {
-        backgroundColor: surface
-      }]}>
-          <View style={styles.infoRow}>
-            <Ionicons name="location-outline" size={20} color={textSecondary} />
-            <View style={styles.infoTextContainer}>
-              <AppText style={[styles.infoLabel, {
-              color: textMuted
-            }]}>
-                {t("buyerProfile.infoLocation")}
-              </AppText>
-              <AppText style={[styles.infoValue, {
-              color: textPrimary
-            }]}>
-                {location.region}, {location.zone}
-              </AppText>
-            </View>
-          </View>
-          <View style={[styles.divider, {
-          backgroundColor: border
-        }]} />
-          <View style={styles.infoRow}>
-            <Ionicons name="call-outline" size={20} color={textSecondary} />
-            <View style={styles.infoTextContainer}>
-              <AppText style={[styles.infoLabel, {
-              color: textMuted
-            }]}>
-                {t("buyerProfile.infoPhone")}
-              </AppText>
-              <AppText style={[styles.infoValue, {
-              color: textPrimary
-            }]}>
-                {phone}
-              </AppText>
-            </View>
-          </View>
-          <View style={[styles.divider, {
-          backgroundColor: border
-        }]} />
-          <View style={styles.infoRow}>
-            <Ionicons name="shield-checkmark-outline" size={20} color={isVerified ? successColor : textMuted} />
-            <View style={styles.infoTextContainer}>
-              <AppText style={[styles.infoLabel, {
-              color: textMuted
-            }]}>
-                {t("buyerProfile.infoStatus")}
-              </AppText>
-              <AppText style={[styles.infoValue, {
-              color: isVerified ? successColor : textMuted
-            }]}>
-                {isVerified ? t("buyerProfile.statusVerified") : t("buyerProfile.statusUnverified")}
-              </AppText>
-            </View>
-          </View>
-        </View>
 
-        {/* Language Section – dropdown style */}
-        <AppText style={[styles.sectionTitle, {
-        color: textPrimary,
-        marginTop: 24
-      }]}>
-          {t("buyerProfile.sectionLanguage")}
-        </AppText>
-        <View style={[styles.infoCard, {
-        backgroundColor: surface
-      }]}>
-          <TouchableOpacity onPress={() => setLanguageOpen(!languageOpen)} style={styles.languageToggle}>
-            <View style={{
-            flexDirection: "row",
-            alignItems: "center"
-          }}>
-              <Ionicons name="globe-outline" size={20} color={textSecondary} style={{
-              marginRight: 12
-            }} />
-              <AppText style={{
-              color: textPrimary,
-              fontSize: 15,
-              fontWeight: "500"
-            }}>
-                {currentLangLabel}
-              </AppText>
-            </View>
-            <Ionicons name={languageOpen ? "chevron-up" : "chevron-down"} size={18} color={textSecondary} />
-          </TouchableOpacity>
-          {languageOpen && <View style={styles.languageList}>
-              {LANGUAGES.map(lang => <TouchableOpacity key={lang.code} onPress={() => handleChangeLanguage(lang.code)} style={[styles.languageOption, currentLang === lang.code && {
-            backgroundColor: primary + "15"
-          }]} disabled={updatingLang}>
-                  <AppText style={{
-              color: currentLang === lang.code ? primary : textPrimary,
-              fontSize: 14,
-              fontWeight: currentLang === lang.code ? "600" : "400"
-            }}>
-                    {lang.native} ({lang.label})
-                  </AppText>
-                  {currentLang === lang.code && <Ionicons name="checkmark" size={18} color={primary} />}
-                </TouchableOpacity>)}
-            </View>}
-        </View>
-
-        {/* Settings menu item – fixed UI */}
-        <TouchableOpacity style={[styles.menuItem, {
-        backgroundColor: surface,
-        borderColor: border
-      }]} onPress={() => navigation?.navigate("Settings")} activeOpacity={0.7}>
-          <Ionicons name="settings-outline" size={20} color={primary} />
-          <AppText style={[styles.menuLabel, {
-          color: textPrimary
-        }]}>
-            {t("farmerProfile.menuSettings")}
+        <View style={styles.verifiedBadge}>
+          <Ionicons name="checkmark-circle" size={14} color={primaryColor} />
+          <AppText style={[styles.verifiedText, { color: primaryColor }]}>
+            Verified Procurement Partner
           </AppText>
-          <Ionicons name="chevron-forward" size={16} color={textMuted} style={{
-          marginLeft: "auto"
-        }} />
+        </View>
+
+        <AppText style={[styles.phoneText, { color: textSecondary }]}>
+          {user?.phone || "+251 900 000 000"} • {user?.location?.region || "Addis Ababa"}
+        </AppText>
+      </View>
+
+      {/* Account KPI Stats */}
+      <View style={styles.statsRow}>
+        <TouchableOpacity
+          style={[styles.statBox, { backgroundColor: "#E0F2FE" }]}
+          onPress={() => onSwitchTab?.("Orders")}
+        >
+          <AppText style={styles.statNumber}>{ordersCount}</AppText>
+          <AppText style={styles.statLabel}>Orders</AppText>
         </TouchableOpacity>
 
-        {/* Logout Button */}
-        <View style={[styles.logoutContainer, {
-        backgroundColor: background
-      }]}>
-          <TouchableOpacity style={[styles.logoutButton, {
-          backgroundColor: errorColor
-        }]} onPress={handleLogout} activeOpacity={0.8}>
-            <Ionicons name="log-out-outline" size={20} color="#FFFFFF" style={{
-            marginRight: 8
-          }} />
-            <AppText style={styles.logoutText}>
-              {t("buyerProfile.logoutButton")}
-            </AppText>
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.statBox, { backgroundColor: "#FCE7F3" }]}
+          onPress={() => onSwitchTab?.("Saved")}
+        >
+          <AppText style={styles.statNumber}>{savedCount}</AppText>
+          <AppText style={styles.statLabel}>Saved</AppText>
+        </TouchableOpacity>
+
+        <View style={[styles.statBox, { backgroundColor: "#D1FAE5" }]}>
+          <AppText style={styles.statNumber}>
+            ETB {Number(totalSpent).toLocaleString()}
+          </AppText>
+          <AppText style={styles.statLabel}>Total Spend</AppText>
         </View>
-      </ScrollView>
-    </View>;
-};
+      </View>
+
+      {/* Account Settings List */}
+      <View style={[styles.settingsGroup, { backgroundColor: surfaceColor }]}>
+        <AppText style={styles.groupTitle}>Preferences & Settings</AppText>
+
+        {/* Language Selector */}
+        <TouchableOpacity
+          style={styles.settingItem}
+          onPress={() => setLanguageOpen(!languageOpen)}
+          activeOpacity={0.8}
+        >
+          <View style={styles.settingLeft}>
+            <View style={[styles.iconWrap, { backgroundColor: "rgba(21, 101, 192, 0.08)" }]}>
+              <Ionicons name="globe-outline" size={20} color={primaryColor} />
+            </View>
+            <View>
+              <AppText style={styles.settingTitle}>Language / ቋንቋ</AppText>
+              <AppText style={styles.settingSub}>{currentLangObj.label} ({currentLangObj.native})</AppText>
+            </View>
+          </View>
+          <Ionicons name={languageOpen ? "chevron-up" : "chevron-down"} size={18} color="#64748B" />
+        </TouchableOpacity>
+
+        {languageOpen && (
+          <View style={styles.languageDropdown}>
+            {LANGUAGES.map((lang) => (
+              <TouchableOpacity
+                key={lang.code}
+                style={[
+                  styles.langOption,
+                  lang.code === currentLang && { backgroundColor: primaryColor + "15" },
+                ]}
+                onPress={() => handleChangeLanguage(lang.code)}
+              >
+                <AppText style={[styles.langText, lang.code === currentLang && { color: primaryColor, fontWeight: "700" }]}>
+                  {lang.label} ({lang.native})
+                </AppText>
+                {lang.code === currentLang && (
+                  <Ionicons name="checkmark" size={16} color={primaryColor} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {/* Quick Sourcing Request Action */}
+        <TouchableOpacity
+          style={styles.settingItem}
+          onPress={() => navigation?.navigate("MarketAnalytics")}
+          activeOpacity={0.8}
+        >
+          <View style={styles.settingLeft}>
+            <View style={[styles.iconWrap, { backgroundColor: "rgba(16, 185, 129, 0.1)" }]}>
+              <Ionicons name="stats-chart-outline" size={20} color="#10B981" />
+            </View>
+            <View>
+              <AppText style={styles.settingTitle}>Market Price Analytics</AppText>
+              <AppText style={styles.settingSub}>View regional crop wholesale price trends</AppText>
+            </View>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color="#64748B" />
+        </TouchableOpacity>
+
+        {/* Help & FAQs */}
+        <TouchableOpacity
+          style={styles.settingItem}
+          onPress={() => navigation?.navigate("HelpCenter")}
+          activeOpacity={0.8}
+        >
+          <View style={styles.settingLeft}>
+            <View style={[styles.iconWrap, { backgroundColor: "rgba(245, 158, 11, 0.1)" }]}>
+              <Ionicons name="help-circle-outline" size={20} color="#F59E0B" />
+            </View>
+            <View>
+              <AppText style={styles.settingTitle}>Help & Support</AppText>
+              <AppText style={styles.settingSub}>FAQs and contact customer service</AppText>
+            </View>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color="#64748B" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Logout Button */}
+      <TouchableOpacity
+        style={styles.logoutBtn}
+        onPress={handleLogout}
+        activeOpacity={0.85}
+      >
+        <Ionicons name="log-out-outline" size={18} color="#EF4444" />
+        <AppText style={styles.logoutBtnText}>Sign Out Account</AppText>
+      </TouchableOpacity>
+
+      <View style={{ height: 80 }} />
+    </DashboardLayout>
+  );
+}
+
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1
-  },
-  scrollContent: {
-    paddingBottom: 20
-  },
-  heroSection: {
+  profileHeaderCard: {
     alignItems: "center",
-    paddingVertical: 28,
-    paddingHorizontal: 16
+    padding: 20,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    marginBottom: 16,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 12
+    marginBottom: 12,
   },
-  name: {
+  userName: {
     fontSize: 20,
-    fontWeight: "700",
-    marginBottom: 8
+    fontWeight: "800",
   },
-  rolePill: {
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginBottom: 8
+  verifiedBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 4,
+    marginBottom: 6,
   },
-  roleText: {
+  verifiedText: {
     fontSize: 12,
     fontWeight: "700",
-    letterSpacing: 0.5
   },
-  phoneNumber: {
-    fontSize: 15
+  phoneText: {
+    fontSize: 13,
+    color: "#64748B",
   },
   statsRow: {
     flexDirection: "row",
-    paddingHorizontal: 16,
-    marginBottom: 20
+    gap: 10,
+    marginBottom: 16,
   },
-  statCard: {
+  statBox: {
     flex: 1,
-    borderRadius: 12,
     padding: 14,
+    borderRadius: 18,
     alignItems: "center",
-    marginHorizontal: 4,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2
+    justifyContent: "center",
   },
-  statValue: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 4
+  statNumber: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: "#0F172A",
   },
   statLabel: {
-    fontSize: 13
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#64748B",
+    marginTop: 2,
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    marginHorizontal: 16,
-    marginBottom: 10,
-    marginTop: 4
-  },
-  infoCard: {
-    marginHorizontal: 16,
-    borderRadius: 12,
-    padding: 4,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2
-  },
-  infoRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 12
-  },
-  infoTextContainer: {
-    marginLeft: 12,
-    flex: 1
-  },
-  infoLabel: {
-    fontSize: 12,
-    marginBottom: 2
-  },
-  infoValue: {
-    fontSize: 15,
-    fontWeight: "500"
-  },
-  divider: {
-    height: 1,
-    marginHorizontal: 12
-  },
-  // Language dropdown
-  languageToggle: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 12,
-    paddingVertical: 14
-  },
-  languageList: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "#D0DEF5",
-    paddingVertical: 4
-  },
-  languageOption: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    marginHorizontal: 8,
-    borderRadius: 8
-  },
-  // Settings menu item
-  menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 16,
-    marginTop: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 14,
-    borderRadius: 12,
+  settingsGroup: {
+    borderRadius: 24,
+    padding: 16,
     borderWidth: 1,
-    gap: 12
+    borderColor: "#E2E8F0",
+    marginBottom: 16,
   },
-  menuLabel: {
+  groupTitle: {
     fontSize: 15,
-    fontWeight: "500",
-    flex: 1
+    fontWeight: "700",
+    color: "#0F172A",
+    marginBottom: 12,
   },
-  logoutContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: Platform.OS === "ios" ? 20 : 16,
-    paddingTop: 10,
-    marginTop: 16
+  settingItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9",
   },
-  logoutButton: {
+  settingLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flex: 1,
+  },
+  iconWrap: {
+    width: 38,
+    height: 38,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  settingTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#0F172A",
+  },
+  settingSub: {
+    fontSize: 12,
+    color: "#64748B",
+    marginTop: 1,
+  },
+  languageDropdown: {
+    backgroundColor: "#F8FAFC",
+    borderRadius: 14,
+    padding: 8,
+    marginVertical: 8,
+    gap: 4,
+  },
+  langOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 10,
+    borderRadius: 10,
+  },
+  langText: {
+    fontSize: 13,
+    color: "#334155",
+  },
+  logoutBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    height: 48,
-    borderRadius: 12
+    gap: 8,
+    backgroundColor: "#FEF2F2",
+    paddingVertical: 14,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "#FECACA",
   },
-  logoutText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "700"
-  }
+  logoutBtnText: {
+    color: "#EF4444",
+    fontSize: 14,
+    fontWeight: "700",
+  },
 });
-export default BuyerProfileScreen;

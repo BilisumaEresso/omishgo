@@ -1,545 +1,680 @@
 // Mobile/src/screens/buyer/ListingDetailScreen.js
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
-import { View, ScrollView, StyleSheet, Linking, Alert, TouchableOpacity, StatusBar, Platform, TextInput, Modal } from "react-native";
 import { useTranslation } from "react-i18next";
+import {
+  Alert,
+  Linking,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import AppButton from "../../components/common/AppButton";
+import AppText from "../../components/common/AppText";
+import AppHeader from "../../components/layout/AppHeader";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
-import AppText from "../../components/common/AppText";
-import AppButton from "../../components/common/AppButton";
 import { useTheme } from "../../hooks/useTheme";
 import { useSavedStore } from "../../store/saved.store";
 
-// ─── Info Row ─────────────────────────────────────────────────────────────────
-const InfoRow = ({
-  iconName,
-  label,
-  value,
-  theme
-}) => {
-  const primary = theme?.colors?.primary || "#1565C0";
-  const textSecondary = theme?.colors?.textSecondary || "#4A6080";
-  const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
-  const border = theme?.colors?.border || "#D0DEF5";
-  return <View style={[styles.infoRow, {
-    borderBottomColor: border
-  }]}>
-      <Ionicons name={iconName} size={20} color={primary} style={{
-      marginTop: 2
-    }} />
-      <View style={styles.infoContent}>
-        <AppText variant="label" style={{
-        color: textSecondary
-      }}>
-          {label}
-        </AppText>
-        <AppText variant="bodyMd" style={{
-        color: textPrimary
-      }}>
-          {value || "—"}
-        </AppText>
-      </View>
-    </View>;
-};
-export default function ListingDetailScreen({
-  route,
-  navigation
-}) {
-  const {
-    t
-  } = useTranslation();
-  const {
-    theme
-  } = useTheme();
-  const {
-    product
-  } = route.params || {};
-  const isSaved = useSavedStore(s => s.isSaved(product?._id || product?.id));
-  const toggleSave = useSavedStore(s => s.toggleSave);
+export default function ListingDetailScreen({ route, navigation }) {
+  const { t } = useTranslation();
+  const { theme } = useTheme();
+  const { product } = route.params || {};
+
+  const isSaved = useSavedStore((s) => s.isSaved(product?._id || product?.id));
+  const toggleSave = useSavedStore((s) => s.toggleSave);
+
   const [ordering, setOrdering] = useState(false);
   const [buyQty, setBuyQty] = useState("");
   const [showBuyModal, setShowBuyModal] = useState(false);
 
-  // Extract theme colors with buyer fallbacks
-  const primary = theme?.colors?.primary || "#1565C0";
-  const surface = theme?.colors?.surface || "#FFFFFF";
-  const textPrimary = theme?.colors?.textPrimary || "#0D1B2A";
-  const textSecondary = theme?.colors?.textSecondary || "#4A6080";
-  const textMuted = theme?.colors?.textMuted || "#8FA3BE";
-  const border = theme?.colors?.border || "#D0DEF5";
-  const background = theme?.colors?.background || "#F5F8FF";
-  const success = theme?.colors?.success || "#2E7D32";
-  const warning = theme?.colors?.warning || "#EF6C00";
-  const error = theme?.colors?.error || "#C62828";
-  // ─── Helper: relative time (inside component to access t) ──────────────────
-  const timeAgo = dateStr => {
-    if (!dateStr) return "";
-    const now = Date.now();
-    const then = new Date(dateStr).getTime();
-    const diffMs = now - then;
-    const days = Math.floor(diffMs / 86400000);
-    if (days === 0) return t("listingDetail.timeToday");
-    if (days === 1) return t("listingDetail.timeYesterday");
-    return t("listingDetail.timeDaysAgo", {
-      count: days
-    });
-  };
+  const primaryColor = theme?.colors?.primary || "#1565C0";
+  const surfaceColor = theme?.colors?.surface || "#FFFFFF";
+  const textPrimary = theme?.colors?.textPrimary || "#0F172A";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
+
   if (!product) {
-    return <View style={[styles.fallbackContainer, {
-      backgroundColor: background
-    }]}>
-        <AppText variant="headingSm" style={{
-        color: textPrimary
-      }}>
-          {t("browse.notFound") || "Listing not found"}
-        </AppText>
-        <AppButton title={t("listingDetail.goBack")} onPress={() => navigation.goBack()} style={{
-        marginTop: 16
-      }} />
-      </View>;
+    return (
+      <DashboardLayout role="buyer" title="Produce Listing" showBack={true}>
+        <View style={styles.emptyContainer}>
+          <Ionicons name="leaf-outline" size={48} color="#94A3B8" />
+          <AppText style={styles.emptyTitle}>Listing Not Found</AppText>
+          <AppText style={styles.emptySub}>This produce listing has been removed or is no longer active.</AppText>
+          <TouchableOpacity style={[styles.backBtn, { backgroundColor: primaryColor }]} onPress={() => navigation.goBack()}>
+            <AppText style={styles.backBtnText}>Go Back</AppText>
+          </TouchableOpacity>
+        </View>
+      </DashboardLayout>
+    );
   }
+
   const farmer = product.farmerId || {};
   const loc = product.location || {};
-  const farmerName = farmer.name || t("browse.unknownFarmer") || "Unknown Farmer";
+  const farmerName = farmer.name || "Verified Local Producer";
   const farmerPhone = farmer.phone || null;
-  const unit = product.unit || "kg";
+  const unit = product.unit || "q";
 
-  // Mock market insights
-  const avgMarketPrice = Math.round(product.price * (0.85 + Math.random() * 0.3));
-  const demandLevel = Math.random() > 0.6 ? "High" : "Medium";
-  const listedTime = timeAgo(product.createdAt || new Date().toISOString());
+  const avgMarketPrice = Math.round((product.price || 4000) * 0.95);
+
   const handleMessageFarmer = () => {
     if (!farmer._id) {
-      Alert.alert(t("listingDetail.farmerUnavailableTitle"), t("listingDetail.farmerUnavailableMessage"));
+      Alert.alert("Producer Unavailable", "This producer cannot be messaged directly.");
       return;
     }
     navigation.navigate("Chat", {
       userId: farmer._id,
-      userName: farmerName
+      userName: farmerName,
     });
   };
+
   const handleCallFarmer = () => {
     if (!farmerPhone) {
-      Alert.alert(t("browse.noPhone") || "No phone number", t("browse.noPhoneDesc") || "This farmer has not provided a phone number.");
+      Alert.alert("Phone Unavailable", "This producer has not shared a phone number.");
       return;
     }
-    Linking.openURL(`tel:${farmerPhone}`).catch(() => Alert.alert(t("common.error") || "Error", "Could not open the dialler"));
+    Linking.openURL(`tel:${farmerPhone}`).catch(() =>
+      Alert.alert("Error", "Could not open phone dialer")
+    );
   };
 
-  // Status color based on theme
-  const getStatusColor = status => {
-    switch (status) {
-      case "sold":
-        return error;
-      case "draft":
-        return textMuted;
-      default:
-        return success;
-      // active
-    }
-  };
-
-  // Demand color based on theme
-  const getDemandColor = level => {
-    switch (level) {
-      case "High":
-        return success;
-      case "Medium":
-        return warning;
-      default:
-        return textMuted;
-    }
-  };
-  const handleSave = () => {
-    if (product) toggleSave(product);
-  };
-  const handleBuyNow = async () => {
+  const handlePlaceOrder = async () => {
     const qty = parseFloat(buyQty);
     if (!qty || qty <= 0) {
-      Alert.alert(t("listingDetail.invalidQuantityTitle"), t("listingDetail.invalidQuantityMessage"));
+      Alert.alert("Invalid Volume", "Please enter a valid order volume in quintals.");
       return;
     }
     if (qty > product.quantity) {
-      Alert.alert(t("listingDetail.quantityExceededTitle"), t("listingDetail.quantityExceededMessage", {
-        max: product.quantity,
-        unit
-      }));
+      Alert.alert("Volume Exceeded", `Maximum available stock is ${product.quantity} ${unit}.`);
       return;
     }
+
     setOrdering(true);
     try {
       await api.post(API_ENDPOINTS.orders.create, {
         productId: product._id || product.id,
-        quantity: qty
+        quantity: qty,
       });
       setShowBuyModal(false);
       setBuyQty("");
-      Alert.alert(t("listingDetail.orderPlacedTitle"), t("listingDetail.orderPlacedMessage", {
-        qty,
-        unit,
-        cropType: product.cropType
-      }), [{
-        text: t("listingDetail.viewOrders"),
-        onPress: () => navigation.navigate("BuyerTabs")
-      }]);
+      Alert.alert(
+        "Order Sent to Farmer! 🎉",
+        `Your wholesale purchase request for ${qty} ${unit} of ${product.cropType} has been submitted cleanly.`,
+        [
+          {
+            text: "View Orders",
+            onPress: () => navigation.navigate("Orders"),
+          },
+        ]
+      );
     } catch (err) {
-      Alert.alert(t("listingDetail.orderFailedTitle"), err?.response?.data?.message || t("listingDetail.couldNotPlaceOrder"));
+      Alert.alert("Order Error", err?.response?.data?.message || "Failed to submit order.");
     } finally {
       setOrdering(false);
     }
   };
 
-  // Translated status text
-  const statusText = (() => {
-    switch (product.status) {
-      case "sold":
-        return t("listingDetail.statusSold");
-      case "draft":
-        return t("listingDetail.statusDraft");
-      default:
-        return t("listingDetail.statusActive");
-    }
-  })();
-  const demandText = demandLevel === "High" ? t("listingDetail.demandHigh") : t("listingDetail.demandMedium");
-  return <View style={[styles.container, {
-    backgroundColor: background
-  }]}>
-      {/* Fixed Header */}
-      <View style={[styles.header, {
-      backgroundColor: surface,
-      borderBottomColor: border,
-      paddingTop: Platform.OS === "android" ? (StatusBar.currentHeight || 24) + 12 : 54
-    }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color={primary} />
+  return (
+    <View style={styles.container}>
+
+    <AppHeader title="Produce Detail" showBack={true} onBackPress={() => navigation.goBack()} />
+        <View
+          title="Produce Detail"
+          showBack={true}
+          onBackPress={() => navigation.goBack()}
+        >
+        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+
+      <View style={styles.topTitleRow}>
+        <View style={{ flex: 1 }}>
+          <AppText style={[styles.cropTitle, { color: textPrimary }]}>
+            {product.cropType}
+          </AppText>
+          <AppText style={styles.cropCategory}>
+            Fresh Wholesale Agricultural Produce
+          </AppText>
+        </View>
+
+        <TouchableOpacity
+          style={[
+            styles.bookmarkBtn,
+            isSaved && { backgroundColor: primaryColor + "15" },
+          ]}
+          onPress={() => toggleSave(product)}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons
+            name={isSaved ? "bookmark" : "bookmark-outline"}
+            size={22}
+            color={primaryColor}
+          />
         </TouchableOpacity>
-        <AppText variant="headingMd" numberOfLines={1} style={{
-        flex: 1,
-        textAlign: "center",
-        color: textPrimary,
-        marginHorizontal: 10
-      }}>
-          {product.cropType}
-        </AppText>
-        <TouchableOpacity onPress={handleSave} style={styles.saveBtn} hitSlop={{
-        top: 10,
-        bottom: 10,
-        left: 10,
-        right: 10
-      }}>
-          <Ionicons name={isSaved ? "bookmark" : "bookmark-outline"} size={24} color={primary} />
+      </View>
+          </ScrollView>
+
+      {/* Saturated Price Banner */}
+      <View style={[styles.priceBanner, { backgroundColor: primaryColor }]}>
+        <View>
+          <AppText style={styles.priceLabel}>Wholesale Unit Rate</AppText>
+          <AppText style={styles.priceAmount}>
+            ETB {Number(product.price).toLocaleString()}{" "}
+            <AppText style={styles.priceUnit}>/ {unit}</AppText>
+          </AppText>
+        </View>
+
+        <View style={styles.stockBadge}>
+          <Ionicons name="cube-outline" size={14} color="#FFFFFF" />
+          <AppText style={styles.stockText}>
+            {product.quantity} {unit} Available
+          </AppText>
+        </View>
+      </View>
+
+      {/* Market Regional Trends Card */}
+      <View style={[styles.card, { backgroundColor: surfaceColor }]}>
+        <View style={styles.cardHeaderRow}>
+          <Ionicons name="trending-up-outline" size={18} color={primaryColor} />
+          <AppText style={styles.cardTitle}>
+            Regional Market Price Index
+          </AppText>
+        </View>
+
+        <View style={styles.insightsGrid}>
+          <View style={styles.insightBox}>
+            <AppText style={styles.insightLabel}>Regional Avg</AppText>
+            <AppText style={[styles.insightValue, { color: primaryColor }]}>
+              ETB {avgMarketPrice.toLocaleString()} / {unit}
+            </AppText>
+          </View>
+          <View style={styles.insightBox}>
+            <AppText style={styles.insightLabel}>Market Demand</AppText>
+            <AppText style={[styles.insightValue, { color: "#059669" }]}>
+              High Demand
+            </AppText>
+          </View>
+          <View style={styles.insightBox}>
+            <AppText style={styles.insightLabel}>Harvest Status</AppText>
+            <AppText style={styles.insightValue}>Fresh Harvest</AppText>
+          </View>
+        </View>
+      </View>
+
+      {/* Product Details Card */}
+      <View style={[styles.card, { backgroundColor: surfaceColor }]}>
+        <AppText style={styles.cardTitle}>Produce Specifications</AppText>
+
+        <View style={styles.specRow}>
+          <AppText style={styles.specKey}>Crop Type</AppText>
+          <AppText style={styles.specVal}>{product.cropType}</AppText>
+        </View>
+        <View style={styles.specRow}>
+          <AppText style={styles.specKey}>Available Stock</AppText>
+          <AppText style={styles.specVal}>
+            {product.quantity} {unit}
+          </AppText>
+        </View>
+        <View style={styles.specRow}>
+          <AppText style={styles.specKey}>Harvest Location</AppText>
+          <AppText style={styles.specVal}>
+            {[loc.region, loc.zone].filter(Boolean).join(", ") ||
+              "Oromia Region"}
+          </AppText>
+        </View>
+        {product.description ? (
+          <View style={styles.specDescBox}>
+            <AppText style={styles.specKey}>Description</AppText>
+            <AppText style={styles.specDescVal}>{product.description}</AppText>
+          </View>
+        ) : null}
+      </View>
+
+      {/* Farmer Producer Profile Card */}
+      <TouchableOpacity
+        style={[styles.farmerCard, { backgroundColor: surfaceColor }]}
+        onPress={() =>
+          farmer._id
+            ? navigation.navigate("FarmerProfile", { farmerId: farmer._id })
+            : null
+        }
+        activeOpacity={0.88}
+      >
+        <View style={styles.farmerLeft}>
+          <View
+            style={[styles.farmerAvatar, { backgroundColor: primaryColor }]}
+          >
+            <Ionicons name="person" size={24} color="#FFFFFF" />
+          </View>
+          <View>
+            <AppText style={styles.farmerName}>{farmerName}</AppText>
+            <View style={styles.verifiedRow}>
+              <Ionicons
+                name="checkmark-circle"
+                size={13}
+                color={primaryColor}
+              />
+              <AppText style={[styles.verifiedLabel, { color: primaryColor }]}>
+                Verified Farm Producer
+              </AppText>
+            </View>
+          </View>
+        </View>
+
+        <Ionicons name="chevron-forward" size={18} color="#64748B" />
+      </TouchableOpacity>
+
+      {/* Quick Action Buttons */}
+      <View style={styles.actionsRow}>
+        <TouchableOpacity
+          style={[styles.outlineActionBtn, { borderColor: primaryColor }]}
+          onPress={handleMessageFarmer}
+          activeOpacity={0.8}
+        >
+          <Ionicons
+            name="chatbubble-ellipses-outline"
+            size={16}
+            color={primaryColor}
+          />
+          <AppText style={[styles.outlineActionText, { color: primaryColor }]}>
+            Chat & Negotiate
+          </AppText>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.outlineActionBtn, { borderColor: "#64748B" }]}
+          onPress={handleCallFarmer}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="call-outline" size={16} color="#64748B" />
+          <AppText style={[styles.outlineActionText, { color: "#64748B" }]}>
+            Call Producer
+          </AppText>
         </TouchableOpacity>
       </View>
 
-      {/* Scrollable Content */}
-      <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Crop title & status */}
-        <AppText variant="headingLg" style={[styles.cropTitle, {
-        color: textPrimary
-      }]}>
-          {product.cropType}
-        </AppText>
-        <View style={[styles.badge, {
-        backgroundColor: getStatusColor(product.status)
-      }]}>
-          <AppText variant="label" style={{
-          color: surface
-        }}>
-            {statusText}
-          </AppText>
-        </View>
+      {/* Primary Buy Button */}
+      <TouchableOpacity
+        style={[styles.buyNowBtn, { backgroundColor: primaryColor }]}
+        onPress={() => setShowBuyModal(true)}
+        activeOpacity={0.88}
+      >
+        <Ionicons
+          name="cart-outline"
+          size={18}
+          color="#FFFFFF"
+          style={{ marginRight: 6 }}
+        />
+        <AppText style={styles.buyNowBtnText}>Place Wholesale Order</AppText>
+      </TouchableOpacity>
 
-        {/* Price banner */}
-        <View style={[styles.priceBanner, {
-        backgroundColor: primary
-      }]}>
-          <AppText variant="headingMd" style={{
-          color: surface,
-          fontWeight: "700"
-        }}>
-            {t("listingDetail.priceETB", {
-            price: product.price
-          })}
-          </AppText>
-          <AppText style={{
-          color: surface,
-          fontSize: 14,
-          marginTop: 2
-        }}>
-            {t("listingDetail.perUnitAvailable", {
-            unit,
-            quantity: product.quantity
-          })}
-          </AppText>
-        </View>
-
-        {/* Market insights card */}
-        <View style={[styles.insightsCard, {
-        backgroundColor: surface,
-        borderColor: border
-      }]}>
-          <View style={{
-          flexDirection: "row",
-          alignItems: "center",
-          marginBottom: 8
-        }}>
-            <Ionicons name="stats-chart-outline" size={20} color={primary} style={{
-            marginRight: 6
-          }} />
-            <AppText variant="headingSm" style={{
-            color: textPrimary
-          }}>
-              {t("listingDetail.marketInsights")}
-            </AppText>
-          </View>
-          <View style={styles.insightsRow}>
-            <View style={styles.insightItem}>
-              <AppText variant="label" style={{
-              color: textSecondary
-            }}>
-                {t("listingDetail.avgPriceLabel")}
-              </AppText>
-              <AppText style={{
-              color: primary,
-              fontWeight: "700"
-            }}>
-                {t("listingDetail.avgPriceValue", {
-                price: avgMarketPrice,
-                unit
-              })}
-              </AppText>
-            </View>
-            <View style={styles.insightItem}>
-              <AppText variant="label" style={{
-              color: textSecondary
-            }}>
-                {t("listingDetail.demandLabel")}
-              </AppText>
-              <AppText style={{
-              color: getDemandColor(demandLevel),
-              fontWeight: "700"
-            }}>
-                {demandText}
-              </AppText>
-            </View>
-            <View style={styles.insightItem}>
-              <AppText variant="label" style={{
-              color: textSecondary
-            }}>
-                {t("listingDetail.listedLabel")}
-              </AppText>
-              <AppText style={{
-              color: textPrimary
-            }}>{listedTime}</AppText>
-            </View>
-          </View>
-        </View>
-
-        {/* Product details */}
-        <View style={[styles.detailCard, {
-        backgroundColor: surface,
-        borderColor: border
-      }]}>
-          <InfoRow iconName="leaf-outline" label={t("product.cropTypeLabel") || "Crop Type"} value={product.cropType} theme={theme} />
-          <InfoRow iconName="scale-outline" label={t("product.quantityLabel") || "Quantity"} value={`${product.quantity} ${unit}`} theme={theme} />
-          <InfoRow iconName="cash-outline" label={t("product.priceLabel") || "Price"} value={`${product.price} ETB / ${unit}`} theme={theme} />
-          <InfoRow iconName="location-outline" label={t("auth.regionLabel") || "Region"} value={loc.region} theme={theme} />
-          <InfoRow iconName="map-outline" label={t("auth.zoneLabel") || "Zone"} value={loc.zone} theme={theme} />
-          {product.description ? <InfoRow iconName="document-text-outline" label={t("product.descLabel") || "Description"} value={product.description} theme={theme} /> : null}
-        </View>
-
-        {/* Farmer info */}
-        <View style={[styles.farmerCard, {
-        backgroundColor: surface,
-        borderColor: border
-      }]}>
-          <AppText variant="headingSm" style={[styles.sectionTitle, {
-          color: textPrimary
-        }]}>
-            {t("browse.farmerTitle") || "Farmer"}
-          </AppText>
-          <InfoRow iconName="person-outline" label={t("auth.nameLabel") || "Name"} value={farmerName} theme={theme} />
-          <InfoRow iconName="call-outline" label={t("auth.phoneLabel") || "Phone"} value={farmerPhone || t("browse.noPhone") || "Not provided"} theme={theme} />
-        </View>
-
-        {/* Actions */}
-        <View style={styles.actions}>
-          <AppButton title={t("browse.messageBtn") || "Message Farmer"} variant="outline" fullWidth onPress={handleMessageFarmer} style={styles.actionBtn} />
-          <AppButton title={t("browse.callBtn") || "Call Farmer"} variant="outline" fullWidth onPress={handleCallFarmer} style={styles.actionBtn} disabled={!farmerPhone} />
-          {product.status === "active" && <AppButton title={t("listingDetail.buyNow")} variant="primary" fullWidth onPress={() => setShowBuyModal(true)} style={styles.actionBtn} />}
-        </View>
-      </ScrollView>
-
-      {/* Buy Now Modal */}
-      <Modal visible={showBuyModal} transparent animationType="slide" onRequestClose={() => setShowBuyModal(false)}>
+      {/* Order Quantity Modal */}
+      <Modal
+        visible={showBuyModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowBuyModal(false)}
+      >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalCard, {
-          backgroundColor: surface,
-          borderColor: border
-        }]}>
-            <AppText variant="headingSm" style={{
-            color: textPrimary,
-            marginBottom: 4
-          }}>
-              {t("listingDetail.placeOrder")}
+          <View style={[styles.modalCard, { backgroundColor: surfaceColor }]}>
+            <AppText style={styles.modalTitle}>Place Wholesale Order</AppText>
+            <AppText style={styles.modalSub}>
+              Enter requested volume for {product.cropType} (Max{" "}
+              {product.quantity} {unit}):
             </AppText>
-            <AppText style={{
-            color: textSecondary,
-            marginBottom: 16,
-            fontSize: 13
-          }}>
-              {t("listingDetail.availableInfo", {
-              quantity: product.quantity,
-              unit,
-              price: product.price
-            })}
-            </AppText>
-            <TextInput style={[styles.qtyInput, {
-            borderColor: border,
-            color: textPrimary
-          }]} placeholder={t("listingDetail.qtyPlaceholder", {
-            max: product.quantity,
-            unit
-          })} placeholderTextColor={textSecondary} keyboardType="numeric" value={buyQty} onChangeText={setBuyQty} />
-            {buyQty ? <AppText style={{
-            color: primary,
-            marginBottom: 12,
-            fontWeight: "700"
-          }}>
-                {t("listingDetail.totalWithCurrency", {
-              total: (parseFloat(buyQty) || 0) * product.price
-            })}
-              </AppText> : null}
-            <View style={{
-            gap: 10
-          }}>
-              <AppButton title={ordering ? t("listingDetail.placingOrder") : t("listingDetail.confirmOrder")} variant="primary" fullWidth onPress={handleBuyNow} disabled={ordering} />
-              <AppButton title={t("listingDetail.cancel")} variant="outline" fullWidth onPress={() => {
-              setShowBuyModal(false);
-              setBuyQty("");
-            }} />
+
+            <TextInput
+              style={styles.qtyInput}
+              placeholder={`Quantity in ${unit} (e.g. 10)`}
+              placeholderTextColor="#94A3B8"
+              keyboardType="numeric"
+              value={buyQty}
+              onChangeText={setBuyQty}
+            />
+
+            {buyQty && parseFloat(buyQty) > 0 ? (
+              <View style={styles.totalBox}>
+                <AppText style={styles.totalLabel}>
+                  Estimated Total Amount:
+                </AppText>
+                <AppText style={[styles.totalAmount, { color: primaryColor }]}>
+                  ETB {(parseFloat(buyQty) * product.price).toLocaleString()}
+                </AppText>
+              </View>
+            ) : null}
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.confirmBtn, { backgroundColor: primaryColor }]}
+                onPress={handlePlaceOrder}
+                disabled={ordering}
+                activeOpacity={0.85}
+              >
+                <AppText style={styles.confirmBtnText}>
+                  {ordering ? "Submitting Order..." : "Confirm & Send Order"}
+                </AppText>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.cancelBtn}
+                onPress={() => {
+                  setShowBuyModal(false);
+                  setBuyQty("");
+                }}
+              >
+                <AppText style={styles.cancelBtnText}>Cancel</AppText>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
-    </View>;
+
+      <View style={{ height: 80 }} />
+    </View>
+      </View>
+  );
 }
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  fallbackContainer: {
-    flex: 1,
-    justifyContent: "center",
+  emptyContainer: {
+    padding: 30,
     alignItems: "center",
-    padding: 32
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginTop: 10,
+  },
+  emptySub: {
+    fontSize: 12,
+    color: "#64748B",
+    textAlign: "center",
+    marginTop: 4,
+    marginBottom: 16,
   },
   backBtn: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  saveBtn: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  scrollArea: {
-    flex: 1
-  },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 32
-  },
-  cropTitle: {
-    marginBottom: 6
-  },
-  badge: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginBottom: 16
-  },
-  priceBanner: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderRadius: 12,
-    padding: 18,
-    alignItems: "center",
-    marginBottom: 16
   },
-  insightsCard: {
-    borderWidth: 1,
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 16
+  backBtnText: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "700",
   },
-  insightsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between"
-  },
-  insightItem: {
-    alignItems: "center",
-    flex: 1
-  },
-  detailCard: {
-    borderWidth: 1,
-    borderRadius: 14,
-    overflow: "hidden",
-    marginBottom: 16
-  },
-  farmerCard: {
-    borderWidth: 1,
-    borderRadius: 14,
-    overflow: "hidden",
-    marginBottom: 24
-  },
-  sectionTitle: {
-    padding: 16,
-    paddingBottom: 0
-  },
-  infoRow: {
+  topTitleRow: {
     flexDirection: "row",
     alignItems: "flex-start",
-    padding: 14,
-    borderBottomWidth: 1,
-    gap: 10
+    justifyContent: "space-between",
+    marginBottom: 14,
   },
-  infoContent: {
+  cropTitle: {
+    fontSize: 22,
+    fontWeight: "900",
+    letterSpacing: -0.3,
+  },
+  cropCategory: {
+    fontSize: 13,
+    color: "#64748B",
+    marginTop: 2,
+  },
+  bookmarkBtn: {
+    padding: 10,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  priceBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+    borderRadius: 20,
+    marginBottom: 16,
+  },
+  priceLabel: {
+    fontSize: 12,
+    color: "rgba(255, 255, 255, 0.85)",
+    fontWeight: "600",
+  },
+  priceAmount: {
+    fontSize: 22,
+    fontWeight: "900",
+    color: "#FFFFFF",
+    marginTop: 2,
+  },
+  priceUnit: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "rgba(255, 255, 255, 0.9)",
+  },
+  stockBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  stockText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#FFFFFF",
+  },
+  card: {
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    marginBottom: 16,
+  },
+  cardHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 12,
+  },
+  cardTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginBottom: 10,
+  },
+  insightsGrid: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  insightBox: {
     flex: 1,
-    gap: 2
+    backgroundColor: "#F8FAFC",
+    padding: 10,
+    borderRadius: 14,
   },
-  actions: {
-    gap: 10
+  insightLabel: {
+    fontSize: 11,
+    color: "#64748B",
   },
-  actionBtn: {},
+  insightValue: {
+    fontSize: 13,
+    fontWeight: "700",
+    marginTop: 4,
+  },
+  specRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9",
+  },
+  specKey: {
+    fontSize: 13,
+    color: "#64748B",
+  },
+  specVal: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#0F172A",
+  },
+  specDescBox: {
+    marginTop: 8,
+  },
+  specDescVal: {
+    fontSize: 13,
+    color: "#334155",
+    marginTop: 4,
+    lineHeight: 18,
+  },
+  farmerCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 14,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    marginBottom: 16,
+  },
+  farmerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  farmerAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  farmerName: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#0F172A",
+  },
+  verifiedRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 2,
+  },
+  verifiedLabel: {
+    fontSize: 11,
+    fontWeight: "600",
+  },
+  actionsRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 12,
+  },
+  outlineActionBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 12,
+    borderRadius: 14,
+    borderWidth: 1.5,
+  },
+  outlineActionText: {
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  buyNowBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    borderRadius: 16,
+    marginBottom: 16,
+  },
+  buyNowBtnText: {
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "800",
+  },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "flex-end"
+    backgroundColor: "rgba(15, 23, 42, 0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
   },
   modalCard: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 24,
-    borderTopWidth: 1,
-    borderLeftWidth: 1,
-    borderRightWidth: 1
+    width: "100%",
+    borderRadius: 24,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#0F172A",
+  },
+  modalSub: {
+    fontSize: 13,
+    color: "#64748B",
+    marginTop: 4,
+    marginBottom: 16,
   },
   qtyInput: {
+    backgroundColor: "#F8FAFC",
     borderWidth: 1,
-    borderRadius: 10,
+    borderColor: "#CBD5E1",
+    borderRadius: 14,
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingVertical: 12,
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#0F172A",
+    marginBottom: 12,
+  },
+  totalBox: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#F1F5F9",
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  totalLabel: {
+    fontSize: 12,
+    color: "#64748B",
+    fontWeight: "600",
+  },
+  totalAmount: {
     fontSize: 16,
-    marginBottom: 12
-  }
+    fontWeight: "800",
+  },
+  modalActions: {
+    gap: 8,
+  },
+  confirmBtn: {
+    alignItems: "center",
+    paddingVertical: 12,
+    borderRadius: 14,
+  },
+  confirmBtnText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  cancelBtn: {
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  cancelBtnText: {
+    color: "#64748B",
+    fontSize: 13,
+    fontWeight: "600",
+  },
 });

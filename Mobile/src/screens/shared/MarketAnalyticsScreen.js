@@ -18,10 +18,10 @@ import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
 const COMMODITIES = [
-  { id: "onion", crop: "Red Onion", price: "4,500", unit: "kg", change: "+5.8%", isPositive: true, low7d: "3,700", high7d: "4,800", volume: "48,500 kg" },
-  { id: "teff", crop: "White Teff", price: "5,200", unit: "kg", change: "+3.2%", isPositive: true, low7d: "4,900", high7d: "5,350", volume: "82,000 kg" },
-  { id: "tomato", crop: "Tomato", price: "3,800", unit: "kg", change: "-2.4%", isPositive: false, low7d: "3,650", high7d: "4,200", volume: "34,000 kg" },
-  { id: "garlic", crop: "Garlic", price: "12,000", unit: "kg", change: "+8.5%", isPositive: true, low7d: "10,200", high7d: "12,400", volume: "18,200 kg" },
+  { id: "onion", crop: "Red Onion", price: "4,500", unit: "q", change: "+5.8%", isPositive: true, low7d: "3,700", high7d: "4,800", volume: "4,850 q" },
+  { id: "teff", crop: "White Teff", price: "5,200", unit: "q", change: "+3.2%", isPositive: true, low7d: "4,900", high7d: "5,350", volume: "8,200 q" },
+  { id: "tomato", crop: "Tomato", price: "3,800", unit: "q", change: "-2.4%", isPositive: false, low7d: "3,650", high7d: "4,200", volume: "3,400 q" },
+  { id: "garlic", crop: "Garlic", price: "12,000", unit: "q", change: "+8.5%", isPositive: true, low7d: "10,200", high7d: "12,400", volume: "1,820 q" },
 ];
 
 export default function MarketAnalyticsScreen({ navigation, route }) {
@@ -124,7 +124,7 @@ export default function MarketAnalyticsScreen({ navigation, route }) {
           />
           <AppText style={styles.actionBtnText}>
             {isFarmer
-              ? `List ${activeCommodity.crop} at ETB ${activeCommodity.price}/kg`
+              ? `List ${activeCommodity.crop} at ETB ${activeCommodity.price}/q`
               : `Browse ${activeCommodity.crop} Sellers`}
           </AppText>
         </TouchableOpacity>
