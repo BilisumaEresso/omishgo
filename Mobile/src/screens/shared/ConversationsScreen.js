@@ -12,12 +12,11 @@ import {
 } from "react-native";
 import AppButton from "../../components/common/AppButton";
 import AppText from "../../components/common/AppText";
-import AppHeader from "../../components/layout/AppHeader";
+import DashboardLayout from "../../components/layout/DashBoardLayout";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 
-// ─── Helper: format relative time ────────────────────────────────────────────
 const formatRelativeTime = (iso, t) => {
   if (!iso) return "";
   const diff = Date.now() - new Date(iso).getTime();
@@ -29,62 +28,53 @@ const formatRelativeTime = (iso, t) => {
   return t("conversationsScreen.timeDays", { days: Math.floor(hrs / 24) });
 };
 
-// ─── Conversation row ─────────────────────────────────────────────────────────
-const ConvoRow = ({ convo, onPress, theme, t }) => {
-  // Extract theme colors
-  const primary = theme?.colors?.primary || "#2E7D32";
+const ConvoRow = ({ convo, onPress, theme, t, isLast }) => {
+  const primary = theme?.colors?.primary || "#1565C0";
   const surface = theme?.colors?.surface || "#FFFFFF";
-  const border = theme?.colors?.border || "#E0E0E0";
-  const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
-  const textSecondary = theme?.colors?.textSecondary || "#4A6741";
-
+  const textPrimary = theme?.colors?.textPrimary || "#0F172A";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
   const hasUnread = convo.unreadCount > 0;
-  const partnerName =
-    convo.partnerName || t("conversationsScreen.unknownPartner");
+  const partnerName = convo.partnerName || t("conversationsScreen.unknownPartner");
+  const initials = (partnerName || "?")[0].toUpperCase();
 
   return (
     <TouchableOpacity
       onPress={onPress}
+      activeOpacity={0.75}
       style={[
-        styles.row,
-        {
-          backgroundColor: surface,
-          borderBottomColor: border,
-        },
+        styles.convoCard,
+        { backgroundColor: surface },
+        !isLast && styles.convoCardMargin,
       ]}
-      activeOpacity={0.7}
     >
       {/* Avatar */}
       <View style={[styles.avatar, { backgroundColor: primary }]}>
-        <AppText style={[styles.avatarText, { color: surface }]}>
-          {(partnerName || "?")[0].toUpperCase()}
-        </AppText>
+        <AppText style={styles.avatarText}>{initials}</AppText>
       </View>
 
-      {/* Text content */}
-      <View style={styles.rowContent}>
-        <View style={styles.rowTop}>
+      {/* Content */}
+      <View style={styles.convoContent}>
+        <View style={styles.convoTop}>
           <AppText
-            variant="headingSm"
             style={[
               styles.partnerName,
               { color: textPrimary },
-              hasUnread && styles.bold,
+              hasUnread && styles.partnerNameBold,
             ]}
+            numberOfLines={1}
           >
             {partnerName}
           </AppText>
-          <AppText variant="label" style={{ color: textSecondary }}>
+          <AppText style={[styles.timeText, { color: textSecondary }]}>
             {formatRelativeTime(convo.lastMessageAt, t)}
           </AppText>
         </View>
-        <View style={styles.rowBottom}>
+        <View style={styles.convoBottom}>
           <AppText
-            variant="bodyMd"
             style={[
               styles.preview,
               { color: textSecondary },
-              hasUnread && styles.previewUnread,
+              hasUnread && styles.previewBold,
             ]}
             numberOfLines={1}
           >
@@ -92,8 +82,8 @@ const ConvoRow = ({ convo, onPress, theme, t }) => {
           </AppText>
           {hasUnread && (
             <View style={[styles.badge, { backgroundColor: primary }]}>
-              <AppText style={[styles.badgeText, { color: surface }]}>
-                {convo.unreadCount}
+              <AppText style={styles.badgeText}>
+                {convo.unreadCount > 99 ? "99+" : convo.unreadCount}
               </AppText>
             </View>
           )}
@@ -103,19 +93,13 @@ const ConvoRow = ({ convo, onPress, theme, t }) => {
   );
 };
 
-// ─── Main Screen ──────────────────────────────────────────────────────────────
 export default function ConversationsScreen({ navigation }) {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
-  // Extract theme colors
-  const primary = theme?.colors?.primary || "#2E7D32";
-  const surface = theme?.colors?.surface || "#FFFFFF";
-  const background = theme?.colors?.background || "#F5F5F5";
-  const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
-  const textSecondary = theme?.colors?.textSecondary || "#4A6741";
-  const textMuted = theme?.colors?.textMuted || "#8FAF8A";
-  const errorColor = theme?.colors?.error || "#F44336";
+  const primary = theme?.colors?.primary || "#1565C0";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
+  const errorColor = theme?.colors?.error || "#EF4444";
 
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -126,7 +110,6 @@ export default function ConversationsScreen({ navigation }) {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
     setError("");
-
     try {
       const res = await api.get(API_ENDPOINTS.messages.conversations);
       setConversations(res.data?.data?.conversations || []);
@@ -134,13 +117,13 @@ export default function ConversationsScreen({ navigation }) {
       setError(
         err?.response?.data?.message ||
           err.message ||
-          t("conversationsScreen.errorLoadConversations"),
+          t("conversationsScreen.errorLoadConversations")
       );
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchConversations();
@@ -153,52 +136,35 @@ export default function ConversationsScreen({ navigation }) {
     });
   };
 
-  // ── Loading state ──
-  if (loading) {
-    return (
-      <View style={[styles.screen, { backgroundColor: background }]}>
-        <AppHeader
-          title={t("messaging.conversations") || "Messages"}
-          showBack={true}
-          onBackPress={() => navigation.goBack()}
-        />
+  return (
+    <DashboardLayout
+      role="buyer"
+      title={t("messaging.conversations") || "Messages"}
+      showBack
+      onBackPress={() => navigation.goBack()}
+      scrollable={false}
+    >
+      {loading ? (
         <View style={styles.center}>
           <ActivityIndicator size="large" color={primary} />
         </View>
-      </View>
-    );
-  }
-
-  return (
-    <View style={[styles.screen, { backgroundColor: background }]}>
-      <AppHeader
-        title={t("messaging.conversations") || "Messages"}
-        showBack={true}
-        onBackPress={() => navigation.goBack()}
-      />
-
-      {error ? (
+      ) : error ? (
         <View style={styles.center}>
-          <AppText
-            style={{ color: errorColor, textAlign: "center", marginBottom: 12 }}
-          >
-            {error}
-          </AppText>
-          <AppButton
-            title={t("conversationsScreen.retry")}
-            onPress={() => fetchConversations()}
-          />
+          <Ionicons name="alert-circle-outline" size={48} color={errorColor} />
+          <AppText style={[styles.errorText, { color: errorColor }]}>{error}</AppText>
+          <AppButton title={t("conversationsScreen.retry")} onPress={() => fetchConversations()} />
         </View>
       ) : (
         <FlatList
           data={conversations}
           keyExtractor={(item) => String(item.partnerId)}
-          renderItem={({ item }) => (
+          renderItem={({ item, index }) => (
             <ConvoRow
               convo={item}
               onPress={() => handleOpen(item)}
               theme={theme}
               t={t}
+              isLast={index === conversations.length - 1}
             />
           )}
           showsVerticalScrollIndicator={false}
@@ -207,30 +173,22 @@ export default function ConversationsScreen({ navigation }) {
               refreshing={refreshing}
               onRefresh={() => fetchConversations(true)}
               colors={[primary]}
+              tintColor={primary}
             />
           }
+          contentContainerStyle={[
+            styles.listContent,
+            conversations.length === 0 && { flex: 1 },
+          ]}
           ListEmptyComponent={
             <View style={styles.center}>
-              {/* Replaced emoji with Ionicons */}
-              <Ionicons
-                name="chatbubbles-outline"
-                size={48}
-                color={textSecondary}
-              />
-              <AppText
-                variant="headingSm"
-                style={{
-                  color: textSecondary,
-                  textAlign: "center",
-                  marginTop: 12,
-                }}
-              >
+              <View style={[styles.emptyIconBg, { backgroundColor: primary + "12" }]}>
+                <Ionicons name="chatbubbles-outline" size={48} color={primary} />
+              </View>
+              <AppText style={[styles.emptyTitle, { color: "#0F172A" }]}>
                 {t("messaging.noConversations") || "No conversations yet"}
               </AppText>
-              <AppText
-                variant="bodyMd"
-                style={{ color: textMuted, textAlign: "center", marginTop: 6 }}
-              >
+              <AppText style={[styles.emptySub, { color: textSecondary }]}>
                 {t("messaging.startConvoHint") ||
                   "Browse a listing and message a farmer to start."}
               </AppText>
@@ -238,58 +196,115 @@ export default function ConversationsScreen({ navigation }) {
           }
         />
       )}
-    </View>
+    </DashboardLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
+  listContent: {
+    padding: 16,
   },
-  row: {
+  convoCard: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    gap: 14,
+    padding: 14,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    gap: 12,
+  },
+  convoCardMargin: {
+    marginBottom: 10,
   },
   avatar: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
+    flexShrink: 0,
   },
-  avatarText: { fontWeight: "700", fontSize: 18 },
-  rowContent: { flex: 1, gap: 3 },
-  rowTop: {
+  avatarText: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+    fontSize: 18,
+  },
+  convoContent: {
+    flex: 1,
+    gap: 4,
+  },
+  convoTop: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    gap: 8,
   },
-  rowBottom: {
+  convoBottom: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: 8,
   },
-  partnerName: { flex: 1 },
-  bold: { fontWeight: "700" },
-  preview: { flex: 1, marginRight: 8 },
-  previewUnread: { fontWeight: "600" },
+  partnerName: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  partnerNameBold: {
+    fontWeight: "800",
+  },
+  timeText: {
+    fontSize: 11,
+    flexShrink: 0,
+  },
+  preview: {
+    flex: 1,
+    fontSize: 13,
+  },
+  previewBold: {
+    fontWeight: "700",
+    color: "#0F172A",
+  },
   badge: {
-    minWidth: 20,
-    height: 20,
-    borderRadius: 10,
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 5,
+    flexShrink: 0,
   },
-  badgeText: { fontSize: 11, fontWeight: "700" },
+  badgeText: {
+    color: "#FFFFFF",
+    fontSize: 11,
+    fontWeight: "800",
+  },
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 32,
+    gap: 12,
+  },
+  errorText: {
+    fontSize: 14,
+    textAlign: "center",
+  },
+  emptyIconBg: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  emptySub: {
+    fontSize: 13,
+    textAlign: "center",
+    lineHeight: 20,
   },
 });

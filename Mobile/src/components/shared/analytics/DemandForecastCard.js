@@ -6,33 +6,44 @@ import AppText from "../../common/AppText";
 export default function DemandForecastCard({
   role = "buyer",
   primaryColor = "#1565C0",
+  cropName = "Red Onion",
 }) {
   const isFarmer = role === "farmer";
 
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Ionicons name="bulb-outline" size={20} color="#D97706" />
-        <AppText style={styles.title}>
-          {isFarmer ? "Selling Opportunity" : "Market Sourcing Tip"}
-        </AppText>
+        <View style={styles.iconBg}>
+          <Ionicons name="sparkles" size={16} color="#D97706" />
+        </View>
+        <View style={{ flex: 1 }}>
+          <AppText style={styles.title}>
+            {isFarmer ? "Harvest Sales Intelligence" : "Market Sourcing Intelligence"}
+          </AppText>
+          <AppText style={styles.subtitle}>Actionable AI market advisory</AppText>
+        </View>
       </View>
 
       <AppText style={styles.bodyText}>
         {isFarmer
-          ? "Wholesale onion prices in Adama are up +5.8% this week (ETB 4,500 / quintal). High demand from local markets makes now a good time to list your harvest."
-          : "Sourcing Teff and Red Onion from Adama and Debre Zeit regional hubs currently offers ~8% lower prices compared to Addis Ababa Mercato."}
+          ? `Wholesale demand for ${cropName} in Addis Ababa & Adama is trending +5.8% higher this week (ETB 4,500/q). High buyer inquiry volume makes this an optimal window to publish your harvest listing.`
+          : `Direct sourcing of ${cropName} from Adama and Debre Zeit regional producer hubs currently offers ~8% lower rates compared to Addis Ababa Mercato, saving logistics expenses.`}
       </AppText>
 
       <View style={styles.statRow}>
         <View style={styles.statItem}>
           <AppText style={styles.statLabel}>7-Day Trend</AppText>
-          <AppText style={[styles.statValue, { color: "#10B981" }]}>+5.8% Rising</AppText>
+          <AppText style={[styles.statValue, { color: "#16A34A" }]}>+5.8% Surge</AppText>
         </View>
         <View style={styles.divider} />
         <View style={styles.statItem}>
-          <AppText style={styles.statLabel}>Market Activity</AppText>
-          <AppText style={[styles.statValue, { color: primaryColor }]}>High Demand</AppText>
+          <AppText style={styles.statLabel}>Demand Index</AppText>
+          <AppText style={[styles.statValue, { color: primaryColor }]}>High Activity</AppText>
+        </View>
+        <View style={styles.divider} />
+        <View style={styles.statItem}>
+          <AppText style={styles.statLabel}>Price Outlook</AppText>
+          <AppText style={[styles.statValue, { color: "#D97706" }]}>Bullish</AppText>
         </View>
       </View>
     </View>
@@ -42,22 +53,39 @@ export default function DemandForecastCard({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 20,
+    borderRadius: 22,
     padding: 18,
     marginBottom: 16,
     borderWidth: 1,
     borderColor: "#E2E8F0",
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    marginBottom: 10,
+    gap: 10,
+    marginBottom: 12,
+  },
+  iconBg: {
+    width: 34,
+    height: 34,
+    borderRadius: 12,
+    backgroundColor: "#FEF3C7",
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: 15,
+    fontWeight: "800",
     color: "#0F172A",
+  },
+  subtitle: {
+    fontSize: 11.5,
+    color: "#64748B",
   },
   bodyText: {
     fontSize: 13,
@@ -68,10 +96,11 @@ const styles = StyleSheet.create({
   statRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     backgroundColor: "#F8FAFC",
     borderRadius: 14,
     paddingVertical: 10,
+    paddingHorizontal: 8,
   },
   statItem: {
     alignItems: "center",
@@ -79,16 +108,17 @@ const styles = StyleSheet.create({
   },
   divider: {
     width: 1,
-    height: 20,
-    backgroundColor: "#CBD5E1",
+    height: 22,
+    backgroundColor: "#E2E8F0",
   },
   statLabel: {
-    fontSize: 11,
+    fontSize: 10.5,
     color: "#64748B",
     marginBottom: 2,
+    fontWeight: "600",
   },
   statValue: {
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: 12.5,
+    fontWeight: "800",
   },
 });

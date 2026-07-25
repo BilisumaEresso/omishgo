@@ -182,13 +182,29 @@ const AppHeader = ({
   const insets = useSafeAreaInsets();
   const { unreadCount, fetchNotifications } = useNotificationStore();
 
+  // Always keep notification count fresh — every screen benefits
   useEffect(() => {
-    if (showNotification) {
-      fetchNotifications();
-      const interval = setInterval(fetchNotifications, 15000);
-      return () => clearInterval(interval);
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, [fetchNotifications]);
+
+  // Shake animation — triggers when unreadCount goes up
+  const bellShake = useRef(new Animated.Value(0)).current;
+  const prevCountRef = useRef(unreadCount);
+  useEffect(() => {
+    if (unreadCount > prevCountRef.current) {
+      Animated.sequence([
+        Animated.timing(bellShake, { toValue: 8, duration: 60, useNativeDriver: true }),
+        Animated.timing(bellShake, { toValue: -8, duration: 60, useNativeDriver: true }),
+        Animated.timing(bellShake, { toValue: 6, duration: 50, useNativeDriver: true }),
+        Animated.timing(bellShake, { toValue: -6, duration: 50, useNativeDriver: true }),
+        Animated.timing(bellShake, { toValue: 3, duration: 40, useNativeDriver: true }),
+        Animated.timing(bellShake, { toValue: 0, duration: 40, useNativeDriver: true }),
+      ]).start();
     }
-  }, [showNotification, fetchNotifications]);
+    prevCountRef.current = unreadCount;
+  }, [unreadCount, bellShake]);
 
   let navigation = null;
   try {
@@ -262,8 +278,9 @@ const AppHeader = ({
   const handleNotificationPress = () => {
     if (onNotificationPress) {
       onNotificationPress();
-    } else if (navigation) {
-      navigation.navigate("Notifications");
+    } else {
+      // Always attempt navigation — useRNNavigation() gives us access from any screen
+      try { navigation?.navigate("Notifications"); } catch (_) {}
     }
   };
 
@@ -385,22 +402,27 @@ const AppHeader = ({
                 onPress={handleSearchPress}
               />
             )}
-            {showNotification && (
-              <HeaderIconButton
-                iconName={unreadCount > 0 ? "notifications" : "notifications-outline"}
-                color={textColor}
-                accessibilityLabel={
-                  unreadCount > 0
-                    ? `Notifications, ${unreadCount} unread`
-                    : "Notifications"
-                }
-                onPress={handleNotificationPress}
-                showBadge={unreadCount > 0}
-                badgeCount={unreadCount}
-                badgeColor={notificationColor}
-                surfaceColor={primaryDark}
-              />
+
+            {/* Notification bell — always visible on non-back screens */}
+            {!showBack && (
+              <Animated.View style={{ transform: [{ translateX: bellShake }] }}>
+                <HeaderIconButton
+                  iconName={unreadCount > 0 ? "notifications" : "notifications-outline"}
+                  color={textColor}
+                  accessibilityLabel={
+                    unreadCount > 0
+                      ? `${unreadCount} unread notifications`
+                      : "Notifications"
+                  }
+                  onPress={handleNotificationPress}
+                  showBadge={unreadCount > 0}
+                  badgeCount={unreadCount}
+                  badgeColor={notificationColor}
+                  surfaceColor={primaryDark}
+                />
+              </Animated.View>
             )}
+
             {showProfile && (
               <Pressable
                 onPress={handleProfilePress}
@@ -496,8 +518,8 @@ const styles = StyleSheet.create({
   },
   badgeContainer: {
     position: "absolute",
-    top: 3,
-    right: 3,
+    top: 2,
+    right: 2,
     borderWidth: 2,
     alignItems: "center",
     justifyContent: "center",
@@ -505,19 +527,19 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: "#FF355E",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.5,
-        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.9,
+        shadowRadius: 6,
       },
       android: {
-        elevation: 5,
+        elevation: 8,
       },
     }),
   },
   badgeDotOnly: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
   },
   badgeCountPill: {
     minWidth: 18,

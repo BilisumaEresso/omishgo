@@ -1,7 +1,9 @@
 // Mobile/src/screens/farmer/EditProductScreen.js
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
+  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -11,146 +13,20 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useTranslation } from "react-i18next";
 import AppButton from "../../components/common/AppButton";
 import AppInput from "../../components/common/AppInput";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
+import { CROP_TYPES, CROP_TYPES_LOCALIZED } from "../../constants/crops";
+import {
+  getLocalizedRegions,
+  getLocalizedZones,
+} from "../../constants/locations";
+import { UNITS_LOCALIZED } from "../../constants/units";
 import { useTheme } from "../../hooks/useTheme";
 
-// ─── Data Constants (duplicated from PostProductScreen) ──────────────────────
-const CROP_TYPES = [
-  "Teff",
-  "Wheat",
-  "Barley",
-  "Maize",
-  "Sorghum",
-  "Millet",
-  "Onion",
-  "Tomato",
-  "Potato",
-  "Garlic",
-  "Pepper",
-  "Cabbage",
-  "Lettuce",
-  "Carrot",
-  "Beetroot",
-  "Coffee",
-  "Chat",
-  "Sesame",
-  "Sunflower",
-  "Lentil",
-  "Chickpea",
-  "Bean",
-  "Pea",
-];
-
-const UNITS = [
-  "kg",
-  "quintal",
-  "ton",
-  "bag (50kg)",
-  "bag (100kg)",
-  "crate",
-  "sack",
-];
-
-const UNIT_LABELS = {
-  ton: "ton (kg)",
-};
-
-const REGIONS = [
-  "Addis Ababa",
-  "Oromia",
-  "Amhara",
-  "Tigray",
-  "SNNPR",
-  "Sidama",
-  "Afar",
-  "Somali",
-  "Benishangul-Gumuz",
-  "Gambela",
-  "Harari",
-  "Dire Dawa",
-];
-
-const ZONES_BY_REGION = {
-  Oromia: [
-    "West Hararghe",
-    "East Hararghe",
-    "Jimma",
-    "Bale",
-    "Borena",
-    "West Shewa",
-    "East Shewa",
-    "North Shewa",
-    "South West Shewa",
-    "Guji",
-    "West Guji",
-    "Arsi",
-    "West Arsi",
-    "Illubabor",
-    "Kelem Wallaga",
-    "East Wallaga",
-    "West Wallaga",
-    "Horo Guduru",
-    "Qellem",
-    "Buno Bedele",
-    "Ilu Aba Bora",
-  ],
-  Amhara: [
-    "North Gondar",
-    "South Gondar",
-    "North Wollo",
-    "South Wollo",
-    "Waghimra",
-    "Awi",
-    "West Gojam",
-    "East Gojam",
-    "North Shewa",
-    "Oromia Special Zone",
-  ],
-  SNNPR: [
-    "Sidama",
-    "Wolayita",
-    "Gedeo",
-    "Gurage",
-    "Hadiya",
-    "Kembata",
-    "Dawro",
-    "Gofa",
-    "Bench Sheko",
-    "Gamo",
-  ],
-  Tigray: [
-    "Central Tigray",
-    "Eastern Tigray",
-    "Western Tigray",
-    "Southern Tigray",
-    "North Western Tigray",
-    "South Eastern Tigray",
-  ],
-  "Addis Ababa": ["Addis Ababa City"],
-  Sidama: ["Sidama"],
-  Afar: ["Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5"],
-  Somali: [
-    "Jijiga",
-    "Fafan",
-    "Liben",
-    "Afder",
-    "Doolo",
-    "Shabelle",
-    "Erer",
-    "Siti",
-    "Korahey",
-    "Nogob",
-    "Daawa",
-  ],
-};
-
-// ─── DropdownPicker (copied from PostProductScreen) ─────────────────────────
 const DropdownPicker = ({
   label,
   value,
@@ -162,50 +38,40 @@ const DropdownPicker = ({
   icon,
   theme,
   placeholder,
+  disabled = false,
 }) => {
-  const primary = theme?.colors?.primary || "#2E7D32";
-  const surface = theme?.colors?.surface || "#FFF";
-  const border = theme?.colors?.border || "#DDD";
-  const textPrimary = theme?.colors?.textPrimary || "#333";
-  const textSecondary = theme?.colors?.textSecondary || "#666";
+  const primary = theme?.colors?.primary || "#15803D";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const border = theme?.colors?.border || "#CBD5E1";
+  const textPrimary = theme?.colors?.textPrimary || "#0F172A";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
+
+  const safeOptions = Array.isArray(options) ? options : [];
 
   const selectedLabel = (() => {
     if (!value) return null;
-    const found = options.find((opt) =>
-      typeof opt === "string" ? opt === value : opt.value === value,
+    const found = safeOptions.find((opt) =>
+      typeof opt === "string" ? opt === value : opt.value === value
     );
     return found ? (typeof found === "string" ? found : found.label) : value;
   })();
 
   return (
     <View>
-      <AppText
-        style={{
-          fontSize: 14,
-          fontWeight: "500",
-          color: textSecondary,
-          marginBottom: 4,
-          marginTop: 16,
-        }}
-      >
-        {label}
-      </AppText>
+      <AppText style={styles.inputLabel}>{label}</AppText>
       <TouchableOpacity
-        onPress={onOpen}
-        activeOpacity={0.8}
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          borderWidth: 1.5,
-          borderColor: visible ? primary : border,
-          borderRadius: 12,
-          paddingHorizontal: 14,
-          paddingVertical: 14,
-          backgroundColor: surface,
-        }}
+        onPress={disabled ? undefined : onOpen}
+        activeOpacity={disabled ? 1 : 0.8}
+        style={[
+          styles.dropdownBtn,
+          {
+            borderColor: visible ? primary : border,
+            backgroundColor: surface,
+            opacity: disabled ? 0.5 : 1,
+          },
+        ]}
       >
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <View style={styles.dropdownInner}>
           {icon && (
             <Ionicons
               name={icon}
@@ -214,7 +80,10 @@ const DropdownPicker = ({
             />
           )}
           <AppText
-            style={{ fontSize: 15, color: value ? textPrimary : textSecondary }}
+            style={[
+              styles.dropdownText,
+              { color: value ? textPrimary : textSecondary },
+            ]}
           >
             {selectedLabel || placeholder || `Select ${label}`}
           </AppText>
@@ -225,27 +94,14 @@ const DropdownPicker = ({
           color={textSecondary}
         />
       </TouchableOpacity>
-      {visible && (
-        <View
-          style={{
-            borderWidth: 1,
-            borderColor: border,
-            borderRadius: 12,
-            marginTop: 4,
-            backgroundColor: surface,
-            maxHeight: 200,
-            overflow: "hidden",
-            elevation: 4,
-            shadowColor: "#000",
-            shadowOpacity: 0.08,
-            shadowRadius: 8,
-            shadowOffset: { width: 0, height: 2 },
-          }}
-        >
+      {visible && safeOptions.length > 0 && (
+        <View style={[styles.dropdownMenu, { backgroundColor: surface, borderColor: border }]}>
           <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false}>
-            {options.map((opt) => {
+            {safeOptions.map((opt) => {
               const optValue = typeof opt === "string" ? opt : opt.value;
               const optLabel = typeof opt === "string" ? opt : opt.label;
+              const isSelected = value === optValue;
+
               return (
                 <TouchableOpacity
                   key={optValue}
@@ -253,21 +109,16 @@ const DropdownPicker = ({
                     onSelect(optValue);
                     onClose();
                   }}
-                  style={{
-                    paddingHorizontal: 16,
-                    paddingVertical: 13,
-                    borderBottomWidth: StyleSheet.hairlineWidth,
-                    borderBottomColor: border,
-                    backgroundColor:
-                      value === optValue ? primary + "12" : "transparent",
-                  }}
+                  style={[
+                    styles.dropdownOption,
+                    isSelected && { backgroundColor: primary + "15" },
+                  ]}
                 >
                   <AppText
-                    style={{
-                      fontSize: 15,
-                      color: value === optValue ? primary : textPrimary,
-                      fontWeight: value === optValue ? "600" : "400",
-                    }}
+                    style={[
+                      styles.dropdownOptionText,
+                      { color: isSelected ? primary : textPrimary, fontWeight: isSelected ? "700" : "400" },
+                    ]}
                   >
                     {optLabel}
                   </AppText>
@@ -281,61 +132,58 @@ const DropdownPicker = ({
   );
 };
 
-// ─── Main Component ───────────────────────────────────────────────────────────
 export default function EditProductScreen({ route, navigation }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const product = route.params?.product || {};
 
-  // Pre‑fill state from product
-  const [cropType, setCropType] = useState(product?.cropType || "");
+  const [cropType, setCropType] = useState(product?.cropType || product?.category || "");
   const [quantity, setQuantity] = useState(String(product?.quantity || ""));
-  const [unit, setUnit] = useState(product?.unit || "kg");
+  const [unit, setUnit] = useState(product?.unit || "quintal");
   const [price, setPrice] = useState(String(product?.price || ""));
+  const [status, setStatus] = useState(product?.status || "active");
   const [description, setDescription] = useState(product?.description || "");
   const [region, setRegion] = useState(product?.location?.region || "");
   const [zone, setZone] = useState(product?.location?.zone || "");
   const [wereda, setWereda] = useState(product?.location?.wereda || "");
   const [loading, setLoading] = useState(false);
 
-  const regionRef = useRef(region);
-  const unitOptions = UNITS.map((option) =>
-    option === "ton" ? { value: option, label: UNIT_LABELS[option] } : option,
-  );
-  const unitDisplay = UNIT_LABELS[unit] || unit;
-
   const [showCropPicker, setShowCropPicker] = useState(false);
   const [showUnitPicker, setShowUnitPicker] = useState(false);
   const [showRegionPicker, setShowRegionPicker] = useState(false);
   const [showZonePicker, setShowZonePicker] = useState(false);
 
-  const primary = theme?.colors?.primary || "#2E7D32";
-  const error = theme?.colors?.error || "#C62828";
-  const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
-  const textSecondary = theme?.colors?.textSecondary || "#4A6741";
-  const background = theme?.colors?.background || "#F9FBF9";
+  const primary = theme?.colors?.primary || "#15803D";
+  const error = "#DC2626";
+  const textPrimary = theme?.colors?.textPrimary || "#0F172A";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
+  const background = "#F8FAFC";
+
+  const lang = i18n.language || "en";
+
+  const cropLabels = CROP_TYPES_LOCALIZED?.[lang] || CROP_TYPES_LOCALIZED?.en || {};
+  const cropOptions = (CROP_TYPES || []).map((key) => ({
+    value: key,
+    label: cropLabels[key] || key,
+  }));
+
+  const unitLabels = UNITS_LOCALIZED?.[lang] || UNITS_LOCALIZED?.en || {};
+  const unitOptions = Object.entries(unitLabels).map(([key, label]) => ({
+    value: key,
+    label,
+  }));
+  const unitDisplay = unitLabels[unit] || unit;
+
+  const regionOptions = getLocalizedRegions(lang);
+  const availableZones = region ? getLocalizedZones(region, lang) : [];
 
   useEffect(() => {
-    if (regionRef.current !== region) {
-      setZone("");
-    }
-    regionRef.current = region;
+    setZone("");
   }, [region]);
 
   const handleUpdate = async () => {
     if (!cropType || !quantity || !price || !region) {
-      Alert.alert(
-        t("editProduct.missingFieldsTitle"),
-        t("editProduct.missingFieldsMessage"),
-      );
-      return;
-    }
-
-    if (region && ZONES_BY_REGION[region]?.length && !zone.trim()) {
-      Alert.alert(
-        t("editProduct.missingZoneTitle"),
-        t("editProduct.missingZoneMessage"),
-      );
+      Alert.alert("Missing Fields", "Please complete crop type, stock quantity, price, and location.");
       return;
     }
 
@@ -348,6 +196,7 @@ export default function EditProductScreen({ route, navigation }) {
           quantity: Number(quantity),
           unit,
           price: Number(price),
+          status,
           description,
           location: {
             region: region.trim(),
@@ -355,17 +204,18 @@ export default function EditProductScreen({ route, navigation }) {
             wereda: wereda.trim(),
             kebele: "",
           },
-        },
+        }
       );
+
       Alert.alert(
-        t("editProduct.updateSuccessTitle"),
-        t("editProduct.updateSuccessMessage"),
-        [{ text: t("editProduct.ok"), onPress: () => navigation.goBack() }],
+        "Listing Updated!",
+        "Your harvest listing changes have been saved successfully.",
+        [{ text: "OK", onPress: () => navigation.goBack() }]
       );
     } catch (err) {
       Alert.alert(
-        t("editProduct.updateErrorTitle"),
-        err.response?.data?.message || t("editProduct.updateErrorMessage"),
+        "Update Failed",
+        err.response?.data?.message || err.message || "Failed to update listing."
       );
     } finally {
       setLoading(false);
@@ -374,86 +224,100 @@ export default function EditProductScreen({ route, navigation }) {
 
   const handleDelete = () => {
     Alert.alert(
-      t("editProduct.deleteConfirmTitle"),
-      t("editProduct.deleteConfirmMessage"),
+      "Delete Listing",
+      `Are you sure you want to delete "${cropType}" listing? This action cannot be undone.`,
       [
-        { text: t("editProduct.cancel"), style: "cancel" },
+        { text: "Cancel", style: "cancel" },
         {
-          text: t("editProduct.delete"),
+          text: "Delete Listing",
           style: "destructive",
           onPress: async () => {
             try {
               await api.delete(
-                API_ENDPOINTS.products.delete(product?.id || product?._id),
+                API_ENDPOINTS.products.delete(product?.id || product?._id)
               );
               navigation.goBack();
             } catch (err) {
-              Alert.alert(
-                t("editProduct.deleteErrorTitle"),
-                t("editProduct.deleteErrorMessage"),
-              );
+              Alert.alert("Delete Error", "Unable to delete product listing.");
             }
           },
         },
-      ],
+      ]
     );
   };
 
   return (
     <View style={[styles.container, { backgroundColor: background }]}>
-      <StatusBar
-        translucent
-        backgroundColor="transparent"
-        barStyle="dark-content"
-      />
-      <AppHeader
-        title={t("editProduct.title")}
-        showBack={true}
-        onBackPress={() => navigation.goBack()}
-      />
+      <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
+      <AppHeader title="Edit Harvest Listing" showBack onBackPress={() => navigation.goBack()} />
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.flex}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
       >
-        <ScrollView
-          contentContainerStyle={styles.scroll}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Crop Type */}
+        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          {/* Status Switcher Banner */}
+          <View style={styles.statusCard}>
+            <AppText style={styles.statusCardTitle}>Listing Availability Status</AppText>
+            <View style={styles.statusToggleRow}>
+              <TouchableOpacity
+                style={[
+                  styles.statusToggleBtn,
+                  status === "active" && { backgroundColor: "#15803D" },
+                ]}
+                onPress={() => setStatus("active")}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="checkmark-circle" size={16} color={status === "active" ? "#FFFFFF" : "#15803D"} />
+                <AppText style={[styles.statusToggleText, status === "active" && { color: "#FFFFFF" }]}>
+                  Active Stock
+                </AppText>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.statusToggleBtn,
+                  status === "sold" && { backgroundColor: "#DC2626" },
+                ]}
+                onPress={() => setStatus("sold")}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="archive" size={16} color={status === "sold" ? "#FFFFFF" : "#DC2626"} />
+                <AppText style={[styles.statusToggleText, status === "sold" && { color: "#FFFFFF" }]}>
+                  Sold Out
+                </AppText>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Crop Type Dropdown */}
           <DropdownPicker
-            label={t("editProduct.cropType")}
+            label="Crop Type / Commodity"
             value={cropType}
-            options={CROP_TYPES}
+            options={cropOptions}
             onSelect={setCropType}
             visible={showCropPicker}
             onOpen={() => setShowCropPicker(true)}
             onClose={() => setShowCropPicker(false)}
             icon="leaf-outline"
             theme={theme}
-            placeholder={t("editProduct.selectLabel", {
-              label: t("editProduct.cropType"),
-            })}
+            placeholder="Select Harvest Crop"
           />
 
-          {/* Quantity & Unit */}
+          {/* Quantity & Unit Row */}
           <View style={styles.row}>
-            <View style={styles.flex2}>
-              <AppText style={[styles.label, { color: textSecondary }]}>
-                {t("editProduct.quantity")}
-              </AppText>
+            <View style={{ flex: 2 }}>
+              <AppText style={styles.inputLabel}>Stock Quantity</AppText>
               <AppInput
-                placeholder={t("editProduct.quantityPlaceholder")}
+                placeholder="0"
                 value={quantity}
                 onChangeText={setQuantity}
                 keyboardType="numeric"
               />
             </View>
-            <View style={styles.flex1}>
+            <View style={{ flex: 1.2 }}>
               <DropdownPicker
-                label={t("editProduct.unit")}
+                label="Unit"
                 value={unit}
                 options={unitOptions}
                 onSelect={setUnit}
@@ -462,19 +326,15 @@ export default function EditProductScreen({ route, navigation }) {
                 onClose={() => setShowUnitPicker(false)}
                 icon="cube-outline"
                 theme={theme}
-                placeholder={t("editProduct.selectLabel", {
-                  label: t("editProduct.unit"),
-                })}
+                placeholder="Unit"
               />
             </View>
           </View>
 
-          {/* Price */}
-          <AppText style={[styles.label, { color: textSecondary }]}>
-            {t("editProduct.pricePerUnit", { unit: unitDisplay })}
-          </AppText>
+          {/* Price per Unit */}
+          <AppText style={styles.inputLabel}>Price per {unitDisplay} (ETB)</AppText>
           <AppInput
-            placeholder={t("editProduct.pricePlaceholder")}
+            placeholder="0"
             value={price}
             onChangeText={setPrice}
             keyboardType="numeric"
@@ -482,11 +342,9 @@ export default function EditProductScreen({ route, navigation }) {
           />
 
           {/* Description */}
-          <AppText style={[styles.label, { color: textSecondary }]}>
-            {t("editProduct.description")}
-          </AppText>
+          <AppText style={styles.inputLabel}>Listing Description</AppText>
           <AppInput
-            placeholder={t("editProduct.descriptionPlaceholder")}
+            placeholder="Add details about crop quality, harvest date, packaging..."
             value={description}
             onChangeText={setDescription}
             multiline
@@ -495,41 +353,31 @@ export default function EditProductScreen({ route, navigation }) {
           />
 
           {/* Location Section */}
-          <View style={styles.section}>
-            <AppText
-              variant="headingSm"
-              style={[styles.sectionTitle, { color: textPrimary }]}
-            >
-              {t("editProduct.location")}
-            </AppText>
+          <View style={styles.sectionCard}>
+            <AppText style={styles.sectionCardTitle}>Farm / Storage Location</AppText>
 
             <DropdownPicker
-              label={t("editProduct.region")}
+              label="Region"
               value={region}
-              options={REGIONS}
+              options={regionOptions}
               onSelect={setRegion}
               visible={showRegionPicker}
               onOpen={() => setShowRegionPicker(true)}
               onClose={() => setShowRegionPicker(false)}
               icon="location-outline"
               theme={theme}
-              placeholder={t("editProduct.selectLabel", {
-                label: t("editProduct.region"),
-              })}
+              placeholder="Select Region"
             />
 
             <DropdownPicker
-              label={t("editProduct.zone")}
+              label="Zone"
               value={zone}
-              options={region ? ZONES_BY_REGION[region] || [] : []}
+              options={availableZones}
               onSelect={setZone}
               visible={showZonePicker}
               onOpen={() => {
                 if (!region) {
-                  Alert.alert(
-                    t("editProduct.selectRegionFirstTitle"),
-                    t("editProduct.selectRegionFirstMessage"),
-                  );
+                  Alert.alert("Select Region First", "Please select a region before picking a zone.");
                   return;
                 }
                 setShowZonePicker(true);
@@ -537,38 +385,28 @@ export default function EditProductScreen({ route, navigation }) {
               onClose={() => setShowZonePicker(false)}
               icon="map-outline"
               theme={theme}
-              placeholder={t("editProduct.selectLabel", {
-                label: t("editProduct.zone"),
-              })}
-            />
-
-            <AppText style={[styles.label, { color: textSecondary }]}>
-              {t("editProduct.wereda")}
-            </AppText>
-            <AppInput
-              placeholder={t("editProduct.weredaPlaceholder")}
-              value={wereda}
-              onChangeText={setWereda}
+              placeholder="Select Zone"
+              disabled={!region}
             />
           </View>
 
           {/* Save / Delete Buttons */}
           <AppButton
-            title={t("editProduct.saveChanges")}
+            title={loading ? "Saving Changes..." : "✓ Save Changes"}
             onPress={handleUpdate}
             loading={loading}
             disabled={loading}
             fullWidth
-            style={styles.submitButton}
+            style={styles.submitBtn}
           />
 
           <AppButton
-            title={t("editProduct.deleteListing")}
+            title="Delete Listing"
             variant="outline"
             fullWidth
             onPress={handleDelete}
             style={{ marginTop: 12 }}
-            textStyle={{ color: error }}
+            textStyle={{ color: error, fontWeight: "800" }}
             borderColor={error}
           />
         </ScrollView>
@@ -579,38 +417,61 @@ export default function EditProductScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  flex: { flex: 1 },
-  scroll: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-    paddingTop: 8,
+  scroll: { paddingHorizontal: 16, paddingBottom: 40, paddingTop: 10 },
+  statusCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#CBD5E1",
+    marginBottom: 16,
   },
-  label: {
-    fontSize: 14,
-    marginBottom: 4,
-    marginTop: 16,
-    fontWeight: "500",
-  },
-  row: {
+  statusCardTitle: { fontSize: 13, fontWeight: "700", color: "#0F172A", marginBottom: 10 },
+  statusToggleRow: { flexDirection: "row", gap: 10 },
+  statusToggleBtn: {
+    flex: 1,
     flexDirection: "row",
-    gap: 12,
-    marginTop: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: "#CBD5E1",
   },
-  flex2: { flex: 2 },
-  flex1: { flex: 1 },
-  textArea: {
-    minHeight: 100,
-    textAlignVertical: "top",
-    paddingTop: 12,
+  statusToggleText: { fontSize: 12.5, fontWeight: "800", color: "#334155" },
+  inputLabel: { fontSize: 13, fontWeight: "700", color: "#0F172A", marginTop: 14, marginBottom: 6 },
+  dropdownBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
   },
-  section: {
-    marginTop: 8,
+  dropdownInner: { flexDirection: "row", alignItems: "center", gap: 8 },
+  dropdownText: { fontSize: 14, fontWeight: "600" },
+  dropdownMenu: {
+    borderWidth: 1,
+    borderRadius: 14,
+    marginTop: 4,
+    maxHeight: 180,
+    overflow: "hidden",
+    elevation: 4,
   },
-  sectionTitle: {
-    marginBottom: 12,
-    marginTop: 8,
+  dropdownOption: { paddingHorizontal: 16, paddingVertical: 12 },
+  dropdownOptionText: { fontSize: 14 },
+  row: { flexDirection: "row", gap: 10 },
+  textArea: { minHeight: 90, textAlignVertical: "top", paddingTop: 10 },
+  sectionCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    marginTop: 18,
   },
-  submitButton: {
-    marginTop: 24,
-  },
+  sectionCardTitle: { fontSize: 14, fontWeight: "800", color: "#0F172A", marginBottom: 4 },
+  submitBtn: { marginTop: 22, backgroundColor: "#15803D", borderRadius: 14, paddingVertical: 14 },
 });

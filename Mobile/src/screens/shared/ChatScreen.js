@@ -26,11 +26,10 @@ const POLL_INTERVAL_MS = 5000;
 
 const formatTime = (iso) => {
   if (!iso) return "";
-  const d = new Date(iso);
-  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 };
 
-// ─── Interactive Sourcing Request Card ───────────────────────────────────────
+// ─── Sourcing Action Card ─────────────────────────────────────────────────────
 const SourcingActionCard = ({ data, isMe, onAccept, onReject, role }) => {
   if (!data) return null;
   const isPending = data.status === "pending";
@@ -41,8 +40,10 @@ const SourcingActionCard = ({ data, isMe, onAccept, onReject, role }) => {
   return (
     <View style={styles.actionCard}>
       <View style={styles.actionCardHeader}>
-        <Ionicons name="cube-outline" size={18} color="#1565C0" />
-        <AppText style={styles.actionCardTitle}>Bulk Sourcing Request Specs</AppText>
+        <View style={styles.actionCardIconBg}>
+          <Ionicons name="cube" size={14} color="#1565C0" />
+        </View>
+        <AppText style={styles.actionCardTitle}>Bulk Sourcing Request</AppText>
       </View>
 
       <AppText style={styles.actionSpecs}>
@@ -52,13 +53,12 @@ const SourcingActionCard = ({ data, isMe, onAccept, onReject, role }) => {
         • Destination: {data.deliveryRegion}
       </AppText>
 
-      {/* Interactive Action Buttons for Farmer */}
       {!isMe && role === "farmer" && isPending && (
         <View style={styles.actionBtnRow}>
-          <TouchableOpacity style={styles.acceptBtn} onPress={() => onAccept(data)}>
-            <AppText style={styles.acceptBtnText}>✓ Accept & List Produce</AppText>
+          <TouchableOpacity style={styles.acceptBtn} onPress={() => onAccept(data)} activeOpacity={0.85}>
+            <AppText style={styles.acceptBtnText}>✓ Accept & List</AppText>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.rejectBtn} onPress={() => onReject(data)}>
+          <TouchableOpacity style={styles.rejectBtn} onPress={() => onReject(data)} activeOpacity={0.85}>
             <AppText style={styles.rejectBtnText}>✕ Decline</AppText>
           </TouchableOpacity>
         </View>
@@ -66,41 +66,45 @@ const SourcingActionCard = ({ data, isMe, onAccept, onReject, role }) => {
 
       {isAccepted && (
         <View style={styles.statusPillSuccess}>
-          <AppText style={styles.statusPillSuccessText}>✓ Accepted — Produce Listing Created</AppText>
+          <Ionicons name="checkmark-circle" size={14} color="#10B981" />
+          <AppText style={styles.statusPillSuccessText}>Accepted — Produce Listing Live</AppText>
         </View>
       )}
 
       {isRejected && (
         <View style={styles.statusPillDeclined}>
+          <Ionicons name="close-circle" size={14} color="#EF4444" />
           <AppText style={styles.statusPillDeclinedText}>Declined / Out of Stock</AppText>
         </View>
       )}
 
       {isMatched && (
         <View style={styles.statusPillMatched}>
-          <AppText style={styles.statusPillMatchedText}>📦 Matching Listing Posted</AppText>
+          <Ionicons name="bag-check" size={14} color="#1565C0" />
+          <AppText style={styles.statusPillMatchedText}>Matching Harvest Posted</AppText>
         </View>
       )}
     </View>
   );
 };
 
-// ─── Message Bubble ─────────────────────────────────────────────────────────
+// ─── Message Bubble ───────────────────────────────────────────────────────────
 const MessageBubble = ({ message, isMe, showAvatar, avatarLetter, theme, onAccept, onReject, role }) => {
-  const primary = theme?.colors?.primary || "#2E7D32";
+  const primary = theme?.colors?.primary || "#1565C0";
   const surface = theme?.colors?.surface || "#FFFFFF";
-  const border = theme?.colors?.border || "#E0E0E0";
-  const textPrimary = theme?.colors?.textPrimary || "#333";
-  const textSecondary = theme?.colors?.textSecondary || "#888";
+  const textPrimary = theme?.colors?.textPrimary || "#0F172A";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
 
   return (
     <View style={[styles.bubbleRow, isMe ? styles.rowRight : styles.rowLeft]}>
-      {!isMe && showAvatar ? (
-        <View style={[styles.avatarSmall, { backgroundColor: primary }]}>
-          <AppText style={styles.avatarText}>{avatarLetter}</AppText>
-        </View>
-      ) : (
-        !isMe && <View style={{ width: 30 }} />
+      {!isMe && (
+        showAvatar ? (
+          <View style={[styles.avatarSmall, { backgroundColor: primary }]}>
+            <AppText style={styles.avatarText}>{avatarLetter}</AppText>
+          </View>
+        ) : (
+          <View style={{ width: 34 }} />
+        )
       )}
 
       <View
@@ -108,14 +112,13 @@ const MessageBubble = ({ message, isMe, showAvatar, avatarLetter, theme, onAccep
           styles.bubble,
           isMe
             ? [styles.bubbleMe, { backgroundColor: primary }]
-            : [styles.bubbleThem, { backgroundColor: surface, borderColor: border }],
+            : [styles.bubbleThem, { backgroundColor: surface }],
         ]}
       >
-        <AppText variant="bodyMd" style={{ color: isMe ? surface : textPrimary }}>
+        <AppText style={{ color: isMe ? "#FFFFFF" : textPrimary, fontSize: 14.5, lineHeight: 21, fontWeight: "400" }}>
           {message.content}
         </AppText>
 
-        {/* Structured Sourcing Request Data Card */}
         {message.sourcingRequestData && (
           <SourcingActionCard
             data={message.sourcingRequestData}
@@ -127,17 +130,14 @@ const MessageBubble = ({ message, isMe, showAvatar, avatarLetter, theme, onAccep
         )}
 
         <View style={styles.metaRow}>
-          <AppText
-            variant="label"
-            style={[styles.timestamp, { color: isMe ? "rgba(255,255,255,0.65)" : textSecondary }]}
-          >
+          <AppText style={[styles.timestamp, { color: isMe ? "rgba(255,255,255,0.7)" : textSecondary }]}>
             {formatTime(message.createdAt)}
           </AppText>
           {isMe && (
             <Ionicons
               name={message.isRead ? "checkmark-done" : "checkmark"}
               size={14}
-              color={message.isRead ? "#4CAF50" : "rgba(255,255,255,0.65)"}
+              color={message.isRead ? "#4ADE80" : "rgba(255,255,255,0.7)"}
               style={{ marginLeft: 4 }}
             />
           )}
@@ -161,17 +161,50 @@ export default function ChatScreen({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+
+  const keyboardHeight = useRef(new Animated.Value(0)).current;
   const flatListRef = useRef(null);
   const latestMsgCount = useRef(0);
-  const [isAtBottom, setIsAtBottom] = useState(true);
 
-  const primary = theme?.colors?.primary || "#2E7D32";
-  const background = theme?.colors?.background || "#F5F5F5";
+  const primary = theme?.colors?.primary || "#1565C0";
+  const background = "#F1F5F9";
   const surface = theme?.colors?.surface || "#FFFFFF";
-  const textPrimary = theme?.colors?.textPrimary || "#333";
-  const textSecondary = theme?.colors?.textSecondary || "#888";
-  const border = theme?.colors?.border || "#E0E0E0";
-  const errorColor = theme?.colors?.error || "#F44336";
+  const textPrimary = theme?.colors?.textPrimary || "#0F172A";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
+
+  const isSupportChat =
+    userId === "support" ||
+    userId === "admin" ||
+    (userName && userName.toLowerCase().includes("support"));
+
+  const targetPhone = phoneNumber || (isSupportChat ? "0938730818" : null);
+
+  // Smooth Animated Keyboard listener (Zero 3rd party native dependencies required)
+  useEffect(() => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      Animated.timing(keyboardHeight, {
+        toValue: e.endCoordinates.height,
+        duration: Platform.OS === "ios" ? e.duration || 250 : 150,
+        useNativeDriver: false,
+      }).start();
+    });
+
+    const hideSub = Keyboard.addListener(hideEvent, (e) => {
+      Animated.timing(keyboardHeight, {
+        toValue: 0,
+        duration: Platform.OS === "ios" ? e.duration || 200 : 150,
+        useNativeDriver: false,
+      }).start();
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, [keyboardHeight]);
 
   const fetchThread = useCallback(
     async (silent = false) => {
@@ -183,9 +216,6 @@ export default function ChatScreen({ route, navigation }) {
         if (fetched.length !== latestMsgCount.current) {
           latestMsgCount.current = fetched.length;
           setMessages(fetched);
-          if (isAtBottom) {
-            setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
-          }
         }
         setError("");
       } catch (err) {
@@ -196,7 +226,7 @@ export default function ChatScreen({ route, navigation }) {
         setLoading(false);
       }
     },
-    [userId, isAtBottom]
+    [userId, t]
   );
 
   useEffect(() => {
@@ -218,9 +248,11 @@ export default function ChatScreen({ route, navigation }) {
       isRead: false,
       _optimistic: true,
     };
+
     setMessages((prev) => [...prev, optimistic]);
     setText("");
     setSending(true);
+
     try {
       const res = await api.post(API_ENDPOINTS.messages.send, {
         receiverId: userId,
@@ -236,11 +268,9 @@ export default function ChatScreen({ route, navigation }) {
       setError(err?.response?.data?.message || t("chatScreen.errorSendMessage"));
     } finally {
       setSending(false);
-      setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
     }
   };
 
-  // Farmer accepts request -> navigates to PostProductScreen pre-filled
   const handleAcceptRequest = (sourcingData) => {
     navigation?.navigate("PostProduct", {
       prefill: {
@@ -253,7 +283,6 @@ export default function ChatScreen({ route, navigation }) {
     });
   };
 
-  // Farmer rejects request -> sends reject update to API
   const handleRejectRequest = async (sourcingData) => {
     try {
       const reqId = sourcingData.sourcingRequestId;
@@ -273,24 +302,38 @@ export default function ChatScreen({ route, navigation }) {
 
   const messagesWithSeparators = useCallback(() => {
     if (!messages.length) return [];
-    const result = [];
-    let lastDate = null;
-    messages.forEach((msg) => {
-      const currentDate = new Date(msg.createdAt).toDateString();
-      if (currentDate !== lastDate) {
-        result.push({
+
+    const reversed = [];
+    let currentDateGroup = null;
+
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const msg = messages[i];
+      const msgDateStr = new Date(msg.createdAt).toDateString();
+
+      if (currentDateGroup !== null && currentDateGroup !== msgDateStr) {
+        reversed.push({
           type: "date",
-          date: currentDate,
-          id: `date-${currentDate}`,
+          date: currentDateGroup,
+          id: `date-${currentDateGroup}`,
         });
-        lastDate = currentDate;
       }
-      result.push({ type: "message", ...msg, id: msg._id });
-    });
-    return result;
+
+      currentDateGroup = msgDateStr;
+      reversed.push({ type: "message", ...msg, id: msg._id });
+    }
+
+    if (currentDateGroup) {
+      reversed.push({
+        type: "date",
+        date: currentDateGroup,
+        id: `date-${currentDateGroup}`,
+      });
+    }
+
+    return reversed;
   }, [messages]);
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item, index }) => {
     if (item.type === "date") {
       return (
         <View style={styles.dateSeparator}>
@@ -298,9 +341,14 @@ export default function ChatScreen({ route, navigation }) {
         </View>
       );
     }
+
+    const invertedList = messagesWithSeparators();
     const showAvatar =
       !isMe(item) &&
-      item.senderId !== messages[messages.indexOf(item) - 1]?.senderId;
+      (index === invertedList.length - 1 ||
+        invertedList[index + 1]?.type === "date" ||
+        isMe(invertedList[index + 1]));
+
     const avatarLetter = userName?.charAt(0).toUpperCase() || "?";
 
     return (
@@ -319,67 +367,229 @@ export default function ChatScreen({ route, navigation }) {
 
   return (
     <View style={[styles.container, { backgroundColor: background }]}>
+      {/* Header */}
       <AppHeader
         title={userName || "Chat"}
         showBack
         onBackPress={() => navigation.goBack()}
+        rightComponent={
+          targetPhone ? (
+            <TouchableOpacity
+              style={styles.headerIconBtn}
+              onPress={() => Linking.openURL(`tel:${targetPhone}`)}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="call" size={18} color="#FFFFFF" />
+            </TouchableOpacity>
+          ) : null
+        }
       />
 
-      <FlatList
-        ref={flatListRef}
-        data={messagesWithSeparators()}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.messageList}
-        showsVerticalScrollIndicator={false}
-      />
-
-      {/* Input bar */}
-      <View style={[styles.inputBar, { backgroundColor: surface, borderTopColor: border }]}>
-        <TextInput
-          style={[styles.input, { backgroundColor: background, color: textPrimary }]}
-          placeholder="Type a message..."
-          placeholderTextColor={textSecondary}
-          value={text}
-          onChangeText={setText}
-          multiline
-        />
-        <TouchableOpacity
-          style={[styles.sendBtn, { backgroundColor: primary }]}
-          onPress={handleSend}
-          disabled={!text.trim() || sending}
-        >
-          {sending ? (
-            <ActivityIndicator size="small" color={surface} />
+      <Animated.View style={{ flex: 1, paddingBottom: keyboardHeight }}>
+        <View style={{ flex: 1 }}>
+          {loading ? (
+            <View style={styles.center}>
+              <ActivityIndicator size="large" color={primary} />
+            </View>
           ) : (
-            <Ionicons name="send" size={18} color={surface} />
+            <FlatList
+              ref={flatListRef}
+              data={messagesWithSeparators()}
+              keyExtractor={(item) => item.id}
+              renderItem={renderItem}
+              inverted
+              contentContainerStyle={styles.messageList}
+              showsVerticalScrollIndicator={false}
+              keyboardDismissMode="interactive"
+              keyboardShouldPersistTaps="handled"
+            />
           )}
-        </TouchableOpacity>
-      </View>
+        </View>
+
+        {/* Error banner */}
+        {!!error && (
+          <View style={[styles.errorBanner, { backgroundColor: "#FEF2F2" }]}>
+            <Ionicons name="alert-circle" size={16} color="#DC2626" />
+            <AppText style={{ color: "#DC2626", fontSize: 13, flex: 1 }}>{error}</AppText>
+          </View>
+        )}
+
+        {/* Floating Input Bar */}
+        <View
+          style={[
+            styles.floatingInputWrapper,
+            { paddingBottom: Math.max(insets.bottom, 8) },
+          ]}
+        >
+          <View style={[styles.floatingInputCard, { backgroundColor: surface }]}>
+            {/* Attachment (+) Button */}
+            <TouchableOpacity
+              style={styles.attachBtn}
+              onPress={() => {}}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="add-circle" size={26} color={primary} />
+            </TouchableOpacity>
+
+            {/* Wide Multiline Input Field */}
+            <TextInput
+              style={[styles.inputField, { color: textPrimary }]}
+              placeholder="Type a message..."
+              placeholderTextColor={textSecondary}
+              value={text}
+              onChangeText={setText}
+              multiline
+              maxLength={1500}
+            />
+
+            {/* Dynamic Send / Mic Action Button */}
+            <TouchableOpacity
+              style={[
+                styles.sendFab,
+                { backgroundColor: text.trim() ? primary : primary + "25" },
+              ]}
+              onPress={handleSend}
+              disabled={!text.trim() || sending}
+              activeOpacity={0.8}
+            >
+              {sending ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : (
+                <Ionicons
+                  name={text.trim() ? "send" : "mic"}
+                  size={18}
+                  color={text.trim() ? "#FFFFFF" : primary}
+                />
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Animated.View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  messageList: { paddingHorizontal: 16, paddingVertical: 12, flexGrow: 1 },
-  dateSeparator: { alignItems: "center", marginVertical: 12 },
-  dateText: { fontSize: 12, color: "#999", backgroundColor: "#e0e0e0", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
-  bubbleRow: { flexDirection: "row", marginVertical: 4, alignItems: "flex-end" },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  messageList: {
+    paddingHorizontal: 12,
+    paddingTop: 12,
+    paddingBottom: 16,
+  },
+  dateSeparator: { alignItems: "center", marginVertical: 14 },
+  dateText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#64748B",
+    backgroundColor: "#E2E8F0",
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    borderRadius: 14,
+    overflow: "hidden",
+  },
+  bubbleRow: { flexDirection: "row", marginVertical: 3, alignItems: "flex-end" },
   rowRight: { justifyContent: "flex-end" },
   rowLeft: { justifyContent: "flex-start" },
-  avatarSmall: { width: 30, height: 30, borderRadius: 15, justifyContent: "center", alignItems: "center", marginRight: 8 },
-  avatarText: { color: "#fff", fontWeight: "700", fontSize: 14 },
-  bubble: { borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10, maxWidth: "82%" },
-  bubbleMe: { borderBottomRightRadius: 4, marginRight: 4 },
-  bubbleThem: { borderBottomLeftRadius: 4, borderWidth: 1 },
-  metaRow: { flexDirection: "row", justifyContent: "flex-end", alignItems: "center", marginTop: 4 },
-  timestamp: { fontSize: 10 },
-  inputBar: { flexDirection: "row", alignItems: "center", paddingHorizontal: 12, paddingVertical: 8, borderTopWidth: 1, gap: 8 },
-  input: { flex: 1, borderRadius: 22, paddingHorizontal: 16, paddingVertical: 8, fontSize: 15, maxHeight: 100 },
-  sendBtn: { width: 42, height: 42, borderRadius: 21, alignItems: "center", justifyContent: "center" },
+  avatarSmall: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 6,
+  },
+  avatarText: { color: "#FFFFFF", fontWeight: "700", fontSize: 13 },
+  bubble: {
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    maxWidth: "82%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  bubbleMe: {
+    borderBottomRightRadius: 4,
+    marginRight: 2,
+  },
+  bubbleThem: {
+    borderBottomLeftRadius: 4,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  metaRow: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    marginTop: 4,
+    gap: 2,
+  },
+  timestamp: { fontSize: 10.5 },
+  headerIconBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(255,255,255,0.22)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  errorBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginHorizontal: 12,
+    marginBottom: 6,
+    padding: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#FECACA",
+  },
 
-  /* Sourcing Action Card Styles */
+  /* Floating WhatsApp / Telegram Input Bar */
+  floatingInputWrapper: {
+    paddingHorizontal: 10,
+    paddingTop: 6,
+  },
+  floatingInputCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 26,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: "#CBD5E1",
+    gap: 6,
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  attachBtn: {
+    padding: 4,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  inputField: {
+    flex: 1,
+    fontSize: 15,
+    lineHeight: 20,
+    maxHeight: 110,
+    paddingHorizontal: 6,
+    paddingVertical: Platform.OS === "ios" ? 8 : 4,
+  },
+  sendFab: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  /* Sourcing Action Card */
   actionCard: {
     backgroundColor: "#F8FAFC",
     borderRadius: 14,
@@ -388,86 +598,65 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#CBD5E1",
   },
-  actionCardHeader: {
-    flexDirection: "row",
+  actionCardHeader: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 6 },
+  actionCardIconBg: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: "#E0F2FE",
     alignItems: "center",
-    gap: 6,
-    marginBottom: 6,
+    justifyContent: "center",
   },
-  actionCardTitle: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#0F172A",
-  },
-  actionSpecs: {
-    fontSize: 12,
-    color: "#334155",
-    lineHeight: 18,
-    marginBottom: 8,
-  },
-  actionBtnRow: {
-    flexDirection: "row",
-    gap: 8,
-    marginTop: 4,
-  },
+  actionCardTitle: { fontSize: 13, fontWeight: "800", color: "#0F172A" },
+  actionSpecs: { fontSize: 12.5, color: "#334155", lineHeight: 19, marginBottom: 8 },
+  actionBtnRow: { flexDirection: "row", gap: 8 },
   acceptBtn: {
     flex: 1,
-    backgroundColor: "#2E7D32",
-    paddingVertical: 8,
+    backgroundColor: "#16A34A",
+    paddingVertical: 9,
     borderRadius: 10,
     alignItems: "center",
   },
-  acceptBtnText: {
-    color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: "700",
-  },
+  acceptBtnText: { color: "#FFFFFF", fontSize: 12, fontWeight: "700" },
   rejectBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
     backgroundColor: "#EF4444",
     borderRadius: 10,
     alignItems: "center",
   },
-  rejectBtnText: {
-    color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: "700",
-  },
+  rejectBtnText: { color: "#FFFFFF", fontSize: 12, fontWeight: "700" },
   statusPillSuccess: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
     backgroundColor: "#ECFDF5",
-    paddingVertical: 6,
+    paddingVertical: 7,
     paddingHorizontal: 10,
-    borderRadius: 8,
-    alignItems: "center",
+    borderRadius: 10,
+    justifyContent: "center",
   },
-  statusPillSuccessText: {
-    color: "#10B981",
-    fontSize: 11,
-    fontWeight: "700",
-  },
+  statusPillSuccessText: { color: "#059669", fontSize: 11.5, fontWeight: "700" },
   statusPillDeclined: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
     backgroundColor: "#FEF2F2",
-    paddingVertical: 6,
+    paddingVertical: 7,
     paddingHorizontal: 10,
-    borderRadius: 8,
-    alignItems: "center",
+    borderRadius: 10,
+    justifyContent: "center",
   },
-  statusPillDeclinedText: {
-    color: "#EF4444",
-    fontSize: 11,
-    fontWeight: "700",
-  },
+  statusPillDeclinedText: { color: "#DC2626", fontSize: 11.5, fontWeight: "700" },
   statusPillMatched: {
-    backgroundColor: "#EFF6FF",
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 8,
+    flexDirection: "row",
     alignItems: "center",
+    gap: 6,
+    backgroundColor: "#EFF6FF",
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    justifyContent: "center",
   },
-  statusPillMatchedText: {
-    color: "#1565C0",
-    fontSize: 11,
-    fontWeight: "700",
-  },
+  statusPillMatchedText: { color: "#1D4ED8", fontSize: 11.5, fontWeight: "700" },
 });

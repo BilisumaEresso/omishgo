@@ -1,46 +1,60 @@
 // src/screens/shared/NotificationsScreen.js
-import { useCallback } from "react";
-import { View, FlatList, StyleSheet, TouchableOpacity, Pressable } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useCallback, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
-import api from "../../config/api";
-import { API_ENDPOINTS } from "../../constants/api";
+import {
+  FlatList,
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import AppText from "../../components/common/AppText";
-import AppHeader from "../../components/layout/AppHeader";
+import DashboardLayout from "../../components/layout/DashBoardLayout";
 import { useTheme } from "../../hooks/useTheme";
 import { useNotificationStore } from "../../store/notification.store";
-export default function NotificationsScreen({
-  navigation
-}) {
-  const {
-    t
-  } = useTranslation();
-  const {
-    theme
-  } = useTheme();
-  const { notifications, unreadCount, fetchNotifications, markAsRead, markAllAsRead, loading } = useNotificationStore();
 
-  useFocusEffect(useCallback(() => {
-    fetchNotifications();
-  }, [fetchNotifications]));
-  const primary = theme.colors.primary || "#2E7D32";
-  const backgroundColor = theme.colors.background || "#F9FBF9";
-  const surface = theme.colors.surface || "#FFFFFF";
-  const textPrimary = theme.colors.textPrimary || "#1A2E1A";
-  const textSecondary = theme.colors.textSecondary || "#4A6741";
-  const textMuted = theme.colors.textMuted || "#8FAF8A";
-  const borderColor = theme.colors.border || "#E0E0E0";
-  const handleMarkRead = (id) => {
-    markAsRead(id);
-  };
-  
-  const handleMarkAllRead = () => {
-    markAllAsRead();
-  };
-  
+const TYPE_CONFIG = {
+  new_message: { icon: "chatbubbles", color: "#2563EB", label: "Message" },
+  new_order: { icon: "receipt", color: "#16A34A", label: "Order" },
+  order_update: { icon: "bicycle", color: "#D97706", label: "Order Update" },
+  account_approved: { icon: "shield-checkmark", color: "#059669", label: "Account Verified" },
+  account_rejected: { icon: "close-circle", color: "#DC2626", label: "Account Alert" },
+  system: { icon: "information-circle", color: "#1565C0", label: "System Notification" },
+};
+
+export default function NotificationsScreen({ navigation }) {
+  const { t } = useTranslation();
+  const { theme } = useTheme();
+  const { notifications, unreadCount, fetchNotifications, markAsRead, markAllAsRead } =
+    useNotificationStore();
+
+  const [selectedNotif, setSelectedNotif] = useState(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchNotifications();
+    }, [fetchNotifications])
+  );
+
+  const primary = theme?.colors?.primary || "#1565C0";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const textPrimary = theme?.colors?.textPrimary || "#0F172A";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
+
+  const allRead = unreadCount === 0;
+
   const handleTapNotification = (item) => {
-    handleMarkRead(item._id || item.id);
+    markAsRead(item._id || item.id);
+    setSelectedNotif(item);
+  };
+
+  const handleNavigateFromModal = (item) => {
+    setSelectedNotif(null);
+    if (!item) return;
+
     if (item.type === "new_message") {
       const partnerId = item.data?.senderId || item.metadata?.senderId;
       const partnerName = item.data?.senderName || item.metadata?.senderName;
@@ -54,168 +68,380 @@ export default function NotificationsScreen({
       if (orderId) {
         navigation.navigate("OrderDetail", { order: { _id: orderId } });
       } else {
-        // Fallback for orders
         navigation.navigate("Orders");
       }
-    } else {
-      // General alert for other types
-      alert(item.message || item.body);
     }
   };
-  const allRead = unreadCount === 0;
-  const renderItem = ({
-    item
-  }) => {
+
+  const renderItem = ({ item, index }) => {
     const isUnread = !item.isRead;
-    const TYPE_CONFIG = {
-      new_message: {
-        icon: "chatbubbles-outline",
-        color: theme.colors.info || "#2196F3"
-      },
-      new_order: {
-        icon: "receipt-outline",
-        color: primary
-      },
-      order_update: {
-        icon: "bicycle-outline",
-        color: theme.colors.warning || "#FF9800"
-      },
-      account_approved: {
-        icon: "shield-checkmark-outline",
-        color: theme.colors.success || "#4CAF50"
-      },
-      account_rejected: {
-        icon: "close-circle-outline",
-        color: theme.colors.error || "#F44336"
-      }
-    };
-    const config = TYPE_CONFIG[item.type] || {
-      icon: "notifications-outline",
-      color: primary
-    };
-    return <Pressable onPress={() => handleTapNotification(item)} style={[styles.notificationRow, {
-      backgroundColor: isUnread ? primary + "08" : surface,
-      borderBottomColor: borderColor
-    }]}>
-        {/* Left icon */}
-        <View style={[styles.iconCircle, {
-        backgroundColor: config.color
-      }]}>
-          <Ionicons name={config.icon} size={20} color="#FFFFFF" />
+    const config = TYPE_CONFIG[item.type] || { icon: "notifications", color: primary, label: "Notification" };
+    const isLast = index === notifications.length - 1;
+
+    return (
+      <TouchableOpacity
+        onPress={() => handleTapNotification(item)}
+        activeOpacity={0.75}
+        style={[
+          styles.notifCard,
+          { backgroundColor: surface },
+          isUnread && { borderLeftWidth: 3.5, borderLeftColor: primary },
+          !isLast && styles.notifCardMargin,
+        ]}
+      >
+        <View style={[styles.iconCircle, { backgroundColor: config.color + "18" }]}>
+          <Ionicons name={config.icon} size={20} color={config.color} />
         </View>
 
-        {/* Text content */}
         <View style={styles.textBlock}>
-          <AppText style={[styles.title, {
-          color: textPrimary
-        }]} numberOfLines={1}>
+          <AppText style={[styles.notifTitle, { color: textPrimary }]} numberOfLines={1}>
             {item.title}
           </AppText>
-          <AppText style={[styles.body, {
-          color: textSecondary
-        }]} numberOfLines={2}>
+          <AppText style={[styles.notifBody, { color: textSecondary }]} numberOfLines={2}>
             {item.message || item.body}
           </AppText>
-          <AppText style={[styles.time, {
-          color: textMuted
-        }]}>
-            {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : item.time}
+          <AppText style={styles.notifTime}>
+            {item.createdAt ? new Date(item.createdAt).toLocaleString() : item.time}
           </AppText>
         </View>
 
-        {/* Unread indicator */}
-        {isUnread && <View style={styles.unreadDot} />}
-      </Pressable>;
+        {isUnread && <View style={[styles.unreadDot, { backgroundColor: primary }]} />}
+      </TouchableOpacity>
+    );
   };
-  const renderEmpty = () => <View style={styles.emptyContainer}>
-      <Ionicons name="notifications-off-outline" size={64} color={textMuted} />
-      <AppText style={[styles.emptyText, {
-      color: textSecondary
-    }]}>
+
+  const renderEmpty = () => (
+    <View style={styles.emptyContainer}>
+      <View style={[styles.emptyIconBg, { backgroundColor: primary + "12" }]}>
+        <Ionicons name="notifications-off-outline" size={48} color={primary} />
+      </View>
+      <AppText style={[styles.emptyTitle, { color: textPrimary }]}>
         {t("notificationsScreen.empty")}
       </AppText>
-    </View>;
-  return <View style={[styles.container, {
-    backgroundColor
-  }]}>
-      {/* Header with back arrow */}
-      <AppHeader title={t("notificationsScreen.title")} showBack={true} onBackPress={() => navigation.goBack()} />
+      <AppText style={[styles.emptySub, { color: textSecondary }]}>
+        You are all caught up. New alerts will appear here.
+      </AppText>
+    </View>
+  );
 
-      {/* Mark all as read */}
-      <TouchableOpacity onPress={handleMarkAllRead} style={styles.markAllRow} disabled={allRead}>
-        <AppText style={[styles.markAllText, {
-        color: allRead ? textMuted : primary
-      }]}>
+  return (
+    <DashboardLayout
+      role="buyer"
+      title={t("notificationsScreen.title")}
+      showBack
+      onBackPress={() => navigation.goBack()}
+      scrollable={false}
+    >
+      {/* Mark all row */}
+      <TouchableOpacity
+        onPress={markAllAsRead}
+        style={styles.markAllRow}
+        disabled={allRead}
+        activeOpacity={0.75}
+      >
+        <Ionicons
+          name="checkmark-done-outline"
+          size={16}
+          color={allRead ? "#94A3B8" : primary}
+        />
+        <AppText style={[styles.markAllText, { color: allRead ? "#94A3B8" : primary }]}>
           {t("notificationsScreen.markAllRead")}
         </AppText>
       </TouchableOpacity>
 
-      {/* Notification list */}
-      <FlatList data={notifications} keyExtractor={item => item._id || item.id} renderItem={renderItem} ListEmptyComponent={renderEmpty} contentContainerStyle={notifications.length === 0 && styles.emptyList} />
-    </View>;
+      {/* Unread count chip */}
+      {!allRead && (
+        <View style={[styles.unreadChip, { backgroundColor: primary + "12" }]}>
+          <AppText style={[styles.unreadChipText, { color: primary }]}>
+            {unreadCount} unread notification{unreadCount !== 1 ? "s" : ""}
+          </AppText>
+        </View>
+      )}
+
+      <FlatList
+        data={notifications}
+        keyExtractor={(item) => item._id || item.id}
+        renderItem={renderItem}
+        ListEmptyComponent={renderEmpty}
+        contentContainerStyle={[
+          styles.listContent,
+          notifications.length === 0 && { flex: 1 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      />
+
+      {/* Detail Alert Modal */}
+      <Modal
+        visible={!!selectedNotif}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSelectedNotif(null)}
+      >
+        <TouchableWithoutFeedback onPress={() => setSelectedNotif(null)}>
+          <View style={styles.modalBackdrop}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalCard, { backgroundColor: surface }]}>
+                {selectedNotif && (() => {
+                  const config = TYPE_CONFIG[selectedNotif.type] || {
+                    icon: "notifications",
+                    color: primary,
+                    label: "System Alert",
+                  };
+                  const hasTarget =
+                    selectedNotif.type === "new_message" ||
+                    selectedNotif.type === "new_order" ||
+                    selectedNotif.type === "order_update";
+
+                  return (
+                    <>
+                      <View style={[styles.modalIconCircle, { backgroundColor: config.color + "18" }]}>
+                        <Ionicons name={config.icon} size={32} color={config.color} />
+                      </View>
+
+                      <View style={styles.modalTagRow}>
+                        <View style={[styles.modalTag, { backgroundColor: config.color + "15" }]}>
+                          <AppText style={[styles.modalTagText, { color: config.color }]}>
+                            {config.label}
+                          </AppText>
+                        </View>
+                      </View>
+
+                      <AppText style={[styles.modalTitle, { color: textPrimary }]}>
+                        {selectedNotif.title}
+                      </AppText>
+
+                      <AppText style={[styles.modalBody, { color: textSecondary }]}>
+                        {selectedNotif.message || selectedNotif.body || "No detailed content provided."}
+                      </AppText>
+
+                      <AppText style={styles.modalTime}>
+                        {selectedNotif.createdAt
+                          ? new Date(selectedNotif.createdAt).toLocaleString()
+                          : selectedNotif.time || "Just now"}
+                      </AppText>
+
+                      <View style={styles.modalBtnRow}>
+                        {hasTarget && (
+                          <TouchableOpacity
+                            style={[styles.modalPrimaryBtn, { backgroundColor: primary }]}
+                            onPress={() => handleNavigateFromModal(selectedNotif)}
+                            activeOpacity={0.85}
+                          >
+                            <AppText style={styles.modalPrimaryBtnText}>
+                              {selectedNotif.type === "new_message" ? "Open Chat" : "View Order"}
+                            </AppText>
+                          </TouchableOpacity>
+                        )}
+
+                        <TouchableOpacity
+                          style={[
+                            styles.modalCloseBtn,
+                            !hasTarget && { backgroundColor: primary, flex: 1 },
+                          ]}
+                          onPress={() => setSelectedNotif(null)}
+                          activeOpacity={0.85}
+                        >
+                          <AppText
+                            style={[
+                              styles.modalCloseBtnText,
+                              !hasTarget ? { color: "#FFFFFF" } : { color: textSecondary },
+                            ]}
+                          >
+                            {hasTarget ? "Close" : "Got It"}
+                          </AppText>
+                        </TouchableOpacity>
+                      </View>
+                    </>
+                  );
+                })()}
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+    </DashboardLayout>
+  );
 }
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   markAllRow: {
-    alignItems: "flex-end",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    alignSelf: "flex-end",
     paddingVertical: 10,
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
   },
   markAllText: {
     fontSize: 13,
-    fontWeight: "600"
+    fontWeight: "600",
   },
-  notificationRow: {
+  unreadChip: {
+    marginHorizontal: 16,
+    marginBottom: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    alignSelf: "flex-start",
+  },
+  unreadChipText: {
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  listContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+  },
+  notifCard: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth
+    padding: 14,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    gap: 12,
+  },
+  notifCardMargin: {
+    marginBottom: 10,
   },
   iconCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 12
+    flexShrink: 0,
   },
   textBlock: {
     flex: 1,
-    marginRight: 10
   },
-  title: {
+  notifTitle: {
     fontSize: 14,
     fontWeight: "700",
-    marginBottom: 2
+    marginBottom: 2,
   },
-  body: {
+  notifBody: {
     fontSize: 13,
-    marginBottom: 4
+    lineHeight: 18,
+    marginBottom: 4,
   },
-  time: {
-    fontSize: 11
+  notifTime: {
+    fontSize: 11,
+    color: "#94A3B8",
   },
   unreadDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#2E7DFF" // blue for unread dot
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    flexShrink: 0,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 32
+    paddingHorizontal: 32,
+    gap: 12,
   },
-  emptyText: {
-    fontSize: 16,
-    marginTop: 12,
-    textAlign: "center"
+  emptyIconBg: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  emptyList: {
-    flexGrow: 1
-  }
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  emptySub: {
+    fontSize: 13,
+    textAlign: "center",
+    lineHeight: 20,
+  },
+
+  /* Alert Detail Modal */
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(15, 23, 42, 0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  modalCard: {
+    width: "100%",
+    maxWidth: 360,
+    borderRadius: 24,
+    padding: 24,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  modalIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  modalTagRow: {
+    marginBottom: 10,
+  },
+  modalTag: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  modalTagText: {
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: "800",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  modalBody: {
+    fontSize: 14,
+    lineHeight: 21,
+    textAlign: "center",
+    marginBottom: 14,
+  },
+  modalTime: {
+    fontSize: 11,
+    color: "#94A3B8",
+    marginBottom: 20,
+  },
+  modalBtnRow: {
+    flexDirection: "row",
+    gap: 10,
+    width: "100%",
+  },
+  modalPrimaryBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 14,
+    alignItems: "center",
+  },
+  modalPrimaryBtnText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  modalCloseBtn: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 14,
+    backgroundColor: "#F1F5F9",
+    alignItems: "center",
+  },
+  modalCloseBtnText: {
+    fontSize: 14,
+    fontWeight: "700",
+  },
 });

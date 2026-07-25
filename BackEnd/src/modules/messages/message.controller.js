@@ -13,7 +13,25 @@ import Message from "./message.model.js";
  */
 export const getThread = asyncHandler(async (req, res) => {
   const me = req.user._id;
-  const other = req.params.userId;
+  let other = req.params.userId;
+
+  // Handle "support" / "admin" alias or invalid ObjectId gracefully
+  if (other === "support" || other === "admin" || !mongoose.Types.ObjectId.isValid(other)) {
+    let adminUser = await User.findOne({ role: "admin" });
+    if (!adminUser) {
+      adminUser = await User.findOne({ phone: "0938730818" });
+    }
+    if (!adminUser) {
+      adminUser = await User.create({
+        name: "OmishGo Support Admin",
+        phone: "0938730818",
+        pin: "$2b$10$e8.Z99K9g5/55vj07vA/ee6j01Y6Z9K9g5/55vj07vA/ee6j01Y6",
+        role: "admin",
+        isVerified: true,
+      });
+    }
+    other = adminUser._id.toString();
+  }
 
   // Validate the other user exists
   const otherUser = await User.findById(other).select("name phone");
@@ -51,10 +69,28 @@ export const getThread = asyncHandler(async (req, res) => {
  * @access  Private
  */
 export const sendMessage = asyncHandler(async (req, res) => {
-  const { receiverId, content } = req.body;
+  let { receiverId, content } = req.body;
 
   if (!receiverId || !content?.trim()) {
     throw new ApiError(400, "receiverId and content are required");
+  }
+
+  // Resolve "support" or "admin" or non-ObjectId alias
+  if (receiverId === "support" || receiverId === "admin" || !mongoose.Types.ObjectId.isValid(receiverId)) {
+    let adminUser = await User.findOne({ role: "admin" });
+    if (!adminUser) {
+      adminUser = await User.findOne({ phone: "0938730818" });
+    }
+    if (!adminUser) {
+      adminUser = await User.create({
+        name: "OmishGo Support Admin",
+        phone: "0938730818",
+        pin: "$2b$10$e8.Z99K9g5/55vj07vA/ee6j01Y6Z9K9g5/55vj07vA/ee6j01Y6",
+        role: "admin",
+        isVerified: true,
+      });
+    }
+    receiverId = adminUser._id.toString();
   }
 
   // Cannot message yourself

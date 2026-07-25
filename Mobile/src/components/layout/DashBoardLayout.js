@@ -12,6 +12,8 @@ const DashboardLayout = ({
   children,
   scrollable = true,
   showHeader = true,
+  showBack = false,
+  onBackPress,
   refreshing = false,
   onRefresh,
   notificationMessage,
@@ -32,11 +34,10 @@ const DashboardLayout = ({
     <View style={[styles.flex, { backgroundColor }]}>
       <AppHeader
         title={title || t("browse.title")}
-        showMenu={true}
-        showNotification={true}
-        notificationCount={0}
+        showBack={showBack}
+        onBackPress={onBackPress}
+        showMenu={!showBack}
         onMenuPress={openSidebar}
-        onNotificationPress={() => navigation?.navigate("Notifications")}
       />
 
       {/* Fixed Floating Header (Search Bar) */}

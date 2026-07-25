@@ -1,18 +1,19 @@
 // Mobile/src/screens/farmer/FarmerProductsScreen.js
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
   FlatList,
-  RefreshControl,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
-import { useTranslation } from "react-i18next";
 import AppText from "../../components/common/AppText";
-import AppHeader from "../../components/layout/AppHeader";
+import FarmerProductsHeroCard from "../../components/farmer/FarmerProductsHeroCard";
+import FarmerProductsMetricsBar from "../../components/farmer/FarmerProductsMetricsBar";
+import DashboardLayout from "../../components/layout/DashBoardLayout";
 import FloatingActionButton from "../../components/layout/FloatingActionBotton";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
@@ -23,26 +24,23 @@ import { useAuthStore } from "../../store/auth.store";
 const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const user = useAuthStore((s) => s.user);
+  const { openSidebar } = useSidebar();
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const { openSidebar } = useSidebar();
   const [updatingProductId, setUpdatingProductId] = useState(null);
-  const user = useAuthStore((s) => s.user);
+  const [selectedFilter, setSelectedFilter] = useState("all");
 
-  // Extract theme colors
-  const primary = theme?.colors?.primary || "#2E7D32";
-  const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
-  const textSecondary = theme?.colors?.textSecondary || "#4A6741";
-  const textMuted = theme?.colors?.textMuted || "#8FAF8A";
-  const background = theme?.colors?.background || "#F9FBF9";
+  const primary = theme?.colors?.primary || "#15803D";
   const surface = theme?.colors?.surface || "#FFFFFF";
-  const border = theme?.colors?.border || "#D0E8CE";
-  const success = theme?.colors?.success || "#2E7D32";
-  const warning = theme?.colors?.warning || "#F57F17";
-  const errorColor = theme?.colors?.error || "#C62828";
+  const textPrimary = theme?.colors?.textPrimary || "#0F172A";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
+  const success = "#16A34A";
+  const warning = "#D97706";
+  const errorColor = "#DC2626";
 
-  // Fetch farmer's products
   const fetchMyProducts = async (isRefresh = false) => {
     if (!isRefresh) setLoading(true);
     try {
@@ -51,7 +49,7 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
       });
       const raw = res.data?.data?.products || [];
       const normalized = raw.map((p) => {
-        let locString = t("farmerProducts.fallbackLocation");
+        let locString = "Ethiopia";
         if (p.location) {
           locString = [p.location.region, p.location.zone, p.location.kebele]
             .filter(Boolean)
@@ -60,18 +58,17 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
 
         return {
           id: p._id,
-          cropType: p.cropType,
-          quantity: p.quantity,
-          unit: p.unit || "kg",
-          price: p.price,
+          cropType: p.cropType || p.category || "Harvest Crop",
+          quantity: p.quantity ?? 0,
+          unit: p.unit || "q",
+          price: p.price ?? 0,
           location: locString,
-          status: p.status,
+          status: p.status || "active",
           photos: p.photos || [],
           description: p.description || "",
           postedDate: new Date(p.createdAt).toLocaleDateString("en-GB", {
             day: "numeric",
             month: "short",
-            year: "numeric",
           }),
           _raw: p,
         };
@@ -101,37 +98,41 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
     fetchMyProducts(true);
   };
 
-  // Counts
-  const countActive = products.filter((p) => p.status === "active").length;
-  const countSold = products.filter((p) => p.status === "sold").length;
-  const countDraft = products.filter((p) => p.status === "draft").length;
+  // Calculations
+  const countActive = useMemo(() => products.filter((p) => p.status === "active").length, [products]);
+  const countSold = useMemo(() => products.filter((p) => p.status === "sold").length, [products]);
+  const countDraft = useMemo(() => products.filter((p) => p.status === "draft").length, [products]);
 
-  // Status badge colors (theme‑based)
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "active":
-        return { bg: success + "18", text: success };
-      case "sold":
-        return { bg: textMuted + "18", text: textMuted };
-      case "draft":
-        return { bg: warning + "18", text: warning };
-      default:
-        return { bg: border, text: textSecondary };
-    }
-  };
+  const totalVolume = useMemo(() => {
+    return products
+      .filter((p) => p.status === "active")
+      .reduce((sum, p) => sum + (Number(p.quantity) || 0), 0);
+  }, [products]);
+
+  const totalValuation = useMemo(() => {
+    return products
+      .filter((p) => p.status === "active")
+      .reduce((sum, p) => sum + (Number(p.price) || 0) * (Number(p.quantity) || 1), 0);
+  }, [products]);
+
+  const filteredProducts = useMemo(() => {
+    if (selectedFilter === "active") return products.filter((p) => p.status === "active");
+    if (selectedFilter === "sold") return products.filter((p) => p.status === "sold");
+    if (selectedFilter === "draft") return products.filter((p) => p.status === "draft");
+    return products;
+  }, [products, selectedFilter]);
 
   const markAsSold = async (id) => {
     setUpdatingProductId(id);
     try {
       await api.put(API_ENDPOINTS.products.update(id), { status: "sold" });
       setProducts((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, status: "sold" } : p)),
+        prev.map((p) => (p.id === id ? { ...p, status: "sold" } : p))
       );
     } catch (err) {
       Alert.alert(
-        t("farmerProducts.unableToMarkSoldTitle"),
-        err?.response?.data?.message ||
-          t("farmerProducts.unableToMarkSoldMessage"),
+        "Status Update Failed",
+        err?.response?.data?.message || "Unable to mark crop as sold out."
       );
     } finally {
       setUpdatingProductId(null);
@@ -139,96 +140,80 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
   };
 
   const renderProductCard = ({ item }) => {
-    const statusColors = getStatusColor(item.status);
     const isSold = item.status === "sold";
-    const formattedPrice = item.price
-      ? t("farmerProducts.priceFormat", {
-          price: Number(item.price).toLocaleString(),
-        })
-      : t("farmerProducts.priceUnavailable");
-    const postedLabel = item.postedDate
-      ? t("farmerProducts.postedLabel", { date: item.postedDate })
-      : "";
+    const statusBg = item.status === "active" ? "#DCFCE7" : item.status === "sold" ? "#F1F5F9" : "#FEF3C7";
+    const statusTextColor = item.status === "active" ? "#16A34A" : item.status === "sold" ? "#64748B" : "#D97706";
+    const statusLabel = item.status === "active" ? "Active Stock" : item.status === "sold" ? "Sold Out" : "Draft";
 
-    // Status display text
-    const statusDisplay =
-      item.status === "active"
-        ? t("farmerProducts.statusActive")
-        : item.status === "sold"
-          ? t("farmerProducts.statusSold")
-          : item.status === "draft"
-            ? t("farmerProducts.statusDraft")
-            : item.status;
+    const stockTotalVal = (Number(item.price) || 0) * (Number(item.quantity) || 1);
 
     return (
       <TouchableOpacity
-        activeOpacity={0.9}
+        activeOpacity={0.85}
         style={[styles.card, { backgroundColor: surface }]}
-        onPress={() =>
-          navigation?.navigate("EditProduct", { product: item._raw })
-        }
+        onPress={() => navigation?.navigate("EditProduct", { product: item._raw })}
       >
-        <View style={styles.cardRow}>
-          <AppText style={[styles.cropName, { color: textPrimary }]}>
-            {item.cropType}
-          </AppText>
-          <View style={[styles.badge, { backgroundColor: statusColors.bg }]}>
-            <AppText style={[styles.badgeText, { color: statusColors.text }]}>
-              {statusDisplay}
-            </AppText>
+        <View style={styles.cardHeaderRow}>
+          <View style={styles.cropTitleWrap}>
+            <View style={styles.cropIconBg}>
+              <Ionicons name="leaf" size={18} color="#15803D" />
+            </View>
+            <View>
+              <AppText style={[styles.cropName, { color: textPrimary }]}>{item.cropType}</AppText>
+              <AppText style={styles.dateText}>Posted {item.postedDate}</AppText>
+            </View>
+          </View>
+
+          <View style={[styles.badge, { backgroundColor: statusBg }]}>
+            <AppText style={[styles.badgeText, { color: statusTextColor }]}>{statusLabel}</AppText>
           </View>
         </View>
 
-        <View style={[styles.cardRow, { marginBottom: 4 }]}>
-          <AppText style={[styles.quantityText, { color: textSecondary }]}>
-            {item.quantity} {item.unit}
-          </AppText>
-          <AppText style={[styles.priceText, { color: primary }]}>
-            {formattedPrice}
-          </AppText>
+        <View style={styles.specGrid}>
+          <View style={styles.specItem}>
+            <AppText style={styles.specLabel}>Available Volume</AppText>
+            <AppText style={styles.specVal}>{item.quantity} {item.unit}</AppText>
+          </View>
+          <View style={styles.specItem}>
+            <AppText style={styles.specLabel}>Unit Price</AppText>
+            <AppText style={styles.specVal}>ETB {Number(item.price).toLocaleString()}/{item.unit}</AppText>
+          </View>
+          <View style={styles.specItem}>
+            <AppText style={styles.specLabel}>Batch Value</AppText>
+            <AppText style={[styles.specVal, { color: primary }]}>ETB {stockTotalVal.toLocaleString()}</AppText>
+          </View>
         </View>
 
         <View style={styles.locationRow}>
-          <Ionicons name="location-outline" size={14} color={textMuted} />
-          <AppText style={[styles.locationText, { color: textMuted }]}>
-            {item.location}
-          </AppText>
+          <Ionicons name="location" size={14} color="#64748B" />
+          <AppText style={styles.locationText}>{item.location}</AppText>
         </View>
-
-        {postedLabel ? (
-          <View style={[styles.locationRow, { marginTop: 4 }]}>
-            <AppText style={[styles.postedText, { color: textMuted }]}>
-              {postedLabel}
-            </AppText>
-          </View>
-        ) : null}
 
         {!isSold && (
           <View style={styles.actionsRow}>
             <TouchableOpacity
-              style={[styles.outlineButton, { borderColor: textSecondary }]}
-              onPress={() =>
-                navigation?.navigate("EditProduct", { product: item._raw })
-              }
+              style={[styles.actionBtn, styles.editBtn]}
+              onPress={() => navigation?.navigate("EditProduct", { product: item._raw })}
+              activeOpacity={0.8}
             >
-              <AppText
-                style={[styles.outlineButtonText, { color: textSecondary }]}
-              >
-                {t("farmerProducts.edit")}
-              </AppText>
+              <Ionicons name="create-outline" size={14} color="#15803D" />
+              <AppText style={styles.editBtnText}>Edit Listing</AppText>
             </TouchableOpacity>
+
             <TouchableOpacity
-              style={[styles.outlineButton, { borderColor: errorColor }]}
+              style={[styles.actionBtn, styles.soldBtn]}
               onPress={() => markAsSold(item.id)}
               disabled={updatingProductId === item.id}
+              activeOpacity={0.8}
             >
-              <AppText
-                style={[styles.outlineButtonText, { color: errorColor }]}
-              >
-                {updatingProductId === item.id
-                  ? t("farmerProducts.updating")
-                  : t("farmerProducts.markSold")}
-              </AppText>
+              {updatingProductId === item.id ? (
+                <ActivityIndicator size="small" color="#DC2626" />
+              ) : (
+                <>
+                  <Ionicons name="checkmark-done" size={14} color="#DC2626" />
+                  <AppText style={styles.soldBtnText}>Mark Sold Out</AppText>
+                </>
+              )}
             </TouchableOpacity>
           </View>
         )}
@@ -238,90 +223,108 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <AppText style={styles.emptyEmoji}>🌱</AppText>
-      <AppText style={[styles.emptyText, { color: textSecondary }]}>
-        {t("farmerProducts.emptyTitle")}
+      <View style={styles.emptyIconBg}>
+        <Ionicons name="leaf-outline" size={48} color={primary} />
+      </View>
+      <AppText style={[styles.emptyTitle, { color: textPrimary }]}>No Harvest Crops Listed</AppText>
+      <AppText style={styles.emptySub}>
+        Post your agricultural produce so wholesale buyers across Ethiopia can discover and order your harvest.
       </AppText>
       <TouchableOpacity
-        style={[styles.addButton, { backgroundColor: primary }]}
+        style={[styles.postFirstBtn, { backgroundColor: primary }]}
         onPress={() => navigation?.navigate("PostProduct")}
+        activeOpacity={0.85}
       >
-        <AppText style={[styles.addButtonText, { color: surface }]}>
-          {t("farmerProducts.postProduct")}
-        </AppText>
+        <AppText style={styles.postFirstBtnText}>+ Post Your First Harvest</AppText>
       </TouchableOpacity>
     </View>
   );
 
-  const countSummary = t("farmerProducts.countSummary", {
-    active: countActive,
-    sold: countSold,
-    draft: countDraft,
-  });
+  const filterTabs = [
+    { id: "all", label: `All (${products.length})` },
+    { id: "active", label: `Active (${countActive})` },
+    { id: "sold", label: `Sold (${countSold})` },
+    { id: "draft", label: `Drafts (${countDraft})` },
+  ];
 
   return (
-    <View style={[styles.screen, { backgroundColor: background }]}>
-      <AppHeader
-        title={t("farmerProducts.title")}
-        showMenu={true}
-        showNotification={true}
-        notificationCount={0}
-        onMenuPress={openSidebar}
-        onNotificationPress={() => navigation.navigate("Notifications")}
+    <DashboardLayout
+      title="My Crop Stock"
+      subtitle="Manage harvest inventory & wholesale listings"
+      role="farmer"
+      showMenu
+      onMenuPress={openSidebar}
+      showNotification
+      notificationCount={0}
+      onNotificationPress={() => navigation.navigate("Notifications")}
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+      scrollable
+      contentPaddingHorizontal={14}
+      navigation={navigation}
+    >
+      {/* 1. Hero Inventory Card */}
+      <FarmerProductsHeroCard
+        totalVolume={totalVolume}
+        totalValuation={totalValuation}
+        currency="ETB"
+        onPostHarvest={() => navigation.navigate("PostProduct")}
       />
 
-      <View style={styles.summaryContainer}>
-        <AppText style={[styles.summaryText, { color: textSecondary }]}>
-          {countSummary}
-        </AppText>
+      {/* 2. Metrics Bar */}
+      <FarmerProductsMetricsBar
+        activeListingsCount={countActive}
+        soldOutCount={countSold}
+        currency="ETB"
+        onActivePress={() => setSelectedFilter("active")}
+        onSoldPress={() => setSelectedFilter("sold")}
+      />
+
+      {/* 3. Category Filter Pills */}
+      <View style={styles.filterRow}>
+        {filterTabs.map((tab) => {
+          const isActive = selectedFilter === tab.id;
+          return (
+            <TouchableOpacity
+              key={tab.id}
+              style={[
+                styles.filterPill,
+                isActive ? { backgroundColor: primary } : { backgroundColor: "#F1F5F9" },
+              ]}
+              onPress={() => setSelectedFilter(tab.id)}
+              activeOpacity={0.8}
+            >
+              <AppText
+                style={[
+                  styles.filterPillText,
+                  isActive ? { color: "#FFFFFF" } : { color: textSecondary },
+                ]}
+              >
+                {tab.label}
+              </AppText>
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
-      {loading && (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            paddingTop: 60,
-          }}
-        >
+      {/* 4. Product Cards List */}
+      {loading ? (
+        <View style={styles.centerLoading}>
           <ActivityIndicator size="large" color={primary} />
         </View>
-      )}
-
-      {!loading && products.length === 0 && (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            paddingTop: 60,
-          }}
-        >
-          <AppText
-            style={{ color: textMuted, fontSize: 16, textAlign: "center" }}
-          >
-            {t("farmerProducts.emptyFallbackMessage")}
-          </AppText>
-        </View>
-      )}
-
-      {!loading && products.length > 0 && (
+      ) : filteredProducts.length === 0 ? (
+        renderEmpty()
+      ) : (
         <FlatList
-          data={products}
+          data={filteredProducts}
           keyExtractor={(item) => item.id}
           renderItem={renderProductCard}
-          contentContainerStyle={styles.listContent}
+          scrollEnabled={false}
           showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={[primary]}
-            />
-          }
         />
       )}
+
+      <View style={{ height: 80 }} />
 
       <FloatingActionButton
         icon="add"
@@ -329,116 +332,175 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
         bottom={24}
         right={24}
       />
-    </View>
+    </DashboardLayout>
   );
 };
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
+  filterRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 16,
   },
-  summaryContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+  filterPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 14,
   },
-  summaryText: {
-    fontSize: 13,
-    fontWeight: "500",
+  filterPillText: {
+    fontSize: 12,
+    fontWeight: "700",
   },
-  listContent: {
-    paddingTop: 8,
-    paddingBottom: 20,
-    flexGrow: 1,
+  centerLoading: {
+    paddingVertical: 40,
+    alignItems: "center",
   },
   card: {
-    borderRadius: 12,
-    padding: 14,
-    marginHorizontal: 16,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
+    borderRadius: 20,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
     elevation: 2,
   },
-  cardRow: {
+  cardHeaderRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 6,
+    marginBottom: 14,
+  },
+  cropTitleWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  cropIconBg: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: "#DCFCE7",
+    alignItems: "center",
+    justifyContent: "center",
   },
   cropName: {
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "800",
+  },
+  dateText: {
+    fontSize: 11,
+    color: "#64748B",
+    marginTop: 1,
   },
   badge: {
     paddingHorizontal: 10,
-    paddingVertical: 3,
+    paddingVertical: 4,
     borderRadius: 10,
   },
   badgeText: {
-    fontSize: 12,
+    fontSize: 11.5,
+    fontWeight: "800",
+  },
+  specGrid: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#F8FAFC",
+    borderRadius: 14,
+    padding: 12,
+    marginBottom: 12,
+  },
+  specItem: {
+    gap: 2,
+  },
+  specLabel: {
+    fontSize: 10.5,
+    color: "#64748B",
     fontWeight: "600",
   },
-  quantityText: {
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  priceText: {
-    fontSize: 14,
-    fontWeight: "700",
+  specVal: {
+    fontSize: 13,
+    fontWeight: "800",
+    color: "#0F172A",
   },
   locationRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
+    gap: 4,
+    marginBottom: 14,
   },
   locationText: {
     fontSize: 12,
-    marginLeft: 4,
-  },
-  postedText: {
-    fontSize: 12,
-    marginLeft: 4,
+    color: "#64748B",
   },
   actionsRow: {
     flexDirection: "row",
-    marginTop: 4,
+    gap: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#F1F5F9",
   },
-  outlineButton: {
-    borderWidth: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    marginRight: 8,
+  actionBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 9,
+    borderRadius: 12,
   },
-  outlineButtonText: {
+  editBtn: {
+    backgroundColor: "#DCFCE7",
+  },
+  editBtnText: {
+    color: "#15803D",
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "800",
+  },
+  soldBtn: {
+    backgroundColor: "#FEF2F2",
+  },
+  soldBtnText: {
+    color: "#DC2626",
+    fontSize: 12,
+    fontWeight: "800",
   },
   emptyContainer: {
-    flex: 1,
-    justifyContent: "center",
     alignItems: "center",
-    paddingBottom: 60,
+    paddingVertical: 36,
+    paddingHorizontal: 20,
+    gap: 12,
   },
-  emptyEmoji: {
-    fontSize: 48,
-    marginBottom: 12,
+  emptyIconBg: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#DCFCE7",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: "500",
-    marginBottom: 16,
+  emptyTitle: {
+    fontSize: 17,
+    fontWeight: "800",
   },
-  addButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 10,
+  emptySub: {
+    fontSize: 13,
+    color: "#64748B",
+    textAlign: "center",
+    lineHeight: 19,
   },
-  addButtonText: {
-    fontSize: 15,
-    fontWeight: "700",
+  postFirstBtn: {
+    paddingHorizontal: 20,
+    paddingVertical: 11,
+    borderRadius: 14,
+    marginTop: 6,
+  },
+  postFirstBtnText: {
+    color: "#FFFFFF",
+    fontSize: 13.5,
+    fontWeight: "800",
   },
 });
 

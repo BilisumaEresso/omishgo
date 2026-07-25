@@ -184,7 +184,7 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
         {/* Help & FAQs */}
         <TouchableOpacity
           style={styles.settingItem}
-          onPress={() => navigation?.navigate("HelpCenter")}
+          onPress={() => navigation?.navigate("Help")}
           activeOpacity={0.8}
         >
           <View style={styles.settingLeft}>

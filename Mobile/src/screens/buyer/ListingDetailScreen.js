@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import AppButton from "../../components/common/AppButton";
 import AppText from "../../components/common/AppText";
-import AppHeader from "../../components/layout/AppHeader";
+import DashboardLayout from "../../components/layout/DashBoardLayout";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
@@ -39,12 +39,17 @@ export default function ListingDetailScreen({ route, navigation }) {
 
   if (!product) {
     return (
-      <DashboardLayout role="buyer" title="Produce Listing" showBack={true}>
+      <DashboardLayout role="buyer" title="Produce Listing" showBack onBackPress={() => navigation.goBack()}>
         <View style={styles.emptyContainer}>
           <Ionicons name="leaf-outline" size={48} color="#94A3B8" />
           <AppText style={styles.emptyTitle}>Listing Not Found</AppText>
-          <AppText style={styles.emptySub}>This produce listing has been removed or is no longer active.</AppText>
-          <TouchableOpacity style={[styles.backBtn, { backgroundColor: primaryColor }]} onPress={() => navigation.goBack()}>
+          <AppText style={styles.emptySub}>
+            This produce listing has been removed or is no longer active.
+          </AppText>
+          <TouchableOpacity
+            style={[styles.backBtn, { backgroundColor: primaryColor }]}
+            onPress={() => navigation.goBack()}
+          >
             <AppText style={styles.backBtnText}>Go Back</AppText>
           </TouchableOpacity>
         </View>
@@ -102,7 +107,7 @@ export default function ListingDetailScreen({ route, navigation }) {
       setBuyQty("");
       Alert.alert(
         "Order Sent to Farmer! 🎉",
-        `Your wholesale purchase request for ${qty} ${unit} of ${product.cropType} has been submitted cleanly.`,
+        `Your wholesale purchase request for ${qty} ${unit} of ${product.cropType} has been submitted.`,
         [
           {
             text: "View Orders",
@@ -118,196 +123,179 @@ export default function ListingDetailScreen({ route, navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-
-    <AppHeader title="Produce Detail" showBack={true} onBackPress={() => navigation.goBack()} />
-        <View
-          title="Produce Detail"
-          showBack={true}
-          onBackPress={() => navigation.goBack()}
-        >
-        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-
-      <View style={styles.topTitleRow}>
-        <View style={{ flex: 1 }}>
-          <AppText style={[styles.cropTitle, { color: textPrimary }]}>
-            {product.cropType}
-          </AppText>
-          <AppText style={styles.cropCategory}>
-            Fresh Wholesale Agricultural Produce
-          </AppText>
-        </View>
-
-        <TouchableOpacity
-          style={[
-            styles.bookmarkBtn,
-            isSaved && { backgroundColor: primaryColor + "15" },
-          ]}
-          onPress={() => toggleSave(product)}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Ionicons
-            name={isSaved ? "bookmark" : "bookmark-outline"}
-            size={22}
-            color={primaryColor}
-          />
-        </TouchableOpacity>
-      </View>
-          </ScrollView>
-
-      {/* Saturated Price Banner */}
-      <View style={[styles.priceBanner, { backgroundColor: primaryColor }]}>
-        <View>
-          <AppText style={styles.priceLabel}>Wholesale Unit Rate</AppText>
-          <AppText style={styles.priceAmount}>
-            ETB {Number(product.price).toLocaleString()}{" "}
-            <AppText style={styles.priceUnit}>/ {unit}</AppText>
-          </AppText>
-        </View>
-
-        <View style={styles.stockBadge}>
-          <Ionicons name="cube-outline" size={14} color="#FFFFFF" />
-          <AppText style={styles.stockText}>
-            {product.quantity} {unit} Available
-          </AppText>
-        </View>
-      </View>
-
-      {/* Market Regional Trends Card */}
-      <View style={[styles.card, { backgroundColor: surfaceColor }]}>
-        <View style={styles.cardHeaderRow}>
-          <Ionicons name="trending-up-outline" size={18} color={primaryColor} />
-          <AppText style={styles.cardTitle}>
-            Regional Market Price Index
-          </AppText>
-        </View>
-
-        <View style={styles.insightsGrid}>
-          <View style={styles.insightBox}>
-            <AppText style={styles.insightLabel}>Regional Avg</AppText>
-            <AppText style={[styles.insightValue, { color: primaryColor }]}>
-              ETB {avgMarketPrice.toLocaleString()} / {unit}
-            </AppText>
-          </View>
-          <View style={styles.insightBox}>
-            <AppText style={styles.insightLabel}>Market Demand</AppText>
-            <AppText style={[styles.insightValue, { color: "#059669" }]}>
-              High Demand
-            </AppText>
-          </View>
-          <View style={styles.insightBox}>
-            <AppText style={styles.insightLabel}>Harvest Status</AppText>
-            <AppText style={styles.insightValue}>Fresh Harvest</AppText>
-          </View>
-        </View>
-      </View>
-
-      {/* Product Details Card */}
-      <View style={[styles.card, { backgroundColor: surfaceColor }]}>
-        <AppText style={styles.cardTitle}>Produce Specifications</AppText>
-
-        <View style={styles.specRow}>
-          <AppText style={styles.specKey}>Crop Type</AppText>
-          <AppText style={styles.specVal}>{product.cropType}</AppText>
-        </View>
-        <View style={styles.specRow}>
-          <AppText style={styles.specKey}>Available Stock</AppText>
-          <AppText style={styles.specVal}>
-            {product.quantity} {unit}
-          </AppText>
-        </View>
-        <View style={styles.specRow}>
-          <AppText style={styles.specKey}>Harvest Location</AppText>
-          <AppText style={styles.specVal}>
-            {[loc.region, loc.zone].filter(Boolean).join(", ") ||
-              "Oromia Region"}
-          </AppText>
-        </View>
-        {product.description ? (
-          <View style={styles.specDescBox}>
-            <AppText style={styles.specKey}>Description</AppText>
-            <AppText style={styles.specDescVal}>{product.description}</AppText>
-          </View>
-        ) : null}
-      </View>
-
-      {/* Farmer Producer Profile Card */}
-      <TouchableOpacity
-        style={[styles.farmerCard, { backgroundColor: surfaceColor }]}
-        onPress={() =>
-          farmer._id
-            ? navigation.navigate("FarmerProfile", { farmerId: farmer._id })
-            : null
-        }
-        activeOpacity={0.88}
+    <DashboardLayout
+      role="buyer"
+      title="Produce Detail"
+      showBack
+      onBackPress={() => navigation.goBack()}
+    >
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
       >
-        <View style={styles.farmerLeft}>
-          <View
-            style={[styles.farmerAvatar, { backgroundColor: primaryColor }]}
-          >
-            <Ionicons name="person" size={24} color="#FFFFFF" />
+        {/* Crop Title Row */}
+        <View style={styles.topTitleRow}>
+          <View style={{ flex: 1 }}>
+            <AppText style={[styles.cropTitle, { color: textPrimary }]}>
+              {product.cropType}
+            </AppText>
+            <AppText style={styles.cropCategory}>
+              Fresh Wholesale Agricultural Produce
+            </AppText>
           </View>
+
+          <TouchableOpacity
+            style={[styles.bookmarkBtn, isSaved && { backgroundColor: primaryColor + "15" }]}
+            onPress={() => toggleSave(product)}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Ionicons
+              name={isSaved ? "bookmark" : "bookmark-outline"}
+              size={22}
+              color={primaryColor}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* Price Banner */}
+        <View style={[styles.priceBanner, { backgroundColor: primaryColor }]}>
           <View>
-            <AppText style={styles.farmerName}>{farmerName}</AppText>
-            <View style={styles.verifiedRow}>
-              <Ionicons
-                name="checkmark-circle"
-                size={13}
-                color={primaryColor}
-              />
-              <AppText style={[styles.verifiedLabel, { color: primaryColor }]}>
-                Verified Farm Producer
+            <AppText style={styles.priceLabel}>Wholesale Unit Rate</AppText>
+            <AppText style={styles.priceAmount}>
+              ETB {Number(product.price).toLocaleString()}{" "}
+              <AppText style={styles.priceUnit}>/ {unit}</AppText>
+            </AppText>
+          </View>
+
+          <View style={styles.stockBadge}>
+            <Ionicons name="cube-outline" size={14} color="#FFFFFF" />
+            <AppText style={styles.stockText}>
+              {product.quantity} {unit} Available
+            </AppText>
+          </View>
+        </View>
+
+        {/* Market Regional Trends Card */}
+        <View style={[styles.card, { backgroundColor: surfaceColor }]}>
+          <View style={styles.cardHeaderRow}>
+            <Ionicons name="trending-up-outline" size={18} color={primaryColor} />
+            <AppText style={styles.cardTitle}>Regional Market Price Index</AppText>
+          </View>
+
+          <View style={styles.insightsGrid}>
+            <View style={styles.insightBox}>
+              <AppText style={styles.insightLabel}>Regional Avg</AppText>
+              <AppText style={[styles.insightValue, { color: primaryColor }]}>
+                ETB {avgMarketPrice.toLocaleString()} / {unit}
               </AppText>
+            </View>
+            <View style={styles.insightBox}>
+              <AppText style={styles.insightLabel}>Market Demand</AppText>
+              <AppText style={[styles.insightValue, { color: "#059669" }]}>
+                High Demand
+              </AppText>
+            </View>
+            <View style={styles.insightBox}>
+              <AppText style={styles.insightLabel}>Harvest Status</AppText>
+              <AppText style={styles.insightValue}>Fresh Harvest</AppText>
             </View>
           </View>
         </View>
 
-        <Ionicons name="chevron-forward" size={18} color="#64748B" />
-      </TouchableOpacity>
+        {/* Product Details Card */}
+        <View style={[styles.card, { backgroundColor: surfaceColor }]}>
+          <AppText style={styles.cardTitle}>Produce Specifications</AppText>
 
-      {/* Quick Action Buttons */}
-      <View style={styles.actionsRow}>
+          <View style={styles.specRow}>
+            <AppText style={styles.specKey}>Crop Type</AppText>
+            <AppText style={styles.specVal}>{product.cropType}</AppText>
+          </View>
+          <View style={styles.specRow}>
+            <AppText style={styles.specKey}>Available Stock</AppText>
+            <AppText style={styles.specVal}>
+              {product.quantity} {unit}
+            </AppText>
+          </View>
+          <View style={styles.specRow}>
+            <AppText style={styles.specKey}>Harvest Location</AppText>
+            <AppText style={styles.specVal}>
+              {[loc.region, loc.zone].filter(Boolean).join(", ") || "Oromia Region"}
+            </AppText>
+          </View>
+          {product.description ? (
+            <View style={styles.specDescBox}>
+              <AppText style={styles.specKey}>Description</AppText>
+              <AppText style={styles.specDescVal}>{product.description}</AppText>
+            </View>
+          ) : null}
+        </View>
+
+        {/* Farmer Producer Profile Card */}
         <TouchableOpacity
-          style={[styles.outlineActionBtn, { borderColor: primaryColor }]}
-          onPress={handleMessageFarmer}
-          activeOpacity={0.8}
+          style={[styles.farmerCard, { backgroundColor: surfaceColor }]}
+          onPress={() =>
+            farmer._id
+              ? navigation.navigate("FarmerProfile", { farmerId: farmer._id })
+              : null
+          }
+          activeOpacity={0.88}
         >
-          <Ionicons
-            name="chatbubble-ellipses-outline"
-            size={16}
-            color={primaryColor}
-          />
-          <AppText style={[styles.outlineActionText, { color: primaryColor }]}>
-            Chat & Negotiate
-          </AppText>
+          <View style={styles.farmerLeft}>
+            <View style={[styles.farmerAvatar, { backgroundColor: primaryColor }]}>
+              <Ionicons name="person" size={24} color="#FFFFFF" />
+            </View>
+            <View>
+              <AppText style={styles.farmerName}>{farmerName}</AppText>
+              <View style={styles.verifiedRow}>
+                <Ionicons name="checkmark-circle" size={13} color={primaryColor} />
+                <AppText style={[styles.verifiedLabel, { color: primaryColor }]}>
+                  Verified Farm Producer
+                </AppText>
+              </View>
+            </View>
+          </View>
+
+          <Ionicons name="chevron-forward" size={18} color="#64748B" />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.outlineActionBtn, { borderColor: "#64748B" }]}
-          onPress={handleCallFarmer}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="call-outline" size={16} color="#64748B" />
-          <AppText style={[styles.outlineActionText, { color: "#64748B" }]}>
-            Call Producer
-          </AppText>
-        </TouchableOpacity>
-      </View>
+        {/* Quick Action Buttons */}
+        <View style={styles.actionsRow}>
+          <TouchableOpacity
+            style={[styles.outlineActionBtn, { borderColor: primaryColor }]}
+            onPress={handleMessageFarmer}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="chatbubble-ellipses-outline" size={16} color={primaryColor} />
+            <AppText style={[styles.outlineActionText, { color: primaryColor }]}>
+              Chat & Negotiate
+            </AppText>
+          </TouchableOpacity>
 
-      {/* Primary Buy Button */}
-      <TouchableOpacity
-        style={[styles.buyNowBtn, { backgroundColor: primaryColor }]}
-        onPress={() => setShowBuyModal(true)}
-        activeOpacity={0.88}
-      >
-        <Ionicons
-          name="cart-outline"
-          size={18}
-          color="#FFFFFF"
-          style={{ marginRight: 6 }}
-        />
-        <AppText style={styles.buyNowBtnText}>Place Wholesale Order</AppText>
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.outlineActionBtn, { borderColor: "#64748B" }]}
+            onPress={handleCallFarmer}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="call-outline" size={16} color="#64748B" />
+            <AppText style={[styles.outlineActionText, { color: "#64748B" }]}>
+              Call Producer
+            </AppText>
+          </TouchableOpacity>
+        </View>
+
+        {/* Primary Buy Button */}
+        <TouchableOpacity
+          style={[styles.buyNowBtn, { backgroundColor: primaryColor }]}
+          onPress={() => setShowBuyModal(true)}
+          activeOpacity={0.88}
+        >
+          <Ionicons name="cart-outline" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
+          <AppText style={styles.buyNowBtnText}>Place Wholesale Order</AppText>
+        </TouchableOpacity>
+
+        <View style={{ height: 40 }} />
+      </ScrollView>
 
       {/* Order Quantity Modal */}
       <Modal
@@ -320,8 +308,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           <View style={[styles.modalCard, { backgroundColor: surfaceColor }]}>
             <AppText style={styles.modalTitle}>Place Wholesale Order</AppText>
             <AppText style={styles.modalSub}>
-              Enter requested volume for {product.cropType} (Max{" "}
-              {product.quantity} {unit}):
+              Enter requested volume for {product.cropType} (Max {product.quantity} {unit}):
             </AppText>
 
             <TextInput
@@ -335,9 +322,7 @@ export default function ListingDetailScreen({ route, navigation }) {
 
             {buyQty && parseFloat(buyQty) > 0 ? (
               <View style={styles.totalBox}>
-                <AppText style={styles.totalLabel}>
-                  Estimated Total Amount:
-                </AppText>
+                <AppText style={styles.totalLabel}>Estimated Total Amount:</AppText>
                 <AppText style={[styles.totalAmount, { color: primaryColor }]}>
                   ETB {(parseFloat(buyQty) * product.price).toLocaleString()}
                 </AppText>
@@ -369,15 +354,19 @@ export default function ListingDetailScreen({ route, navigation }) {
           </View>
         </View>
       </Modal>
-
-      <View style={{ height: 80 }} />
-    </View>
-      </View>
+    </DashboardLayout>
   );
 }
 
 const styles = StyleSheet.create({
+  scroll: {
+    flex: 1,
+  },
+  content: {
+    padding: 16,
+  },
   emptyContainer: {
+    margin: 16,
     padding: 30,
     alignItems: "center",
     backgroundColor: "#FFFFFF",
@@ -425,7 +414,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   bookmarkBtn: {
-    padding: 10,
+    padding: 8,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: "#E2E8F0",
@@ -505,6 +494,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "700",
     marginTop: 4,
+    color: "#0F172A",
   },
   specRow: {
     flexDirection: "row",

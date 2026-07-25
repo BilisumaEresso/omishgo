@@ -2,6 +2,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
@@ -14,22 +15,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useTranslation } from "react-i18next";
 import AppButton from "../../components/common/AppButton";
 import AppInput from "../../components/common/AppInput";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
-import { useTheme } from "../../hooks/useTheme";
-import uploadService from "../../services/upload.service";
-import draftsService from "../../services/drafts.service";
-import { isConnected, subscribeToConnectivity } from "../../utils/connectivity";
-import {
-  getLocalizedRegions,
-  getLocalizedZones,
-  getLocalizedWereda,
-} from "../../constants/locations";
 import {
   CROP_TYPES,
   CROP_TYPES_LOCALIZED,
@@ -37,7 +28,16 @@ import {
   DEFAULT_DESCRIPTIONS_LOCALIZED,
   REFERENCE_PRICES,
 } from "../../constants/crops";
+import {
+  getLocalizedRegions,
+  getLocalizedWereda,
+  getLocalizedZones,
+} from "../../constants/locations";
 import { UNITS_LOCALIZED } from "../../constants/units";
+import { useTheme } from "../../hooks/useTheme";
+import draftsService from "../../services/drafts.service";
+import uploadService from "../../services/upload.service";
+import { isConnected, subscribeToConnectivity } from "../../utils/connectivity";
 
 const DropdownPicker = ({
   label,
@@ -52,52 +52,38 @@ const DropdownPicker = ({
   placeholder,
   disabled = false,
 }) => {
-  const primary = theme?.colors?.primary || "#2E7D32";
-  const surface = theme?.colors?.surface || "#FFF";
-  const border = theme?.colors?.border || "#DDD";
-  const textPrimary = theme?.colors?.textPrimary || "#333";
-  const textSecondary = theme?.colors?.textSecondary || "#666";
+  const primary = theme?.colors?.primary || "#15803D";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const border = theme?.colors?.border || "#CBD5E1";
+  const textPrimary = theme?.colors?.textPrimary || "#0F172A";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
 
   const safeOptions = Array.isArray(options) ? options : [];
 
   const selectedLabel = (() => {
     if (!value) return null;
     const found = safeOptions.find((opt) =>
-      typeof opt === "string" ? opt === value : opt.value === value,
+      typeof opt === "string" ? opt === value : opt.value === value
     );
     return found ? (typeof found === "string" ? found : found.label) : value;
   })();
 
   return (
     <View>
-      <AppText
-        style={{
-          fontSize: 14,
-          fontWeight: "500",
-          color: textSecondary,
-          marginBottom: 4,
-          marginTop: 16,
-        }}
-      >
-        {label}
-      </AppText>
+      <AppText style={styles.inputLabel}>{label}</AppText>
       <TouchableOpacity
         onPress={disabled ? undefined : onOpen}
         activeOpacity={disabled ? 1 : 0.8}
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          borderWidth: 1.5,
-          borderColor: visible ? primary : border,
-          borderRadius: 12,
-          paddingHorizontal: 14,
-          paddingVertical: 14,
-          backgroundColor: surface,
-          opacity: disabled ? 0.5 : 1,
-        }}
+        style={[
+          styles.dropdownBtn,
+          {
+            borderColor: visible ? primary : border,
+            backgroundColor: surface,
+            opacity: disabled ? 0.5 : 1,
+          },
+        ]}
       >
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <View style={styles.dropdownInner}>
           {icon && (
             <Ionicons
               name={icon}
@@ -106,7 +92,10 @@ const DropdownPicker = ({
             />
           )}
           <AppText
-            style={{ fontSize: 15, color: value ? textPrimary : textSecondary }}
+            style={[
+              styles.dropdownText,
+              { color: value ? textPrimary : textSecondary },
+            ]}
           >
             {selectedLabel || placeholder || `Select ${label}`}
           </AppText>
@@ -118,26 +107,13 @@ const DropdownPicker = ({
         />
       </TouchableOpacity>
       {visible && safeOptions.length > 0 && (
-        <View
-          style={{
-            borderWidth: 1,
-            borderColor: border,
-            borderRadius: 12,
-            marginTop: 4,
-            backgroundColor: surface,
-            maxHeight: 200,
-            overflow: "hidden",
-            elevation: 4,
-            shadowColor: "#000",
-            shadowOpacity: 0.08,
-            shadowRadius: 8,
-            shadowOffset: { width: 0, height: 2 },
-          }}
-        >
+        <View style={[styles.dropdownMenu, { backgroundColor: surface, borderColor: border }]}>
           <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false}>
             {safeOptions.map((opt) => {
               const optValue = typeof opt === "string" ? opt : opt.value;
               const optLabel = typeof opt === "string" ? opt : opt.label;
+              const isSelected = value === optValue;
+
               return (
                 <TouchableOpacity
                   key={optValue}
@@ -145,21 +121,16 @@ const DropdownPicker = ({
                     onSelect(optValue);
                     onClose();
                   }}
-                  style={{
-                    paddingHorizontal: 16,
-                    paddingVertical: 13,
-                    borderBottomWidth: StyleSheet.hairlineWidth,
-                    borderBottomColor: border,
-                    backgroundColor:
-                      value === optValue ? primary + "12" : "transparent",
-                  }}
+                  style={[
+                    styles.dropdownOption,
+                    isSelected && { backgroundColor: primary + "15" },
+                  ]}
                 >
                   <AppText
-                    style={{
-                      fontSize: 15,
-                      color: value === optValue ? primary : textPrimary,
-                      fontWeight: value === optValue ? "600" : "400",
-                    }}
+                    style={[
+                      styles.dropdownOptionText,
+                      { color: isSelected ? primary : textPrimary, fontWeight: isSelected ? "700" : "400" },
+                    ]}
                   >
                     {optLabel}
                   </AppText>
@@ -169,25 +140,17 @@ const DropdownPicker = ({
           </ScrollView>
         </View>
       )}
-      {visible && safeOptions.length === 0 && (
-        <AppText style={{ color: textSecondary, fontSize: 13, marginTop: 4 }}>
-          No options available
-        </AppText>
-      )}
     </View>
   );
 };
 
 const MAX_PHOTOS = 2;
 
-// Up to 2 photo slots: pick from camera/gallery, upload to Cloudinary
-// immediately, show progress, and let the farmer remove/retry.
 const PhotoSlots = ({ photos, onAdd, onRemove, onRetry, theme, t }) => {
-  const primary = theme?.colors?.primary || "#2E7D32";
-  const surface = theme?.colors?.surface || "#FFF";
-  const border = theme?.colors?.border || "#DDD";
-  const textSecondary = theme?.colors?.textSecondary || "#666";
-  const errorColor = theme?.colors?.error || "#C62828";
+  const primary = theme?.colors?.primary || "#15803D";
+  const surface = theme?.colors?.surface || "#FFFFFF";
+  const border = theme?.colors?.border || "#CBD5E1";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
 
   const slots = [...photos];
   while (slots.length < MAX_PHOTOS) slots.push(null);
@@ -200,108 +163,35 @@ const PhotoSlots = ({ photos, onAdd, onRemove, onRetry, theme, t }) => {
             <TouchableOpacity
               key={`empty-${index}`}
               onPress={() => onAdd(index)}
-              style={{
-                width: 96,
-                height: 96,
-                borderRadius: 12,
-                borderWidth: 1.5,
-                borderStyle: "dashed",
-                borderColor: border,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: surface,
-              }}
+              style={[styles.photoSlotEmpty, { borderColor: border, backgroundColor: surface }]}
             >
-              <Ionicons name="camera-outline" size={26} color={textSecondary} />
-              <AppText style={{ fontSize: 11, color: textSecondary, marginTop: 4 }}>
-                {t("postProduct.addPhoto")}
+              <Ionicons name="camera" size={26} color={primary} />
+              <AppText style={[styles.photoSlotEmptyText, { color: textSecondary }]}>
+                {t("postProduct.addPhoto", "Add Photo")}
               </AppText>
             </TouchableOpacity>
           );
         }
 
         return (
-          <View
-            key={photo.uri}
-            style={{
-              width: 96,
-              height: 96,
-              borderRadius: 12,
-              overflow: "hidden",
-              borderWidth: 1,
-              borderColor: border,
-            }}
-          >
-            <Image
-              source={{ uri: photo.uri }}
-              style={{ width: "100%", height: "100%" }}
-              resizeMode="cover"
-            />
+          <View key={photo.uri} style={[styles.photoSlotFilled, { borderColor: border }]}>
+            <Image source={{ uri: photo.uri }} style={styles.photoImg} resizeMode="cover" />
+
             {photo.uploading && (
-              <View
-                style={{
-                  ...StyleSheet.absoluteFillObject,
-                  backgroundColor: "rgba(0,0,0,0.35)",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <ActivityIndicator color="#FFF" />
+              <View style={styles.photoOverlay}>
+                <ActivityIndicator color="#FFFFFF" />
               </View>
             )}
+
             {photo.error && !photo.uploading && (
-              <TouchableOpacity
-                onPress={() => onRetry(index)}
-                style={{
-                  ...StyleSheet.absoluteFillObject,
-                  backgroundColor: "rgba(0,0,0,0.55)",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Ionicons name="refresh" size={20} color="#FFF" />
-                <AppText style={{ fontSize: 10, color: "#FFF", marginTop: 2 }}>
-                  {t("postProduct.retry")}
-                </AppText>
+              <TouchableOpacity onPress={() => onRetry(index)} style={styles.photoOverlayError}>
+                <Ionicons name="refresh" size={20} color="#FFFFFF" />
+                <AppText style={styles.photoRetryText}>{t("postProduct.retry", "Retry")}</AppText>
               </TouchableOpacity>
             )}
-            {photo.offline && !photo.uploading && !photo.error && (
-              <View
-                style={{
-                  position: "absolute",
-                  bottom: 4,
-                  left: 4,
-                  backgroundColor: "rgba(0,0,0,0.6)",
-                  borderRadius: 8,
-                  paddingHorizontal: 6,
-                  paddingVertical: 2,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 3,
-                }}
-              >
-                <Ionicons name="cloud-offline-outline" size={11} color="#FFF" />
-                <AppText style={{ fontSize: 9, color: "#FFF" }}>
-                  {t("postProduct.willUploadLater")}
-                </AppText>
-              </View>
-            )}
-            <TouchableOpacity
-              onPress={() => onRemove(index)}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              style={{
-                position: "absolute",
-                top: 4,
-                right: 4,
-                backgroundColor: "rgba(0,0,0,0.6)",
-                borderRadius: 10,
-                width: 20,
-                height: 20,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Ionicons name="close" size={13} color="#FFF" />
+
+            <TouchableOpacity onPress={() => onRemove(index)} style={styles.removePhotoBtn}>
+              <Ionicons name="close" size={13} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
         );
@@ -310,7 +200,6 @@ const PhotoSlots = ({ photos, onAdd, onRemove, onRetry, theme, t }) => {
   );
 };
 
-// ─── Main Component ───────────────────────────────────────────────────────────
 export default function PostProductScreen({ navigation, route }) {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
@@ -318,50 +207,35 @@ export default function PostProductScreen({ navigation, route }) {
 
   const [cropType, setCropType] = useState("");
   const [quantity, setQuantity] = useState("");
-  const [unit, setUnit] = useState("kg");
+  const [unit, setUnit] = useState("quintal");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-  // Each item: { uri, url, uploading, error, offline }. url is set once
-  // Cloudinary upload succeeds. offline:true means "picked while offline,
-  // will upload automatically once the draft is synced" (distinct from
-  // error, which means a real upload attempt failed while online).
   const [photos, setPhotos] = useState([]);
   const [isOnline, setIsOnline] = useState(true);
   const [region, setRegion] = useState("");
   const [zone, setZone] = useState("");
   const [wereda, setWereda] = useState("");
   const [loading, setLoading] = useState(false);
-  const [priceWarning, setPriceWarning] = useState("");
-  const [priceSuggestion, setPriceSuggestion] = useState(null);
+
   const [showCropPicker, setShowCropPicker] = useState(false);
   const [showUnitPicker, setShowUnitPicker] = useState(false);
   const [showRegionPicker, setShowRegionPicker] = useState(false);
   const [showZonePicker, setShowZonePicker] = useState(false);
   const [showWeredaPicker, setShowWeredaPicker] = useState(false);
 
-  const primary = theme?.colors?.primary || "#2E7D32";
-  const warningColor = theme?.colors?.warning || "#F57F17";
-  const textPrimary = theme?.colors?.textPrimary || "#1A2E1A";
-  const textSecondary = theme?.colors?.textSecondary || "#4A6741";
-  const textMuted = theme?.colors?.textMuted || "#8FAF8A";
-  const background = theme?.colors?.background || "#F9FBF9";
+  const primary = theme?.colors?.primary || "#15803D";
+  const textPrimary = theme?.colors?.textPrimary || "#0F172A";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
+  const background = "#F8FAFC";
 
   const lang = i18n.language || "en";
 
-  // Build localized crop options – CROP_TYPES must be an array
-  const cropLabels =
-    CROP_TYPES_LOCALIZED?.[lang] || CROP_TYPES_LOCALIZED?.en || {};
+  const cropLabels = CROP_TYPES_LOCALIZED?.[lang] || CROP_TYPES_LOCALIZED?.en || {};
   const cropOptions = (CROP_TYPES || []).map((key) => ({
     value: key,
     label: cropLabels[key] || key,
   }));
 
-  const descriptionTemplates =
-    DEFAULT_DESCRIPTIONS_LOCALIZED?.[lang] ||
-    DEFAULT_DESCRIPTIONS_LOCALIZED?.en ||
-    {};
-
-  // Localized units — keep `value` as the stable key, only `label` is localized
   const unitLabels = UNITS_LOCALIZED?.[lang] || UNITS_LOCALIZED?.en || {};
   const unitOptions = Object.entries(unitLabels).map(([key, label]) => ({
     value: key,
@@ -369,73 +243,28 @@ export default function PostProductScreen({ navigation, route }) {
   }));
   const unitDisplay = unitLabels[unit] || unit;
 
-  // Localized location options (region/zone always populated; wereda depends on zone)
   const regionOptions = getLocalizedRegions(lang);
   const availableZones = region ? getLocalizedZones(region, lang) : [];
   const availableWereda = zone ? getLocalizedWereda(region, zone, lang) : [];
 
-  // Track connectivity so photo picking and submit can branch to the
-  // offline draft path instead of failing outright.
+  const popularCrops = ["Teff", "Red Onion", "Tomato", "Garlic", "Wheat"];
+
   useEffect(() => {
     isConnected().then(setIsOnline);
     const unsubscribe = subscribeToConnectivity(setIsOnline);
     return unsubscribe;
   }, []);
 
-  // Price validation — fully guarded against missing reference data
-  useEffect(() => {
-    if (!price || !cropType) {
-      setPriceWarning("");
-      setPriceSuggestion(null);
-      return;
-    }
-    const ref = REFERENCE_PRICES?.[cropType];
-    const unitKey = unit === "quintal" ? "quintal" : "kg";
-    const refPrice = ref?.[unitKey];
-    if (!refPrice) {
-      setPriceWarning("");
-      setPriceSuggestion(null);
-      return;
-    }
-    const entered = parseFloat(price);
-    if (isNaN(entered)) {
-      setPriceWarning("");
-      return;
-    }
-    if (entered < refPrice * 0.6) {
-      setPriceWarning(t("postProduct.priceLowWarning", { refPrice, unitKey }));
-    } else if (entered > refPrice * 1.6) {
-      setPriceWarning(t("postProduct.priceHighWarning", { refPrice, unitKey }));
-    } else {
-      setPriceWarning("");
-    }
-    setPriceSuggestion(refPrice);
-  }, [price, cropType, unit]);
-
-  // Prefill from navigation
   useEffect(() => {
     if (prefill.cropType) setCropType(prefill.cropType);
     if (prefill.quantity) setQuantity(String(prefill.quantity));
-    if (prefill.price !== undefined && prefill.price !== null)
-      setPrice(String(prefill.price));
+    if (prefill.price !== undefined && prefill.price !== null) setPrice(String(prefill.price));
     if (prefill.unit) setUnit(prefill.unit);
     if (prefill.region) setRegion(prefill.region);
     if (prefill.zone) setZone(prefill.zone);
     if (prefill.wereda) setWereda(prefill.wereda);
   }, [prefill]);
 
-  // Localized default description
-  useEffect(() => {
-    if (cropType && !description) {
-      const localizedDesc = descriptionTemplates?.[cropType];
-      const fallbackDesc = DEFAULT_DESCRIPTIONS?.[cropType];
-      if (localizedDesc || fallbackDesc) {
-        setDescription(localizedDesc || fallbackDesc);
-      }
-    }
-  }, [cropType]);
-
-  // Reset child fields on parent change
   useEffect(() => {
     setZone("");
     setWereda("");
@@ -445,13 +274,9 @@ export default function PostProductScreen({ navigation, route }) {
     setWereda("");
   }, [zone]);
 
-  // Upload a freshly-picked asset to Cloudinary and update its slot with
-  // the resulting URL (or an error flag the farmer can retry from).
   const uploadPhotoAt = async (uri, asset) => {
     setPhotos((prev) =>
-      prev.map((p) =>
-        p.uri === uri ? { ...p, uploading: true, error: false, offline: false } : p,
-      ),
+      prev.map((p) => (p.uri === uri ? { ...p, uploading: true, error: false } : p))
     );
 
     const result = await uploadService.uploadImage(asset);
@@ -462,17 +287,14 @@ export default function PostProductScreen({ navigation, route }) {
           ? result.success
             ? { ...p, uploading: false, error: false, url: result.url }
             : { ...p, uploading: false, error: true }
-          : p,
-      ),
+          : p
+      )
     );
   };
 
   const launchPicker = async (source) => {
     if (photos.length >= MAX_PHOTOS) {
-      Alert.alert(
-        t("postProduct.photoLimitTitle"),
-        t("postProduct.photoLimitMessage", { max: MAX_PHOTOS }),
-      );
+      Alert.alert("Photo Limit", "Maximum 2 photos per crop listing.");
       return;
     }
 
@@ -482,10 +304,7 @@ export default function PostProductScreen({ navigation, route }) {
         : await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permission.granted) {
-      Alert.alert(
-        t("postProduct.permissionDeniedTitle"),
-        t("postProduct.permissionDeniedMessage"),
-      );
+      Alert.alert("Permission Required", "Camera/Gallery access is required to attach product photos.");
       return;
     }
 
@@ -504,31 +323,20 @@ export default function PostProductScreen({ navigation, route }) {
     if (result.canceled || !result.assets?.length) return;
 
     const asset = result.assets[0];
-
-    if (!isOnline) {
-      // Don't even attempt the network call — just record it as a photo
-      // that will upload once this draft gets synced.
-      setPhotos((prev) => [
-        ...prev,
-        { uri: asset.uri, url: null, uploading: false, error: false, offline: true },
-      ]);
-      return;
-    }
-
-    setPhotos((prev) => [...prev, { uri: asset.uri, url: null, uploading: true, error: false }]);
+    setPhotos((prev) => [...prev, { uri: asset.uri, url: asset.uri, uploading: false, error: false }]);
     uploadPhotoAt(asset.uri, asset);
   };
 
   const handleAddPhoto = () => {
     Alert.alert(
-      t("postProduct.addPhoto"),
-      undefined,
+      "Add Crop Photo",
+      "Choose photo source:",
       [
-        { text: t("postProduct.takePhoto"), onPress: () => launchPicker("camera") },
-        { text: t("postProduct.chooseFromGallery"), onPress: () => launchPicker("gallery") },
-        { text: t("postProduct.cancel"), style: "cancel" },
+        { text: "Take Photo", onPress: () => launchPicker("camera") },
+        { text: "Choose from Gallery", onPress: () => launchPicker("gallery") },
+        { text: "Cancel", style: "cancel" },
       ],
-      { cancelable: true },
+      { cancelable: true }
     );
   };
 
@@ -544,70 +352,30 @@ export default function PostProductScreen({ navigation, route }) {
 
   const handleSubmit = async () => {
     if (!cropType.trim()) {
-      Alert.alert(
-        t("postProduct.missingCropTitle"),
-        t("postProduct.missingCropMessage"),
-      );
+      Alert.alert("Crop Required", "Please select a crop type.");
       return;
     }
     const qtyNum = parseFloat(quantity);
     if (!quantity || isNaN(qtyNum) || qtyNum <= 0) {
-      Alert.alert(
-        t("postProduct.invalidQuantityTitle"),
-        t("postProduct.invalidQuantityMessage"),
-      );
+      Alert.alert("Quantity Required", "Please enter a valid stock volume quantity.");
       return;
     }
     const priceNum = parseFloat(price);
     if (!price || isNaN(priceNum) || priceNum <= 0) {
-      Alert.alert(
-        t("postProduct.invalidPriceTitle"),
-        t("postProduct.invalidPriceMessage"),
-      );
+      Alert.alert("Price Required", "Please enter a valid price per unit.");
       return;
     }
     if (!region.trim()) {
-      Alert.alert(
-        t("postProduct.missingLocationTitle"),
-        t("postProduct.missingLocationMessage"),
-      );
-      return;
-    }
-    if (availableZones.length > 0 && !zone.trim()) {
-      Alert.alert(
-        t("postProduct.missingZoneTitle"),
-        t("postProduct.missingZoneMessage"),
-      );
-      return;
-    }
-    if (availableWereda.length > 0 && !wereda.trim()) {
-      Alert.alert(
-        t("postProduct.missingWeredaTitle"),
-        t("postProduct.missingWeredaMessage"),
-      );
-      return;
-    }
-    if (isOnline && photos.some((p) => p.uploading)) {
-      Alert.alert(
-        t("postProduct.photosStillUploadingTitle"),
-        t("postProduct.photosStillUploadingMessage"),
-      );
-      return;
-    }
-    if (isOnline && photos.some((p) => p.error)) {
-      Alert.alert(
-        t("postProduct.photoErrorTitle"),
-        t("postProduct.photoErrorMessage"),
-      );
+      Alert.alert("Location Required", "Please select a region.");
       return;
     }
 
     const payload = {
       cropType: cropType.trim(),
       quantity: qtyNum,
-      unit: unit.trim() || "kg",
+      unit: unit.trim() || "quintal",
       price: priceNum,
-      description: description.trim(),
+      description: description.trim() || `${qtyNum} ${unit} of fresh ${cropType} harvest ready for wholesale.`,
       location: {
         region: region.trim(),
         zone: zone.trim(),
@@ -616,111 +384,67 @@ export default function PostProductScreen({ navigation, route }) {
       },
     };
 
-    const saveAsDraft = async () => {
-      await draftsService.save({
-        id: `draft_${Date.now()}`,
-        ...payload,
-        photos: photos.map((p) => ({ uri: p.uri, url: p.url || null })),
-        createdAt: Date.now(),
-        syncError: null,
-      });
-      navigation.navigate("FarmerTabs", {
-        successMessage: t("postProduct.savedAsDraftMessage"),
-      });
-    };
-
-    // Offline at submit time: don't even attempt the network call — go
-    // straight to the local draft, which MyDraftsScreen will sync later.
-    if (!isOnline) {
-      setLoading(true);
-      try {
-        await saveAsDraft();
-      } finally {
-        setLoading(false);
-      }
-      return;
-    }
-
     setLoading(true);
     try {
-      const photoUrls = photos.filter((p) => p.url).map((p) => p.url);
-      const res = await api.post(API_ENDPOINTS.products.create, { ...payload, photos: photoUrls });
-      if (prefill.sourcingRequestId) {
-        try {
-          await api.post(API_ENDPOINTS.sourcing.respond(prefill.sourcingRequestId), {
-            action: "accepted",
-            productId: res.data?.data?.product?._id,
-          });
-        } catch (_) {}
-      }
-      navigation.navigate("FarmerTabs", {
-        successMessage: t("postProduct.successMessage"),
-      });
+      const photoUrls = photos.map((p) => p.url || p.uri).filter(Boolean);
+      await api.post(API_ENDPOINTS.products.create, { ...payload, photos: photoUrls });
+
+      Alert.alert("Harvest Listed!", "Your produce listing is now live for wholesale buyers.", [
+        { text: "OK", onPress: () => navigation.goBack() },
+      ]);
     } catch (err) {
-      // Connectivity dropped between opening this screen and submitting —
-      // treat it the same as the offline path instead of just erroring out.
-      if (!err?.response) {
-        await saveAsDraft();
-        return;
-      }
-      const msg = err?.response?.data?.message || t("postProduct.defaultErrorMessage");
-      Alert.alert(t("postProduct.error"), msg);
+      const msg = err?.response?.data?.message || err.message || "Failed to post listing";
+      Alert.alert("Submission Error", msg);
     } finally {
       setLoading(false);
     }
   };
 
-  const isDefaultDescription =
-    cropType &&
-    (description === DEFAULT_DESCRIPTIONS?.[cropType] ||
-      description === descriptionTemplates?.[cropType]);
-
   return (
     <View style={[styles.container, { backgroundColor: background }]}>
-      <StatusBar
-        translucent
-        backgroundColor="transparent"
-        barStyle="dark-content"
-      />
-      <AppHeader
-        title={t("postProduct.title")}
-        showBack={true}
-        onBackPress={() => navigation.goBack()}
-      />
-
-      {!isOnline && (
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 6,
-            marginHorizontal: 16,
-            marginTop: 8,
-            padding: 10,
-            borderRadius: 10,
-            backgroundColor: (theme?.colors?.warning || "#F57F17") + "20",
-          }}
-        >
-          <Ionicons name="cloud-offline-outline" size={16} color={theme?.colors?.warning || "#F57F17"} />
-          <AppText style={{ color: theme?.colors?.warning || "#F57F17", fontSize: 12, flex: 1 }}>
-            {t("postProduct.offlineBanner")}
-          </AppText>
-        </View>
-      )}
+      <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
+      <AppHeader title="Post Harvest Produce" showBack onBackPress={() => navigation.goBack()} />
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.flex}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
       >
-        <ScrollView
-          contentContainerStyle={styles.scroll}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          {/* Hero Form Header Card */}
+          <View style={styles.heroBanner}>
+            <View style={styles.heroBadge}>
+              <Ionicons name="leaf" size={14} color="#A7F3D0" />
+              <AppText style={styles.heroBadgeText}>Producer Listing Form</AppText>
+            </View>
+            <AppText style={styles.heroTitle}>Post New Harvest Listing</AppText>
+            <AppText style={styles.heroSub}>
+              Fill in your crop details to receive direct purchase orders from wholesale buyers across Ethiopia.
+            </AppText>
+          </View>
+
+          {/* Quick Select Crop Pills */}
+          <AppText style={styles.inputLabel}>Popular Harvest Crops</AppText>
+          <View style={styles.popularRow}>
+            {popularCrops.map((c) => (
+              <TouchableOpacity
+                key={c}
+                style={[
+                  styles.popularPill,
+                  cropType === c ? { backgroundColor: primary } : { backgroundColor: "#FFFFFF" },
+                ]}
+                onPress={() => setCropType(c)}
+                activeOpacity={0.8}
+              >
+                <AppText style={[styles.popularPillText, cropType === c && { color: "#FFFFFF" }]}>
+                  {c}
+                </AppText>
+              </TouchableOpacity>
+            ))}
+          </View>
+
           {/* Crop Type Dropdown */}
           <DropdownPicker
-            label={t("postProduct.cropType")}
+            label="Crop Type / Commodity"
             value={cropType}
             options={cropOptions}
             onSelect={setCropType}
@@ -729,27 +453,23 @@ export default function PostProductScreen({ navigation, route }) {
             onClose={() => setShowCropPicker(false)}
             icon="leaf-outline"
             theme={theme}
-            placeholder={t("postProduct.selectLabel", {
-              label: t("postProduct.cropType"),
-            })}
+            placeholder="Select Harvest Crop"
           />
 
-          {/* Quantity & Unit row */}
+          {/* Quantity & Unit Row */}
           <View style={styles.row}>
-            <View style={styles.flex2}>
-              <AppText style={[styles.label, { color: textSecondary }]}>
-                {t("postProduct.quantity")}
-              </AppText>
+            <View style={{ flex: 2 }}>
+              <AppText style={styles.inputLabel}>Stock Quantity</AppText>
               <AppInput
-                placeholder="0"
+                placeholder="e.g. 100"
                 value={quantity}
                 onChangeText={setQuantity}
                 keyboardType="numeric"
               />
             </View>
-            <View style={styles.flex1}>
+            <View style={{ flex: 1.2 }}>
               <DropdownPicker
-                label={t("postProduct.unit")}
+                label="Unit"
                 value={unit}
                 options={unitOptions}
                 onSelect={setUnit}
@@ -758,98 +478,23 @@ export default function PostProductScreen({ navigation, route }) {
                 onClose={() => setShowUnitPicker(false)}
                 icon="cube-outline"
                 theme={theme}
-                placeholder={t("postProduct.selectLabel", {
-                  label: t("postProduct.unit"),
-                })}
+                placeholder="Unit"
               />
             </View>
           </View>
 
-          {/* Price input with suggestion and warning */}
-          <AppText style={[styles.label, { color: textSecondary }]}>
-            {t("postProduct.pricePer", { unit: unitDisplay })}
-          </AppText>
+          {/* Price per Unit */}
+          <AppText style={styles.inputLabel}>Price per {unitDisplay} (ETB)</AppText>
           <AppInput
-            placeholder="0"
+            placeholder="e.g. 4500"
             value={price}
             onChangeText={setPrice}
             keyboardType="numeric"
             leftIcon="pricetag-outline"
           />
-          {priceSuggestion && (
-            <TouchableOpacity
-              onPress={() => setPrice(String(priceSuggestion))}
-              style={{
-                backgroundColor: primary + "15",
-                borderRadius: 8,
-                paddingVertical: 8,
-                paddingHorizontal: 12,
-                marginTop: 8,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <Ionicons
-                name="bulb-outline"
-                size={14}
-                color={primary}
-                style={{ marginRight: 6 }}
-              />
-              <AppText
-                style={{ color: primary, fontSize: 13, fontWeight: "600" }}
-              >
-                {t("postProduct.priceSuggestion", {
-                  price: priceSuggestion,
-                  unit: unitDisplay,
-                })}
-              </AppText>
-            </TouchableOpacity>
-          )}
-          {priceWarning ? (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginTop: 6,
-              }}
-            >
-              <Ionicons
-                name="warning-outline"
-                size={14}
-                color={warningColor}
-                style={{ marginRight: 4 }}
-              />
-              <AppText style={{ color: warningColor, fontSize: 13, flex: 1 }}>
-                {priceWarning}
-              </AppText>
-            </View>
-          ) : null}
 
-          {/* Description */}
-          <AppText style={[styles.label, { color: textSecondary }]}>
-            {t("postProduct.descriptionOptional")}
-          </AppText>
-          <AppInput
-            placeholder={t("postProduct.descriptionPlaceholder")}
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            numberOfLines={4}
-            inputStyle={styles.textArea}
-          />
-          {isDefaultDescription && (
-            <AppText style={{ color: textMuted, fontSize: 12, marginTop: 4 }}>
-              {t("postProduct.defaultDescriptionHint")}
-            </AppText>
-          )}
-
-          {/* Photos Section */}
-          <AppText style={[styles.label, { color: textSecondary }]}>
-            {t("postProduct.photos")}
-          </AppText>
-          <AppText style={{ color: textMuted, fontSize: 12, marginBottom: 4 }}>
-            {t("postProduct.photosHint")}
-          </AppText>
+          {/* Photos Upload Section */}
+          <AppText style={styles.inputLabel}>Harvest Photos (Max 2)</AppText>
           <PhotoSlots
             photos={photos}
             onAdd={handleAddPhoto}
@@ -860,16 +505,11 @@ export default function PostProductScreen({ navigation, route }) {
           />
 
           {/* Location Section */}
-          <View style={styles.section}>
-            <AppText
-              variant="headingSm"
-              style={[styles.sectionTitle, { color: textPrimary }]}
-            >
-              {t("postProduct.location")}
-            </AppText>
+          <View style={styles.sectionCard}>
+            <AppText style={styles.sectionCardTitle}>Farm / Storage Location</AppText>
 
             <DropdownPicker
-              label={t("postProduct.region")}
+              label="Region"
               value={region}
               options={regionOptions}
               onSelect={setRegion}
@@ -878,23 +518,18 @@ export default function PostProductScreen({ navigation, route }) {
               onClose={() => setShowRegionPicker(false)}
               icon="location-outline"
               theme={theme}
-              placeholder={t("postProduct.selectLabel", {
-                label: t("postProduct.region"),
-              })}
+              placeholder="Select Region"
             />
 
             <DropdownPicker
-              label={t("postProduct.zone")}
+              label="Zone"
               value={zone}
               options={availableZones}
               onSelect={setZone}
               visible={showZonePicker}
               onOpen={() => {
                 if (!region) {
-                  Alert.alert(
-                    t("postProduct.selectRegionFirstTitle"),
-                    t("postProduct.selectRegionFirstMessage"),
-                  );
+                  Alert.alert("Select Region First", "Please pick a region before choosing a zone.");
                   return;
                 }
                 setShowZonePicker(true);
@@ -902,51 +537,19 @@ export default function PostProductScreen({ navigation, route }) {
               onClose={() => setShowZonePicker(false)}
               icon="map-outline"
               theme={theme}
-              placeholder={t("postProduct.selectLabel", {
-                label: t("postProduct.zone"),
-              })}
+              placeholder="Select Zone"
               disabled={!region}
-            />
-
-            <DropdownPicker
-              label={t("postProduct.wereda")}
-              value={wereda}
-              options={availableWereda}
-              onSelect={setWereda}
-              visible={showWeredaPicker}
-              onOpen={() => {
-                if (!zone) {
-                  Alert.alert(
-                    t("postProduct.selectZoneFirstTitle"),
-                    t("postProduct.selectZoneFirstMessage"),
-                  );
-                  return;
-                }
-                setShowWeredaPicker(true);
-              }}
-              onClose={() => setShowWeredaPicker(false)}
-              icon="pin-outline"
-              theme={theme}
-              placeholder={t("postProduct.selectLabel", {
-                label: t("postProduct.wereda"),
-              })}
-              disabled={!zone}
             />
           </View>
 
+          {/* Submit Button */}
           <AppButton
-            title={
-              loading
-                ? t("postProduct.posting")
-                : !isOnline
-                  ? t("postProduct.saveDraft")
-                  : t("postProduct.postListing")
-            }
+            title={loading ? "Publishing Listing..." : "🚀 Publish Harvest Listing"}
             onPress={handleSubmit}
             loading={loading}
             disabled={loading}
             fullWidth
-            style={styles.submitButton}
+            style={styles.submitBtn}
           />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -956,31 +559,103 @@ export default function PostProductScreen({ navigation, route }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  flex: { flex: 1 },
-  scroll: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-    paddingTop: 8,
+  scroll: { paddingHorizontal: 16, paddingBottom: 40, paddingTop: 10 },
+  heroBanner: {
+    backgroundColor: "#15803D",
+    borderRadius: 20,
+    padding: 18,
+    marginBottom: 16,
   },
-  label: {
-    fontSize: 14,
-    marginBottom: 4,
-    marginTop: 16,
-    fontWeight: "500",
-  },
-  row: {
+  heroBadge: {
     flexDirection: "row",
-    gap: 12,
-    marginTop: 16,
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: "flex-start",
+    marginBottom: 8,
   },
-  flex2: { flex: 2 },
-  flex1: { flex: 1 },
-  textArea: {
-    minHeight: 100,
-    textAlignVertical: "top",
-    paddingTop: 12,
+  heroBadgeText: { color: "#A7F3D0", fontSize: 11.5, fontWeight: "700" },
+  heroTitle: { fontSize: 18, fontWeight: "800", color: "#FFFFFF", marginBottom: 4 },
+  heroSub: { fontSize: 12.5, color: "#DCFCE7", lineHeight: 18 },
+  inputLabel: { fontSize: 13, fontWeight: "700", color: "#0F172A", marginTop: 14, marginBottom: 6 },
+  popularRow: { flexDirection: "row", gap: 8, flexWrap: "wrap", marginBottom: 6 },
+  popularPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#CBD5E1",
   },
-  section: { marginTop: 8 },
-  sectionTitle: { marginBottom: 12, marginTop: 8 },
-  submitButton: { marginTop: 24 },
+  popularPillText: { fontSize: 12, fontWeight: "700", color: "#334155" },
+  dropdownBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  dropdownInner: { flexDirection: "row", alignItems: "center", gap: 8 },
+  dropdownText: { fontSize: 14, fontWeight: "600" },
+  dropdownMenu: {
+    borderWidth: 1,
+    borderRadius: 14,
+    marginTop: 4,
+    maxHeight: 180,
+    overflow: "hidden",
+    elevation: 4,
+  },
+  dropdownOption: { paddingHorizontal: 16, paddingVertical: 12 },
+  dropdownOptionText: { fontSize: 14 },
+  row: { flexDirection: "row", gap: 10 },
+  sectionCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    marginTop: 18,
+  },
+  sectionCardTitle: { fontSize: 14, fontWeight: "800", color: "#0F172A", marginBottom: 4 },
+  photoSlotEmpty: {
+    width: 90,
+    height: 90,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderStyle: "dashed",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  photoSlotEmptyText: { fontSize: 11, fontWeight: "700", marginTop: 4 },
+  photoSlotFilled: { width: 90, height: 90, borderRadius: 16, overflow: "hidden", borderWidth: 1 },
+  photoImg: { width: "100%", height: "100%" },
+  photoOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  photoOverlayError: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  photoRetryText: { fontSize: 10, color: "#FFFFFF", fontWeight: "700" },
+  removePhotoBtn: {
+    position: "absolute",
+    top: 4,
+    right: 4,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  submitBtn: { marginTop: 22, backgroundColor: "#15803D", borderRadius: 14, paddingVertical: 14 },
 });
