@@ -1,25 +1,30 @@
-// src/components/farmer/FarmerCropInventoryBreakdown.js
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
+import { getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedUnitName } from "../../constants/units";
 
 export default function FarmerCropInventoryBreakdown({
   products = [],
   onManageProducts,
   onProductPress,
 }) {
+  const { t, i18n } = useTranslation();
   if (!products || products.length === 0) return null;
+
+  const currentLang = i18n.language || "en";
 
   return (
     <View style={styles.card}>
       <View style={styles.header}>
         <View>
-          <AppText style={styles.title}>Crop Stock & Inventory</AppText>
-          <AppText style={styles.subtitle}>Listed harvests ready for wholesale buyers</AppText>
+          <AppText style={styles.title}>{t("farmerDashboard.cropStockMgmt", { defaultValue: "Crop Stock & Inventory" })}</AppText>
+          <AppText style={styles.subtitle}>{t("farmerProducts.subtitle", { defaultValue: "Listed harvests ready for wholesale buyers" })}</AppText>
         </View>
 
         <TouchableOpacity onPress={onManageProducts} activeOpacity={0.8}>
-          <AppText style={styles.manageBtnText}>Manage</AppText>
+          <AppText style={styles.manageBtnText}>{t("farmerProducts.title", { defaultValue: "Manage" })}</AppText>
         </TouchableOpacity>
       </View>
 
@@ -27,8 +32,10 @@ export default function FarmerCropInventoryBreakdown({
         {products.slice(0, 4).map((p, idx) => {
           const isLast = idx === Math.min(products.length, 4) - 1;
           const quantity = p.quantity ?? 0;
-          const unit = p.unit || "q";
-          const cropName = p.category || p.cropType || p.name || "Harvest Crop";
+          const rawUnit = p.unit || "q";
+          const rawCrop = p.category || p.cropType || p.name || "Harvest Crop";
+          const cropName = getLocalizedCropName(rawCrop, currentLang, t);
+          const unitLabel = getLocalizedUnitName(rawUnit, currentLang, t);
           const price = p.price ?? 0;
 
           return (
@@ -45,15 +52,15 @@ export default function FarmerCropInventoryBreakdown({
               <View style={{ flex: 1 }}>
                 <AppText style={styles.cropName}>{cropName}</AppText>
                 <AppText style={styles.cropSub}>
-                  Volume: <AppText style={styles.cropBold}>{quantity} {unit}</AppText>
+                  {t("orders.quantityLabel", { defaultValue: "Volume:" })} <AppText style={styles.cropBold}>{quantity} {unitLabel}</AppText>
                 </AppText>
               </View>
 
               <View style={{ alignItems: "flex-end" }}>
-                <AppText style={styles.priceText}>ETB {Number(price).toLocaleString()}/{unit}</AppText>
+                <AppText style={styles.priceText}>ETB {Number(price).toLocaleString("en-US")}/{unitLabel}</AppText>
                 <View style={styles.statusBadge}>
                   <View style={styles.statusDot} />
-                  <AppText style={styles.statusText}>Active Stock</AppText>
+                  <AppText style={styles.statusText}>{t("editProduct.activeStock", { defaultValue: "Active Stock" })}</AppText>
                 </View>
               </View>
             </TouchableOpacity>

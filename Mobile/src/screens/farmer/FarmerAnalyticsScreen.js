@@ -1,4 +1,5 @@
 // src/screens/farmer/FarmerAnalyticsScreen.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useState } from "react";
 import {
@@ -16,6 +17,7 @@ import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 
 export default function FarmerAnalyticsScreen({ navigation }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const { openSidebar } = useSidebar();
   const [data, setData] = useState(null);
@@ -86,8 +88,8 @@ export default function FarmerAnalyticsScreen({ navigation }) {
   return (
     <View style={[styles.screen, { backgroundColor }]}>
       <AppHeader
-        title="Market Insights & Sales"
-        subtitle="Wholesale market rates per quintal (100 kg)"
+        title={t("farmerAnalytics.title", { defaultValue: "Market Insights & Sales" })}
+        subtitle={t("analytics.subtitle", { defaultValue: "Wholesale market rates per quintal (100 kg)" })}
         showMenu={true}
         onMenuPress={openSidebar}
         showNotification={true}

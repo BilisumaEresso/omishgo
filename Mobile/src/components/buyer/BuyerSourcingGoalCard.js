@@ -1,9 +1,11 @@
 // src/components/buyer/BuyerSourcingGoalCard.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../common/AppText";
 
 export default function BuyerSourcingGoalCard({ onPress }) {
+  const { t } = useTranslation();
   return (
     <TouchableOpacity
       style={styles.card}

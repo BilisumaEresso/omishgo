@@ -1,7 +1,11 @@
+// Mobile/src/constants/units.js
+
+export const UNITS = ["kg", "quintal", "ton", "bag50", "bag100", "crate", "sack"];
+
 export const UNITS_LOCALIZED = {
   en: {
     kg: "kg",
-    quintal: "quintal",
+    quintal: "quintal (q)",
     ton: "ton (1000kg)",
     bag50: "bag (50kg)",
     bag100: "bag (100kg)",
@@ -19,7 +23,7 @@ export const UNITS_LOCALIZED = {
   },
   om: {
     kg: "kg",
-    quintal: "quxinxalee",
+    quintal: "quxinxalee (q)",
     ton: "tooni (1000kg)",
     bag50: "torbaan (50kg)",
     bag100: "torbaan (100kg)",
@@ -27,3 +31,22 @@ export const UNITS_LOCALIZED = {
     sack: "qodaa",
   },
 };
+
+/**
+ * Get localized display label for a unit key
+ */
+export const getLocalizedUnitName = (unitKey, lang = "en", t = null) => {
+  if (!unitKey) return "";
+  const key = unitKey === "q" ? "quintal" : unitKey;
+  if (t) {
+    return t(`units.${key}`, {
+      defaultValue: UNITS_LOCALIZED[lang]?.[key] || UNITS_LOCALIZED.en?.[key] || unitKey,
+    });
+  }
+  return (
+    UNITS_LOCALIZED[lang]?.[key] ||
+    UNITS_LOCALIZED.en?.[key] ||
+    unitKey
+  );
+};
+

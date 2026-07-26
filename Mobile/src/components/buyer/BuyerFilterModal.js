@@ -8,16 +8,12 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
 import { useTheme } from "../../hooks/useTheme";
 
 const CATEGORIES = ["All", "Tomato", "Teff", "Onion", "Garlic", "Vegetables", "Grains"];
 const REGIONS = ["All Regions", "Adama", "Debre Zeit", "Ziway", "Bishoftu", "Hawassa"];
-const SORT_OPTIONS = [
-  { id: "newest", label: "Newest First" },
-  { id: "price_asc", label: "Price: Low to High" },
-  { id: "price_desc", label: "Price: High to Low" },
-];
 
 export default function BuyerFilterModal({
   visible,
@@ -30,10 +26,17 @@ export default function BuyerFilterModal({
   onSelectSortBy,
   onReset,
 }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const primaryColor = theme?.colors?.primary || "#1565C0";
   const surfaceColor = theme?.colors?.surface || "#FFFFFF";
+
+  const SORT_OPTIONS = [
+    { id: "newest", label: t("browse.sortNewest", { defaultValue: "Newest First" }) },
+    { id: "price_asc", label: t("browse.sortPriceAsc", { defaultValue: "Price: Low to High" }) },
+    { id: "price_desc", label: t("browse.sortPriceDesc", { defaultValue: "Price: High to Low" }) },
+  ];
 
   const activeFilterCount =
     (selectedCategory !== "All" ? 1 : 0) +
@@ -63,12 +66,14 @@ export default function BuyerFilterModal({
 
           {/* Header */}
           <View style={styles.header}>
-            <AppText style={styles.title}>Filter Produce & Farmers</AppText>
+            <AppText style={styles.title}>
+              {t("buyerDashboard.filterProduce", { defaultValue: "Filter Produce & Farmers" })}
+            </AppText>
             <View style={styles.headerRight}>
               {activeFilterCount > 0 && (
                 <TouchableOpacity onPress={onReset} style={styles.resetBtn}>
                   <AppText style={[styles.resetText, { color: primaryColor }]}>
-                    Reset
+                    {t("buyerSaved.cancel", { defaultValue: "Reset" })}
                   </AppText>
                 </TouchableOpacity>
               )}
@@ -81,10 +86,13 @@ export default function BuyerFilterModal({
           <ScrollView style={styles.body} showsVerticalScrollIndicator={false}>
             {/* Category Filter Section */}
             <View style={styles.section}>
-              <AppText style={styles.sectionTitle}>Crop Category</AppText>
+              <AppText style={styles.sectionTitle}>
+                {t("postProduct.cropType", { defaultValue: "Crop Category" })}
+              </AppText>
               <View style={styles.pillContainer}>
                 {CATEGORIES.map((cat) => {
                   const active = selectedCategory === cat;
+                  const displayCat = cat === "All" ? t("browse.filterAll", { defaultValue: "All" }) : t(`crops.${cat}`, { defaultValue: cat });
                   return (
                     <TouchableOpacity
                       key={cat}
@@ -101,7 +109,7 @@ export default function BuyerFilterModal({
                           active && styles.activePillText,
                         ]}
                       >
-                        {cat}
+                        {displayCat}
                       </AppText>
                     </TouchableOpacity>
                   );
@@ -111,10 +119,13 @@ export default function BuyerFilterModal({
 
             {/* Region Filter Section */}
             <View style={styles.section}>
-              <AppText style={styles.sectionTitle}>Sourcing Region</AppText>
+              <AppText style={styles.sectionTitle}>
+                {t("browse.filterRegion", { defaultValue: "Sourcing Region" })}
+              </AppText>
               <View style={styles.pillContainer}>
                 {REGIONS.map((reg) => {
                   const active = selectedRegion === reg;
+                  const displayReg = reg === "All Regions" ? t("browse.allRegions", { defaultValue: "All Regions" }) : reg;
                   return (
                     <TouchableOpacity
                       key={reg}
@@ -131,7 +142,7 @@ export default function BuyerFilterModal({
                           active && styles.activePillText,
                         ]}
                       >
-                        {reg}
+                        {displayReg}
                       </AppText>
                     </TouchableOpacity>
                   );
@@ -141,7 +152,9 @@ export default function BuyerFilterModal({
 
             {/* Sort By Section */}
             <View style={styles.section}>
-              <AppText style={styles.sectionTitle}>Sort By</AppText>
+              <AppText style={styles.sectionTitle}>
+                {t("browse.sort", { defaultValue: "Sort By" })}
+              </AppText>
               <View style={styles.sortList}>
                 {SORT_OPTIONS.map((opt) => {
                   const active = sortBy === opt.id;
@@ -186,7 +199,7 @@ export default function BuyerFilterModal({
               activeOpacity={0.88}
             >
               <AppText style={styles.applyBtnText}>
-                Apply Filters {activeFilterCount > 0 ? `(${activeFilterCount})` : ""}
+                {t("common.apply", { defaultValue: "Apply Filters" })} {activeFilterCount > 0 ? `(${activeFilterCount})` : ""}
               </AppText>
             </TouchableOpacity>
           </View>

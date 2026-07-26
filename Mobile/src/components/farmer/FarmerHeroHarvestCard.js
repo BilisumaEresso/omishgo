@@ -1,4 +1,5 @@
 // src/components/farmer/FarmerHeroHarvestCard.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../common/AppText";
@@ -11,6 +12,7 @@ export default function FarmerHeroHarvestCard({
   onPostHarvest,
   onViewOrders,
 }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
 
   return (
@@ -19,19 +21,19 @@ export default function FarmerHeroHarvestCard({
       <View style={styles.topRow}>
         <View style={styles.badge}>
           <Ionicons name="leaf-outline" size={14} color="#A7F3D0" />
-          <AppText style={styles.badgeText}>Producer Operations</AppText>
+          <AppText style={styles.badgeText}>{t("farmerDashboard.producerOps", { defaultValue: "Producer Operations" })}</AppText>
         </View>
 
         <TouchableOpacity style={styles.historyBtn} onPress={onViewOrders} activeOpacity={0.8}>
-          <AppText style={styles.historyBtnText}>Sales History</AppText>
+          <AppText style={styles.historyBtnText}>{t("farmerDashboard.salesHistory", { defaultValue: "Sales History" })}</AppText>
           <Ionicons name="chevron-forward" size={14} color="#E2E8F0" />
         </TouchableOpacity>
       </View>
 
       {/* Main Revenue Amount */}
-      <AppText style={styles.label}>Total Harvest Revenue</AppText>
+      <AppText style={styles.label}>{t("farmerDashboard.totalHarvestRevenue", { defaultValue: "Total Harvest Revenue" })}</AppText>
       <AppText style={styles.amountText}>
-        {currency} {Number(totalRevenue).toLocaleString()}
+        {currency} {Number(totalRevenue).toLocaleString("en-US")}
       </AppText>
 
       {/* Divider */}
@@ -40,13 +42,13 @@ export default function FarmerHeroHarvestCard({
       {/* Inventory KPI & Primary Action */}
       <View style={styles.bottomRow}>
         <View>
-          <AppText style={styles.subLabel}>Active Stock Listed</AppText>
-          <AppText style={styles.subValue}>{activeInventory} quintals (q)</AppText>
+          <AppText style={styles.subLabel}>{t("farmerDashboard.activeStockListed", { defaultValue: "Active Stock Listed" })}</AppText>
+          <AppText style={styles.subValue}>{activeInventory} {t("units.quintal", { defaultValue: "quintals (q)" })}</AppText>
         </View>
 
         <TouchableOpacity style={styles.actionBtn} onPress={onPostHarvest} activeOpacity={0.85}>
           <Ionicons name="add-circle" size={18} color="#15803D" />
-          <AppText style={styles.actionBtnText}>+ Post Harvest</AppText>
+          <AppText style={styles.actionBtnText}>+ {t("farmerDashboard.listHarvest", { defaultValue: "Post Harvest" })}</AppText>
         </TouchableOpacity>
       </View>
     </View>

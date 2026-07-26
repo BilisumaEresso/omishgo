@@ -1,6 +1,7 @@
 // src/components/buyer/BuyerHeroBudgetCard.js
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
 
 export default function BuyerHeroBudgetCard({
@@ -9,6 +10,8 @@ export default function BuyerHeroBudgetCard({
   currency = "ETB",
   onSeeDetails,
 }) {
+  const { t } = useTranslation();
+
   const formattedSpend = Number(totalSpend || 0).toLocaleString("en-US", {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
@@ -40,7 +43,9 @@ export default function BuyerHeroBudgetCard({
         </View>
 
         <View style={styles.heroContent}>
-          <AppText style={styles.label}>Available Procurement Spend</AppText>
+          <AppText style={styles.label}>
+            {t("buyerDashboard.availableSpend", { defaultValue: "Available Procurement Spend" })}
+          </AppText>
           <AppText style={styles.amount}>
             {currency} {formattedSpend}
           </AppText>
@@ -50,7 +55,9 @@ export default function BuyerHeroBudgetCard({
             activeOpacity={0.8}
             style={styles.seeDetailsBtn}
           >
-            <AppText style={styles.seeDetailsText}>See details</AppText>
+            <AppText style={styles.seeDetailsText}>
+              {t("recentOrdersList.seeAll", { defaultValue: "See details" })}
+            </AppText>
             <Ionicons name="chevron-forward" size={14} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
@@ -60,8 +67,12 @@ export default function BuyerHeroBudgetCard({
       <View style={styles.budgetStripCard}>
         <View style={styles.stripHeader}>
           <View>
-            <AppText style={styles.stripTitle}>Procurement Budget</AppText>
-            <AppText style={styles.stripSubtitle}>Monthly Allocation</AppText>
+            <AppText style={styles.stripTitle}>
+              {t("buyerDashboard.budgetTitle", { defaultValue: "Procurement Budget" })}
+            </AppText>
+            <AppText style={styles.stripSubtitle}>
+              {t("buyerDashboard.monthlyAllocation", { defaultValue: "Monthly Allocation" })}
+            </AppText>
           </View>
           <AppText style={styles.stripAmount}>
             {currency} {formattedBudget}
@@ -85,7 +96,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   heroCard: {
-    backgroundColor: "#1E1B4B", // Deep Indigo/Navy matching Image 1
+    backgroundColor: "#1E1B4B",
     borderRadius: 24,
     padding: 22,
     position: "relative",
@@ -109,13 +120,13 @@ const styles = StyleSheet.create({
     borderRadius: 35,
   },
   leafCyan: {
-    backgroundColor: "#38BDF8", // Cyan leaf
+    backgroundColor: "#38BDF8",
     top: 10,
     right: 50,
     transform: [{ rotate: "-45deg" }],
   },
   leafPink: {
-    backgroundColor: "#F43F5E", // Pink leaf
+    backgroundColor: "#F43F5E",
     bottom: 15,
     right: 15,
     transform: [{ rotate: "35deg" }],
@@ -127,14 +138,14 @@ const styles = StyleSheet.create({
   circleYellow: {
     width: 32,
     height: 32,
-    backgroundColor: "#FBBF24", // Yellow circle
+    backgroundColor: "#FBBF24",
     top: 5,
     right: 25,
   },
   circleBlue: {
     width: 24,
     height: 24,
-    backgroundColor: "#818CF8", // Soft purple circle
+    backgroundColor: "#818CF8",
     bottom: 5,
     right: 70,
   },
@@ -166,7 +177,6 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 
-  /* Budget Strip */
   budgetStripCard: {
     backgroundColor: "#2E2A68",
     borderRadius: 20,
@@ -204,7 +214,8 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: "100%",
-    backgroundColor: "#FBBF24", // Yellow progress indicator
+    backgroundColor: "#FBBF24",
     borderRadius: 3,
   },
 });
+

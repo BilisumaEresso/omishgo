@@ -249,7 +249,7 @@ export default function EditProductScreen({ route, navigation }) {
   return (
     <View style={[styles.container, { backgroundColor: background }]}>
       <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
-      <AppHeader title="Edit Harvest Listing" showBack onBackPress={() => navigation.goBack()} />
+      <AppHeader title={t("editProduct.title", { defaultValue: "Edit Harvest Listing" })} showBack onBackPress={() => navigation.goBack()} />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -258,7 +258,7 @@ export default function EditProductScreen({ route, navigation }) {
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           {/* Status Switcher Banner */}
           <View style={styles.statusCard}>
-            <AppText style={styles.statusCardTitle}>Listing Availability Status</AppText>
+            <AppText style={styles.statusCardTitle}>{t("editProduct.availabilityStatus", { defaultValue: "Listing Availability Status" })}</AppText>
             <View style={styles.statusToggleRow}>
               <TouchableOpacity
                 style={[
@@ -270,7 +270,7 @@ export default function EditProductScreen({ route, navigation }) {
               >
                 <Ionicons name="checkmark-circle" size={16} color={status === "active" ? "#FFFFFF" : "#15803D"} />
                 <AppText style={[styles.statusToggleText, status === "active" && { color: "#FFFFFF" }]}>
-                  Active Stock
+                  {t("editProduct.activeStock", { defaultValue: "Active Stock" })}
                 </AppText>
               </TouchableOpacity>
 
@@ -284,7 +284,7 @@ export default function EditProductScreen({ route, navigation }) {
               >
                 <Ionicons name="archive" size={16} color={status === "sold" ? "#FFFFFF" : "#DC2626"} />
                 <AppText style={[styles.statusToggleText, status === "sold" && { color: "#FFFFFF" }]}>
-                  Sold Out
+                  {t("editProduct.soldOut", { defaultValue: "Sold Out" })}
                 </AppText>
               </TouchableOpacity>
             </View>
@@ -292,7 +292,7 @@ export default function EditProductScreen({ route, navigation }) {
 
           {/* Crop Type Dropdown */}
           <DropdownPicker
-            label="Crop Type / Commodity"
+            label={t("postProduct.cropType", { defaultValue: "Crop Type / Commodity" })}
             value={cropType}
             options={cropOptions}
             onSelect={setCropType}
@@ -301,13 +301,13 @@ export default function EditProductScreen({ route, navigation }) {
             onClose={() => setShowCropPicker(false)}
             icon="leaf-outline"
             theme={theme}
-            placeholder="Select Harvest Crop"
+            placeholder={t("editProduct.cropSelectPlaceholder", { defaultValue: "Select Harvest Crop" })}
           />
 
           {/* Quantity & Unit Row */}
           <View style={styles.row}>
             <View style={{ flex: 2 }}>
-              <AppText style={styles.inputLabel}>Stock Quantity</AppText>
+              <AppText style={styles.inputLabel}>{t("postProduct.stockQuantity", { defaultValue: "Stock Quantity" })}</AppText>
               <AppInput
                 placeholder="0"
                 value={quantity}
@@ -317,7 +317,7 @@ export default function EditProductScreen({ route, navigation }) {
             </View>
             <View style={{ flex: 1.2 }}>
               <DropdownPicker
-                label="Unit"
+                label={t("postProduct.unit", { defaultValue: "Unit" })}
                 value={unit}
                 options={unitOptions}
                 onSelect={setUnit}
@@ -342,7 +342,7 @@ export default function EditProductScreen({ route, navigation }) {
           />
 
           {/* Description */}
-          <AppText style={styles.inputLabel}>Listing Description</AppText>
+          <AppText style={styles.inputLabel}>{t("editProduct.description", { defaultValue: "Listing Description" })}</AppText>
           <AppInput
             placeholder="Add details about crop quality, harvest date, packaging..."
             value={description}

@@ -1,4 +1,5 @@
 // src/components/buyer/BuyerProcurementMetrics.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../common/AppText";
@@ -12,6 +13,7 @@ export default function BuyerProcurementMetrics({
   onPurchasesPress,
   onFarmersPress,
 }) {
+  const { t } = useTranslation();
   const formattedSpend = Number(totalSpend || 0).toLocaleString("en-US", {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
@@ -40,7 +42,7 @@ export default function BuyerProcurementMetrics({
           </View>
         </TouchableOpacity>
 
-        {/* Middle Metric: Active Orders / Listings */}
+        {/* Middle Metric: {t("buyerDashboard.activeOrders", { defaultValue: "Active Orders" })} / Listings */}
         <TouchableOpacity
           style={[styles.card, styles.pinkCard]}
           onPress={onActiveOrdersPress}

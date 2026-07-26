@@ -403,7 +403,7 @@ export default function PostProductScreen({ navigation, route }) {
   return (
     <View style={[styles.container, { backgroundColor: background }]}>
       <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
-      <AppHeader title="Post Harvest Produce" showBack onBackPress={() => navigation.goBack()} />
+      <AppHeader title={t("postProduct.title", { defaultValue: "Post Harvest Produce" })} showBack onBackPress={() => navigation.goBack()} />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -414,16 +414,16 @@ export default function PostProductScreen({ navigation, route }) {
           <View style={styles.heroBanner}>
             <View style={styles.heroBadge}>
               <Ionicons name="leaf" size={14} color="#A7F3D0" />
-              <AppText style={styles.heroBadgeText}>Producer Listing Form</AppText>
+              <AppText style={styles.heroBadgeText}>{t("postProduct.formTitle", { defaultValue: "Producer Listing Form" })}</AppText>
             </View>
-            <AppText style={styles.heroTitle}>Post New Harvest Listing</AppText>
+            <AppText style={styles.heroTitle}>{t("postProduct.title", { defaultValue: "Post New Harvest Listing" })}</AppText>
             <AppText style={styles.heroSub}>
-              Fill in your crop details to receive direct purchase orders from wholesale buyers across Ethiopia.
+              {t("postProduct.formDesc", { defaultValue: "Fill in your crop details to receive direct purchase orders from wholesale buyers across Ethiopia." })}
             </AppText>
           </View>
 
           {/* Quick Select Crop Pills */}
-          <AppText style={styles.inputLabel}>Popular Harvest Crops</AppText>
+          <AppText style={styles.inputLabel}>{t("postProduct.popularCrops", { defaultValue: "Popular Harvest Crops" })}</AppText>
           <View style={styles.popularRow}>
             {popularCrops.map((c) => (
               <TouchableOpacity
@@ -444,7 +444,7 @@ export default function PostProductScreen({ navigation, route }) {
 
           {/* Crop Type Dropdown */}
           <DropdownPicker
-            label="Crop Type / Commodity"
+            label={t("postProduct.cropType", { defaultValue: "Crop Type / Commodity" })}
             value={cropType}
             options={cropOptions}
             onSelect={setCropType}
@@ -453,15 +453,15 @@ export default function PostProductScreen({ navigation, route }) {
             onClose={() => setShowCropPicker(false)}
             icon="leaf-outline"
             theme={theme}
-            placeholder="Select Harvest Crop"
+            placeholder={t("editProduct.cropSelectPlaceholder", { defaultValue: "Select Harvest Crop" })}
           />
 
           {/* Quantity & Unit Row */}
           <View style={styles.row}>
             <View style={{ flex: 2 }}>
-              <AppText style={styles.inputLabel}>Stock Quantity</AppText>
+              <AppText style={styles.inputLabel}>{t("postProduct.stockQuantity", { defaultValue: "Stock Quantity" })}</AppText>
               <AppInput
-                placeholder="e.g. 100"
+                placeholder={t("postProduct.quantityPlaceholder", { defaultValue: "e.g. 100" })}
                 value={quantity}
                 onChangeText={setQuantity}
                 keyboardType="numeric"
@@ -469,7 +469,7 @@ export default function PostProductScreen({ navigation, route }) {
             </View>
             <View style={{ flex: 1.2 }}>
               <DropdownPicker
-                label="Unit"
+                label={t("postProduct.unit", { defaultValue: "Unit" })}
                 value={unit}
                 options={unitOptions}
                 onSelect={setUnit}

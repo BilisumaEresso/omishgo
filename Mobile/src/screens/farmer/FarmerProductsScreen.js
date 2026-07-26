@@ -171,15 +171,15 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
 
         <View style={styles.specGrid}>
           <View style={styles.specItem}>
-            <AppText style={styles.specLabel}>Available Volume</AppText>
+            <AppText style={styles.specLabel}>{t("postProduct.stockQuantity", { defaultValue: "Available Volume" })}</AppText>
             <AppText style={styles.specVal}>{item.quantity} {item.unit}</AppText>
           </View>
           <View style={styles.specItem}>
-            <AppText style={styles.specLabel}>Unit Price</AppText>
+            <AppText style={styles.specLabel}>{t("listingDetail.unitRate", { defaultValue: "Unit Price" })}</AppText>
             <AppText style={styles.specVal}>ETB {Number(item.price).toLocaleString()}/{item.unit}</AppText>
           </View>
           <View style={styles.specItem}>
-            <AppText style={styles.specLabel}>Batch Value</AppText>
+            <AppText style={styles.specLabel}>{t("listingDetail.batchValue", { defaultValue: "Batch Value" })}</AppText>
             <AppText style={[styles.specVal, { color: primary }]}>ETB {stockTotalVal.toLocaleString()}</AppText>
           </View>
         </View>
@@ -197,7 +197,7 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
               activeOpacity={0.8}
             >
               <Ionicons name="create-outline" size={14} color="#15803D" />
-              <AppText style={styles.editBtnText}>Edit Listing</AppText>
+              <AppText style={styles.editBtnText}>{t("common.edit", { defaultValue: "Edit Listing" })}</AppText>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -249,8 +249,8 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
 
   return (
     <DashboardLayout
-      title="My Crop Stock"
-      subtitle="Manage harvest inventory & wholesale listings"
+      title={t("farmerProducts.title", { defaultValue: "My Crop Stock" })}
+      subtitle={t("farmerProducts.subtitle", { defaultValue: "Manage harvest inventory & wholesale listings" })}
       role="farmer"
       showMenu
       onMenuPress={openSidebar}

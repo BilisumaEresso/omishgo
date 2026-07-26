@@ -20,9 +20,12 @@ import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
+import { getOrderStatusConfig } from "../../constants/statuses";
+import { getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedUnitName } from "../../constants/units";
 
 export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +53,7 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
         unit: o.unit || "q",
         price: o.totalPrice || (o.priceAtOrder || 0) * (o.quantity || 1),
         unitPrice: o.priceAtOrder || o.price || 0,
-        buyerName: o.buyerId?.name || "Wholesale Buyer",
+        buyerName: o.buyerId?.name || t("orders.wholesaleBuyer", { defaultValue: "Wholesale Buyer" }),
         buyerPhone: o.buyerId?.phone || null,
         buyerId: o.buyerId?._id || o.buyerId,
         status: o.status || "pending",
@@ -96,17 +99,20 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
     return orders.filter((o) => o.status === activeFilter);
   }, [orders, activeFilter]);
 
-  const statusConfig = {
-    pending: { label: "Pending Dispatch", color: "#D97706", bg: "#FEF3C7" },
-    confirmed: { label: "Confirmed Order", color: "#2563EB", bg: "#EFF6FF" },
-    in_transit: { label: "In Transit", color: "#7C3AED", bg: "#F3E8FF" },
-    delivered: { label: "Delivered", color: "#16A34A", bg: "#DCFCE7" },
-    completed: { label: "Completed", color: "#16A34A", bg: "#DCFCE7" },
-    cancelled: { label: "Cancelled", color: "#DC2626", bg: "#FEF2F2" },
+  const currentLang = i18n.language || "en";
+
+  const renderStatusBadge = (statusKey) => {
+    const config = getOrderStatusConfig(statusKey, currentLang);
+    return (
+      <View style={[styles.statusBadge, { backgroundColor: config.bg }]}>
+        <AppText style={[styles.statusBadgeText, { color: config.color }]}>
+          {config.displayLabel}
+        </AppText>
+      </View>
+    );
   };
 
   const renderOrderCard = ({ item }) => {
-    const st = statusConfig[item.status] || { label: item.status, color: "#64748B", bg: "#F1F5F9" };
     const shortId = item.id ? item.id.substring(item.id.length - 6).toUpperCase() : "ORD";
 
     return (
@@ -121,22 +127,22 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
             <Ionicons name="receipt" size={16} color={primary} />
             <AppText style={styles.refText}>#ORD-{shortId}</AppText>
           </View>
-          <View style={[styles.statusBadge, { backgroundColor: st.bg }]}>
-            <AppText style={[styles.statusBadgeText, { color: st.color }]}>{st.label}</AppText>
-          </View>
+          {renderStatusBadge(item.status)}
         </View>
 
         {/* Main Crop Specs & Price */}
         <View style={styles.mainSpecRow}>
           <View style={{ flex: 1 }}>
-            <AppText style={[styles.cropTitle, { color: textPrimary }]}>{item.cropType}</AppText>
+            <AppText style={[styles.cropTitle, { color: textPrimary }]}>
+              {getLocalizedCropName(item.cropType, currentLang, t)}
+            </AppText>
             <AppText style={styles.volumeText}>
-              Quantity: <AppText style={styles.boldText}>{item.quantity} {item.unit}</AppText>
+              {t("orders.quantityLabel", { defaultValue: "Quantity:" })} <AppText style={styles.boldText}>{item.quantity} {getLocalizedUnitName(item.unit, currentLang, t)}</AppText>
             </AppText>
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <AppText style={[styles.priceText, { color: primary }]}>
-              ETB {Number(item.price).toLocaleString()}
+              ETB {Number(item.price).toLocaleString("en-US")}
             </AppText>
             <AppText style={styles.dateText}>{item.date}</AppText>
           </View>
@@ -148,7 +154,7 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
             <Ionicons name="person" size={14} color="#15803D" />
           </View>
           <View style={{ flex: 1 }}>
-            <AppText style={styles.buyerLabel}>Wholesale Buyer</AppText>
+            <AppText style={styles.buyerLabel}>{t("orders.wholesaleBuyer", { defaultValue: "Wholesale Buyer" })}</AppText>
             <AppText style={styles.buyerName}>{item.buyerName}</AppText>
           </View>
         </View>
@@ -162,7 +168,7 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
               activeOpacity={0.8}
             >
               <Ionicons name="chatbubble-ellipses" size={14} color="#15803D" />
-              <AppText style={styles.chatBtnText}>Message Buyer</AppText>
+              <AppText style={styles.chatBtnText}>{t("orders.messageBuyer", { defaultValue: "Message Buyer" })}</AppText>
             </TouchableOpacity>
           )}
 
@@ -173,7 +179,7 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
               activeOpacity={0.8}
             >
               <Ionicons name="call" size={14} color="#2563EB" />
-              <AppText style={styles.callBtnText}>Call Buyer</AppText>
+              <AppText style={styles.callBtnText}>{t("orders.callBuyer", { defaultValue: "Call Buyer" })}</AppText>
             </TouchableOpacity>
           )}
         </View>
@@ -182,16 +188,16 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
   };
 
   const filterTabs = [
-    { id: "all", label: `All (${orders.length})` },
-    { id: "pending", label: `Pending (${pendingCount})` },
-    { id: "in_transit", label: `In Transit (${inTransitCount})` },
-    { id: "completed", label: `Delivered (${completedCount})` },
+    { id: "all", label: `${t("buyerOrders.filterAll", { defaultValue: "All" })} (${orders.length})` },
+    { id: "pending", label: `${t("buyerOrders.filterPending", { defaultValue: "Pending" })} (${pendingCount})` },
+    { id: "in_transit", label: `${t("buyerOrders.statusInTransit", { defaultValue: "In Transit" })} (${inTransitCount})` },
+    { id: "completed", label: `${t("buyerOrders.filterDelivered", { defaultValue: "Delivered" })} (${completedCount})` },
   ];
 
   return (
     <DashboardLayout
-      title="Harvest Sales Orders"
-      subtitle="Track buyer purchase orders & fulfillment"
+      title={t("farmerOrders.title", { defaultValue: "Harvest Sales Orders" })}
+      subtitle={t("orders.trackFulfillment", { defaultValue: "Track buyer purchase orders & fulfillment" })}
       role="farmer"
       showMenu
       onMenuPress={openSidebar}
@@ -256,9 +262,9 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
       ) : filteredOrders.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Ionicons name="receipt-outline" size={44} color="#94A3B8" />
-          <AppText style={styles.emptyTitle}>No Sales Orders Found</AppText>
+          <AppText style={styles.emptyTitle}>{t("orders.noSalesOrdersFound", { defaultValue: "No Sales Orders Found" })}</AppText>
           <AppText style={styles.emptySub}>
-            New buyer purchase requests will appear here for confirm and dispatch.
+            {t("orders.emptyFarmerSub", { defaultValue: "New buyer purchase requests will appear here for confirm and dispatch." })}
           </AppText>
         </View>
       ) : (

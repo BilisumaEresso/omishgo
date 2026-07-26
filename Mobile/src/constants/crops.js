@@ -1,159 +1,196 @@
-export const CROP_TYPES_LOCALIZED = {
-  en: {
-    Tomato: "Tomato",
-    Onion: "Onion",
-    Maize: "Maize",
-    Wheat: "Wheat",
-    Teff: "Teff",
-    "Haricot Bean": "Haricot Bean",
-    "Green Pepper": "Green Pepper",
-    Cabbage: "Cabbage",
-    Potato: "Potato",
-    Garlic: "Garlic",
-    Papaya: "Papaya",
-  },
-  am: {
-    Tomato: "ቲማቲም",
-    Onion: "ሽንኩርት",
-    Maize: "በቆሎ",
-    Wheat: "ስንዴ",
-    Teff: "ጤፍ",
-    "Haricot Bean": "ቦሌቄ",
-    "Green Pepper": "ቃሪያ",
-    Cabbage: "ጎመን",
-    Potato: "ድንች",
-    Garlic: "ነጭ ሽንኩርት",
-    Papaya: "ፓፓያ",
-  },
-  om: {
-    Tomato: "Xaafii Diimaa",
-    Onion: "Qasaricha",
-    Maize: "Boqqoolloo",
-    Wheat: "Qamadii",
-    Teff: "Xaafii",
-    "Haricot Bean": "Buna Dachee",
-    "Green Pepper": "Kariyaa",
-    Cabbage: "Damma",
-    Potato: "Dinnicha",
-    Garlic: "Qasaricha Adii",
-    Papaya: "Papaayyaa",
-  },
-};
+// Mobile/src/constants/crops.js
+
 export const CROP_TYPES = [
-  "Tomato",
-  "Onion",
-  "Maize",
-  "Wheat",
   "Teff",
-  "Haricot Bean",
+  "Red Onion",
+  "Tomato",
+  "Garlic",
+  "White Maize",
+  "Wheat",
+  "Barley",
+  "Sorghum",
+  "Millet",
   "Green Pepper",
   "Cabbage",
   "Potato",
-  "Garlic",
+  "Carrot",
+  "Beetroot",
+  "Coffee",
+  "Sesame",
+  "Lentil",
+  "Chickpea",
+  "Haricot Bean",
   "Papaya",
 ];
-export const DEFAULT_DESCRIPTIONS_LOCALIZED = {
+
+export const CROP_TYPES_LOCALIZED = {
   en: {
-    Tomato:
-      "Fresh Rift Valley tomatoes, fully ripe and firm. Harvested this morning from local Meki irrigation farms. Excellent for immediate market distribution.",
-    Onion:
-      "Red Bombay onion, medium to large size. Well-cured and dry. Sourced directly from local cooperative farms with no bruising.",
-    Maize:
-      "White maize, premium quality. Properly dried and cleaned grain, ready for milling or direct consumer sale.",
-    Wheat:
-      "High-yield wheat, this season's harvest. Dry, clean, and well-stored. Perfect for commercial flour milling.",
-    Teff: "Magna (White) Teff, freshly harvested. Thoroughly sifted, cleaned, and grown strictly without chemical residues.",
-    "Haricot Bean":
-      "Export-grade white pea beans (Boleqe). Carefully sorted, clean, and dry. High market demand product.",
-    "Green Pepper":
-      "Fresh green peppers (Kariya). Plump, unblemished, and uniform in size. Harvested this week.",
-    Cabbage:
-      "Fresh, tightly packed green cabbage. Farm-fresh with crisp leaves, grown using local irrigation.",
-    Potato:
-      "White potato, uniform medium size. Freshly unearthed, cured, and stored in dry conditions to prevent sprouting.",
-    Garlic:
-      "Dry white garlic bulbs. Strong flavor and aroma. Properly cured for extended shelf life.",
-    Papaya:
-      "Sweet Batu/Meki papaya. Smooth skin, medium-ripe, and carefully handled to avoid transit bruising.",
+    Teff: "White Teff",
+    "Red Onion": "Red Onion",
+    Tomato: "Fresh Tomato",
+    Garlic: "White Garlic",
+    "White Maize": "White Maize",
+    Wheat: "Bread Wheat",
+    Barley: "Malt Barley",
+    Sorghum: "White Sorghum",
+    Millet: "Finger Millet",
+    "Green Pepper": "Green Pepper (Kariya)",
+    Cabbage: "Head Cabbage",
+    Potato: "White Potato",
+    Carrot: "Fresh Carrot",
+    Beetroot: "Red Beetroot",
+    Coffee: "Arabica Coffee",
+    Sesame: "Humera Sesame",
+    Lentil: "Red Lentil",
+    Chickpea: "Kabuli Chickpea",
+    "Haricot Bean": "White Pea Bean (Boleqe)",
+    Papaya: "Sweet Papaya",
   },
   am: {
-    Tomato:
-      "ትኩስ ሸለቆ ቲማቲም፣ ሙሉ ለሙሉ የ익은እና ጠንካራ። ዛሬ ጠዋት ከአካባቢው የሜኪ መስኖ ማሳዎች የተሰበሰበ። ወዲያውኑ ለገበያ ማሰራጨት ተስማሚ።",
-    Onion:
-      "ቀይ ቦምቤ ሽንኩርት፣ መካከለኛ እስከ ትልቅ መጠን። ጠንካራ እና ደረቅ። ቁስለት ሳይኖር ከሕብረት ሥራ ማህበራት ቀጥታ የተሰጠ።",
-    Maize: "ነጭ በቆሎ፣ ከፍተኛ ጥራት። በትክክል የደረቀ እና የተጸዳ ዘር፣ ለወፍጮ ወይም ለቀጥታ ሽያጭ ዝግጁ።",
-    Wheat:
-      "ከፍተኛ ምርት ስንዴ፣ የዚህ ወቅት ሰብል። ደረቅ፣ ንጹህ እና በጥሩ ሁኔታ የተቀመጠ። ለዱቄት ፋብሪካዎች ተስማሚ።",
-    Teff: "ማግና (ነጭ) ጤፍ፣ አዲስ የተሰበሰበ። ሙሉ ለሙሉ የተለቀመ፣ የተጸዳ፣ ምንም ኬሚካል ሳይጠቀሙ የተመረተ።",
-    "Haricot Bean":
-      "ለወጪ ንግድ ደረጃ ቦሌቄ። በጥንቃቄ የተለቀመ፣ ንጹህ እና ደረቅ። ከፍተኛ የገበያ ፍላጎት ያለው ምርት።",
-    "Green Pepper": "ትኩስ ቃሪያ። ደንዳና፣ ቁስለት የሌለው እና ወጥ መጠን ያለው። በዚህ ሳምንት የተሰበሰበ።",
-    Cabbage: "ትኩስ፣ ጠንካራ ጎመን። ከቅርብ ቦታ ቀጥታ ከማሳ፣ ሸካካ ቅጠሎች ያሉት፣ በመስኖ ውሃ የተመረተ።",
-    Potato:
-      "ነጭ ድንች፣ ወጥ መካከለኛ መጠን። አዲስ የተቆፈረ፣ ፈዋሽ ሆኖ ትኩሳት እንዳይበቅለው ደረቅ ቦታ ላይ ተቀምጧል።",
-    Garlic: "ደረቅ ነጭ ሽንኩርት። ጠንካራ ጣዕምና መዓዛ ያለው። ለረጅም ጊዜ እንዲቆይ በጥሩ ሁኔታ ተጠብቋል።",
-    Papaya: "ጣፋጭ ባቱ/ሜኪ ፓፓያ። ለስላሳ ቆዳ፣ ግማሽ የ익፣ በጥንቃቄ የተያዘ።",
+    Teff: "ማግና (ነጭ) ጤፍ",
+    "Red Onion": "ቀይ ሽንኩርት",
+    Tomato: "ቲማቲም",
+    Garlic: "ነጭ ሽንኩርት",
+    "White Maize": "ነጭ በቆሎ",
+    Wheat: "ስንዴ",
+    Barley: "ገብስ",
+    Sorghum: "ማሽላ",
+    Millet: "ዳጉሣ",
+    "Green Pepper": "ቃሪያ",
+    Cabbage: "ጎመን",
+    Potato: "ድንች",
+    Carrot: "ካሮት",
+    Beetroot: "ቀይ ስር",
+    Coffee: "ቡና",
+    Sesame: "ሰሊጥ",
+    Lentil: "ምስር",
+    Chickpea: "ሽምብራ",
+    "Haricot Bean": "ቦሌቄ",
+    Papaya: "ፓፓያ",
   },
   om: {
-    Tomato:
-      "Xaafii Diimaa Caaccuu Laftii Qorichaa, guutummaatti gabbatee fi cimaadha. Har'a ganama qonnaa magaalaa Meekii keessaa sassaabame. Gabaa yeroo gabaabaa keessatti raabsuuf gaarii.",
-    Onion:
-      "Qasaricha Bombee Diimaa, dheerinni giddugaleessaa hanga guddaatti. Gogee fi jabaatadha. Qonnaan bultoota waldaa keessaa kallattiidhaan argame.",
-    Maize:
-      "Boqqoolloo adii, qulqullina ol aanaa. Akka gaaritti gogee fi qulqullaa'e, xayyoo ykn gurguramaa kallattiidhaan fayyadamuuf qophii.",
-    Wheat:
-      "Qamadii galii guddaa, xaa'oo kana. Gogaa, qulqulluu fi tolfamee kuufame. Warshaa ulee ittiin dalagu.",
-    Teff: "Xaafii Magna (Adii), haaraa sassaabame. Guutummaatti gara'amee, qulqullaa'ee fi maaddii tokko malee qotame.",
-    "Haricot Bean":
-      "Buna dachee baasii gara alaatti erguuf, Boleqe. Har'oo to'annaan qoodame, qulqulluu fi gogaadha. Gabaa keessatti baay'ee barbaadama.",
-    "Green Pepper":
-      "Kariyaa haaraa. Gabbatee, dhukkubbii malee fi dheerinni qixa. Torbee kana sassaabame.",
-    Cabbage:
-      "Damma haaraa, jabaatee walitti qabame. Qonnaarraa kallattiidhaan, dahanna jabaataa qabu, bishaaniin qotame.",
-    Potato:
-      "Dinnicha adii, dheerinni giddugaleessaa qixa. Haaraa baafame, gogee fi dachii gogaa irra kuufame akka hin dhibnetti.",
-    Garlic:
-      "Qasaricha Adii gogaa. Urgaa fi mi'aa cimaa qaba. Yeroo dheeraa akka turuuf sirriitti to'atame.",
-    Papaya:
-      "Papaayyaa mi'awa Baatuu/Meekii. Gogaa laafaa, giddu galeessaan gabbatee, tarkaanfii tolfama keessatti akka hin midhamneetti of eeggannoon qabame.",
+    Teff: "Xaafii Adii (Magna)",
+    "Red Onion": "Qasaricha Diimaa",
+    Tomato: "Xaafii Diimaa (Timaatimi)",
+    Garlic: "Qasaricha Adii",
+    "White Maize": "Boqqoolloo Adii",
+    Wheat: "Qamadii",
+    Barley: "Garbuu",
+    Sorghum: "Misingaa",
+    Millet: "Dagusa",
+    "Green Pepper": "Kariyaa",
+    Cabbage: "Damma",
+    Potato: "Dinnicha",
+    Carrot: "Kaarotii",
+    Beetroot: "Dinnicha Diimaa",
+    Coffee: "Buna",
+    Sesame: "Salxiqi",
+    Lentil: "Misira",
+    Chickpea: "Shimbiraa",
+    "Haricot Bean": "Boleqe (Buna Dachee)",
+    Papaya: "Papaayyaa",
   },
 };
-export const DEFAULT_DESCRIPTIONS = {
-  Tomato:
-    "Fresh Rift Valley tomatoes, fully ripe and firm. Harvested this morning from local Meki irrigation farms. Excellent for immediate market distribution.",
-  Onion:
-    "Red Bombay onion, medium to large size. Well-cured and dry. Sourced directly from local cooperative farms with no bruising.",
-  Maize:
-    "White maize, premium quality. Properly dried and cleaned grain, ready for milling or direct consumer sale.",
-  Wheat:
-    "High-yield wheat, this season's harvest. Dry, clean, and well-stored. Perfect for commercial flour milling.",
-  Teff: "Magna (White) Teff, freshly harvested. Thoroughly sifted, cleaned, and grown strictly without chemical residues.",
-  "Haricot Bean":
-    "Export-grade white pea beans (Boleqe). Carefully sorted, clean, and dry. High market demand product.",
-  "Green Pepper":
-    "Fresh green peppers (Kariya). Plump, unblemished, and uniform in size. Harvested this week.",
-  Cabbage:
-    "Fresh, tightly packed green cabbage. Farm-fresh with crisp leaves, grown using local irrigation.",
-  Potato:
-    "White potato, uniform medium size. Freshly unearthed, cured, and stored in dry conditions to prevent sprouting.",
-  Garlic:
-    "Dry white garlic bulbs. Strong flavor and aroma. Properly cured for extended shelf life.",
-  Papaya:
-    "Sweet Batu/Meki papaya. Smooth skin, medium-ripe, and carefully handled to avoid transit bruising.",
+
+export const DEFAULT_DESCRIPTIONS_LOCALIZED = {
+  en: {
+    Teff: "Magna (White) Teff, freshly harvested. Thoroughly sifted, cleaned, and grown strictly without chemical residues.",
+    "Red Onion": "Red Bombay onion, medium to large size. Well-cured and dry. Sourced directly from local cooperative farms.",
+    Tomato: "Fresh Rift Valley tomatoes, fully ripe and firm. Harvested this morning from local irrigation farms.",
+    Garlic: "Dry white garlic bulbs. Strong flavor and aroma. Properly cured for extended shelf life.",
+    "White Maize": "White maize, premium quality. Properly dried and cleaned grain, ready for milling or direct sale.",
+    Wheat: "High-yield bread wheat, this season's harvest. Dry, clean, and well-stored. Perfect for flour milling.",
+    Barley: "Premium malt barley, uniform grain size and high germination rate for brewing and food processing.",
+    Sorghum: "Clean white sorghum, dry grain harvested from Rift Valley lowlands.",
+    Millet: "High-nutrient finger millet, thoroughly winnowed and ready for traditional foods and beverages.",
+    "Green Pepper": "Fresh green peppers (Kariya). Plump, unblemished, and uniform in size. Harvested this week.",
+    Cabbage: "Fresh, tightly packed green cabbage. Farm-fresh with crisp leaves, grown using local irrigation.",
+    Potato: "White potato, uniform medium size. Freshly unearthed, cured, and stored in dry conditions.",
+    Carrot: "Vibrant orange carrots, washed, sweet, and crisp. Harvested fresh from highland farms.",
+    Beetroot: "Deep red beetroot, firm and medium-sized. Rich in color and nutrients.",
+    Coffee: "Grade-1 Specialty Arabica coffee beans, sun-dried and hand-picked from Ethiopian highlands.",
+    Sesame: "Export-grade Humera white sesame seeds. High oil content, thoroughly cleaned.",
+    Lentil: "Split red lentils, thoroughly cleaned, dry, and free from debris.",
+    Chickpea: "Large Kabuli chickpeas, uniform shape, dry and well-stored.",
+    "Haricot Bean": "Export-grade white pea beans (Boleqe). Carefully sorted, clean, and dry.",
+    Papaya: "Sweet Batu/Meki papaya. Smooth skin, medium-ripe, and carefully handled to avoid transit bruising.",
+  },
+  am: {
+    Teff: "ማግና (ነጭ) ጤፍ፣ አዲስ የተሰበሰበ። ሙሉ ለሙሉ የተለቀመ፣ የተጸዳ፣ ምንም ኬሚካል ሳይጠቀሙ የተመረተ።",
+    "Red Onion": "ቀይ ቦምቤ ሽንኩርት፣ መካከለኛ እስከ ትልቅ መጠን። ጠንካራ እና ደረቅ። ቁስለት ሳይኖር ከሕብረት ሥራ ማህበራት ቀጥታ የተሰጠ።",
+    Tomato: "ትኩስ ሸለቆ ቲማቲም፣ ሙሉ ለሙሉ የደረሰ እና ጠንካራ። ዛሬ ጠዋት ከአካባቢው የመስኖ ማሳዎች የተሰበሰበ።",
+    Garlic: "ደረቅ ነጭ ሽንኩርት። ጠንካራ ጣዕምና መዓዛ ያለው። ለረጅም ጊዜ እንዲቆይ በጥሩ ሁኔታ ተጠብቋል።",
+    "White Maize": "ነጭ በቆሎ፣ ከፍተኛ ጥራት። በትክክል የደረቀ እና የተጸዳ ዘር፣ ለወፍጮ ወይም ለቀጥታ ሽያጭ ዝግጁ።",
+    Wheat: "ከፍተኛ ምርት ስንዴ፣ የዚህ ወቅት ሰብል። ደረቅ፣ ንጹህ እና በጥሩ ሁኔታ የተቀመጠ። ለዱቄት ፋብሪካዎች ተስማሚ።",
+    Barley: "ጥራት ያለው የገብስ ምርት፣ ለምግብ እና ለጠጅ/ቢራ ፋብሪካዎች ዝግጁ የሆነ።",
+    Sorghum: "ንጹህ ነጭ ማሽላ፣ በጥሩ ሁኔታ የተሰበሰበ እና የደረቀ።",
+    Millet: "ጥራት ያለው ዳጉሣ፣ ለባህላዊ ምግቦችና ጠጅ ዝግጅት የተጸዳ።",
+    "Green Pepper": "ትኩስ ቃሪያ። ደንዳና፣ ቁስለት የሌለው እና ወጥ መጠን ያለው። በዚህ ሳምንት የተሰበሰበ።",
+    Cabbage: "ትኩስ፣ ጠንካራ ጎመን። ከቅርብ ቦታ ቀጥታ ከማሳ፣ ሸካካ ቅጠሎች ያሉት።",
+    Potato: "ነጭ ድንች፣ ወጥ መካከለኛ መጠን። አዲስ የተቆፈረ፣ ደረቅ ቦታ ላይ ተቀምጧል።",
+    Carrot: "ትኩስ ካሮት፣ የተጣጠበ እና ጣፋጭ። ከደብር ማሳዎች የተሰበሰበ።",
+    Beetroot: "ቀይ ስር፣ ጠንካራ እና መካከለኛ መጠን ያለው።",
+    Coffee: "ደረጃ-1 የኢትዮጵያ አራቢካ ቡና፣ በፀሐይ የደረቀ እና በጥንቃቄ የተለቀመ።",
+    Sesame: "ለወጪ ንግድ ደረጃ ሁመራ ነጭ ሰሊጥ፣ ከፍተኛ የዘይት መጠን ያለው።",
+    Lentil: "የተሰነጠቀ ቀይ ምስር፣ ንጹህ እና ደረቅ።",
+    Chickpea: "ትልቅ የካቡሊ ሽምብራ፣ በጥንቃቄ የተለቀመ እና የተቀመጠ።",
+    "Haricot Bean": "ለወጪ ንግድ ደረጃ ቦሌቄ። በጥንቃቄ የተለቀመ፣ ንጹህ እና ደረቅ።",
+    Papaya: "ጣፋጭ ባቱ/ሜኪ ፓፓያ። ለስላሳ ቆዳ፣ በጥንቃቄ የተያዘ።",
+  },
+  om: {
+    Teff: "Xaafii Magna (Adii), haaraa sassaabame. Guutummaatti gara'amee, qulqullaa'ee fi maaddii tokko malee qotame.",
+    "Red Onion": "Qasaricha Bombee Diimaa, dheerinni giddugaleessaa hanga guddaatti. Gogee fi jabaatadha.",
+    Tomato: "Xaafii Diimaa Caaccuu Laftii Qorichaa, guutummaatti gabbatee fi cimaadha. Har'a ganama sassaabame.",
+    Garlic: "Qasaricha Adii gogaa. Urgaa fi mi'aa cimaa qaba. Yeroo dheeraa akka turuuf sirriitti to'atame.",
+    "White Maize": "Boqqoolloo adii, qulqullina ol aanaa. Akka gaaritti gogee fi qulqullaa'e.",
+    Wheat: "Qamadii galii guddaa, xaa'oo kana. Gogaa, qulqulluu fi tolfamee kuufame.",
+    Barley: "Garbuu gaarii qulqulluu, nyaata fi dhugaatiif qophii.",
+    "Green Pepper": "Kariyaa haaraa. Gabbatee, dhukkubbii malee fi dheerinni qixa.",
+    Cabbage: "Damma haaraa, jabaatee walitti qabame. Qonnaarraa kallattiidhaan.",
+    Potato: "Dinnicha adii, dheerinni giddugaleessaa qixa. Haaraa baafame, gogee kuufame.",
+    Coffee: "Buna Itoophiyaa sadarkaa 1ffaa, aduudhaan goge fi of eeggannoon sassaabame.",
+    Sesame: "Salxiqi adii Humeeraa baasii alaatiif, cooma ol aanaa qabu.",
+    "Haricot Bean": "Boleqe (Buna dachee) baasii gara alaatti erguuf. Har'oo to'annaan qoodame, qulqulluu.",
+    Papaya: "Papaayyaa mi'awa Baatuu/Meekii. Gogaa laafaa, of eeggannoon qabame.",
+  },
 };
 
-// Reference prices in Birr, used to warn farmers if their listed price
-// is unusually low or high compared to typical market rates.
 export const REFERENCE_PRICES = {
-  Tomato: { kg: 25, quintal: 2500 },
-  Onion: { kg: 30, quintal: 3000 },
-  Maize: { kg: 18, quintal: 1800 },
-  Wheat: { kg: 35, quintal: 3500 },
-  Teff: { kg: 90, quintal: 9000 },
-  "Haricot Bean": { kg: 60, quintal: 6000 },
-  "Green Pepper": { kg: 40, quintal: 4000 },
-  Cabbage: { kg: 15, quintal: 1500 },
-  Potato: { kg: 20, quintal: 2000 },
+  Teff: { kg: 95, quintal: 9500 },
+  "Red Onion": { kg: 45, quintal: 4500 },
+  Tomato: { kg: 38, quintal: 3800 },
   Garlic: { kg: 120, quintal: 12000 },
+  "White Maize": { kg: 22, quintal: 2200 },
+  Wheat: { kg: 41, quintal: 4100 },
+  Barley: { kg: 38, quintal: 3800 },
+  Sorghum: { kg: 25, quintal: 2500 },
+  Millet: { kg: 28, quintal: 2800 },
+  "Green Pepper": { kg: 40, quintal: 4000 },
+  Cabbage: { kg: 18, quintal: 1800 },
+  Potato: { kg: 24, quintal: 2400 },
+  Carrot: { kg: 30, quintal: 3000 },
+  Beetroot: { kg: 28, quintal: 2800 },
+  Coffee: { kg: 220, quintal: 22000 },
+  Sesame: { kg: 140, quintal: 14000 },
+  Lentil: { kg: 85, quintal: 8500 },
+  Chickpea: { kg: 70, quintal: 7000 },
+  "Haricot Bean": { kg: 65, quintal: 6500 },
   Papaya: { kg: 25, quintal: 2500 },
+};
+
+/**
+ * Get localized display name for a crop key
+ */
+export const getLocalizedCropName = (cropKey, lang = "en", t = null) => {
+  if (!cropKey) return "";
+  if (t) {
+    return t(`crops.${cropKey}`, {
+      defaultValue: CROP_TYPES_LOCALIZED[lang]?.[cropKey] || CROP_TYPES_LOCALIZED.en?.[cropKey] || cropKey,
+    });
+  }
+  return (
+    CROP_TYPES_LOCALIZED[lang]?.[cropKey] ||
+    CROP_TYPES_LOCALIZED.en?.[cropKey] ||
+    cropKey
+  );
 };

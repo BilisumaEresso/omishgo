@@ -1,4 +1,5 @@
 // src/components/shared/analytics/DemandForecastCard.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, View } from "react-native";
 import AppText from "../../common/AppText";
@@ -8,6 +9,7 @@ export default function DemandForecastCard({
   primaryColor = "#1565C0",
   cropName = "Red Onion",
 }) {
+  const { t } = useTranslation();
   const isFarmer = role === "farmer";
 
   return (
@@ -20,7 +22,7 @@ export default function DemandForecastCard({
           <AppText style={styles.title}>
             {isFarmer ? "Harvest Sales Intelligence" : "Market Sourcing Intelligence"}
           </AppText>
-          <AppText style={styles.subtitle}>Actionable AI market advisory</AppText>
+          <AppText style={styles.subtitle}>{t("analytics.actionableAdvisory", { defaultValue: "Actionable AI market advisory" })}</AppText>
         </View>
       </View>
 
@@ -32,17 +34,17 @@ export default function DemandForecastCard({
 
       <View style={styles.statRow}>
         <View style={styles.statItem}>
-          <AppText style={styles.statLabel}>7-Day Trend</AppText>
+          <AppText style={styles.statLabel}>{t("analytics.sevenDayTrend", { defaultValue: "7-Day Trend" })}</AppText>
           <AppText style={[styles.statValue, { color: "#16A34A" }]}>+5.8% Surge</AppText>
         </View>
         <View style={styles.divider} />
         <View style={styles.statItem}>
-          <AppText style={styles.statLabel}>Demand Index</AppText>
-          <AppText style={[styles.statValue, { color: primaryColor }]}>High Activity</AppText>
+          <AppText style={styles.statLabel}>{t("analytics.demandIndex", { defaultValue: "Demand Index" })}</AppText>
+          <AppText style={[styles.statValue, { color: primaryColor }]}>{t("analytics.highActivity", { defaultValue: "High Activity" })}</AppText>
         </View>
         <View style={styles.divider} />
         <View style={styles.statItem}>
-          <AppText style={styles.statLabel}>Price Outlook</AppText>
+          <AppText style={styles.statLabel}>{t("analytics.priceOutlook", { defaultValue: "Price Outlook" })}</AppText>
           <AppText style={[styles.statValue, { color: "#D97706" }]}>Bullish</AppText>
         </View>
       </View>

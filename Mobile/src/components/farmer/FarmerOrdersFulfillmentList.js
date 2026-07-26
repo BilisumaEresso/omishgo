@@ -1,7 +1,11 @@
 // src/components/farmer/FarmerOrdersFulfillmentList.js
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
+import { getOrderStatusConfig } from "../../constants/statuses";
+import { getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedUnitName } from "../../constants/units";
 
 export default function FarmerOrdersFulfillmentList({
   orders = [],
@@ -9,39 +13,35 @@ export default function FarmerOrdersFulfillmentList({
   onOrderPress,
   onChatBuyer,
 }) {
-  const statusConfig = {
-    pending: { label: "Pending Dispatch", color: "#D97706", bg: "#FEF3C7" },
-    confirmed: { label: "Confirmed Order", color: "#2563EB", bg: "#EFF6FF" },
-    in_transit: { label: "In Transit", color: "#7C3AED", bg: "#F3E8FF" },
-    delivered: { label: "Delivered", color: "#16A34A", bg: "#DCFCE7" },
-    completed: { label: "Completed", color: "#16A34A", bg: "#DCFCE7" },
-  };
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
 
   return (
     <View style={styles.card}>
       <View style={styles.header}>
         <View>
-          <AppText style={styles.title}>Buyer Orders & Fulfillment Feed</AppText>
-          <AppText style={styles.subtitle}>Direct wholesale purchase requests</AppText>
+          <AppText style={styles.title}>{t("farmerOrders.title", "Buyer Orders & Fulfillment Feed")}</AppText>
+          <AppText style={styles.subtitle}>{t("farmerDashboard.recentOrders", "Direct wholesale purchase requests")}</AppText>
         </View>
 
         <TouchableOpacity onPress={onViewAllOrders} activeOpacity={0.8}>
-          <AppText style={styles.viewAllText}>View All Orders</AppText>
+          <AppText style={styles.viewAllText}>{t("farmerDashboard.viewAll", "View All Orders")}</AppText>
         </TouchableOpacity>
       </View>
 
       {orders.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Ionicons name="basket-outline" size={32} color="#94A3B8" />
-          <AppText style={styles.emptyText}>No recent buyer orders yet</AppText>
+          <AppText style={styles.emptyText}>{t("farmerOrders.emptyNoOrders", "No recent buyer orders yet")}</AppText>
         </View>
       ) : (
         <View style={styles.list}>
           {orders.slice(0, 4).map((o, idx) => {
             const isLast = idx === Math.min(orders.length, 4) - 1;
-            const st = statusConfig[o.status] || { label: o.status, color: "#64748B", bg: "#F1F5F9" };
-            const cropName = o.cropType || "Harvest Crop";
-            const amount = o.totalPrice ? `ETB ${Number(o.totalPrice).toLocaleString()}` : "Pending Quote";
+            const statusConfig = getOrderStatusConfig(o.status, currentLang);
+            const cropName = getLocalizedCropName(o.cropType || "Harvest Crop", currentLang);
+            const unitLabel = getLocalizedUnitName(o.unit || "q", currentLang);
+            const amount = o.totalPrice ? `${Number(o.totalPrice).toLocaleString("en-US")} ETB` : t("farmerProducts.priceUnavailable", "Pending Quote");
 
             return (
               <TouchableOpacity
@@ -53,15 +53,17 @@ export default function FarmerOrdersFulfillmentList({
                 <View style={styles.orderMain}>
                   <View style={styles.topMeta}>
                     <AppText style={styles.cropTitle}>
-                      {cropName} <AppText style={styles.volume}>({o.quantity || 1} {o.unit || "q"})</AppText>
+                      {cropName} <AppText style={styles.volume}>({o.quantity || 1} {unitLabel})</AppText>
                     </AppText>
-                    <View style={[styles.statusBadge, { backgroundColor: st.bg }]}>
-                      <AppText style={[styles.statusBadgeText, { color: st.color }]}>{st.label}</AppText>
+                    <View style={[styles.statusBadge, { backgroundColor: statusConfig.bg }]}>
+                      <AppText style={[styles.statusBadgeText, { color: statusConfig.color }]}>
+                        {statusConfig.displayLabel}
+                      </AppText>
                     </View>
                   </View>
 
                   <AppText style={styles.buyerText}>
-                    Buyer: <AppText style={styles.buyerName}>{o.buyerName || "Wholesale Buyer"}</AppText> • {o.date || "Today"}
+                    {t("buyerOrders.unknownFarmer", "Buyer")}: <AppText style={styles.buyerName}>{o.buyerName || t("farmerOrders.unknownBuyer", "Wholesale Buyer")}</AppText> • {o.date || t("listingDetail.timeToday", "Today")}
                   </AppText>
 
                   <View style={styles.bottomMeta}>
@@ -74,7 +76,7 @@ export default function FarmerOrdersFulfillmentList({
                         activeOpacity={0.85}
                       >
                         <Ionicons name="chatbubble-ellipses" size={14} color="#15803D" />
-                        <AppText style={styles.chatBtnText}>Chat Buyer</AppText>
+                        <AppText style={styles.chatBtnText}>{t("buyerProfile.chatNow", "Chat Buyer")}</AppText>
                       </TouchableOpacity>
                     )}
                   </View>
@@ -100,21 +102,21 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     marginBottom: 14,
   },
   title: {
-    fontSize: 15,
-    fontWeight: "800",
+    fontSize: 16,
+    fontWeight: "700",
     color: "#0F172A",
   },
   subtitle: {
-    fontSize: 11.5,
+    fontSize: 12,
     color: "#64748B",
-    marginTop: 1,
+    marginTop: 2,
   },
   viewAllText: {
-    fontSize: 12.5,
+    fontSize: 13,
     fontWeight: "700",
     color: "#15803D",
   },
@@ -125,22 +127,18 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 13,
-    color: "#94A3B8",
-    fontWeight: "600",
+    color: "#64748B",
   },
-  list: {
-    gap: 10,
-  },
+  list: {},
   row: {
-    backgroundColor: "#F8FAFC",
-    borderRadius: 14,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
+    paddingVertical: 12,
   },
-  rowBorder: {},
+  rowBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9",
+  },
   orderMain: {
-    gap: 4,
+    gap: 6,
   },
   topMeta: {
     flexDirection: "row",
@@ -148,57 +146,55 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cropTitle: {
-    fontSize: 14,
-    fontWeight: "800",
+    fontSize: 15,
+    fontWeight: "700",
     color: "#0F172A",
   },
   volume: {
+    fontSize: 13,
     fontWeight: "600",
-    color: "#475569",
+    color: "#64748B",
   },
   statusBadge: {
     paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingVertical: 4,
     borderRadius: 8,
   },
   statusBadgeText: {
-    fontSize: 10.5,
-    fontWeight: "800",
+    fontSize: 11,
+    fontWeight: "700",
   },
   buyerText: {
     fontSize: 12,
     color: "#64748B",
   },
   buyerName: {
-    fontWeight: "700",
+    fontWeight: "600",
     color: "#334155",
   },
   bottomMeta: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 6,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: "#E2E8F0",
+    marginTop: 4,
   },
   totalPrice: {
-    fontSize: 14,
-    fontWeight: "900",
+    fontSize: 15,
+    fontWeight: "800",
     color: "#15803D",
   },
   chatBtn: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
+    gap: 6,
     backgroundColor: "#DCFCE7",
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 6,
     borderRadius: 10,
   },
   chatBtnText: {
-    fontSize: 11.5,
-    fontWeight: "800",
+    fontSize: 12,
+    fontWeight: "700",
     color: "#15803D",
   },
 });

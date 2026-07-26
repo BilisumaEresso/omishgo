@@ -1,6 +1,7 @@
 // src/screens/auth/RoleSelection.js
 import { useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import AppButton from "../../components/common/AppButton";
 import AppText from "../../components/common/AppText";
 import ScreenWrapper from "../../components/common/ScreenWrapper";
@@ -10,6 +11,7 @@ import { useAuthStore } from "../../store/auth.store";
 
 export default function RoleSelection({ navigation }) {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const [selectedRole, setSelectedRole] = useState(null);
 
   const { requestRole, switchRole } = useAuthStore();
@@ -17,26 +19,26 @@ export default function RoleSelection({ navigation }) {
   const roles = [
     {
       id: ROLES.FARMER,
-      title: "Farmer",
-      desc: "Sell your crops directly to buyers.",
+      title: t("roleSelection.farmerTitle", { defaultValue: "Farmer / Producer" }),
+      desc: t("roleSelection.farmerDesc", { defaultValue: "List harvests and sell directly to commercial buyers" }),
       icon: "🚜",
     },
     {
       id: ROLES.BUYER,
-      title: "Buyer",
-      desc: "Purchase fresh produce seamlessly.",
+      title: t("roleSelection.buyerTitle", { defaultValue: "Wholesale Buyer" }),
+      desc: t("roleSelection.buyerDesc", { defaultValue: "Source crops directly from Ethiopian farmers in bulk" }),
       icon: "🛒",
     },
     {
       id: ROLES.SUPPLIER,
-      title: "Supplier",
-      desc: "Provide equipment and fertilizers.",
+      title: t("roleSelection.supplierTitle", { defaultValue: "Agricultural Supplier" }),
+      desc: t("roleSelection.supplierDesc", { defaultValue: "Supply seeds, fertilizers, and equipment to farmers" }),
       icon: "🏪",
     },
     {
       id: ROLES.DRIVER,
-      title: "Driver",
-      desc: "Manage logistics and deliveries.",
+      title: t("auth.roleDriver", { defaultValue: "Logistics Driver" }),
+      desc: t("auth.roleDriverDesc", { defaultValue: "Manage produce transport and dispatches" }),
       icon: "🚚",
     },
   ];
@@ -45,7 +47,6 @@ export default function RoleSelection({ navigation }) {
     if (!selectedRole) return;
 
     try {
-      // 🌾 FARMER (DEFAULT ROLE - NO REQUEST NEEDED)
       if (selectedRole === ROLES.FARMER) {
         const result = await switchRole("farmer");
 
@@ -59,7 +60,6 @@ export default function RoleSelection({ navigation }) {
         return;
       }
 
-      // 🛒 BUYER OR 🚚 DRIVER (ACTIVE AFTER REQUEST + SWITCH)
       if (selectedRole === ROLES.BUYER || selectedRole === ROLES.DRIVER) {
         const request = await requestRole(selectedRole);
 
@@ -82,13 +82,12 @@ export default function RoleSelection({ navigation }) {
         return;
       }
 
-      // 🏪 SUPPLIER (PENDING APPROVAL FLOW)
       if (selectedRole === ROLES.SUPPLIER) {
         const request = await requestRole("supplier");
 
         if (!request.success) return;
 
-        navigation.navigate("SupplierPending" /* TODO: SupplierPending screen not yet registered */);
+        navigation.navigate("SupplierPending");
 
         return;
       }
@@ -101,7 +100,7 @@ export default function RoleSelection({ navigation }) {
     <ScreenWrapper>
       <View style={styles.container}>
         <AppText variant="headingMd" style={styles.heading}>
-          Choose Your Role
+          {t("roleSelection.title", { defaultValue: "Choose Your Role" })}
         </AppText>
 
         <AppText
@@ -109,7 +108,7 @@ export default function RoleSelection({ navigation }) {
           color={theme?.colors?.textSecondary}
           style={styles.subtext}
         >
-          Select how you want to use OmishGo.
+          {t("roleSelection.subtitle", { defaultValue: "Select how you want to use OmishGo." })}
         </AppText>
 
         <ScrollView contentContainerStyle={styles.list}>
@@ -143,7 +142,7 @@ export default function RoleSelection({ navigation }) {
         </ScrollView>
 
         <AppButton
-          title="Continue"
+          title={t("roleSelection.continueBtn", { defaultValue: "Continue" })}
           disabled={!selectedRole}
           onPress={handleContinue}
           fullWidth
@@ -190,3 +189,4 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+

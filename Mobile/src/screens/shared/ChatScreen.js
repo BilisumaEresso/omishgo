@@ -43,7 +43,7 @@ const SourcingActionCard = ({ data, isMe, onAccept, onReject, role }) => {
         <View style={styles.actionCardIconBg}>
           <Ionicons name="cube" size={14} color="#1565C0" />
         </View>
-        <AppText style={styles.actionCardTitle}>Bulk Sourcing Request</AppText>
+        <AppText style={styles.actionCardTitle}>{t("chat.bulkSourcingReq", { defaultValue: "Bulk Sourcing Request" })}</AppText>
       </View>
 
       <AppText style={styles.actionSpecs}>
@@ -74,14 +74,14 @@ const SourcingActionCard = ({ data, isMe, onAccept, onReject, role }) => {
       {isRejected && (
         <View style={styles.statusPillDeclined}>
           <Ionicons name="close-circle" size={14} color="#EF4444" />
-          <AppText style={styles.statusPillDeclinedText}>Declined / Out of Stock</AppText>
+          <AppText style={styles.statusPillDeclinedText}>{t("chat.declinedOutOfStock", { defaultValue: "Declined / Out of Stock" })}</AppText>
         </View>
       )}
 
       {isMatched && (
         <View style={styles.statusPillMatched}>
           <Ionicons name="bag-check" size={14} color="#1565C0" />
-          <AppText style={styles.statusPillMatchedText}>Matching Harvest Posted</AppText>
+          <AppText style={styles.statusPillMatchedText}>{t("chat.matchingHarvest", { defaultValue: "Matching Harvest Posted" })}</AppText>
         </View>
       )}
     </View>
@@ -434,7 +434,7 @@ export default function ChatScreen({ route, navigation }) {
             {/* Wide Multiline Input Field */}
             <TextInput
               style={[styles.inputField, { color: textPrimary }]}
-              placeholder="Type a message..."
+              placeholder={t("chat.typeMessage", { defaultValue: "Type a message..." })}
               placeholderTextColor={textSecondary}
               value={text}
               onChangeText={setText}

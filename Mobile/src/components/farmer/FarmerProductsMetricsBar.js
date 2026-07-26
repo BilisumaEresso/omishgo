@@ -1,4 +1,5 @@
 // src/components/farmer/FarmerProductsMetricsBar.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../common/AppText";
@@ -10,6 +11,7 @@ export default function FarmerProductsMetricsBar({
   onActivePress,
   onSoldPress,
 }) {
+  const { t } = useTranslation();
   return (
     <View style={styles.metricsRow}>
       {/* Active Market Listings Card */}
@@ -22,14 +24,14 @@ export default function FarmerProductsMetricsBar({
           <View style={[styles.iconBg, { backgroundColor: "#16A34A" }]}>
             <Ionicons name="checkmark-circle" size={16} color="#FFFFFF" />
           </View>
-          <AppText style={styles.badgeLabel}>Live On Market</AppText>
+          <AppText style={styles.badgeLabel}>{t("farmerDashboard.liveOnMarket", { defaultValue: "Live On Market" })}</AppText>
         </View>
 
         <AppText style={[styles.metricValue, { color: "#065F46" }]}>
           {activeListingsCount}
         </AppText>
         <AppText style={[styles.metricLabel, { color: "#047857" }]}>
-          Active Harvest Crops
+          {t("farmerDashboard.activeHarvestCrops", { defaultValue: "Active Harvest Crops" })}
         </AppText>
       </TouchableOpacity>
 
@@ -50,7 +52,7 @@ export default function FarmerProductsMetricsBar({
           {soldOutCount}
         </AppText>
         <AppText style={[styles.metricLabel, { color: "#1D4ED8" }]}>
-          Sold Out Batches
+          {t("farmerDashboard.soldOutBatches", { defaultValue: "Sold Out Batches" })}
         </AppText>
       </TouchableOpacity>
     </View>

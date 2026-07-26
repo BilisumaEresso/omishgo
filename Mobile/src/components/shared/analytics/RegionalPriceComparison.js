@@ -1,4 +1,5 @@
 // src/components/shared/analytics/RegionalPriceComparison.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, View } from "react-native";
 import AppText from "../../common/AppText";
@@ -19,6 +20,7 @@ export default function RegionalPriceComparison({
   const minPriceObj = hubs.reduce((min, h) => (h.rawPrice < min.rawPrice ? h : min), hubs[0]);
 
   const getSupplyBadge = (supply) => {
+  const { t } = useTranslation();
     if (supply === "high") {
       return { label: "High Volume", color: "#16A34A", bg: "#DCFCE7" };
     }
@@ -32,14 +34,14 @@ export default function RegionalPriceComparison({
     <View style={styles.card}>
       <View style={styles.header}>
         <View style={styles.titleRow}>
-          <AppText style={styles.title}>Ethiopian Regional Market Hubs</AppText>
+          <AppText style={styles.title}>{t("analytics.regionalHubs", { defaultValue: "Ethiopian Regional Market Hubs" })}</AppText>
           <View style={styles.hubsBadge}>
             <Ionicons name="earth" size={13} color={primaryColor} />
-            <AppText style={[styles.hubsBadgeText, { color: primaryColor }]}>5 Key Hubs</AppText>
+            <AppText style={[styles.hubsBadgeText, { color: primaryColor }]}>{t("analytics.keyHubs", { defaultValue: "5 Key Hubs" })}</AppText>
           </View>
         </View>
         <AppText style={styles.subtitle}>
-          Wholesale commodity rates per quintal (100 kg) across regional market centers
+          {t("analytics.ratesPerQuintal", { defaultValue: "Wholesale commodity rates per quintal (100 kg) across regional market centers" })}
         </AppText>
       </View>
 
@@ -58,7 +60,7 @@ export default function RegionalPriceComparison({
                   {isHighest && isFarmer && (
                     <View style={styles.recommendTag}>
                       <Ionicons name="sparkles" size={10} color="#15803D" />
-                      <AppText style={styles.recommendTagText}>Best Hub to Sell</AppText>
+                      <AppText style={styles.recommendTagText}>{t("analytics.bestHubToSell", { defaultValue: "Best Hub to Sell" })}</AppText>
                     </View>
                   )}
 

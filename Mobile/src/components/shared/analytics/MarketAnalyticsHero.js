@@ -1,4 +1,5 @@
 // src/components/shared/analytics/MarketAnalyticsHero.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, View } from "react-native";
 import AppText from "../../common/AppText";
@@ -18,6 +19,7 @@ export default function MarketAnalyticsHero({
   primaryColor = "#15803D",
   isFarmer = true,
 }) {
+  const { t } = useTranslation();
   const bgGradient = isFarmer ? "#15803D" : "#1565C0";
   const badgeColor = isFarmer ? "#A7F3D0" : "#BFDBFE";
 
@@ -29,7 +31,7 @@ export default function MarketAnalyticsHero({
           <View style={styles.tagBadge}>
             <Ionicons name="stats-chart" size={13} color={badgeColor} />
             <AppText style={[styles.tagBadgeText, { color: badgeColor }]}>
-              National Commodity Index
+              {t("analytics.nationalCommodityIndex", { defaultValue: "National Commodity Index" })}
             </AppText>
           </View>
           <AppText style={styles.cropTitle}>{commodity.crop}</AppText>

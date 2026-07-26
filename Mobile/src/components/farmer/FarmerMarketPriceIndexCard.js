@@ -1,13 +1,17 @@
-// src/components/farmer/FarmerMarketPriceIndexCard.js
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
+import { getLocalizedCropName } from "../../constants/crops";
 
 export default function FarmerMarketPriceIndexCard({
   trends = [],
   onSeeAllAnalytics,
   onListCropAtRate,
 }) {
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
+
   const defaultTrends = [
     { crop: "Red Onion", region: "Addis Ababa", price: "4,500 ETB/q", demandChange: "+15%", isUp: true },
     { crop: "White Teff", region: "Regional Hub", price: "5,200 ETB/q", demandChange: "+8%", isUp: true },
@@ -24,13 +28,13 @@ export default function FarmerMarketPriceIndexCard({
             <Ionicons name="stats-chart" size={16} color="#15803D" />
           </View>
           <View>
-            <AppText style={styles.title}>Ethiopian Wholesale Price Index</AppText>
-            <AppText style={styles.subtitle}>Real-time commodity demand & hub rates</AppText>
+            <AppText style={styles.title}>{t("farmerDashboard.ethiopianPriceIndex", { defaultValue: "Ethiopian Wholesale Price Index" })}</AppText>
+            <AppText style={styles.subtitle}>{t("analytics.ratesPerQuintal", { defaultValue: "Real-time commodity demand & hub rates" })}</AppText>
           </View>
         </View>
 
         <TouchableOpacity onPress={onSeeAllAnalytics} activeOpacity={0.8}>
-          <AppText style={styles.seeAllText}>Full Market</AppText>
+          <AppText style={styles.seeAllText}>{t("farmerDashboard.fullMarket", { defaultValue: "Full Market" })}</AppText>
         </TouchableOpacity>
       </View>
 
@@ -38,12 +42,13 @@ export default function FarmerMarketPriceIndexCard({
         {list.map((item, idx) => {
           const isLast = idx === list.length - 1;
           const isUp = item.isUp ?? !item.demandChange?.includes("-");
+          const cropName = getLocalizedCropName(item.crop, currentLang, t);
 
           return (
             <View key={item.crop + idx} style={[styles.row, !isLast && styles.rowBorder]}>
               <View style={{ flex: 1 }}>
                 <View style={styles.cropTitleRow}>
-                  <AppText style={styles.cropName}>{item.crop}</AppText>
+                  <AppText style={styles.cropName}>{cropName}</AppText>
                   <View style={[styles.badge, { backgroundColor: isUp ? "#DCFCE7" : "#FEE2E2" }]}>
                     <Ionicons name={isUp ? "trending-up" : "trending-down"} size={12} color={isUp ? "#16A34A" : "#DC2626"} />
                     <AppText style={[styles.badgeText, { color: isUp ? "#16A34A" : "#DC2626" }]}>
@@ -53,7 +58,7 @@ export default function FarmerMarketPriceIndexCard({
                 </View>
 
                 <AppText style={styles.regionText}>
-                  Market Hub: <AppText style={styles.regionVal}>{item.region || "Addis Ababa"}</AppText>
+                  {t("farmerDashboard.marketHub", { defaultValue: "Market Hub:" })} <AppText style={styles.regionVal}>{item.region || "Addis Ababa"}</AppText>
                 </AppText>
               </View>
 
@@ -64,7 +69,7 @@ export default function FarmerMarketPriceIndexCard({
                   onPress={() => onListCropAtRate?.(item)}
                   activeOpacity={0.8}
                 >
-                  <AppText style={styles.listBtnText}>List Harvest</AppText>
+                  <AppText style={styles.listBtnText}>{t("farmerDashboard.listHarvest", { defaultValue: "List Harvest" })}</AppText>
                 </TouchableOpacity>
               </View>
             </View>

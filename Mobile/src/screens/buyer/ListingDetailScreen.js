@@ -42,15 +42,15 @@ export default function ListingDetailScreen({ route, navigation }) {
       <DashboardLayout role="buyer" title="Produce Listing" showBack onBackPress={() => navigation.goBack()}>
         <View style={styles.emptyContainer}>
           <Ionicons name="leaf-outline" size={48} color="#94A3B8" />
-          <AppText style={styles.emptyTitle}>Listing Not Found</AppText>
+          <AppText style={styles.emptyTitle}>{t("listingDetail.listingNotFound", { defaultValue: "Listing Not Found" })}</AppText>
           <AppText style={styles.emptySub}>
-            This produce listing has been removed or is no longer active.
+            {t("listingDetail.listingRemoved", { defaultValue: "This produce listing has been removed or is no longer active." })}
           </AppText>
           <TouchableOpacity
             style={[styles.backBtn, { backgroundColor: primaryColor }]}
             onPress={() => navigation.goBack()}
           >
-            <AppText style={styles.backBtnText}>Go Back</AppText>
+            <AppText style={styles.backBtnText}>{t("listingDetail.goBack", { defaultValue: "Go Back" })}</AppText>
           </TouchableOpacity>
         </View>
       </DashboardLayout>
@@ -125,7 +125,7 @@ export default function ListingDetailScreen({ route, navigation }) {
   return (
     <DashboardLayout
       role="buyer"
-      title="Produce Detail"
+      title={t("listingDetail.screenTitle", { defaultValue: "Produce Detail" })}
       showBack
       onBackPress={() => navigation.goBack()}
     >
@@ -141,7 +141,7 @@ export default function ListingDetailScreen({ route, navigation }) {
               {product.cropType}
             </AppText>
             <AppText style={styles.cropCategory}>
-              Fresh Wholesale Agricultural Produce
+              {t("listingDetail.freshProduce", { defaultValue: "Fresh Wholesale Agricultural Produce" })}
             </AppText>
           </View>
 
@@ -161,7 +161,7 @@ export default function ListingDetailScreen({ route, navigation }) {
         {/* Price Banner */}
         <View style={[styles.priceBanner, { backgroundColor: primaryColor }]}>
           <View>
-            <AppText style={styles.priceLabel}>Wholesale Unit Rate</AppText>
+            <AppText style={styles.priceLabel}>{t("listingDetail.unitRate", { defaultValue: "Wholesale Unit Rate" })}</AppText>
             <AppText style={styles.priceAmount}>
               ETB {Number(product.price).toLocaleString()}{" "}
               <AppText style={styles.priceUnit}>/ {unit}</AppText>
@@ -212,7 +212,7 @@ export default function ListingDetailScreen({ route, navigation }) {
             <AppText style={styles.specVal}>{product.cropType}</AppText>
           </View>
           <View style={styles.specRow}>
-            <AppText style={styles.specKey}>Available Stock</AppText>
+            <AppText style={styles.specKey}>{t("listingDetail.availableStock", { defaultValue: "Available Stock" })}</AppText>
             <AppText style={styles.specVal}>
               {product.quantity} {unit}
             </AppText>

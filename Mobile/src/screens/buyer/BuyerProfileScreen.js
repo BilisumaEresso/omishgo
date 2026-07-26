@@ -55,10 +55,14 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
   }, []);
 
   const handleLogout = () => {
-    Alert.alert("Sign Out", "Are you sure you want to log out of OmishGo?", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Log Out", style: "destructive", onPress: () => logout() },
-    ]);
+    Alert.alert(
+      t("buyerProfile.logoutAlertTitle", "Sign Out"),
+      t("buyerProfile.logoutAlertMessage", "Are you sure you want to log out of OmishGo?"),
+      [
+        { text: t("common.cancel", "Cancel"), style: "cancel" },
+        { text: t("buyerProfile.logoutAlertConfirm", "Log Out"), style: "destructive", onPress: () => logout() },
+      ]
+    );
   };
 
   const handleChangeLanguage = async (code) => {
@@ -70,7 +74,7 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
   };
 
   return (
-    <DashboardLayout role="buyer" title="Buyer Account" showBack={false}>
+    <DashboardLayout role="buyer" title={t("buyerProfile.title", "Buyer Account")} showBack={false}>
       {/* Profile Header Card */}
       <View style={[styles.profileHeaderCard, { backgroundColor: surfaceColor }]}>
         <View style={[styles.avatar, { backgroundColor: primaryColor }]}>
@@ -78,13 +82,13 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
         </View>
 
         <AppText style={[styles.userName, { color: textPrimary }]}>
-          {user?.name || "Wholesale Buyer"}
+          {user?.name || t("buyerProfile.fallbackName", "Wholesale Buyer")}
         </AppText>
 
         <View style={styles.verifiedBadge}>
           <Ionicons name="checkmark-circle" size={14} color={primaryColor} />
           <AppText style={[styles.verifiedText, { color: primaryColor }]}>
-            Verified Procurement Partner
+            {t("buyerProfile.statusVerified", "Verified Procurement Partner")}
           </AppText>
         </View>
 
@@ -97,25 +101,25 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
       <View style={styles.statsRow}>
         <TouchableOpacity
           style={[styles.statBox, { backgroundColor: "#E0F2FE" }]}
-          onPress={() => onSwitchTab?.("Orders")}
+          onPress={() => onSwitchTab?.(t("tabs.orders", { defaultValue: "Orders" }))}
         >
           <AppText style={styles.statNumber}>{ordersCount}</AppText>
-          <AppText style={styles.statLabel}>Orders</AppText>
+          <AppText style={styles.statLabel}>{t("tabs.orders", { defaultValue: "Orders" })}</AppText>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.statBox, { backgroundColor: "#FCE7F3" }]}
-          onPress={() => onSwitchTab?.("Saved")}
+          onPress={() => onSwitchTab?.(t("tabs.saved", { defaultValue: "Saved" }))}
         >
           <AppText style={styles.statNumber}>{savedCount}</AppText>
-          <AppText style={styles.statLabel}>Saved</AppText>
+          <AppText style={styles.statLabel}>{t("tabs.saved", { defaultValue: "Saved" })}</AppText>
         </TouchableOpacity>
 
         <View style={[styles.statBox, { backgroundColor: "#D1FAE5" }]}>
           <AppText style={styles.statNumber}>
-            ETB {Number(totalSpent).toLocaleString()}
+            ETB {Number(totalSpent).toLocaleString("en-US")}
           </AppText>
-          <AppText style={styles.statLabel}>Total Spend</AppText>
+          <AppText style={styles.statLabel}>{t("profile.totalSpend", { defaultValue: "Total Spend" })}</AppText>
         </View>
       </View>
 
@@ -174,8 +178,8 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
               <Ionicons name="stats-chart-outline" size={20} color="#10B981" />
             </View>
             <View>
-              <AppText style={styles.settingTitle}>Market Price Analytics</AppText>
-              <AppText style={styles.settingSub}>View regional crop wholesale price trends</AppText>
+              <AppText style={styles.settingTitle}>{t("profile.priceTrends", { defaultValue: "Market Price Analytics" })}</AppText>
+              <AppText style={styles.settingSub}>{t("profile.viewRegionalTrends", { defaultValue: "View regional crop wholesale price trends" })}</AppText>
             </View>
           </View>
           <Ionicons name="chevron-forward" size={18} color="#64748B" />

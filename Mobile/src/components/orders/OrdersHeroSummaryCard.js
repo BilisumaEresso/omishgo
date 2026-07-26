@@ -1,4 +1,5 @@
 // src/components/orders/OrdersHeroSummaryCard.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, View } from "react-native";
 import AppText from "../common/AppText";
@@ -9,10 +10,13 @@ export default function OrdersHeroSummaryCard({
   role = "farmer",
   currency = "ETB",
 }) {
+  const { t } = useTranslation();
   const isFarmer = role === "farmer";
   const bgGradient = isFarmer ? "#15803D" : "#1565C0";
   const badgeColor = isFarmer ? "#A7F3D0" : "#BFDBFE";
-  const titleText = isFarmer ? "Harvest Sales Orders" : "Produce Procurement Orders";
+  const titleText = isFarmer
+    ? t("farmerOrders.title", { defaultValue: "Harvest Sales Orders" })
+    : t("buyerOrders.title", { defaultValue: "Produce Procurement Orders" });
 
   return (
     <View style={[styles.cardContainer, { backgroundColor: bgGradient }]}>
@@ -21,12 +25,12 @@ export default function OrdersHeroSummaryCard({
           <Ionicons name={isFarmer ? "cube-outline" : "cart-outline"} size={14} color={badgeColor} />
           <AppText style={[styles.badgeText, { color: badgeColor }]}>{titleText}</AppText>
         </View>
-        <AppText style={styles.activeBadgeText}>{activeCount} Active</AppText>
+        <AppText style={styles.activeBadgeText}>{activeCount} {t("statuses.active", { defaultValue: "Active" })}</AppText>
       </View>
 
-      <AppText style={styles.label}>Total Active Orders Value</AppText>
+      <AppText style={styles.label}>{t("orders.totalActiveValue", { defaultValue: "Total Active Orders Value" })}</AppText>
       <AppText style={styles.amountText}>
-        {currency} {Number(totalValue).toLocaleString()}
+        {currency} {Number(totalValue).toLocaleString("en-US")}
       </AppText>
     </View>
   );

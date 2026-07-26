@@ -57,21 +57,21 @@ export default function BuyerSavedScreen({ navigation, onSwitchTab }) {
       {loading && savedProducts.length === 0 ? (
         <View style={styles.centerLoading}>
           <ActivityIndicator size="large" color={primaryColor} />
-          <AppText style={{ marginTop: 8, color: textSecondary }}>Loading bookmarked produce...</AppText>
+          <AppText style={{ marginTop: 8, color: textSecondary }}>{t("saved.loading", { defaultValue: "Loading bookmarked produce..." })}</AppText>
         </View>
       ) : savedProducts.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Ionicons name="bookmark-outline" size={48} color="#94A3B8" />
-          <AppText style={styles.emptyTitle}>No Saved Produce Items</AppText>
+          <AppText style={styles.emptyTitle}>{t("saved.empty", { defaultValue: "No Saved Produce Items" })}</AppText>
           <AppText style={styles.emptySub}>
-            Bookmark wholesale crops from the marketplace to easily compare and order later.
+            {t("saved.emptyDesc", { defaultValue: "Bookmark wholesale crops from the marketplace to easily compare and order later." })}
           </AppText>
           <TouchableOpacity
             style={[styles.browseBtn, { backgroundColor: primaryColor }]}
             onPress={() => onSwitchTab?.("Marketplace")}
             activeOpacity={0.85}
           >
-            <AppText style={styles.browseBtnText}>Browse Produce Marketplace</AppText>
+            <AppText style={styles.browseBtnText}>{t("saved.browseBtn", { defaultValue: "Browse Produce Marketplace" })}</AppText>
           </TouchableOpacity>
         </View>
       ) : (

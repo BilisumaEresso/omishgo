@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 import { useNotificationStore } from "../../store/notification.store";
@@ -178,6 +179,7 @@ const AppHeader = ({
   rightComponent,
 }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const { user, role: authRole } = useAuthStore();
   const insets = useSafeAreaInsets();
   const { unreadCount, fetchNotifications } = useNotificationStore();

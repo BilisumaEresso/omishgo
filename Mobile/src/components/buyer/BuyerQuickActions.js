@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { View, TextInput, TouchableOpacity, StyleSheet, Text } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -9,6 +10,7 @@ export default function BuyerQuickActions({
   onFilterPress,
   suggestions = DEFAULT_SUGGESTIONS
 }) {
+  const { t } = useTranslation();
   const {
     theme
   } = useTheme();

@@ -66,10 +66,14 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
   );
 
   const handleLogout = () => {
-    Alert.alert("Sign Out", "Are you sure you want to log out of your OmishGo producer account?", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Log Out", style: "destructive", onPress: () => logout() },
-    ]);
+    Alert.alert(
+      t("buyerProfile.logoutAlertTitle", "Sign Out"),
+      t("buyerProfile.logoutAlertMessage", "Are you sure you want to log out of your OmishGo producer account?"),
+      [
+        { text: t("common.cancel", "Cancel"), style: "cancel" },
+        { text: t("buyerProfile.logoutAlertConfirm", "Log Out"), style: "destructive", onPress: () => logout() },
+      ]
+    );
   };
 
   const handleChangeLanguage = async (code) => {
@@ -88,7 +92,7 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
   return (
     <DashboardLayout
       role="farmer"
-      title="Producer Account"
+      title={t("farmerProfile.title", "Producer Account")}
       showMenu
       onMenuPress={openSidebar}
       showNotification
@@ -111,7 +115,7 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
         <View style={styles.verifiedBadge}>
           <Ionicons name="shield-checkmark" size={14} color={primaryColor} />
           <AppText style={[styles.verifiedText, { color: primaryColor }]}>
-            Verified Producer Partner
+            {t("profile.verifiedProducer", { defaultValue: "Verified Producer Partner" })}
           </AppText>
         </View>
 
@@ -127,7 +131,7 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
           onPress={() => onSwitchTab?.("Products")}
         >
           <AppText style={styles.statNumber}>{productsCount}</AppText>
-          <AppText style={styles.statLabel}>My Crops</AppText>
+          <AppText style={styles.statLabel}>{t("profile.myCrops", { defaultValue: "My Crops" })}</AppText>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -135,7 +139,7 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
           onPress={() => onSwitchTab?.("Orders")}
         >
           <AppText style={styles.statNumber}>{ordersCount}</AppText>
-          <AppText style={styles.statLabel}>Sales Orders</AppText>
+          <AppText style={styles.statLabel}>{t("profile.salesOrders", { defaultValue: "Sales Orders" })}</AppText>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -143,9 +147,9 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
           onPress={() => navigation?.navigate("MarketAnalytics")}
         >
           <AppText style={styles.statNumber}>
-            ETB {Number(totalRevenue).toLocaleString()}
+            ETB {Number(totalRevenue).toLocaleString("en-US")}
           </AppText>
-          <AppText style={styles.statLabel}>Total Sales</AppText>
+          <AppText style={styles.statLabel}>{t("profile.totalSales", { defaultValue: "Total Sales" })}</AppText>
         </TouchableOpacity>
       </View>
 
@@ -209,7 +213,7 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
               <Ionicons name="stats-chart-outline" size={20} color="#16A34A" />
             </View>
             <View>
-              <AppText style={styles.settingTitle}>Market Price Index</AppText>
+              <AppText style={styles.settingTitle}>{t("profile.marketPriceIndex", { defaultValue: "Market Price Index" })}</AppText>
               <AppText style={styles.settingSub}>View national commodity wholesale rates</AppText>
             </View>
           </View>

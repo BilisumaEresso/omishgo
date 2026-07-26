@@ -1,4 +1,5 @@
 // src/components/farmer/FarmerSalesMetrics.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../common/AppText";
@@ -10,6 +11,7 @@ export default function FarmerSalesMetrics({
   onPendingPress,
   onCompletedPress,
 }) {
+  const { t } = useTranslation();
   return (
     <View style={styles.metricsRow}>
       {/* Pending Dispatch Orders Card */}
@@ -29,7 +31,7 @@ export default function FarmerSalesMetrics({
           {pendingOrdersCount}
         </AppText>
         <AppText style={[styles.metricLabel, { color: "#047857" }]}>
-          Pending Dispatches
+          {t("farmerDashboard.pendingDispatches", { defaultValue: "Pending Dispatches" })}
         </AppText>
       </TouchableOpacity>
 
@@ -50,7 +52,7 @@ export default function FarmerSalesMetrics({
           {completedOrdersCount}
         </AppText>
         <AppText style={[styles.metricLabel, { color: "#1D4ED8" }]}>
-          Delivered Harvests
+          {t("farmerDashboard.deliveredHarvests", { defaultValue: "Delivered Harvests" })}
         </AppText>
       </TouchableOpacity>
     </View>

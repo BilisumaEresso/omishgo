@@ -1,4 +1,5 @@
 // src/components/farmer/FarmerProductsHeroCard.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../common/AppText";
@@ -9,12 +10,13 @@ export default function FarmerProductsHeroCard({
   currency = "ETB",
   onPostHarvest,
 }) {
+  const { t } = useTranslation();
   return (
     <View style={styles.cardContainer}>
       <View style={styles.topRow}>
         <View style={styles.badge}>
           <Ionicons name="leaf" size={14} color="#A7F3D0" />
-          <AppText style={styles.badgeText}>Crop Stock Management</AppText>
+          <AppText style={styles.badgeText}>{t("farmerDashboard.cropStockMgmt", { defaultValue: "Crop Stock Management" })}</AppText>
         </View>
 
         <TouchableOpacity style={styles.actionBtn} onPress={onPostHarvest} activeOpacity={0.85}>
@@ -23,18 +25,18 @@ export default function FarmerProductsHeroCard({
         </TouchableOpacity>
       </View>
 
-      <AppText style={styles.label}>Total Active Harvest Volume</AppText>
+      <AppText style={styles.label}>{t("farmerDashboard.totalActiveVolume", { defaultValue: "Total Active Harvest Volume" })}</AppText>
       <AppText style={styles.amountText}>
-        {totalVolume} <AppText style={styles.unitText}>quintals (q)</AppText>
+        {totalVolume} <AppText style={styles.unitText}>{t("farmerDashboard.quintalsAbbr", { defaultValue: "quintals (q)" })}</AppText>
       </AppText>
 
       <View style={styles.divider} />
 
       <View style={styles.bottomRow}>
         <View>
-          <AppText style={styles.subLabel}>Estimated Total Inventory Value</AppText>
+          <AppText style={styles.subLabel}>{t("farmerDashboard.estimatedValue", { defaultValue: "Estimated Total Inventory Value" })}</AppText>
           <AppText style={styles.subValue}>
-            {currency} {Number(totalValuation).toLocaleString()}
+            {currency} {Number(totalValuation).toLocaleString("en-US")}
           </AppText>
         </View>
       </View>

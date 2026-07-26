@@ -53,10 +53,10 @@ export default function FarmerProfileScreen({ route, navigation }) {
 
   if (loading) {
     return (
-      <DashboardLayout role="buyer" title="Producer Profile" showBack={true}>
+      <DashboardLayout role="buyer" title={t("listingDetail.producerProfile", { defaultValue: "Producer Profile" })} showBack={true}>
         <View style={styles.centerLoading}>
           <ActivityIndicator size="large" color={primaryColor} />
-          <AppText style={{ marginTop: 8, color: textSecondary }}>Loading farm profile...</AppText>
+          <AppText style={{ marginTop: 8, color: textSecondary }}>{t("profile.loadingFarm", { defaultValue: "Loading farm profile..." })}</AppText>
         </View>
       </DashboardLayout>
     );
@@ -64,13 +64,13 @@ export default function FarmerProfileScreen({ route, navigation }) {
 
   if (error || !farmer) {
     return (
-      <DashboardLayout role="buyer" title="Producer Profile" showBack={true}>
+      <DashboardLayout role="buyer" title={t("listingDetail.producerProfile", { defaultValue: "Producer Profile" })} showBack={true}>
         <View style={styles.emptyContainer}>
           <Ionicons name="alert-circle-outline" size={48} color="#94A3B8" />
-          <AppText style={styles.emptyTitle}>Producer Profile Not Found</AppText>
+          <AppText style={styles.emptyTitle}>{t("profile.producerNotFound", { defaultValue: "Producer Profile Not Found" })}</AppText>
           <AppText style={styles.emptySub}>{error || "This farmer profile is unavailable."}</AppText>
           <TouchableOpacity style={[styles.backBtn, { backgroundColor: primaryColor }]} onPress={() => navigation.goBack()}>
-            <AppText style={styles.backBtnText}>Return to Marketplace</AppText>
+            <AppText style={styles.backBtnText}>{t("profile.returnToMarket", { defaultValue: "Return to Marketplace" })}</AppText>
           </TouchableOpacity>
         </View>
       </DashboardLayout>
@@ -92,7 +92,7 @@ export default function FarmerProfileScreen({ route, navigation }) {
         <View style={styles.verifiedBadge}>
           <Ionicons name="checkmark-circle" size={14} color={primaryColor} />
           <AppText style={[styles.verifiedText, { color: primaryColor }]}>
-            Verified Local Producer
+            {t("profile.verifiedProducer", { defaultValue: "Verified Local Producer" })}
           </AppText>
         </View>
 

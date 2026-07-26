@@ -1,7 +1,8 @@
-// src/components/farmer/FarmerMarketOpportunityCard.js
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
+import { getLocalizedCropName } from "../../constants/crops";
 
 export default function FarmerMarketOpportunityCard({
   cropName = "Red Onion",
@@ -10,6 +11,9 @@ export default function FarmerMarketOpportunityCard({
   suggestedPrice = 4500,
   onSellNow,
 }) {
+  const { t, i18n } = useTranslation();
+  const localizedCrop = getLocalizedCropName(cropName, i18n.language, t);
+
   return (
     <View style={styles.card}>
       <View style={styles.headerRow}>
@@ -17,22 +21,22 @@ export default function FarmerMarketOpportunityCard({
           <Ionicons name="trending-up" size={18} color="#D97706" />
         </View>
         <View style={{ flex: 1 }}>
-          <AppText style={styles.title}>High Crop Wholesale Demand Alert</AppText>
+          <AppText style={styles.title}>{t("farmerDashboard.wholesaleDemandAlert", { defaultValue: "High Crop Wholesale Demand Alert" })}</AppText>
           <AppText style={styles.subtitle}>
-            Wholesale demand for <AppText style={styles.highlight}>{cropName}</AppText> is up{" "}
-            <AppText style={styles.changeText}>{demandChange}</AppText> in {targetHub}.
+            {t("farmerDashboard.wholesaleDemandFor", { defaultValue: "Wholesale demand for" })} <AppText style={styles.highlight}>{localizedCrop}</AppText> {t("farmerDashboard.isUp", { defaultValue: "is up" })}{" "}
+            <AppText style={styles.changeText}>{demandChange}</AppText> {t("farmerDashboard.inLocation", { defaultValue: "in" })} {targetHub}.
           </AppText>
         </View>
       </View>
 
       <View style={styles.bottomRow}>
         <View>
-          <AppText style={styles.priceLabel}>Suggested Listing Price</AppText>
-          <AppText style={styles.priceVal}>ETB {Number(suggestedPrice).toLocaleString()} / q</AppText>
+          <AppText style={styles.priceLabel}>{t("farmerDashboard.suggestedPrice", { defaultValue: "Suggested Listing Price" })}</AppText>
+          <AppText style={styles.priceVal}>ETB {Number(suggestedPrice).toLocaleString("en-US")} / {t("units.q", { defaultValue: "q" })}</AppText>
         </View>
 
         <TouchableOpacity style={styles.sellBtn} onPress={onSellNow} activeOpacity={0.85}>
-          <AppText style={styles.sellBtnText}>List Harvest Now</AppText>
+          <AppText style={styles.sellBtnText}>{t("farmerDashboard.listHarvestNow", { defaultValue: "List Harvest Now" })}</AppText>
           <Ionicons name="arrow-forward" size={14} color="#FFFFFF" />
         </TouchableOpacity>
       </View>

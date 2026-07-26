@@ -1,4 +1,5 @@
 // src/components/farmer/FarmerActionHub.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../common/AppText";
@@ -11,6 +12,7 @@ export default function FarmerActionHub({
   onDraftsPress,
   onAnalyticsPress,
 }) {
+  const { t } = useTranslation();
   const actions = [
     {
       id: "messages",

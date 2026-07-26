@@ -1,10 +1,12 @@
 // src/screens/role/RoleSelectionModal.js
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { View, Modal, StyleSheet } from "react-native";
 import AppButton from "../../components/common/AppButton";
 import AppText from "../../components/common/AppText";
 import { useAuthStore } from "../../store/auth.store";
 const RoleSelectionModal = () => {
+  const { t } = useTranslation();
   const {
     requestRole,
     switchRole,
@@ -22,9 +24,9 @@ const RoleSelectionModal = () => {
   };
   return <Modal visible={true} transparent>
       <View style={styles.container}>
-        <AppText variant="headingMd">Choose your Role</AppText>
-        <AppButton title="Buyer" onPress={() => handleSelect("buyer")} loading={isLoading} />
-        <AppButton title="Supplier" onPress={() => handleSelect("supplier")} loading={isLoading} />
+        <AppText variant="headingMd">{t("roleSelection.title", { defaultValue: "Choose your Role" })}</AppText>
+        <AppButton title={t("roleSelection.buyerTitle", { defaultValue: "Buyer" })} onPress={() => handleSelect("buyer")} loading={isLoading} />
+        <AppButton title={t("roleSelection.supplierTitle", { defaultValue: "Supplier" })} onPress={() => handleSelect("supplier")} loading={isLoading} />
         {error && <AppText style={{
         color: "red"
       }}>{error}</AppText>}

@@ -1,9 +1,11 @@
 // src/components/farmer/FarmerRevenueChartWidget.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, View } from "react-native";
 import AppText from "../common/AppText";
 
 export default function FarmerRevenueChartWidget({ currency = "ETB" }) {
+  const { t } = useTranslation();
   const chartData = [
     { month: "Jan", heightPct: 40, value: "14K" },
     { month: "Feb", heightPct: 65, value: "28K" },
@@ -17,8 +19,8 @@ export default function FarmerRevenueChartWidget({ currency = "ETB" }) {
     <View style={styles.card}>
       <View style={styles.header}>
         <View>
-          <AppText style={styles.title}>Monthly Harvest Sales Trend</AppText>
-          <AppText style={styles.subtitle}>Revenue trajectory over past 6 months</AppText>
+          <AppText style={styles.title}>{t("farmerDashboard.monthlySalesTrend", { defaultValue: "Monthly Harvest Sales Trend" })}</AppText>
+          <AppText style={styles.subtitle}>{t("farmerDashboard.revenueTrajectory", { defaultValue: "Revenue trajectory over past 6 months" })}</AppText>
         </View>
 
         <View style={styles.trendBadge}>

@@ -1,8 +1,11 @@
 // src/components/common/ProductCard.js
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import AppButton from "./AppButton";
 import AppText from "./AppText";
+import { getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedUnitName } from "../../constants/units";
 
 export const ProductCard = ({
   product,
@@ -11,6 +14,9 @@ export const ProductCard = ({
   isSaved,
   onToggleSave,
 }) => {
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
+
   const farmer = product.farmerId || {};
   const loc = product.location || {};
 
@@ -21,10 +27,14 @@ export const ProductCard = ({
   const textSecondary = theme?.colors?.textSecondary || "#64748B";
   const border = theme?.colors?.border || "#E2E8F0";
 
-  const unit = product.unit || "q";
+  const rawUnit = product.unit || "q";
+  const localizedUnit = getLocalizedUnitName(rawUnit, currentLang);
+  const rawCrop = product.cropType || product.name || "Harvest Crop";
+  const localizedCrop = getLocalizedCropName(rawCrop, currentLang);
+
   const formattedPrice = product.price
-    ? `ETB ${Number(product.price).toLocaleString()} / ${unit}`
-    : "Price on Request";
+    ? `${Number(product.price).toLocaleString("en-US")} ETB / ${localizedUnit}`
+    : t("farmerProducts.priceUnavailable", "Price on Request");
 
   return (
     <View
@@ -40,12 +50,12 @@ export const ProductCard = ({
       <View style={styles.cardHeader}>
         <View style={styles.cropTitleWrap}>
           <AppText style={[styles.cropTitle, { color: textPrimary }]}>
-            {product.cropType || product.name || "Agricultural Produce"}
+            {localizedCrop}
           </AppText>
           <View style={styles.verifiedRow}>
             <Ionicons name="checkmark-circle" size={14} color={primary} />
             <AppText style={[styles.verifiedText, { color: primary }]}>
-              Verified Producer
+              {t("buyerProfile.statusVerified", "Verified Producer")}
             </AppText>
           </View>
         </View>
@@ -66,7 +76,7 @@ export const ProductCard = ({
       {/* Pricing & Stock Row */}
       <View style={styles.pricingRow}>
         <View>
-          <AppText style={styles.priceLabel}>Wholesale Price</AppText>
+          <AppText style={styles.priceLabel}>{t("browse.avgPrice", "Wholesale Price")}</AppText>
           <AppText style={[styles.priceValue, { color: primary }]}>
             {formattedPrice}
           </AppText>
@@ -74,7 +84,9 @@ export const ProductCard = ({
 
         <View style={[styles.stockBadge, { backgroundColor: primaryCont }]}>
           <AppText style={[styles.stockText, { color: primary }]}>
-            {product.quantity ? `${product.quantity} ${unit} in stock` : "Available"}
+            {product.quantity
+              ? `${product.quantity} ${localizedUnit} ${t("listingDetail.statusActive", "in stock")}`
+              : t("statuses.active", "Available")}
           </AppText>
         </View>
       </View>
@@ -102,7 +114,7 @@ export const ProductCard = ({
 
       {/* Action Button */}
       <AppButton
-        title="View Produce Details"
+        title={t("buyerSaved.viewListing", "View Produce Details")}
         variant="outline"
         onPress={() => onView(product)}
         style={styles.viewBtn}

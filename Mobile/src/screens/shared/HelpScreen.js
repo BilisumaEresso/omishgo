@@ -78,7 +78,7 @@ export default function HelpScreen({ navigation }) {
             {t("helpScreen.sendMessage")}
           </AppText>
           <AppText style={[styles.contactCardSub, { color: textSecondary }]}>
-            Direct message to admin
+            {t("help.directAdmin", { defaultValue: "Direct message to admin" })}
           </AppText>
         </TouchableOpacity>
       </View>

@@ -16,17 +16,21 @@ import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 
+import { getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedUnitName } from "../../constants/units";
+
 const STATUS_CONFIG = {
-  pending:   { bg: "#FEF3C7", text: "#B45309", icon: "time-outline",            label: "PENDING CONFIRMATION" },
-  confirmed: { bg: "#E0F2FE", text: "#0284C7", icon: "checkmark-circle-outline", label: "CONFIRMED & PREPARING" },
-  in_transit:{ bg: "#EFF6FF", text: "#1D4ED8", icon: "car-outline",             label: "IN TRANSIT TO BUYER" },
-  delivered: { bg: "#ECFDF5", text: "#059669", icon: "bag-check-outline",        label: "DELIVERED & COMPLETED" },
-  completed: { bg: "#ECFDF5", text: "#059669", icon: "checkmark-done-outline",   label: "COMPLETED" },
-  cancelled: { bg: "#FEF2F2", text: "#DC2626", icon: "close-circle-outline",     label: "CANCELLED ORDER" },
+  pending:   { bg: "#FEF3C7", text: "#B45309", icon: "time-outline",            labelKey: "buyerOrders.statusPending" },
+  confirmed: { bg: "#E0F2FE", text: "#0284C7", icon: "checkmark-circle-outline", labelKey: "buyerOrders.statusConfirmed" },
+  in_transit:{ bg: "#EFF6FF", text: "#1D4ED8", icon: "car-outline",             labelKey: "buyerOrders.statusInTransit" },
+  delivered: { bg: "#ECFDF5", text: "#059669", icon: "bag-check-outline",        labelKey: "buyerOrders.statusDelivered" },
+  completed: { bg: "#ECFDF5", text: "#059669", icon: "checkmark-done-outline",   labelKey: "statuses.completed" },
+  cancelled: { bg: "#FEF2F2", text: "#DC2626", icon: "close-circle-outline",     labelKey: "buyerOrders.statusCancelled" },
 };
 
 export default function OrderDetailScreen({ route, navigation }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
   const { theme } = useTheme();
   const { order: initialOrder, role } = route.params || {};
 
@@ -40,10 +44,12 @@ export default function OrderDetailScreen({ route, navigation }) {
 
   if (!order) {
     return (
-      <DashboardLayout role="buyer" title="Order Detail" showBack onBackPress={() => navigation.goBack()}>
+      <DashboardLayout role="buyer" title={t("orderDetail.screenTitle", { defaultValue: "Order Detail" })} showBack onBackPress={() => navigation.goBack()}>
         <View style={styles.centered}>
           <Ionicons name="receipt-outline" size={48} color="#94A3B8" />
-          <AppText style={{ color: textSecondary, marginTop: 12, fontSize: 15 }}>Order details not found.</AppText>
+          <AppText style={{ color: textSecondary, marginTop: 12, fontSize: 15 }}>
+            {t("orderDetail.orderNotFound", { defaultValue: "Order details not found." })}
+          </AppText>
         </View>
       </DashboardLayout>
     );
@@ -56,6 +62,7 @@ export default function OrderDetailScreen({ route, navigation }) {
   const totalPrice = order.totalPrice ?? quantity * pricePerUnit;
   const rawStatus = order.status || "pending";
   const statusStyle = STATUS_CONFIG[rawStatus] || STATUS_CONFIG.pending;
+  const statusLabel = t(statusStyle.labelKey, { defaultValue: rawStatus.toUpperCase() });
 
   const date = order.createdAt
     ? new Date(order.createdAt).toLocaleDateString("en-GB", {
@@ -65,25 +72,25 @@ export default function OrderDetailScreen({ route, navigation }) {
       })
     : "Recently";
 
-  const buyerName = order.buyerId?.name || order.buyerName || "Wholesale Buyer";
+  const buyerName = order.buyerId?.name || order.buyerName || t("orders.wholesaleBuyer", { defaultValue: "Wholesale Buyer" });
   const buyerPhone = order.buyerId?.phone || order.buyerPhone || null;
-  const farmerName = order.farmerId?.name || order.farmerName || "Verified Local Producer";
+  const farmerName = order.farmerId?.name || order.farmerName || t("profile.verifiedProducer", { defaultValue: "Verified Local Producer" });
   const farmerPhone = order.farmerId?.phone || order.farmerPhone || null;
   const farmerId = order.farmerId?._id || order.farmerId;
 
   const handleCall = (phone) => {
     if (!phone) {
-      Alert.alert("Phone Unavailable", "No contact phone number provided.");
+      Alert.alert(t("chat.phoneUnavailable", "Phone Unavailable"), t("chat.noPhoneProvided", "No contact phone number provided."));
       return;
     }
-    Linking.openURL(`tel:${phone}`).catch(() => Alert.alert("Error", "Could not open dialer"));
+    Linking.openURL(`tel:${phone}`).catch(() => Alert.alert(t("errorMessage.title", "Error"), t("chat.couldNotDial", "Could not open dialer")));
   };
 
   const handleMessagePartner = () => {
     const partnerId = role === "farmer" ? order.buyerId?._id || order.buyerId : farmerId;
     const partnerName = role === "farmer" ? buyerName : farmerName;
     if (!partnerId) {
-      Alert.alert("Messaging Unavailable", "Cannot open chat for this partner.");
+      Alert.alert(t("chat.messagingUnavailable", "Messaging Unavailable"), t("chat.cannotOpenChat", "Cannot open chat for this partner."));
       return;
     }
     navigation.navigate("Chat", { userId: partnerId, userName: partnerName });
@@ -91,9 +98,9 @@ export default function OrderDetailScreen({ route, navigation }) {
 
   const handleUpdateStatus = async (newStatus) => {
     if (newStatus === "cancelled") {
-      Alert.alert("Cancel Order", "Are you sure you want to cancel this order?", [
-        { text: "No", style: "cancel" },
-        { text: "Yes, Cancel", style: "destructive", onPress: () => doUpdate(newStatus) },
+      Alert.alert(t("orderDetail.cancelOrderTitle", "Cancel Order"), t("orderDetail.cancelOrderConfirm", "Are you sure you want to cancel this order?"), [
+        { text: t("buyerSaved.cancel", "No"), style: "cancel" },
+        { text: t("common.yesCancel", "Yes, Cancel"), style: "destructive", onPress: () => doUpdate(newStatus) },
       ]);
     } else {
       doUpdate(newStatus);
@@ -106,9 +113,9 @@ export default function OrderDetailScreen({ route, navigation }) {
       const res = await api.patch(API_ENDPOINTS.orders.updateStatus(order._id), { status: newStatus });
       const updated = res.data?.data?.order;
       if (updated) setOrder(updated);
-      Alert.alert("Status Updated", `Order status changed to ${newStatus.toUpperCase()}`);
+      Alert.alert(t("orderDetail.statusUpdated", "Status Updated"), `${t("orderDetail.statusChangedTo", "Order status changed to")} ${newStatus.toUpperCase()}`);
     } catch (err) {
-      Alert.alert("Update Error", err?.response?.data?.message || "Failed to update order status.");
+      Alert.alert(t("errorMessage.title", "Update Error"), err?.response?.data?.message || t("orderDetail.failedUpdate", "Failed to update order status."));
     } finally {
       setUpdating(false);
     }
@@ -117,7 +124,7 @@ export default function OrderDetailScreen({ route, navigation }) {
   return (
     <DashboardLayout
       role={role || "buyer"}
-      title="Order Specification"
+      title={t("orderDetail.screenTitle", { defaultValue: "Order Specification" })}
       showBack
       onBackPress={() => navigation.goBack()}
     >
@@ -125,30 +132,32 @@ export default function OrderDetailScreen({ route, navigation }) {
       <View style={[styles.statusBanner, { backgroundColor: statusStyle.bg }]}>
         <Ionicons name={statusStyle.icon} size={18} color={statusStyle.text} />
         <AppText style={[styles.statusBannerText, { color: statusStyle.text }]}>
-          {statusStyle.label}
+          {statusLabel}
         </AppText>
       </View>
 
       {/* Order Date */}
-      <AppText style={styles.orderDate}>Placed on {date}</AppText>
+      <AppText style={styles.orderDate}>{t("orderDetail.placedOn", { defaultValue: "Placed on" })} {date}</AppText>
 
       {/* Product Details Card */}
       <View style={[styles.card, { backgroundColor: surfaceColor }]}>
-        <AppText style={[styles.cardTitle, { color: textPrimary }]}>Harvest Order Details</AppText>
+        <AppText style={[styles.cardTitle, { color: textPrimary }]}>
+          {t("orderDetail.productInfo", { defaultValue: "Harvest Order Details" })}
+        </AppText>
         <View style={styles.infoRow}>
-          <AppText style={styles.infoLabel}>Crop Type</AppText>
-          <AppText style={styles.infoVal}>{cropType}</AppText>
+          <AppText style={styles.infoLabel}>{t("orderDetail.cropType", { defaultValue: "Crop Type" })}</AppText>
+          <AppText style={styles.infoVal}>{getLocalizedCropName(cropType, currentLang, t)}</AppText>
         </View>
         <View style={styles.infoRow}>
-          <AppText style={styles.infoLabel}>Order Volume</AppText>
-          <AppText style={styles.infoVal}>{quantity} {unit}</AppText>
+          <AppText style={styles.infoLabel}>{t("orderDetail.quantity", { defaultValue: "Order Volume" })}</AppText>
+          <AppText style={styles.infoVal}>{quantity} {getLocalizedUnitName(unit, currentLang, t)}</AppText>
         </View>
         <View style={styles.infoRow}>
-          <AppText style={styles.infoLabel}>Price per Quintal</AppText>
+          <AppText style={styles.infoLabel}>{t("orderDetail.unitPrice", { defaultValue: "Price per Quintal" })}</AppText>
           <AppText style={styles.infoVal}>ETB {Number(pricePerUnit).toLocaleString()}</AppText>
         </View>
         <View style={styles.totalRow}>
-          <AppText style={styles.totalLabel}>Total Wholesale Amount</AppText>
+          <AppText style={styles.totalLabel}>{t("orderDetail.totalPrice", { defaultValue: "Total Wholesale Amount" })}</AppText>
           <AppText style={[styles.totalAmount, { color: primaryColor }]}>
             ETB {Number(totalPrice).toLocaleString()}
           </AppText>
@@ -158,7 +167,7 @@ export default function OrderDetailScreen({ route, navigation }) {
       {/* Partner Info Card */}
       <View style={[styles.card, { backgroundColor: surfaceColor }]}>
         <AppText style={[styles.cardTitle, { color: textPrimary }]}>
-          {role === "farmer" ? "Buyer Contact" : "Producer Contact"}
+          {role === "farmer" ? t("orderDetail.buyerContact", { defaultValue: "Buyer Contact" }) : t("orderDetail.producerContact", { defaultValue: "Producer Contact" })}
         </AppText>
         <View style={styles.partnerRow}>
           <View style={[styles.partnerAvatar, { backgroundColor: primaryColor }]}>
@@ -171,7 +180,7 @@ export default function OrderDetailScreen({ route, navigation }) {
             <View style={styles.verifiedRow}>
               <Ionicons name="checkmark-circle" size={13} color={primaryColor} />
               <AppText style={[styles.verifiedLabel, { color: primaryColor }]}>
-                {role === "farmer" ? "Registered Wholesale Buyer" : "Verified Farmer Producer"}
+                {role === "farmer" ? t("roleSelection.buyerTitle", { defaultValue: "Registered Wholesale Buyer" }) : t("profile.verifiedProducer", { defaultValue: "Verified Farmer Producer" })}
               </AppText>
             </View>
           </View>
@@ -183,7 +192,7 @@ export default function OrderDetailScreen({ route, navigation }) {
             activeOpacity={0.8}
           >
             <Ionicons name="chatbubble-ellipses-outline" size={16} color={primaryColor} />
-            <AppText style={[styles.contactBtnText, { color: primaryColor }]}>Message</AppText>
+            <AppText style={[styles.contactBtnText, { color: primaryColor }]}>{t("common.message", { defaultValue: "Message" })}</AppText>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.contactBtn, { borderColor: "#64748B" }]}
@@ -191,7 +200,7 @@ export default function OrderDetailScreen({ route, navigation }) {
             activeOpacity={0.8}
           >
             <Ionicons name="call-outline" size={16} color="#64748B" />
-            <AppText style={[styles.contactBtnText, { color: "#64748B" }]}>Call</AppText>
+            <AppText style={[styles.contactBtnText, { color: "#64748B" }]}>{t("common.call", { defaultValue: "Call" })}</AppText>
           </TouchableOpacity>
         </View>
       </View>
@@ -205,7 +214,7 @@ export default function OrderDetailScreen({ route, navigation }) {
           activeOpacity={0.85}
         >
           <AppText style={styles.primaryActionText}>
-            {updating ? "Updating..." : "Accept & Confirm Harvest Order"}
+            {updating ? t("common.loading", "Updating...") : t("orderDetail.acceptOrder", { defaultValue: "Accept & Confirm Harvest Order" })}
           </AppText>
         </TouchableOpacity>
       )}
@@ -217,7 +226,7 @@ export default function OrderDetailScreen({ route, navigation }) {
           activeOpacity={0.85}
         >
           <AppText style={styles.primaryActionText}>
-            {updating ? "Updating..." : "Dispatch Shipment (In Transit)"}
+            {updating ? t("common.loading", "Updating...") : t("orderDetail.dispatchShipment", { defaultValue: "Dispatch Shipment (In Transit)" })}
           </AppText>
         </TouchableOpacity>
       )}
@@ -229,7 +238,7 @@ export default function OrderDetailScreen({ route, navigation }) {
           activeOpacity={0.85}
         >
           <AppText style={styles.primaryActionText}>
-            {updating ? "Updating..." : "Mark Order Delivered"}
+            {updating ? t("common.loading", "Updating...") : t("orderDetail.markDelivered", { defaultValue: "Mark Order Delivered" })}
           </AppText>
         </TouchableOpacity>
       )}
@@ -242,7 +251,7 @@ export default function OrderDetailScreen({ route, navigation }) {
           disabled={updating}
           activeOpacity={0.85}
         >
-          <AppText style={styles.cancelActionText}>Cancel Wholesale Order</AppText>
+          <AppText style={styles.cancelActionText}>{t("orderDetail.cancelOrder", { defaultValue: "Cancel Wholesale Order" })}</AppText>
         </TouchableOpacity>
       )}
 
