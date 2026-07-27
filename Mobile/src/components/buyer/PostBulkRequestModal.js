@@ -11,12 +11,14 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
+import { CROP_TYPES, getLocalizedCropName } from "../../constants/crops";
 import { useTheme } from "../../hooks/useTheme";
 import AppText from "../common/AppText";
 
-const CROPS = ["Red Onion", "White Teff", "Tomato", "Garlic", "Wheat", "Coffee Beans"];
+const CROPS = CROP_TYPES;
 
 export default function PostBulkRequestModal({
   visible,
@@ -24,6 +26,7 @@ export default function PostBulkRequestModal({
   initialCrop = "Red Onion",
   onSuccess,
 }) {
+  const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const primaryColor = theme?.colors?.primary || "#1565C0";
@@ -43,7 +46,7 @@ export default function PostBulkRequestModal({
 
   const handleSubmit = async () => {
     if (!cropType || !quantity || !targetPrice || !deliveryRegion) {
-      setErrorMsg("Please fill in all required fields (crop, quantity, price, delivery region)");
+      setErrorMsg(t("sourcing.fillAllFields", { defaultValue: "Please fill in all required fields (crop, quantity, price, delivery region)" }));
       return;
     }
 
@@ -69,18 +72,18 @@ export default function PostBulkRequestModal({
 
       if (data.success) {
         const notifiedCount = data.data?.notifiedCount || 0;
-        setSuccessResult(`Request created! ${notifiedCount} matching farmers notified in chat.`);
+        setSuccessResult(t("sourcing.requestCreatedMsg", { count: notifiedCount, defaultValue: `Request created! ${notifiedCount} matching farmers notified in chat.` }));
         setTimeout(() => {
           setSuccessResult(null);
           onSuccess && onSuccess(data.data?.request);
           onClose();
         }, 1800);
       } else {
-        setErrorMsg(data.message || "Failed to submit request");
+        setErrorMsg(data.message || t("sourcing.failedSubmit", { defaultValue: "Failed to submit request" }));
       }
     } catch (err) {
       console.warn("PostBulkRequest error:", err.message);
-      setErrorMsg(err.response?.data?.message || err.message || "Network request error");
+      setErrorMsg(err.response?.data?.message || err.message || t("sourcing.networkError", { defaultValue: "Network request error" }));
     } finally {
       setLoading(false);
     }
@@ -106,8 +109,8 @@ export default function PostBulkRequestModal({
           {/* Header */}
           <View style={styles.header}>
             <View>
-              <AppText style={styles.title}>Post Bulk Sourcing Request</AppText>
-              <AppText style={styles.subtitle}>Broadcast your requirements directly to local farmers</AppText>
+              <AppText style={styles.title}>{t("buyerDashboard.postBulkRequest", { defaultValue: "Post Bulk Sourcing Request" })}</AppText>
+              <AppText style={styles.subtitle}>{t("sourcing.broadcastSub", { defaultValue: "Broadcast your requirements directly to local farmers" })}</AppText>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
               <Ionicons name="close" size={22} color="#64748B" />
@@ -131,7 +134,7 @@ export default function PostBulkRequestModal({
 
             {/* Crop Selector */}
             <View style={styles.fieldGroup}>
-              <AppText style={styles.fieldLabel}>Commodity Crop *</AppText>
+              <AppText style={styles.fieldLabel}>{t("sourcing.commodityCropLabel", { defaultValue: "Commodity Crop *" })}</AppText>
               <View style={styles.cropPillRow}>
                 {CROPS.map((c) => {
                   const active = c === cropType;
@@ -146,7 +149,7 @@ export default function PostBulkRequestModal({
                       activeOpacity={0.8}
                     >
                       <AppText style={[styles.cropPillText, active && styles.activeCropText]}>
-                        {c}
+                        {getLocalizedCropName(c, i18n.language || "en", t)}
                       </AppText>
                     </TouchableOpacity>
                   );
@@ -157,7 +160,7 @@ export default function PostBulkRequestModal({
             {/* Quantity & Target Price */}
             <View style={styles.rowFields}>
               <View style={[styles.fieldGroup, { flex: 1 }]}>
-                <AppText style={styles.fieldLabel}>Quantity (Quintals `q`) *</AppText>
+                <AppText style={styles.fieldLabel}>{t("sourcing.quantityLabel", { defaultValue: "Quantity (Quintals `q`) *" })}</AppText>
                 <TextInput
                   style={styles.input}
                   keyboardType="numeric"
@@ -169,7 +172,7 @@ export default function PostBulkRequestModal({
               </View>
 
               <View style={[styles.fieldGroup, { flex: 1 }]}>
-                <AppText style={styles.fieldLabel}>Target Price (ETB / q) *</AppText>
+                <AppText style={styles.fieldLabel}>{t("sourcing.targetPriceLabel", { defaultValue: "Target Price (ETB / q) *" })}</AppText>
                 <TextInput
                   style={styles.input}
                   keyboardType="numeric"
@@ -183,31 +186,31 @@ export default function PostBulkRequestModal({
 
             {/* Delivery Destination */}
             <View style={styles.fieldGroup}>
-              <AppText style={styles.fieldLabel}>Delivery Destination / Market Hub *</AppText>
+              <AppText style={styles.fieldLabel}>{t("sourcing.deliveryDestLabel", { defaultValue: "Delivery Destination / Market Hub *" })}</AppText>
               <TextInput
                 style={styles.input}
                 value={deliveryRegion}
                 onChangeText={setDeliveryRegion}
-                placeholder="e.g. Addis Ababa Mercato, Adama Hub"
+                placeholder={t("sourcing.deliveryPlaceholder", { defaultValue: "e.g. Addis Ababa Mercato, Adama Hub" })}
                 placeholderTextColor="#94A3B8"
               />
             </View>
 
             {/* Farmer Criteria / Region */}
             <View style={styles.fieldGroup}>
-              <AppText style={styles.fieldLabel}>Target Farmer Region (Optional)</AppText>
+              <AppText style={styles.fieldLabel}>{t("sourcing.farmerRegionLabel", { defaultValue: "Target Farmer Region (Optional)" })}</AppText>
               <TextInput
                 style={styles.input}
                 value={farmerRegion}
                 onChangeText={setFarmerRegion}
-                placeholder="e.g. Oromia, East Shewa"
+                placeholder={t("sourcing.farmerRegionPlaceholder", { defaultValue: "e.g. Oromia, East Shewa" })}
                 placeholderTextColor="#94A3B8"
               />
             </View>
 
             {/* Special Instructions */}
             <View style={styles.fieldGroup}>
-              <AppText style={styles.fieldLabel}>Special Requirements / Notes</AppText>
+              <AppText style={styles.fieldLabel}>{t("sourcing.notesLabel", { defaultValue: "Special Requirements / Notes" })}</AppText>
               <TextInput
                 style={[styles.input, styles.multilineInput]}
                 multiline
@@ -233,7 +236,7 @@ export default function PostBulkRequestModal({
               ) : (
                 <>
                   <Ionicons name="send" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
-                  <AppText style={styles.submitBtnText}>Broadcast Sourcing Request to Farmers</AppText>
+                  <AppText style={styles.submitBtnText}>{t("sourcing.broadcastBtn", { defaultValue: "Broadcast Sourcing Request to Farmers" })}</AppText>
                 </>
               )}
             </TouchableOpacity>

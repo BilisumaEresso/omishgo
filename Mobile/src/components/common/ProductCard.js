@@ -7,6 +7,8 @@ import AppText from "./AppText";
 import { getLocalizedCropName } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
 
+import { getLocalizedWeredaName, getLocalizedZoneName, getLocalizedRegionName } from "../../constants/locations";
+
 export const ProductCard = ({
   product,
   onView,
@@ -32,9 +34,13 @@ export const ProductCard = ({
   const rawCrop = product.cropType || product.name || "Harvest Crop";
   const localizedCrop = getLocalizedCropName(rawCrop, currentLang);
 
+  const localizedWereda = getLocalizedWeredaName(loc.wereda, currentLang);
+  const localizedZone = getLocalizedZoneName(loc.zone, currentLang);
+  const localizedRegion = getLocalizedRegionName(loc.region, currentLang);
+
   const formattedPrice = product.price
     ? `${Number(product.price).toLocaleString("en-US")} ETB / ${localizedUnit}`
-    : t("farmerProducts.priceUnavailable", "Price on Request");
+    : t("farmerProducts.priceUnavailable", { defaultValue: "Price on Request" });
 
   return (
     <View
@@ -55,7 +61,7 @@ export const ProductCard = ({
           <View style={styles.verifiedRow}>
             <Ionicons name="checkmark-circle" size={14} color={primary} />
             <AppText style={[styles.verifiedText, { color: primary }]}>
-              {t("buyerProfile.statusVerified", "Verified Producer")}
+              {t("buyerProfile.statusVerified", { defaultValue: "Verified Producer" })}
             </AppText>
           </View>
         </View>
@@ -76,7 +82,7 @@ export const ProductCard = ({
       {/* Pricing & Stock Row */}
       <View style={styles.pricingRow}>
         <View>
-          <AppText style={styles.priceLabel}>{t("browse.avgPrice", "Wholesale Price")}</AppText>
+          <AppText style={styles.priceLabel}>{t("browse.avgPrice", { defaultValue: "Wholesale Price" })}</AppText>
           <AppText style={[styles.priceValue, { color: primary }]}>
             {formattedPrice}
           </AppText>
@@ -85,19 +91,19 @@ export const ProductCard = ({
         <View style={[styles.stockBadge, { backgroundColor: primaryCont }]}>
           <AppText style={[styles.stockText, { color: primary }]}>
             {product.quantity
-              ? `${product.quantity} ${localizedUnit} ${t("listingDetail.statusActive", "in stock")}`
-              : t("statuses.active", "Available")}
+              ? `${product.quantity} ${localizedUnit} ${t("listingDetail.statusActive", { defaultValue: "in stock" })}`
+              : t("statuses.active", { defaultValue: "Available" })}
           </AppText>
         </View>
       </View>
 
       {/* Location & Farmer Details */}
       <View style={styles.infoMetaRow}>
-        {loc.region || loc.zone ? (
+        {loc.wereda || loc.zone || loc.region ? (
           <View style={styles.metaItem}>
             <Ionicons name="location-outline" size={14} color={textSecondary} />
-            <AppText style={[styles.metaText, { color: textSecondary }]}>
-              {[loc.region, loc.zone].filter(Boolean).join(", ") || "Ethiopia"}
+            <AppText style={[styles.metaText, { color: textSecondary }]} numberOfLines={1}>
+              {[localizedWereda, localizedZone, localizedRegion].filter(Boolean).join(", ") || "Ethiopia"}
             </AppText>
           </View>
         ) : null}
@@ -114,7 +120,7 @@ export const ProductCard = ({
 
       {/* Action Button */}
       <AppButton
-        title={t("buyerSaved.viewListing", "View Produce Details")}
+        title={t("buyerSaved.viewListing", { defaultValue: "View Produce Details" })}
         variant="outline"
         onPress={() => onView(product)}
         style={styles.viewBtn}

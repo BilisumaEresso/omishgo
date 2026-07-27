@@ -20,7 +20,9 @@ export default function DemandForecastCard({
         </View>
         <View style={{ flex: 1 }}>
           <AppText style={styles.title}>
-            {isFarmer ? "Harvest Sales Intelligence" : "Market Sourcing Intelligence"}
+            {isFarmer
+              ? t("analytics.harvestSalesIntel", { defaultValue: "Harvest Sales Intelligence" })
+              : t("analytics.marketSourcingIntel", { defaultValue: "Market Sourcing Intelligence" })}
           </AppText>
           <AppText style={styles.subtitle}>{t("analytics.actionableAdvisory", { defaultValue: "Actionable AI market advisory" })}</AppText>
         </View>
@@ -28,14 +30,14 @@ export default function DemandForecastCard({
 
       <AppText style={styles.bodyText}>
         {isFarmer
-          ? `Wholesale demand for ${cropName} in Addis Ababa & Adama is trending +5.8% higher this week (ETB 4,500/q). High buyer inquiry volume makes this an optimal window to publish your harvest listing.`
-          : `Direct sourcing of ${cropName} from Adama and Debre Zeit regional producer hubs currently offers ~8% lower rates compared to Addis Ababa Mercato, saving logistics expenses.`}
+          ? t("analytics.farmerAdvisoryBody", { cropName, defaultValue: `Wholesale demand for ${cropName} in Addis Ababa & Adama is trending +5.8% higher this week (ETB 4,500/q). High buyer inquiry volume makes this an optimal window to publish your harvest listing.` })
+          : t("analytics.buyerAdvisoryBody", { cropName, defaultValue: `Direct sourcing of ${cropName} from Adama and Debre Zeit regional producer hubs currently offers ~8% lower rates compared to Addis Ababa Mercato, saving logistics expenses.` })}
       </AppText>
 
       <View style={styles.statRow}>
         <View style={styles.statItem}>
           <AppText style={styles.statLabel}>{t("analytics.sevenDayTrend", { defaultValue: "7-Day Trend" })}</AppText>
-          <AppText style={[styles.statValue, { color: "#16A34A" }]}>+5.8% Surge</AppText>
+          <AppText style={[styles.statValue, { color: "#16A34A" }]}>{t("analytics.sevenDaySurge", { defaultValue: "+5.8% Surge" })}</AppText>
         </View>
         <View style={styles.divider} />
         <View style={styles.statItem}>
@@ -45,7 +47,7 @@ export default function DemandForecastCard({
         <View style={styles.divider} />
         <View style={styles.statItem}>
           <AppText style={styles.statLabel}>{t("analytics.priceOutlook", { defaultValue: "Price Outlook" })}</AppText>
-          <AppText style={[styles.statValue, { color: "#D97706" }]}>Bullish</AppText>
+          <AppText style={[styles.statValue, { color: "#D97706" }]}>{t("analytics.bullish", { defaultValue: "Bullish" })}</AppText>
         </View>
       </View>
     </View>

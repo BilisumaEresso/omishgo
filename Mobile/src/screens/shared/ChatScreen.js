@@ -31,6 +31,7 @@ const formatTime = (iso) => {
 
 // ─── Sourcing Action Card ─────────────────────────────────────────────────────
 const SourcingActionCard = ({ data, isMe, onAccept, onReject, role }) => {
+  const { t } = useTranslation();
   if (!data) return null;
   const isPending = data.status === "pending";
   const isAccepted = data.status === "accepted";
@@ -67,7 +68,7 @@ const SourcingActionCard = ({ data, isMe, onAccept, onReject, role }) => {
       {isAccepted && (
         <View style={styles.statusPillSuccess}>
           <Ionicons name="checkmark-circle" size={14} color="#10B981" />
-          <AppText style={styles.statusPillSuccessText}>Accepted — Produce Listing Live</AppText>
+          <AppText style={styles.statusPillSuccessText}>{t("chat.acceptedListingLive", "Accepted — Produce Listing Live")}</AppText>
         </View>
       )}
 

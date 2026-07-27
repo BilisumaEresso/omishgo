@@ -119,7 +119,7 @@ export default function NotificationsScreen({ navigation }) {
         {t("notificationsScreen.empty")}
       </AppText>
       <AppText style={[styles.emptySub, { color: textSecondary }]}>
-        You are all caught up. New alerts will appear here.
+        {t("notificationsScreen.emptySub", "You are all caught up. New alerts will appear here.")}
       </AppText>
     </View>
   );
@@ -153,7 +153,7 @@ export default function NotificationsScreen({ navigation }) {
       {!allRead && (
         <View style={[styles.unreadChip, { backgroundColor: primary + "12" }]}>
           <AppText style={[styles.unreadChipText, { color: primary }]}>
-            {unreadCount} unread notification{unreadCount !== 1 ? "s" : ""}
+            {t("notificationsScreen.unreadCount", { count: unreadCount, defaultValue: `${unreadCount} unread notification(s)` })}
           </AppText>
         </View>
       )}

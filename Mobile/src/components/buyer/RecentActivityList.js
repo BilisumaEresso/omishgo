@@ -1,10 +1,11 @@
-// src/components/buyer/RecentActivityList.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 import AppText from "../common/AppText";
 
 export default function RecentActivityList({ activities = [], onActivityPress }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const primaryColor = theme?.colors?.primary || "#1565C0";
   const surfaceColor = theme?.colors?.surface || "#FFFFFF";
@@ -19,7 +20,7 @@ export default function RecentActivityList({ activities = [], onActivityPress })
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
         <AppText style={[styles.sectionTitle, { color: textColor }]}>
-          Recent Orders & Activity
+          {t("buyerDashboard.recentActivityTitle", { defaultValue: "Recent Orders & Activity" })}
         </AppText>
       </View>
 
@@ -41,24 +42,26 @@ export default function RecentActivityList({ activities = [], onActivityPress })
             <View style={styles.contentWrap}>
               <View style={styles.topRow}>
                 <AppText style={[styles.title, { color: textColor }]} numberOfLines={1}>
-                  {activity.title || "Order Activity"}
+                  {activity.title || t("buyerOrders.orderActivity", { defaultValue: "Order Activity" })}
                 </AppText>
-                <AppText style={styles.timeText}>{activity.time || "Recent"}</AppText>
+                <AppText style={styles.timeText}>{activity.time || t("common.recent", { defaultValue: "Recent" })}</AppText>
               </View>
 
               <AppText style={[styles.description, { color: textMuted }]} numberOfLines={1}>
-                {activity.description || "Activity updated"}
+                {activity.description || t("buyerOrders.activityUpdated", { defaultValue: "Activity updated" })}
               </AppText>
 
               {isOrder && (
                 <View style={styles.orderFooter}>
                   <View style={styles.statusPill}>
                     <View style={styles.statusDot} />
-                    <AppText style={styles.statusText}>Order Processing</AppText>
+                    <AppText style={styles.statusText}>
+                      {t("statuses.processing", { defaultValue: "Order Processing" })}
+                    </AppText>
                   </View>
 
                   <AppText style={[styles.actionLink, { color: primaryColor }]}>
-                    Track Details →
+                    {t("buyerOrders.trackDetails", { defaultValue: "Track Details →" })}
                   </AppText>
                 </View>
               )}

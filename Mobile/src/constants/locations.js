@@ -1305,8 +1305,112 @@ export const getLocalizedZones = (region, lang = "en") => {
 
 
 export const WEREDA_TRANSLATIONS = {
-  am: {},
-  om: {},
+  am: {
+    // East Shewa (19)
+    "Ada'a": "አዳዓ",
+    Adama: "አዳማ",
+    "Adama Town": "አዳማ ከተማ",
+    "Adami Tullu and Jido Kombolcha": "አዳሚ ቱሉ እና ጂዶ ኮምቦልቻ",
+    "Batu (Zway) Town": "ባቱ (ዝዋይ) ከተማ",
+    Bora: "ቦራ",
+    Boset: "ቦሰት",
+    Dodota: "ዶዶታ",
+    Dugda: "ዱግዳ",
+    Fentale: "ፈንታሌ",
+    Gimbichu: "ጊምቢቹ",
+    Liben: "ሊበን",
+    Lome: "ሎሜ",
+    "Metehara Town": "መተሃራ ከተማ",
+    "Mojo Town": "ሞጆ ከተማ",
+    "Bishoftu Town": "ቢሾፍቱ ከተማ",
+    "Meki Town": "ሜኪ ከተማ",
+    "Awash Melkasa Town": "አዋሽ መልካሳ ከተማ",
+    "Wonji Town": "ወንጂ ከተማ",
+
+    // West Shewa (21)
+    "Abuna Ginde Beret": "አቡና ግንደ በረት",
+    Ambo: "አምቦ",
+    "Ambo Town": "አምቦ ከተማ",
+    "Bako Tibe": "ባኮ ጥቤ",
+    "Bako Town": "ባኮ ከተማ",
+    Cobi: "ቾቢ",
+    Dano: "ዳኖ",
+    Dendi: "ደንዲ",
+    "Dire Enchini": "ድሬ እንቺኒ",
+    "Inchini Town": "እንቺኒ ከተማ",
+    Ejere: "እጀሬ",
+    Elfu: "እልፉ",
+    "Ginde Beret": "ግንደ በረት",
+    "Guder Town": "ጉደር ከተማ",
+    Ilfata: "እልፋታ",
+    Jeldu: "ጀልዱ",
+    Jibat: "ጅባት",
+    "Meta Robi": "ሜታ ሮቢ",
+    Midakegn: "ሚዳቀኝ",
+    Nono: "ኖኖ",
+    "Toke Kutaye": "ቶኬ ቁታዬ",
+
+    // Addis Ababa (6)
+    "Wereda 01": "ወረዳ 01",
+    "Wereda 02": "ወረዳ 02",
+    "Wereda 03": "ወረዳ 03",
+    "Wereda 04": "ወረዳ 04",
+    "Wereda 05": "ወረዳ 05",
+    "Wereda 06": "ወረዳ 06",
+  },
+  om: {
+    // East Shewa (19)
+    "Ada'a": "Ada'aa",
+    Adama: "Adaamaa",
+    "Adama Town": "Magaalaa Adaamaa",
+    "Adami Tullu and Jido Kombolcha": "Adaamii Tulluu fi Jiiddoo Kombolchaa",
+    "Batu (Zway) Town": "Magaalaa Baatuu (Zwaay)",
+    Bora: "Booraa",
+    Boset: "Bosat",
+    Dodota: "Doodotaa",
+    Dugda: "Dugda",
+    Fentale: "Fantaallee",
+    Gimbichu: "Gimbichuu",
+    Liben: "Liiban",
+    Lome: "Loomii",
+    "Metehara Town": "Magaalaa Mataharaa",
+    "Mojo Town": "Magaalaa Moojoo",
+    "Bishoftu Town": "Magaalaa Bishooftuu",
+    "Meki Town": "Magaalaa Meekii",
+    "Awash Melkasa Town": "Magaalaa Awaash Malkasaa",
+    "Wonji Town": "Magaalaa Wonjii",
+
+    // West Shewa (21)
+    "Abuna Ginde Beret": "Abuna Gindabarat",
+    Ambo: "Amboo",
+    "Ambo Town": "Magaalaa Amboo",
+    "Bako Tibe": "Baaqoo Tibbee",
+    "Bako Town": "Magaalaa Baaqoo",
+    Cobi: "Cobii",
+    Dano: "Daannoo",
+    Dendi: "Dandii",
+    "Dire Enchini": "Dirree Enchini",
+    "Inchini Town": "Magaalaa Enchini",
+    Ejere: "Ejerrii",
+    Elfu: "Elfuu",
+    "Ginde Beret": "Gindabarat",
+    "Guder Town": "Magaalaa Gudarii",
+    Ilfata: "Ilfaata",
+    Jeldu: "Jalduu",
+    Jibat: "Jibaat",
+    "Meta Robi": "Mitaa Roobii",
+    "Midakegn": "Miidaa Qannee",
+    Nono: "Noonnoo",
+    "Toke Kutaye": "Tookkee Kuttaayyee",
+
+    // Addis Ababa (6)
+    "Wereda 01": "Waraadaa 01",
+    "Wereda 02": "Waraadaa 02",
+    "Wereda 03": "Waraadaa 03",
+    "Wereda 04": "Waraadaa 04",
+    "Wereda 05": "Waraadaa 05",
+    "Wereda 06": "Waraadaa 06",
+  },
 };
 
 export const getLocalizedWereda = (region, zone, lang = "en") => {
@@ -1314,4 +1418,22 @@ export const getLocalizedWereda = (region, zone, lang = "en") => {
   if (lang === "en") return weredas.map((w) => ({ value: w, label: w }));
   const dict = WEREDA_TRANSLATIONS[lang] || {};
   return weredas.map((w) => ({ value: w, label: dict[w] || w }));
+};
+
+export const getLocalizedRegionName = (region, lang = "en") => {
+  if (!region) return "";
+  if (lang === "en") return region;
+  return REGIONS_LOCALIZED[lang]?.[region] || region;
+};
+
+export const getLocalizedZoneName = (zone, lang = "en") => {
+  if (!zone) return "";
+  if (lang === "en") return zone;
+  return ZONE_TRANSLATIONS[lang]?.[zone] || zone;
+};
+
+export const getLocalizedWeredaName = (wereda, lang = "en") => {
+  if (!wereda) return "";
+  if (lang === "en") return wereda;
+  return WEREDA_TRANSLATIONS[lang]?.[wereda] || wereda;
 };

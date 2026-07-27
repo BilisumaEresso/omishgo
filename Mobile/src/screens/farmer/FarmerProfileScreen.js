@@ -78,9 +78,7 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
 
   const handleChangeLanguage = async (code) => {
     try {
-      await i18n.changeLanguage(code);
-      if (setLanguage) setLanguage(code);
-      api.patch("/api/v1/auth/me/language", { preferredLang: code }).catch(() => {});
+      if (setLanguage) await setLanguage(code);
       setLanguageOpen(false);
     } catch (_) {}
   };
@@ -109,7 +107,7 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
         </View>
 
         <AppText style={[styles.userName, { color: textPrimary }]}>
-          {user?.name || "Verified Farmer Producer"}
+          {user?.name || t("farmerProfile.fallbackName", { defaultValue: "Verified Farmer Producer" })}
         </AppText>
 
         <View style={styles.verifiedBadge}>
@@ -120,7 +118,7 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
         </View>
 
         <AppText style={[styles.phoneText, { color: textSecondary }]}>
-          {user?.phone || "+251 900 000 000"} • {user?.location?.region || "Oromia"}, {user?.location?.zone || "East Shewa"}
+          {user?.phone || "+251 900 000 000"} • {[user?.location?.wereda, user?.location?.zone, user?.location?.region].filter(Boolean).join(", ") || "Oromia, East Shewa"}
         </AppText>
       </View>
 
@@ -155,7 +153,7 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
 
       {/* Account Settings List */}
       <View style={[styles.settingsGroup, { backgroundColor: surfaceColor }]}>
-        <AppText style={styles.groupTitle}>Preferences & Settings</AppText>
+        <AppText style={styles.groupTitle}>{t("profile.preferencesAndSettings", { defaultValue: "Preferences & Settings" })}</AppText>
 
         {/* Language Selector */}
         <TouchableOpacity
@@ -168,7 +166,7 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
               <Ionicons name="globe-outline" size={20} color={primaryColor} />
             </View>
             <View>
-              <AppText style={styles.settingTitle}>Language / ቋንቋ</AppText>
+              <AppText style={styles.settingTitle}>{t("buyerProfile.languageLabel", "Language / ቋንቋ")}</AppText>
               <AppText style={styles.settingSub}>{currentLangObj.label} ({currentLangObj.native})</AppText>
             </View>
           </View>
@@ -214,7 +212,7 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
             </View>
             <View>
               <AppText style={styles.settingTitle}>{t("profile.marketPriceIndex", { defaultValue: "Market Price Index" })}</AppText>
-              <AppText style={styles.settingSub}>View national commodity wholesale rates</AppText>
+              <AppText style={styles.settingSub}>{t("profile.marketPriceIndexSub", { defaultValue: "View national commodity wholesale rates" })}</AppText>
             </View>
           </View>
           <Ionicons name="chevron-forward" size={18} color="#64748B" />
@@ -231,8 +229,8 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
               <Ionicons name="call-outline" size={20} color="#D97706" />
             </View>
             <View>
-              <AppText style={styles.settingTitle}>Producer Support & Help</AppText>
-              <AppText style={styles.settingSub}>Call official support (0938730818)</AppText>
+              <AppText style={styles.settingTitle}>{t("profile.producerSupport", { defaultValue: "Producer Support & Help" })}</AppText>
+              <AppText style={styles.settingSub}>{t("profile.callSupportSub", { defaultValue: "Call official support (0938730818)" })}</AppText>
             </View>
           </View>
           <Ionicons name="chevron-forward" size={18} color="#64748B" />
@@ -246,7 +244,7 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
         activeOpacity={0.85}
       >
         <Ionicons name="log-out-outline" size={18} color="#DC2626" />
-        <AppText style={styles.logoutBtnText}>Sign Out Account</AppText>
+        <AppText style={styles.logoutBtnText}>{t("appSidebar.logout", { defaultValue: "Sign Out Account" })}</AppText>
       </TouchableOpacity>
 
       <View style={{ height: 80 }} />

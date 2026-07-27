@@ -158,7 +158,7 @@ const AppSidebar = ({
 }) => {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
-  const { logout, user } = useAuthStore();
+  const { logout, user, setLanguage } = useAuthStore();
   const insets = useSafeAreaInsets();
 
   const slideAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
@@ -328,7 +328,7 @@ const AppSidebar = ({
   }, [showModal]);
 
   const changeLanguage = (code) => {
-    i18n.changeLanguage(code).catch(() => {});
+    if (setLanguage) setLanguage(code);
     setLanguageOpen(false);
   };
 

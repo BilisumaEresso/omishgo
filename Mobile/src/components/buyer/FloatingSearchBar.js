@@ -8,7 +8,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
+import { getLocalizedUnitName } from "../../constants/units";
 import { useTheme } from "../../hooks/useTheme";
 
 export default function FloatingSearchBar({
@@ -19,6 +21,7 @@ export default function FloatingSearchBar({
   onSelectProduct,
   hasActiveFilters = false,
 }) {
+  const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
 
@@ -62,7 +65,7 @@ export default function FloatingSearchBar({
         />
 
         <TextInput
-          placeholder="Search crops, farmers, regions (e.g. Teff, Onion)..."
+          placeholder={t("browse.searchPlaceholder", { defaultValue: "Search crops, farmers, regions (e.g. Teff, Onion)..." })}
           placeholderTextColor={placeholderColor}
           value={searchQuery}
           onChangeText={onSearchChange}
@@ -120,12 +123,12 @@ export default function FloatingSearchBar({
               <View style={styles.itemInfo}>
                 <AppText style={styles.itemCropTitle}>{item.cropType || item.name}</AppText>
                 <AppText style={styles.itemSubtext}>
-                  {item.farmerId?.name || "Verified Farmer"} • {item.location?.region || "Local"}
+                  {item.farmerId?.name || "Verified Farmer"} • {[item.location?.wereda, item.location?.zone, item.location?.region].filter(Boolean).join(", ") || "Local"}
                 </AppText>
               </View>
 
               <AppText style={styles.itemPrice}>
-                ETB {item.price?.toLocaleString() || "N/A"}/{item.unit || "kg"}
+                ETB {item.price?.toLocaleString() || "N/A"}/{getLocalizedUnitName(item.unit || "kg", i18n.language || "en", t)}
               </AppText>
             </TouchableOpacity>
           ))}

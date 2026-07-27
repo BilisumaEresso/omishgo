@@ -21,10 +21,11 @@ import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
-import { useAuthStore } from "../../store/auth.store";
 import { useTranslation } from "react-i18next";
+import { CROP_TYPES, getLocalizedCropName } from "../../constants/crops";
+import { useAuthStore } from "../../store/auth.store";
 
-const CATEGORIES = ["All", "Tomato", "Teff", "Onion", "Garlic", "Vegetables"];
+const CATEGORIES = ["All", "Vegetables", ...CROP_TYPES];
 
 export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
   const { theme } = useTheme();
@@ -220,7 +221,9 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
       const matchesSearch = q
         ? (p.cropType || "").toLowerCase().includes(q) ||
           (p.farmerId?.name || "").toLowerCase().includes(q) ||
-          (p.location?.region || "").toLowerCase().includes(q)
+          (p.location?.region || "").toLowerCase().includes(q) ||
+          (p.location?.zone || "").toLowerCase().includes(q) ||
+          (p.location?.wereda || "").toLowerCase().includes(q)
         : true;
       const matchesCat =
         selectedCategory === "All" ||
@@ -268,9 +271,10 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
   return (
     <>
       <DashboardLayout
-        title={t("buyerDashboard.title", "Dashboard")}
+        title={t("buyerDashboard.title", { defaultValue: "Dashboard" })}
         subtitle={t("buyerDashboard.welcomeMessage", {
-          name: user?.name || "Buyer",
+          name: user?.name || t("buyerDashboard.fallbackName", { defaultValue: "Buyer" }),
+          defaultValue: "Welcome, {{name}}!",
         })}
         role="buyer"
         scrollable={true}
@@ -379,10 +383,10 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
           </View>
           <View style={{ flex: 1 }}>
             <AppText style={[styles.customSourcingTitle, { color: textPrimary }]}>
-              Need a Custom Crop Volume?
+              {t("buyerDashboard.needCustomVolume", { defaultValue: "Need a Custom Crop Volume?" })}
             </AppText>
             <AppText style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>
-              Post a custom sourcing request to receive direct quotes from verified local producers.
+              {t("buyerDashboard.postCustomDesc", { defaultValue: "Post a custom sourcing request to receive direct quotes from verified local producers." })}
             </AppText>
           </View>
           <TouchableOpacity
@@ -390,7 +394,7 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
             onPress={() => setIsBulkModalOpen(true)}
             activeOpacity={0.85}
           >
-            <AppText style={styles.customSourcingBtnText}>Request Quote</AppText>
+            <AppText style={styles.customSourcingBtnText}>{t("buyerDashboard.requestQuote", { defaultValue: "Request Quote" })}</AppText>
           </TouchableOpacity>
         </View>
 

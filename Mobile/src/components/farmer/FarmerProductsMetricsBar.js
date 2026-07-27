@@ -45,7 +45,7 @@ export default function FarmerProductsMetricsBar({
           <View style={[styles.iconBg, { backgroundColor: "#2563EB" }]}>
             <Ionicons name="archive" size={16} color="#FFFFFF" />
           </View>
-          <AppText style={[styles.badgeLabel, { color: "#1D4ED8" }]}>Sold</AppText>
+          <AppText style={[styles.badgeLabel, { color: "#1D4ED8" }]}>{t("farmerDashboard.soldBadge", "Sold")}</AppText>
         </View>
 
         <AppText style={[styles.metricValue, { color: "#1E40AF" }]}>

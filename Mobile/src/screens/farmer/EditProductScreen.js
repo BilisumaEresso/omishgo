@@ -23,6 +23,7 @@ import { CROP_TYPES, CROP_TYPES_LOCALIZED } from "../../constants/crops";
 import {
   getLocalizedRegions,
   getLocalizedZones,
+  getLocalizedWereda,
 } from "../../constants/locations";
 import { UNITS_LOCALIZED } from "../../constants/units";
 import { useTheme } from "../../hooks/useTheme";
@@ -152,6 +153,7 @@ export default function EditProductScreen({ route, navigation }) {
   const [showUnitPicker, setShowUnitPicker] = useState(false);
   const [showRegionPicker, setShowRegionPicker] = useState(false);
   const [showZonePicker, setShowZonePicker] = useState(false);
+  const [showWeredaPicker, setShowWeredaPicker] = useState(false);
 
   const primary = theme?.colors?.primary || "#15803D";
   const error = "#DC2626";
@@ -176,14 +178,23 @@ export default function EditProductScreen({ route, navigation }) {
 
   const regionOptions = getLocalizedRegions(lang);
   const availableZones = region ? getLocalizedZones(region, lang) : [];
+  const availableWereda = zone ? getLocalizedWereda(region, zone, lang) : [];
 
   useEffect(() => {
     setZone("");
+    setWereda("");
   }, [region]);
+
+  useEffect(() => {
+    setWereda("");
+  }, [zone]);
 
   const handleUpdate = async () => {
     if (!cropType || !quantity || !price || !region) {
-      Alert.alert("Missing Fields", "Please complete crop type, stock quantity, price, and location.");
+      Alert.alert(
+        t("editProduct.missingFieldsTitle", { defaultValue: "Missing Fields" }),
+        t("editProduct.missingFieldsMsg", { defaultValue: "Please complete crop type, stock quantity, price, and location." })
+      );
       return;
     }
 
@@ -208,14 +219,14 @@ export default function EditProductScreen({ route, navigation }) {
       );
 
       Alert.alert(
-        "Listing Updated!",
-        "Your harvest listing changes have been saved successfully.",
-        [{ text: "OK", onPress: () => navigation.goBack() }]
+        t("editProduct.updatedSuccessTitle", { defaultValue: "Listing Updated!" }),
+        t("editProduct.updatedSuccessMsg", { defaultValue: "Your harvest listing changes have been saved successfully." }),
+        [{ text: t("common.ok", { defaultValue: "OK" }), onPress: () => navigation.goBack() }]
       );
     } catch (err) {
       Alert.alert(
-        "Update Failed",
-        err.response?.data?.message || err.message || "Failed to update listing."
+        t("editProduct.updateFailedTitle", { defaultValue: "Update Failed" }),
+        err.response?.data?.message || err.message || t("editProduct.updateFailedMsg", { defaultValue: "Failed to update listing." })
       );
     } finally {
       setLoading(false);
@@ -224,12 +235,12 @@ export default function EditProductScreen({ route, navigation }) {
 
   const handleDelete = () => {
     Alert.alert(
-      "Delete Listing",
-      `Are you sure you want to delete "${cropType}" listing? This action cannot be undone.`,
+      t("editProduct.deleteConfirmTitle", { defaultValue: "Delete Listing" }),
+      t("editProduct.deleteConfirmMsg", { cropType, defaultValue: "Are you sure you want to delete \"{{cropType}}\" listing? This action cannot be undone." }),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("common.cancel", { defaultValue: "Cancel" }), style: "cancel" },
         {
-          text: "Delete Listing",
+          text: t("editProduct.deleteListingBtn", { defaultValue: "Delete Listing" }),
           style: "destructive",
           onPress: async () => {
             try {
@@ -238,7 +249,10 @@ export default function EditProductScreen({ route, navigation }) {
               );
               navigation.goBack();
             } catch (err) {
-              Alert.alert("Delete Error", "Unable to delete product listing.");
+              Alert.alert(
+                t("editProduct.deleteErrorTitle", { defaultValue: "Delete Error" }),
+                t("editProduct.deleteErrorMsg", { defaultValue: "Unable to delete product listing." })
+              );
             }
           },
         },
@@ -326,13 +340,15 @@ export default function EditProductScreen({ route, navigation }) {
                 onClose={() => setShowUnitPicker(false)}
                 icon="cube-outline"
                 theme={theme}
-                placeholder="Unit"
+                placeholder={t("postProduct.unitPlaceholder", "Unit")}
               />
             </View>
           </View>
 
           {/* Price per Unit */}
-          <AppText style={styles.inputLabel}>Price per {unitDisplay} (ETB)</AppText>
+          <AppText style={styles.inputLabel}>
+            {t("postProduct.pricePerUnit", { defaultValue: "Price per" })} {unitDisplay} (ETB)
+          </AppText>
           <AppInput
             placeholder="0"
             value={price}
@@ -344,7 +360,7 @@ export default function EditProductScreen({ route, navigation }) {
           {/* Description */}
           <AppText style={styles.inputLabel}>{t("editProduct.description", { defaultValue: "Listing Description" })}</AppText>
           <AppInput
-            placeholder="Add details about crop quality, harvest date, packaging..."
+            placeholder={t("editProduct.descriptionPlaceholder", { defaultValue: "Add details about crop quality, harvest date, packaging..." })}
             value={description}
             onChangeText={setDescription}
             multiline
@@ -354,10 +370,12 @@ export default function EditProductScreen({ route, navigation }) {
 
           {/* Location Section */}
           <View style={styles.sectionCard}>
-            <AppText style={styles.sectionCardTitle}>Farm / Storage Location</AppText>
+            <AppText style={styles.sectionCardTitle}>
+              {t("postProduct.farmLocationSection", { defaultValue: "Farm / Storage Location" })}
+            </AppText>
 
             <DropdownPicker
-              label="Region"
+              label={t("postProduct.regionLabel", { defaultValue: "Region" })}
               value={region}
               options={regionOptions}
               onSelect={setRegion}
@@ -366,18 +384,21 @@ export default function EditProductScreen({ route, navigation }) {
               onClose={() => setShowRegionPicker(false)}
               icon="location-outline"
               theme={theme}
-              placeholder="Select Region"
+              placeholder={t("postProduct.selectRegionPlaceholder", { defaultValue: "Select Region" })}
             />
 
             <DropdownPicker
-              label="Zone"
+              label={t("postProduct.zoneLabel", { defaultValue: "Zone" })}
               value={zone}
               options={availableZones}
               onSelect={setZone}
               visible={showZonePicker}
               onOpen={() => {
                 if (!region) {
-                  Alert.alert("Select Region First", "Please select a region before picking a zone.");
+                  Alert.alert(
+                    t("postProduct.selectRegionFirstTitle", { defaultValue: "Select Region First" }),
+                    t("postProduct.selectRegionFirstMsg", { defaultValue: "Please select a region before picking a zone." })
+                  );
                   return;
                 }
                 setShowZonePicker(true);
@@ -385,14 +406,37 @@ export default function EditProductScreen({ route, navigation }) {
               onClose={() => setShowZonePicker(false)}
               icon="map-outline"
               theme={theme}
-              placeholder="Select Zone"
+              placeholder={t("postProduct.selectZonePlaceholder", { defaultValue: "Select Zone" })}
               disabled={!region}
+            />
+
+            <DropdownPicker
+              label={t("postProduct.weredaLabel", { defaultValue: "Wereda / District" })}
+              value={wereda}
+              options={availableWereda}
+              onSelect={setWereda}
+              visible={showWeredaPicker}
+              onOpen={() => {
+                if (!zone) {
+                  Alert.alert(
+                    t("postProduct.selectZoneFirstTitle", { defaultValue: "Select Zone First" }),
+                    t("postProduct.selectZoneFirstMsg", { defaultValue: "Please select a zone before picking a wereda." })
+                  );
+                  return;
+                }
+                setShowWeredaPicker(true);
+              }}
+              onClose={() => setShowWeredaPicker(false)}
+              icon="navigate-outline"
+              theme={theme}
+              placeholder={t("postProduct.selectWeredaPlaceholder", { defaultValue: "Select Wereda" })}
+              disabled={!zone}
             />
           </View>
 
           {/* Save / Delete Buttons */}
           <AppButton
-            title={loading ? "Saving Changes..." : "✓ Save Changes"}
+            title={loading ? t("editProduct.savingChanges", { defaultValue: "Saving Changes..." }) : t("editProduct.saveChangesBtn", { defaultValue: "✓ Save Changes" })}
             onPress={handleUpdate}
             loading={loading}
             disabled={loading}
@@ -401,7 +445,7 @@ export default function EditProductScreen({ route, navigation }) {
           />
 
           <AppButton
-            title="Delete Listing"
+            title={t("editProduct.deleteListingBtn", { defaultValue: "Delete Listing" })}
             variant="outline"
             fullWidth
             onPress={handleDelete}

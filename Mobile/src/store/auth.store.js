@@ -3,6 +3,7 @@ import axios from "axios";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { API_BASE_URL } from "../constants/api.js";
+import api from "../config/api.js";
 import i18n from "../locales/i18n.js";
 import authService from "../services/auth.service.js";
 import storageService from "../services/storage.service.js";
@@ -76,12 +77,17 @@ export const useAuthStore = create(persist((set, get) => ({
   role: null,
   setLanguage: async language => {
     const normalized = ["en", "am", "om"].includes(language) ? language : "en";
+    const currentUser = get().user;
     set({
-      language: normalized
+      language: normalized,
+      ...(currentUser ? { user: { ...currentUser, preferredLang: normalized } } : {})
     });
     try {
       await i18n.changeLanguage(normalized);
       await AsyncStorage.setItem("@app_language", normalized);
+      if (get().isAuthenticated) {
+        api.patch("/api/v1/auth/me/language", { preferredLang: normalized }).catch(() => {});
+      }
     } catch (error) {
       console.warn("Failed to persist app language", error);
     }

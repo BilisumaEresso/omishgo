@@ -45,6 +45,9 @@ export const CROP_TYPES_LOCALIZED = {
     Chickpea: "Kabuli Chickpea",
     "Haricot Bean": "White Pea Bean (Boleqe)",
     Papaya: "Sweet Papaya",
+    All: "All",
+    Vegetables: "Vegetables",
+    Grains: "Grains",
   },
   am: {
     Teff: "ማግና (ነጭ) ጤፍ",
@@ -67,6 +70,9 @@ export const CROP_TYPES_LOCALIZED = {
     Chickpea: "ሽምብራ",
     "Haricot Bean": "ቦሌቄ",
     Papaya: "ፓፓያ",
+    All: "ሁሉንም",
+    Vegetables: "አትክልት",
+    Grains: "እህል",
   },
   om: {
     Teff: "Xaafii Adii (Magna)",
@@ -89,6 +95,9 @@ export const CROP_TYPES_LOCALIZED = {
     Chickpea: "Shimbiraa",
     "Haricot Bean": "Boleqe (Buna Dachee)",
     Papaya: "Papaayyaa",
+    All: "Hunda",
+    Vegetables: "Kuduraa",
+    Grains: "Midhaan",
   },
 };
 

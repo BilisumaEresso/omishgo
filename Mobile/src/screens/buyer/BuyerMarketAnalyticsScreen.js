@@ -1,6 +1,6 @@
-// src/screens/buyer/BuyerMarketAnalyticsScreen.js
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ScrollView,
   StyleSheet,
@@ -14,6 +14,7 @@ import PriceTrendWidget from "../../components/buyer/PriceTrendWidget";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
 import { useTheme } from "../../hooks/useTheme";
+import { getLocalizedCropName } from "../../constants/crops";
 
 const COMMODITIES = [
   { id: "onion", crop: "Red Onion", price: "4,500", unit: "q", change: "+5.8%", isPositive: true, low7d: "3,700", high7d: "4,800", volume: "485 q" },
@@ -23,6 +24,7 @@ const COMMODITIES = [
 ];
 
 export default function BuyerMarketAnalyticsScreen({ navigation }) {
+  const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const [selectedId, setSelectedId] = useState("onion");
   const [priceAlertActive, setPriceAlertActive] = useState(false);
@@ -42,8 +44,8 @@ export default function BuyerMarketAnalyticsScreen({ navigation }) {
     <View style={[styles.screen, { backgroundColor }]}>
       {/* Sub-Screen Header: Back button enabled, NO Hamburger menu */}
       <AppHeader
-        title="Market Prices & Trends"
-        subtitle="Wholesale market rates per quintal (100 kg)"
+        title={t("analytics.title", { defaultValue: "Market Prices & Trends" })}
+        subtitle={t("analytics.subtitle", { defaultValue: "Wholesale market rates per quintal (100 kg)" })}
         showBack={true}
         onBackPress={() => navigation?.goBack()}
         showMenu={false}
@@ -72,7 +74,7 @@ export default function BuyerMarketAnalyticsScreen({ navigation }) {
                 activeOpacity={0.8}
               >
                 <AppText style={[styles.pillText, active && styles.activePillText]}>
-                  {c.crop}
+                  {getLocalizedCropName(c.crop, i18n.language || "en", t)}
                 </AppText>
               </TouchableOpacity>
             );
@@ -96,12 +98,12 @@ export default function BuyerMarketAnalyticsScreen({ navigation }) {
             />
             <View style={styles.alertTextWrap}>
               <AppText style={styles.alertTitle}>
-                {priceAlertActive ? "Price Alert Enabled" : `Track ${activeCommodity.crop} Prices`}
+                {priceAlertActive ? t("analytics.alertEnabled", { defaultValue: "Price Alert Enabled" }) : t("analytics.trackCropRates", { crop: activeCommodity.crop, defaultValue: `Track ${activeCommodity.crop} Prices` })}
               </AppText>
               <AppText style={styles.alertSubtitle}>
                 {priceAlertActive
-                  ? `Alerting when price drops below ETB ${activeCommodity.price}/q`
-                  : `Get notified when market prices drop`}
+                  ? t("analytics.alertingDesc", { price: activeCommodity.price, defaultValue: `Alerting when price drops below ETB ${activeCommodity.price}/q` })
+                  : t("analytics.getNotifiedDrop", { defaultValue: "Get notified when market prices drop" })}
               </AppText>
             </View>
           </View>
@@ -115,7 +117,7 @@ export default function BuyerMarketAnalyticsScreen({ navigation }) {
             activeOpacity={0.85}
           >
             <AppText style={styles.alertToggleText}>
-              {priceAlertActive ? "Active" : "+ Set Alert"}
+              {priceAlertActive ? t("analytics.activeTag", { defaultValue: "Active" }) : t("analytics.setAlertBtn", { defaultValue: "+ Set Alert" })}
             </AppText>
           </TouchableOpacity>
         </View>
@@ -137,7 +139,7 @@ export default function BuyerMarketAnalyticsScreen({ navigation }) {
         >
           <Ionicons name="cart-outline" size={20} color="#FFFFFF" />
           <AppText style={styles.primaryCtaText}>
-            Browse {activeCommodity.crop} Sellers
+            {t("analytics.browseSellers", { crop: activeCommodity.crop, defaultValue: `Browse ${activeCommodity.crop} Sellers` })}
           </AppText>
         </TouchableOpacity>
 

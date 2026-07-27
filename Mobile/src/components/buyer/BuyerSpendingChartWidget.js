@@ -1,4 +1,4 @@
-// src/components/buyer/BuyerSpendingChartWidget.js
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../common/AppText";
@@ -12,6 +12,7 @@ export default function BuyerSpendingChartWidget({
   ],
   currency = "ETB",
 }) {
+  const { t } = useTranslation();
   const [selectedIdx, setSelectedIdx] = useState(2); // Default to Mar
 
   const maxVal = Math.max(...monthlyData.map((d) => d.amount), 50000);
@@ -20,8 +21,12 @@ export default function BuyerSpendingChartWidget({
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <AppText style={styles.title}>My Spending</AppText>
-        <AppText style={styles.timeframe}>Last 4 Months</AppText>
+        <AppText style={styles.title}>
+          {t("buyerDashboard.mySpending", { defaultValue: "My Spending" })}
+        </AppText>
+        <AppText style={styles.timeframe}>
+          {t("buyerDashboard.last4Months", { defaultValue: "Last 4 Months" })}
+        </AppText>
       </View>
 
       <View style={styles.chartContainer}>

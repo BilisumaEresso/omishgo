@@ -14,19 +14,20 @@ import DashboardLayout from "../../components/layout/DashBoardLayout";
 import DemandForecastCard from "../../components/shared/analytics/DemandForecastCard";
 import MarketAnalyticsHero from "../../components/shared/analytics/MarketAnalyticsHero";
 import RegionalPriceComparison from "../../components/shared/analytics/RegionalPriceComparison";
+import { getLocalizedCropName } from "../../constants/crops";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
 const COMMODITIES = [
   { id: "onion", crop: "Red Onion", price: "4,500", unit: "q", change: "+5.8%", isPositive: true, low7d: "3,700", high7d: "4,800", volume: "4,850 q", hubsCount: 12 },
-  { id: "teff", crop: "White Teff", price: "5,200", unit: "q", change: "+3.2%", isPositive: true, low7d: "4,900", high7d: "5,350", volume: "8,200 q", hubsCount: 15 },
+  { id: "teff", crop: "Teff", price: "5,200", unit: "q", change: "+3.2%", isPositive: true, low7d: "4,900", high7d: "5,350", volume: "8,200 q", hubsCount: 15 },
   { id: "tomato", crop: "Tomato", price: "3,800", unit: "q", change: "-2.4%", isPositive: false, low7d: "3,650", high7d: "4,200", volume: "3,400 q", hubsCount: 10 },
   { id: "garlic", crop: "Garlic", price: "12,000", unit: "q", change: "+8.5%", isPositive: true, low7d: "10,200", high7d: "12,400", volume: "1,820 q", hubsCount: 8 },
   { id: "wheat", crop: "Wheat", price: "4,100", unit: "q", change: "+1.5%", isPositive: true, low7d: "3,900", high7d: "4,250", volume: "6,100 q", hubsCount: 14 },
 ];
 
 export default function MarketAnalyticsScreen({ navigation, route }) {
-  const { theme } = useTheme();
+  const { t, i18n } = useTranslation();
   const { user, role: authRole } = useAuthStore();
   const [selectedId, setSelectedId] = useState("onion");
   const [priceAlertActive, setPriceAlertActive] = useState(false);
@@ -54,8 +55,8 @@ export default function MarketAnalyticsScreen({ navigation, route }) {
   return (
     <DashboardLayout
       role={activeRole}
-      title="National Market Analytics"
-      subtitle="Ethiopian Wholesale Commodity Indices & Hub Rates"
+      title={t("analytics.nationalAnalyticsTitle", { defaultValue: "National Market Analytics" })}
+      subtitle={t("analytics.nationalAnalyticsSub", { defaultValue: "Ethiopian Wholesale Commodity Indices & Hub Rates" })}
       showBack
       onBackPress={() => navigation?.goBack()}
       scrollable
@@ -78,7 +79,7 @@ export default function MarketAnalyticsScreen({ navigation, route }) {
                 activeOpacity={0.8}
               >
                 <AppText style={[styles.pillText, active && { color: "#FFFFFF" }]}>
-                  {c.crop}
+                  {getLocalizedCropName(c.crop, i18n.language || "en", t)}
                 </AppText>
               </TouchableOpacity>
             );
@@ -103,12 +104,12 @@ export default function MarketAnalyticsScreen({ navigation, route }) {
           />
           <View style={{ flex: 1 }}>
             <AppText style={styles.alertTitle}>
-              {priceAlertActive ? "Price Alert Active" : `Track ${activeCommodity.crop} Rates`}
+              {priceAlertActive ? t("analytics.alertActive", { defaultValue: "Price Alert Active" }) : t("analytics.trackCropRates", { crop: activeCommodity.crop, defaultValue: `Track ${activeCommodity.crop} Rates` })}
             </AppText>
             <AppText style={styles.alertSub}>
               {priceAlertActive
-                ? `Alerting when price drops below ETB ${activeCommodity.price}/q`
-                : `Get notified when market prices drop`}
+                ? t("analytics.alertingDesc", { price: activeCommodity.price, defaultValue: `Alerting when price drops below ETB ${activeCommodity.price}/q` })
+                : t("analytics.getNotifiedDrop", { defaultValue: "Get notified when market prices drop" })}
             </AppText>
           </View>
         </View>
@@ -122,7 +123,7 @@ export default function MarketAnalyticsScreen({ navigation, route }) {
           activeOpacity={0.85}
         >
           <AppText style={styles.alertToggleText}>
-            {priceAlertActive ? "Active" : "+ Set Alert"}
+            {priceAlertActive ? t("analytics.activeTag", { defaultValue: "Active" }) : t("analytics.setAlertBtn", { defaultValue: "+ Set Alert" })}
           </AppText>
         </TouchableOpacity>
       </View>
@@ -150,8 +151,8 @@ export default function MarketAnalyticsScreen({ navigation, route }) {
         />
         <AppText style={styles.actionBtnText}>
           {isFarmer
-            ? `List ${activeCommodity.crop} at Market Rate (ETB ${activeCommodity.price}/q)`
-            : `Browse Verified ${activeCommodity.crop} Sellers`}
+            ? t("analytics.listAtMarketRate", { crop: activeCommodity.crop, price: activeCommodity.price, defaultValue: `List ${activeCommodity.crop} at Market Rate (ETB ${activeCommodity.price}/q)` })
+            : t("analytics.browseVerifiedSellers", { crop: activeCommodity.crop, defaultValue: `Browse Verified ${activeCommodity.crop} Sellers` })}
         </AppText>
       </TouchableOpacity>
 

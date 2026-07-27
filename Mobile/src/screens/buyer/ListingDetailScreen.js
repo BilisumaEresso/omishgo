@@ -39,7 +39,7 @@ export default function ListingDetailScreen({ route, navigation }) {
 
   if (!product) {
     return (
-      <DashboardLayout role="buyer" title="Produce Listing" showBack onBackPress={() => navigation.goBack()}>
+      <DashboardLayout role="buyer" title={t("listingDetail.screenTitle", "Produce Listing")} showBack onBackPress={() => navigation.goBack()}>
         <View style={styles.emptyContainer}>
           <Ionicons name="leaf-outline" size={48} color="#94A3B8" />
           <AppText style={styles.emptyTitle}>{t("listingDetail.listingNotFound", { defaultValue: "Listing Not Found" })}</AppText>
@@ -67,7 +67,10 @@ export default function ListingDetailScreen({ route, navigation }) {
 
   const handleMessageFarmer = () => {
     if (!farmer._id) {
-      Alert.alert("Producer Unavailable", "This producer cannot be messaged directly.");
+      Alert.alert(
+        t("listingDetail.producerUnavailableTitle", { defaultValue: "Producer Unavailable" }),
+        t("listingDetail.producerUnavailableMsg", { defaultValue: "This producer cannot be messaged directly." })
+      );
       return;
     }
     navigation.navigate("Chat", {
@@ -78,22 +81,34 @@ export default function ListingDetailScreen({ route, navigation }) {
 
   const handleCallFarmer = () => {
     if (!farmerPhone) {
-      Alert.alert("Phone Unavailable", "This producer has not shared a phone number.");
+      Alert.alert(
+        t("listingDetail.phoneUnavailableTitle", { defaultValue: "Phone Unavailable" }),
+        t("listingDetail.phoneUnavailableMsg", { defaultValue: "This producer has not shared a phone number." })
+      );
       return;
     }
     Linking.openURL(`tel:${farmerPhone}`).catch(() =>
-      Alert.alert("Error", "Could not open phone dialer")
+      Alert.alert(
+        t("errorMessage.title", { defaultValue: "Error" }),
+        t("chat.couldNotDial", { defaultValue: "Could not open phone dialer" })
+      )
     );
   };
 
   const handlePlaceOrder = async () => {
     const qty = parseFloat(buyQty);
     if (!qty || qty <= 0) {
-      Alert.alert("Invalid Volume", "Please enter a valid order volume in quintals.");
+      Alert.alert(
+        t("listingDetail.invalidVolumeTitle", { defaultValue: "Invalid Volume" }),
+        t("listingDetail.invalidVolumeMsg", { defaultValue: "Please enter a valid order volume in quintals." })
+      );
       return;
     }
     if (qty > product.quantity) {
-      Alert.alert("Volume Exceeded", `Maximum available stock is ${product.quantity} ${unit}.`);
+      Alert.alert(
+        t("listingDetail.volumeExceededTitle", { defaultValue: "Volume Exceeded" }),
+        t("listingDetail.volumeExceededMsg", { max: product.quantity, unit, defaultValue: "Maximum available stock is {{max}} {{unit}}." })
+      );
       return;
     }
 
@@ -106,17 +121,20 @@ export default function ListingDetailScreen({ route, navigation }) {
       setShowBuyModal(false);
       setBuyQty("");
       Alert.alert(
-        "Order Sent to Farmer! 🎉",
-        `Your wholesale purchase request for ${qty} ${unit} of ${product.cropType} has been submitted.`,
+        t("listingDetail.orderSentTitle", { defaultValue: "Order Sent to Farmer! 🎉" }),
+        t("listingDetail.orderSentMsg", { qty, unit, cropType: product.cropType, defaultValue: "Your wholesale purchase request for {{qty}} {{unit}} of {{cropType}} has been submitted." }),
         [
           {
-            text: "View Orders",
+            text: t("listingDetail.viewOrdersBtn", { defaultValue: "View Orders" }),
             onPress: () => navigation.navigate("Orders"),
           },
         ]
       );
     } catch (err) {
-      Alert.alert("Order Error", err?.response?.data?.message || "Failed to submit order.");
+      Alert.alert(
+        t("listingDetail.orderErrorTitle", { defaultValue: "Order Error" }),
+        err?.response?.data?.message || t("listingDetail.orderErrorMsg", { defaultValue: "Failed to submit order." })
+      );
     } finally {
       setOrdering(false);
     }
@@ -180,35 +198,35 @@ export default function ListingDetailScreen({ route, navigation }) {
         <View style={[styles.card, { backgroundColor: surfaceColor }]}>
           <View style={styles.cardHeaderRow}>
             <Ionicons name="trending-up-outline" size={18} color={primaryColor} />
-            <AppText style={styles.cardTitle}>Regional Market Price Index</AppText>
+            <AppText style={styles.cardTitle}>{t("listingDetail.regionalMarketPriceIndex", "Regional Market Price Index")}</AppText>
           </View>
 
           <View style={styles.insightsGrid}>
             <View style={styles.insightBox}>
-              <AppText style={styles.insightLabel}>Regional Avg</AppText>
+              <AppText style={styles.insightLabel}>{t("listingDetail.regionalAvg", "Regional Avg")}</AppText>
               <AppText style={[styles.insightValue, { color: primaryColor }]}>
                 ETB {avgMarketPrice.toLocaleString()} / {unit}
               </AppText>
             </View>
             <View style={styles.insightBox}>
-              <AppText style={styles.insightLabel}>Market Demand</AppText>
+              <AppText style={styles.insightLabel}>{t("listingDetail.marketDemand", "Market Demand")}</AppText>
               <AppText style={[styles.insightValue, { color: "#059669" }]}>
-                High Demand
+                {t("listingDetail.highDemand", "High Demand")}
               </AppText>
             </View>
             <View style={styles.insightBox}>
-              <AppText style={styles.insightLabel}>Harvest Status</AppText>
-              <AppText style={styles.insightValue}>Fresh Harvest</AppText>
+              <AppText style={styles.insightLabel}>{t("listingDetail.harvestStatus", "Harvest Status")}</AppText>
+              <AppText style={styles.insightValue}>{t("listingDetail.freshHarvest", "Fresh Harvest")}</AppText>
             </View>
           </View>
         </View>
 
         {/* Product Details Card */}
         <View style={[styles.card, { backgroundColor: surfaceColor }]}>
-          <AppText style={styles.cardTitle}>Produce Specifications</AppText>
+          <AppText style={styles.cardTitle}>{t("listingDetail.produceSpecifications", "Produce Specifications")}</AppText>
 
           <View style={styles.specRow}>
-            <AppText style={styles.specKey}>Crop Type</AppText>
+            <AppText style={styles.specKey}>{t("listingDetail.cropType", "Crop Type")}</AppText>
             <AppText style={styles.specVal}>{product.cropType}</AppText>
           </View>
           <View style={styles.specRow}>
@@ -218,14 +236,14 @@ export default function ListingDetailScreen({ route, navigation }) {
             </AppText>
           </View>
           <View style={styles.specRow}>
-            <AppText style={styles.specKey}>Harvest Location</AppText>
+            <AppText style={styles.specKey}>{t("listingDetail.harvestLocation", "Harvest Location")}</AppText>
             <AppText style={styles.specVal}>
-              {[loc.region, loc.zone].filter(Boolean).join(", ") || "Oromia Region"}
+              {[loc.wereda, loc.zone, loc.region].filter(Boolean).join(", ") || "Oromia Region"}
             </AppText>
           </View>
           {product.description ? (
             <View style={styles.specDescBox}>
-              <AppText style={styles.specKey}>Description</AppText>
+              <AppText style={styles.specKey}>{t("listingDetail.description", "Description")}</AppText>
               <AppText style={styles.specDescVal}>{product.description}</AppText>
             </View>
           ) : null}
@@ -250,7 +268,7 @@ export default function ListingDetailScreen({ route, navigation }) {
               <View style={styles.verifiedRow}>
                 <Ionicons name="checkmark-circle" size={13} color={primaryColor} />
                 <AppText style={[styles.verifiedLabel, { color: primaryColor }]}>
-                  Verified Farm Producer
+                  {t("listingDetail.verifiedFarmProducer", "Verified Farm Producer")}
                 </AppText>
               </View>
             </View>
@@ -268,7 +286,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           >
             <Ionicons name="chatbubble-ellipses-outline" size={16} color={primaryColor} />
             <AppText style={[styles.outlineActionText, { color: primaryColor }]}>
-              Chat & Negotiate
+              {t("listingDetail.chatNegotiate", "Chat & Negotiate")}
             </AppText>
           </TouchableOpacity>
 
@@ -279,7 +297,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           >
             <Ionicons name="call-outline" size={16} color="#64748B" />
             <AppText style={[styles.outlineActionText, { color: "#64748B" }]}>
-              Call Producer
+              {t("listingDetail.callProducer", "Call Producer")}
             </AppText>
           </TouchableOpacity>
         </View>
@@ -291,7 +309,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           activeOpacity={0.88}
         >
           <Ionicons name="cart-outline" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
-          <AppText style={styles.buyNowBtnText}>Place Wholesale Order</AppText>
+          <AppText style={styles.buyNowBtnText}>{t("listingDetail.placeWholesaleOrder", "Place Wholesale Order")}</AppText>
         </TouchableOpacity>
 
         <View style={{ height: 40 }} />
@@ -306,14 +324,14 @@ export default function ListingDetailScreen({ route, navigation }) {
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalCard, { backgroundColor: surfaceColor }]}>
-            <AppText style={styles.modalTitle}>Place Wholesale Order</AppText>
+            <AppText style={styles.modalTitle}>{t("listingDetail.placeWholesaleOrder", "Place Wholesale Order")}</AppText>
             <AppText style={styles.modalSub}>
-              Enter requested volume for {product.cropType} (Max {product.quantity} {unit}):
+              {t("listingDetail.enterRequestedVolume", { cropType: product.cropType, max: product.quantity, unit, defaultValue: `Enter requested volume for ${product.cropType} (Max ${product.quantity} ${unit}):` })}
             </AppText>
 
             <TextInput
               style={styles.qtyInput}
-              placeholder={`Quantity in ${unit} (e.g. 10)`}
+              placeholder={t("listingDetail.qtyInputPlaceholder", { unit, defaultValue: `Quantity in ${unit} (e.g. 10)` })}
               placeholderTextColor="#94A3B8"
               keyboardType="numeric"
               value={buyQty}
@@ -322,7 +340,7 @@ export default function ListingDetailScreen({ route, navigation }) {
 
             {buyQty && parseFloat(buyQty) > 0 ? (
               <View style={styles.totalBox}>
-                <AppText style={styles.totalLabel}>Estimated Total Amount:</AppText>
+                <AppText style={styles.totalLabel}>{t("listingDetail.estimatedTotalAmount", "Estimated Total Amount:")}</AppText>
                 <AppText style={[styles.totalAmount, { color: primaryColor }]}>
                   ETB {(parseFloat(buyQty) * product.price).toLocaleString()}
                 </AppText>
@@ -337,7 +355,7 @@ export default function ListingDetailScreen({ route, navigation }) {
                 activeOpacity={0.85}
               >
                 <AppText style={styles.confirmBtnText}>
-                  {ordering ? "Submitting Order..." : "Confirm & Send Order"}
+                  {ordering ? t("listingDetail.submittingOrder", "Submitting Order...") : t("listingDetail.confirmSendOrder", "Confirm & Send Order")}
                 </AppText>
               </TouchableOpacity>
 
@@ -348,7 +366,7 @@ export default function ListingDetailScreen({ route, navigation }) {
                   setBuyQty("");
                 }}
               >
-                <AppText style={styles.cancelBtnText}>Cancel</AppText>
+                <AppText style={styles.cancelBtnText}>{t("common.cancel", "Cancel")}</AppText>
               </TouchableOpacity>
             </View>
           </View>

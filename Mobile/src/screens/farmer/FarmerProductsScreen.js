@@ -51,7 +51,7 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
       const normalized = raw.map((p) => {
         let locString = "Ethiopia";
         if (p.location) {
-          locString = [p.location.region, p.location.zone, p.location.kebele]
+          locString = [p.location.wereda, p.location.zone, p.location.region]
             .filter(Boolean)
             .join(", ");
         }
@@ -131,8 +131,8 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
       );
     } catch (err) {
       Alert.alert(
-        "Status Update Failed",
-        err?.response?.data?.message || "Unable to mark crop as sold out."
+        t("farmerProducts.unableToMarkSoldTitle", { defaultValue: "Status Update Failed" }),
+        err?.response?.data?.message || t("farmerProducts.unableToMarkSoldMessage", { defaultValue: "Unable to mark crop as sold out." })
       );
     } finally {
       setUpdatingProductId(null);
@@ -211,7 +211,7 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
               ) : (
                 <>
                   <Ionicons name="checkmark-done" size={14} color="#DC2626" />
-                  <AppText style={styles.soldBtnText}>Mark Sold Out</AppText>
+                  <AppText style={styles.soldBtnText}>{t("farmerProducts.markSoldOut", "Mark Sold Out")}</AppText>
                 </>
               )}
             </TouchableOpacity>
@@ -226,16 +226,16 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
       <View style={styles.emptyIconBg}>
         <Ionicons name="leaf-outline" size={48} color={primary} />
       </View>
-      <AppText style={[styles.emptyTitle, { color: textPrimary }]}>No Harvest Crops Listed</AppText>
+      <AppText style={[styles.emptyTitle, { color: textPrimary }]}>{t("farmerProducts.noCropsTitle", "No Harvest Crops Listed")}</AppText>
       <AppText style={styles.emptySub}>
-        Post your agricultural produce so wholesale buyers across Ethiopia can discover and order your harvest.
+        {t("farmerProducts.noCropsSub", "Post your agricultural produce so wholesale buyers across Ethiopia can discover and order your harvest.")}
       </AppText>
       <TouchableOpacity
         style={[styles.postFirstBtn, { backgroundColor: primary }]}
         onPress={() => navigation?.navigate("PostProduct")}
         activeOpacity={0.85}
       >
-        <AppText style={styles.postFirstBtnText}>+ Post Your First Harvest</AppText>
+        <AppText style={styles.postFirstBtnText}>{t("farmerProducts.postFirstHarvest", "+ Post Your First Harvest")}</AppText>
       </TouchableOpacity>
     </View>
   );

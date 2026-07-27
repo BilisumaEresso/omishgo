@@ -48,10 +48,10 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
   const hours = new Date().getHours();
   const greetingText =
     hours < 12
-      ? t("farmerDashboard.goodMorning", "Good Morning")
+      ? t("farmerDashboard.goodMorning", { defaultValue: "Good Morning" })
       : hours < 17
-      ? t("farmerDashboard.goodAfternoon", "Good Afternoon")
-      : t("farmerDashboard.goodEvening", "Good Evening");
+      ? t("farmerDashboard.goodAfternoon", { defaultValue: "Good Afternoon" })
+      : t("farmerDashboard.goodEvening", { defaultValue: "Good Evening" });
 
   const fetchProducts = async () => {
     try {
@@ -68,7 +68,7 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
             category: p.cropType || p.category,
             quantity: p.quantity,
             unit: p.unit || "q",
-            location: `${p.location?.region || ""}, Ethiopia`,
+            location: [p.location?.wereda, p.location?.zone, p.location?.region].filter(Boolean).join(", ") || "Ethiopia",
             farmerName: user?.name || "Farmer",
             photos: p.photos || [],
           }))
@@ -172,10 +172,11 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
   return (
     <>
       <DashboardLayout
-        title={t("farmerDashboard.title", "Farmer Dashboard")}
+        title={t("farmerDashboard.title", { defaultValue: "Farmer Dashboard" })}
         subtitle={t("farmerDashboard.subtitle", {
           greeting: greetingText,
-          name: user?.name || "Farmer Producer",
+          name: user?.name || t("farmerDashboard.fallbackName", { defaultValue: "Farmer Producer" }),
+          defaultValue: "{{greeting}}, {{name}}!",
         })}
         role="farmer"
         scrollable={true}

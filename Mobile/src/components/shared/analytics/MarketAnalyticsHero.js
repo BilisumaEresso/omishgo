@@ -1,8 +1,9 @@
-// src/components/shared/analytics/MarketAnalyticsHero.js
 import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, View } from "react-native";
 import AppText from "../../common/AppText";
+import { getLocalizedUnitName } from "../../../constants/units";
+import { getLocalizedCropName } from "../../../constants/crops";
 
 export default function MarketAnalyticsHero({
   commodity = {
@@ -19,7 +20,11 @@ export default function MarketAnalyticsHero({
   primaryColor = "#15803D",
   isFarmer = true,
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
+  const localizedUnit = getLocalizedUnitName(commodity.unit || "q", currentLang, t);
+  const localizedCrop = getLocalizedCropName(commodity.crop, currentLang, t);
+
   const bgGradient = isFarmer ? "#15803D" : "#1565C0";
   const badgeColor = isFarmer ? "#A7F3D0" : "#BFDBFE";
 
@@ -34,7 +39,7 @@ export default function MarketAnalyticsHero({
               {t("analytics.nationalCommodityIndex", { defaultValue: "National Commodity Index" })}
             </AppText>
           </View>
-          <AppText style={styles.cropTitle}>{commodity.crop}</AppText>
+          <AppText style={styles.cropTitle}>{localizedCrop}</AppText>
         </View>
 
         <View
@@ -66,14 +71,18 @@ export default function MarketAnalyticsHero({
       {/* Main Price */}
       <View style={styles.priceRow}>
         <AppText style={styles.priceAmount}>ETB {commodity.price}</AppText>
-        <AppText style={styles.priceUnit}>/ {commodity.unit}</AppText>
+        <AppText style={styles.priceUnit}>/ {localizedUnit}</AppText>
       </View>
 
       {/* 7-Day Low / High Range Track */}
       <View style={styles.rangeSection}>
         <View style={styles.rangeLabels}>
-          <AppText style={styles.rangeText}>7d Low: ETB {commodity.low7d}/q</AppText>
-          <AppText style={styles.rangeText}>7d High: ETB {commodity.high7d}/q</AppText>
+          <AppText style={styles.rangeText}>
+            {t("analytics.sevenDayLow", { price: commodity.low7d, unit: localizedUnit, defaultValue: `7d Low: ETB ${commodity.low7d}/${localizedUnit}` })}
+          </AppText>
+          <AppText style={styles.rangeText}>
+            {t("analytics.sevenDayHigh", { price: commodity.high7d, unit: localizedUnit, defaultValue: `7d High: ETB ${commodity.high7d}/${localizedUnit}` })}
+          </AppText>
         </View>
         <View style={styles.rangeTrack}>
           <View style={styles.rangeFill} />
@@ -84,11 +93,15 @@ export default function MarketAnalyticsHero({
       <View style={styles.footerRow}>
         <View style={styles.footerItem}>
           <Ionicons name="cube-outline" size={13} color="rgba(255,255,255,0.7)" />
-          <AppText style={styles.footerText}>Traded Vol: {commodity.volume}</AppText>
+          <AppText style={styles.footerText}>
+            {t("analytics.tradedVol", { volume: commodity.volume, defaultValue: `Traded Vol: ${commodity.volume}` })}
+          </AppText>
         </View>
         <View style={styles.footerItem}>
           <Ionicons name="location-outline" size={13} color="rgba(255,255,255,0.7)" />
-          <AppText style={styles.footerText}>{commodity.hubsCount || 12} Regional Hubs</AppText>
+          <AppText style={styles.footerText}>
+            {t("analytics.regionalHubsCount", { count: commodity.hubsCount || 12, defaultValue: `${commodity.hubsCount || 12} Regional Hubs` })}
+          </AppText>
         </View>
       </View>
     </View>

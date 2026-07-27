@@ -24,7 +24,7 @@ export default function FarmerSalesMetrics({
           <View style={[styles.iconBg, { backgroundColor: "#10B981" }]}>
             <Ionicons name="time" size={16} color="#FFFFFF" />
           </View>
-          <AppText style={styles.badgeLabel}>Fulfillment</AppText>
+          <AppText style={styles.badgeLabel}>{t("farmerDashboard.fulfillment", "Fulfillment")}</AppText>
         </View>
 
         <AppText style={[styles.metricValue, { color: "#065F46" }]}>
@@ -45,7 +45,7 @@ export default function FarmerSalesMetrics({
           <View style={[styles.iconBg, { backgroundColor: "#2563EB" }]}>
             <Ionicons name="checkmark-done" size={16} color="#FFFFFF" />
           </View>
-          <AppText style={[styles.badgeLabel, { color: "#1D4ED8" }]}>Completed</AppText>
+          <AppText style={[styles.badgeLabel, { color: "#1D4ED8" }]}>{t("farmerDashboard.completed", "Completed")}</AppText>
         </View>
 
         <AppText style={[styles.metricValue, { color: "#1E40AF" }]}>

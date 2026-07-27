@@ -45,10 +45,10 @@ export default function FarmerAnalyticsScreen({ navigation }) {
 
   // Farmer metrics
   const farmerMetrics = [
-    { label: "Active Listings", value: data?.totalProducts ?? 8, icon: "cube-outline" },
-    { label: "Total Revenue", value: data?.totalRevenue ? `ETB ${data.totalRevenue}` : "ETB 142.5k", icon: "cash-outline" },
-    { label: "Orders Delivered", value: data?.delivered ?? 34, icon: "checkmark-circle-outline" },
-    { label: "Pending Orders", value: data?.pending ?? 5, icon: "time-outline" },
+    { label: t("farmerProducts.activeListings", { defaultValue: "Active Listings" }), value: data?.totalProducts ?? 8, icon: "cube-outline" },
+    { label: t("farmerDashboard.totalRevenue", { defaultValue: "Total Revenue" }), value: data?.totalRevenue ? `ETB ${data.totalRevenue}` : "ETB 142.5k", icon: "cash-outline" },
+    { label: t("farmerOrders.ordersDelivered", { defaultValue: "Orders Delivered" }), value: data?.delivered ?? 34, icon: "checkmark-circle-outline" },
+    { label: t("farmerOrders.pendingOrders", { defaultValue: "Pending Orders" }), value: data?.pending ?? 5, icon: "time-outline" },
   ];
 
   // Market Prices in Quintal (q)
@@ -104,7 +104,7 @@ export default function FarmerAnalyticsScreen({ navigation }) {
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* 1. Store Performance Grid */}
           <AppText style={[styles.sectionTitle, { color: textPrimary }]}>
-            Your Store Performance
+            {t("farmerAnalytics.storePerformance", { defaultValue: "Your Store Performance" })}
           </AppText>
           <View style={styles.metricsGrid}>
             {farmerMetrics.map((item, idx) => (
@@ -119,14 +119,14 @@ export default function FarmerAnalyticsScreen({ navigation }) {
           {/* 2. Market Rates & Quick Sell */}
           <View style={styles.sectionHeaderRow}>
             <AppText style={[styles.sectionTitle, { color: textPrimary }]}>
-              Market Rates per Quintal
+              {t("analytics.marketRatesTitle", { defaultValue: "Market Rates per Quintal" })}
             </AppText>
             <TouchableOpacity
               onPress={() => navigation?.navigate("PostProduct")}
               activeOpacity={0.8}
             >
               <AppText style={[styles.addListingBtnText, { color: primaryColor }]}>
-                + Post Listing
+                {t("farmerProducts.addListingBtn", { defaultValue: "+ Post Listing" })}
               </AppText>
             </TouchableOpacity>
           </View>
@@ -171,7 +171,7 @@ export default function FarmerAnalyticsScreen({ navigation }) {
                     onPress={() => handleSellPress(item)}
                     activeOpacity={0.85}
                   >
-                    <AppText style={styles.sellBtnText}>Sell Harvest</AppText>
+                    <AppText style={styles.sellBtnText}>{t("farmerAnalytics.sellHarvest", { defaultValue: "Sell Harvest" })}</AppText>
                   </TouchableOpacity>
                 </View>
               );
@@ -180,7 +180,7 @@ export default function FarmerAnalyticsScreen({ navigation }) {
 
           {/* 3. Regional Buyer Demand */}
           <AppText style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}>
-            Buyer Demand by Location
+            {t("farmerAnalytics.buyerDemandByLoc", { defaultValue: "Buyer Demand by Location" })}
           </AppText>
           <View style={styles.locationGrid}>
             {locationDemand.map((loc) => {
@@ -194,7 +194,7 @@ export default function FarmerAnalyticsScreen({ navigation }) {
                     </View>
                     <View style={[styles.demandBadge, { backgroundColor: badgeColor + "18" }]}>
                       <AppText style={[styles.demandText, { color: badgeColor }]}>
-                        {loc.demandLevel.toUpperCase()} DEMAND
+                        {loc.demandLevel.toUpperCase()} {t("analytics.demand", { defaultValue: "DEMAND" })}
                       </AppText>
                     </View>
                   </View>
@@ -204,8 +204,8 @@ export default function FarmerAnalyticsScreen({ navigation }) {
                   </View>
 
                   <View style={styles.locationFooterRow}>
-                    <AppText style={styles.topCropText}>Top Wanted: {loc.topCrop}</AppText>
-                    <AppText style={styles.buyersCountText}>{loc.activeBuyers} Buyers</AppText>
+                    <AppText style={styles.topCropText}>{t("analytics.topWanted", { defaultValue: "Top Wanted" })}: {loc.topCrop}</AppText>
+                    <AppText style={styles.buyersCountText}>{t("analytics.buyersCount", { count: loc.activeBuyers, defaultValue: `${loc.activeBuyers} Buyers` })}</AppText>
                   </View>
 
                   <TouchableOpacity
@@ -218,7 +218,7 @@ export default function FarmerAnalyticsScreen({ navigation }) {
                     activeOpacity={0.8}
                   >
                     <AppText style={[styles.targetMarketText, { color: primaryColor }]}>
-                      Target This Market
+                      {t("analytics.targetMarket", { defaultValue: "Target This Market" })}
                     </AppText>
                   </TouchableOpacity>
                 </View>
@@ -228,25 +228,25 @@ export default function FarmerAnalyticsScreen({ navigation }) {
 
           {/* 4. Actionable Market Tips */}
           <AppText style={[styles.sectionTitle, { color: textPrimary, marginTop: 24 }]}>
-            Market Tips
+            {t("analytics.marketTips", { defaultValue: "Market Tips" })}
           </AppText>
           <View style={styles.advisoryList}>
             <View style={[styles.advisoryCard, { backgroundColor: primaryContainer }]}>
               <View style={styles.advisoryTop}>
                 <Ionicons name="bulb-outline" size={20} color={primaryColor} />
                 <AppText style={[styles.advisoryTitle, { color: textPrimary }]}>
-                  Onion Price Rise in Adama
+                  {t("farmerAnalytics.advisoryOnionTitle", "Onion Price Rise in Adama")}
                 </AppText>
               </View>
               <AppText style={[styles.advisoryBody, { color: textSecondary }]}>
-                Wholesale onion prices are up +5.8% (ETB 4,500 / quintal) in East Shewa. Post your harvest today to secure good prices.
+                {t("farmerAnalytics.advisoryOnionBody", "Wholesale onion prices are up +5.8% (ETB 4,500 / quintal) in East Shewa. Post your harvest today to secure good prices.")}
               </AppText>
               <TouchableOpacity
                 style={[styles.advisoryActionBtn, { backgroundColor: primaryColor }]}
                 onPress={() => navigation?.navigate("PostProduct", { prefill: { cropType: "Red Onion", price: 4500, unit: "q" } })}
                 activeOpacity={0.85}
               >
-                <AppText style={styles.advisoryActionText}>Post Onion Listing →</AppText>
+                <AppText style={styles.advisoryActionText}>{t("farmerAnalytics.postOnionListing", { defaultValue: "Post Onion Listing →" })}</AppText>
               </TouchableOpacity>
             </View>
 
@@ -254,18 +254,18 @@ export default function FarmerAnalyticsScreen({ navigation }) {
               <View style={styles.advisoryTop}>
                 <Ionicons name="location-outline" size={20} color="#D97706" />
                 <AppText style={[styles.advisoryTitle, { color: "#78350F" }]}>
-                  High Demand for Coffee in Harar
+                  {t("farmerAnalytics.advisoryCoffeeTitle", "High Demand for Coffee in Harar")}
                 </AppText>
               </View>
               <AppText style={[styles.advisoryBody, { color: "#92400E" }]}>
-                185 buyers are searching for Coffee Beans in Harar. List your stock to get instant buyer orders.
+                {t("farmerAnalytics.advisoryCoffeeBody", "185 buyers are searching for Coffee Beans in Harar. List your stock to get instant buyer orders.")}
               </AppText>
               <TouchableOpacity
                 style={[styles.advisoryActionBtn, { backgroundColor: "#D97706" }]}
                 onPress={() => navigation?.navigate("PostProduct", { prefill: { cropType: "Coffee Beans", price: 9600, unit: "q" } })}
                 activeOpacity={0.85}
               >
-                <AppText style={styles.advisoryActionText}>Post Coffee Listing →</AppText>
+                <AppText style={styles.advisoryActionText}>{t("farmerAnalytics.postCoffeeListing", { defaultValue: "Post Coffee Listing →" })}</AppText>
               </TouchableOpacity>
             </View>
           </View>

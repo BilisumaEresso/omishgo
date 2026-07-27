@@ -1,10 +1,9 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { getRoleColors, neutralColors } from "../constants/colors";
 import { spacing } from "../constants/layout";
 import Typography from "./Typography";
-
-
 
 const styles = StyleSheet.create({
   button: {
@@ -34,7 +33,7 @@ const SkipButton = React.forwardRef(
   (
     {
       onPress,
-      label = "Skip",
+      label,
       variant = "text", // 'text' | 'background'
       size = "medium", // 'small' | 'medium' | 'large'
       role = "farmer",
@@ -45,6 +44,8 @@ const SkipButton = React.forwardRef(
     },
     ref,
   ) => {
+    const { t } = useTranslation();
+    const displayLabel = label || t("common.skip", "Skip");
     const roleColors = getRoleColors(role);
 
     const sizeStyle = {
@@ -83,7 +84,7 @@ const SkipButton = React.forwardRef(
           color={textColor}
           style={styles.buttonText}
         >
-          {label}
+          {displayLabel}
         </Typography>
       </TouchableOpacity>
     );

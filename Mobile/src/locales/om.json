@@ -22,8 +22,9 @@
     "pickPhotoSource": "Madda suuraa filadhaa:",
     "camera": "Suuraa Kaasaa",
     "gallery": "Gaalarii irraa filadhaa",
-    "weredaAlert": "Maaloo godina filachuun dura naannoo filadhaa.",
-    "viewAll": "Hunda Ilaalaa"
+    "weredaAlert": "Godina filachuun dura maaloo naannoo filadhu.",
+    "viewAll": "Hunda Ilaali",
+    "refreshing": "Haaromsamaa jira…"
   },
   "splash": {
     "title": "OmishGo",
@@ -58,8 +59,8 @@
     "nameLabel": "Maqaa Guutuu",
     "namePlaceholder": "Maqaa kee guutuu galchi",
     "roleLabel": "Ani...",
-    "roleFarmer": "Qotee Bulaa Oomishaa",
-    "roleBuyer": "Bitaa Gudaa",
+    "roleFarmer": "Qotee Bulaa",
+    "roleBuyer": "Bitaa Guddaa",
     "roleAdmin": "Bulchaa dha",
     "emailLabel": "Imeelii (Filannoo)",
     "emailPlaceholder": "Imeelii kee galchi",
@@ -73,7 +74,20 @@
     "hasAccount": "Akkaawuntii qabdaa?",
     "noAccount": "Akkaawuntii hin qabduu?",
     "registerError": "Galmeen hin milkoofne. Irra deebi'ii yaali.",
-    "registrationFailed": "Rakkoon uumameera. Maaloo irra deebi'ii yaali."
+    "registrationFailed": "Rakkoon uumameera. Maaloo irra deebi'ii yaali.",
+    "nameRequired": "Maqaan guutuun Barbaachisaadha.",
+    "phoneRequired": "Lakkoofsi bilbilaa Barbaachisaadha.",
+    "pinRequired": "Lakkoofsi PIN Barbaachisaadha.",
+    "pinLengthError": "PIN dijiti 4 hanga 6 ta'uu qaba.",
+    "regionRequired": "Naannoon Barbaachisaadha.",
+    "zoneRequired": "Godinaan Barbaachisaadha.",
+    "weredaRequired": "Aanaon Barbaachisaadha.",
+    "createAccountTitle": "Akkawuntii Uumi",
+    "supportHelpline": "Gargaarsa barbaaduu? Deeggarsaaf bilbilaa: 0938730818",
+    "registerSupportHelpline": "Gargaarsa galmee barbaaduu? Deeggarsaaf bilbilaa: 0938730818",
+    "rememberMe": "Na yaadadhu",
+    "adminAccessTitle": "Seensa Bulchaa",
+    "adminAccessBody": "Paanaliin bulchiinsaa web irratti qofa argama.\nMaaloo kompiyuutaraa irratti OmishGo AdminWeb daashboordii daawwadhaa."
   },
   "crops": {
     "Teff": "Xaafii",
@@ -102,7 +116,10 @@
     "Sunflower": "Suufii",
     "Avocado": "Avokaadoo",
     "Banana": "Muuzii",
-    "Mango": "Maangoo"
+    "Mango": "Maangoo",
+    "All": "Hunda",
+    "Vegetables": "Kuduraa",
+    "Grains": "Midhaan"
   },
   "units": {
     "kg": "Kiiloogiraama (kg)",
@@ -173,7 +190,23 @@
     "resetFilters": "Calaltuu Hunda Haqaa",
     "noProduceMatch": "Oomishni Calaltuu Keessan Wajjin Walsimatu Hoomayyuu Hin Jiru",
     "clearFilterHint": "Calaltuu haquun ykn gaaffii bittaa jumlaa maxxansuu yaalaai.",
-    "loadingListings": "Tarreen oomishaa fe'amaa jira..."
+    "loadingListings": "Tarreen oomishaa fe'amaa jira...",
+    "procurementOverview": "Ilaalcha Waliigalaa Bittaa fi Gabaa",
+    "procurementRate": "Reettii Bittaa",
+    "item": "Mi'a",
+    "items": "Mi'oota",
+    "activeSupply": "Dhiyeessa Hojii Irra Jiru",
+    "farmersCount": "Qonnaan Bultoota {{count}}",
+    "verified": "Mirkanaa'aa",
+    "getDirectQuotes": "Qonnaan bultoota naannoo mirkanaa'an irraa kallattiin gatii bittaa jumlaa argadhaa.",
+    "mySpending": "Baasii Ko",
+    "last4Months": "Ji'oota 4n Darban",
+    "procurementCategories": "Gosa Bittaa",
+    "priceTrends": "Adeemsa Gatii",
+    "viewFullAnalysis": "Ilaalcha Gabaa Guutuu Ilaali",
+    "specialityDefault": "Xaafii fi Shunkurtii Irratti Kan Xiyyeeffate",
+    "viewFarmStock": "Qotiisa fi Omisha Ilaali",
+    "recentActivityTitle": "Ajajawwan fi Sochii Dhiyootti"
   },
   "browse": {
     "title": "Gabaa",
@@ -202,7 +235,8 @@
     "farmerTitle": "Qotee Bulaa",
     "unknownFarmer": "Qotee Bulaa Hin Beekamne",
     "noPhone": "Lakkofsi bilbilaa hin jiru",
-    "noLocation": "Iddoon hin jiru"
+    "noLocation": "Iddoon hin jiru",
+    "noProductsMatch": "Omishni barbaacha keessaniin walsimatu hin jiru."
   },
   "buyerOrders": {
     "title": "Ajajawwan Koo",
@@ -223,7 +257,10 @@
     "messageFarmer": "Qotee bulaatti ergi",
     "emptyNoOrders": "Hanga ammaa ajaja tokkoyyuu hin goone",
     "emptyNoFilterOrders": "Ajajawwan {{filter}} hin jiran",
-    "browseMarketplace": "Gabaa Daawwadhu"
+    "browseMarketplace": "Gabaa Daawwadhu",
+    "orderActivity": "Sochii Ajaja",
+    "activityUpdated": "Sochiin haaromsameera",
+    "trackDetails": "Tarreeffama Hordofi →"
   },
   "buyerProfile": {
     "title": "Akkaawuntii Bitaa",
@@ -246,7 +283,12 @@
     "logoutAlertCancel": "Haqi",
     "logoutAlertConfirm": "Bahi",
     "menuSettings": "Qindaa'inoota",
-    "chatNow": "Amma Barreessif"
+    "chatNow": "Amma Barreessif",
+    "preferencesTitle": "Filannoowwan & Qindaa'ina",
+    "languageLabel": "Afaan / Language",
+    "helpSupport": "Gargaarsa & Deeggarsa",
+    "helpSupportSub": "Gaaffiilee waaltaa & Tajaajila maamilaa",
+    "signOutBtn": "Akaawuntii Ba'i"
   },
   "buyerSaved": {
     "title": "Beeksisawwan Kuufaman",
@@ -304,7 +346,39 @@
     "batchValue": "Gatii Waligala Oomishaa",
     "availableStock": "Kuusaa Jiru",
     "listingNotFound": "Oomishni Hin Argamne",
-    "listingRemoved": "Oomishni kun haqameera ykn hojii irra hin jiru."
+    "listingRemoved": "Beeksisni oomisha kanaa haqameera ykn banaa miti.",
+    "producerUnavailableTitle": "Oomishaan Hin Jiru",
+    "producerUnavailableMsg": "Oomishaa kanaaf ergaa kallattii erguun hin danda'amne.",
+    "phoneUnavailableTitle": "Lakkoofsi Bilbilaa Hin Jiru",
+    "phoneUnavailableMsg": "Oomishaan kun lakkoofsa bilbilaa hin qoodanne.",
+    "invalidVolumeTitle": "Hamma Soba",
+    "invalidVolumeMsg": "Maaloo lakkoofsa hamma ajajaa sirrii qunxalaan galchi.",
+    "volumeExceededTitle": "Hamma Kuusaa Ol",
+    "volumeExceededMsg": "Hammi gaafatame kuusaa jiru irra caala.",
+    "orderSentTitle": "Ajajni Oomishaaf Ergameera! 🎉",
+    "orderSentMsg": "Gaaffiin bitannaa jumlaa keessani milkaa'inaan ergameera.",
+    "viewOrdersBtn": "Ajajawwan Ilaali",
+    "orderErrorTitle": "Dogoggora Ajajaa",
+    "orderErrorMsg": "Ajaja erguun hin danda'amne.",
+    "regionalMarketPriceIndex": "Tarree Gatii Gabaa Naannoo",
+    "regionalAvg": "Giddu-galeessa Naannoo",
+    "marketDemand": "Fedhii Gabaa",
+    "highDemand": "Fedhii Ol'aanaa",
+    "harvestStatus": "Haala Oomishaa",
+    "freshHarvest": "Oomisha Haaraa",
+    "produceSpecifications": "Tarree Ibsa Oomishaa",
+    "cropType": "Gosa Oomishaa",
+    "harvestLocation": "Bakka Oomishaa",
+    "description": "Ibsa",
+    "verifiedFarmProducer": "Oomishtaa Qonnaa Mirkanaa'e",
+    "chatNegotiate": "Waliin Haasa'i & Dhaabbadhu",
+    "callProducer": "Oomishtaan Bilbili",
+    "placeWholesaleOrder": "Ajaja Jumlaa Dhiyeessi",
+    "enterRequestedVolume": "{{cropType}}-f hamma barbaadamu galchu (Hamma {{max}} {{unit}}):",
+    "qtyInputPlaceholder": "Hamma {{unit}}-n (fkn 10)",
+    "estimatedTotalAmount": "Gatii Waliigalaa Tilmaamamaa:",
+    "submittingOrder": "Ajaja Ergamaa Jira...",
+    "confirmSendOrder": "Mirkaneessi & Ajaja Ergi"
   },
   "farmerDashboard": {
     "title": "Daashboordii Qotee Bulaa",
@@ -354,7 +428,15 @@
     "monthlySalesTrend": "Adeemsa Gurgurtaaa Ji'aa",
     "revenueTrajectory": "Adeemsa galii ji'oottan 6n darban",
     "pendingDispatches": "Ergawwan Eeggamaa Jiran",
-    "deliveredHarvests": "Oomishoota Dhiyaatan"
+    "deliveredHarvests": "Oomishoota Dhiyaatan",
+    "quickActionsTitle": "Tarkaanfiiwwan Saffisaa Oomishtaa",
+    "buyerChats": "Waliin Haasaa Bittootaa",
+    "notifications": "Beeksisa",
+    "myDrafts": "Wixinee Koos",
+    "priceTrends": "Adeemsa Gatiinii",
+    "soldBadge": "Gurgurameera",
+    "fulfillment": "Raawwachiisa",
+    "completed": "Xumurameera"
   },
   "farmerProfile": {
     "title": "Akkaawuntii Qotee Bulaa",
@@ -418,13 +500,22 @@
     "deleteErrorMessage": "Beeksisa balleessuun hin danda'amne. Irra deebi'ii yaali.",
     "selectRegionFirstTitle": "Dursee Naannoo Filadhu",
     "selectRegionFirstMessage": "Godina filachuun dura maaloo naannoo filadhu.",
-    "availabilityStatus": "Haala Dhiyeessii Oomishaa",
-    "activeStock": "Gabaaf Kan Qophaa'e",
-    "soldOut": "Gurguramee Kan Dhumate",
-    "cropSelectPlaceholder": "Gosa Oomishaa Filadhaa"
+    "availabilityStatus": "Haala Qophii Oomishaa",
+    "activeStock": "Kuusaa Qophii",
+    "soldOut": "Gurgurameera",
+    "cropSelectPlaceholder": "Oomisha Filadhu",
+    "updatedSuccessTitle": "Oomishni Fooyya'eera!",
+    "updatedSuccessMsg": "Jijjiiramni oomisha keessanii milkaa'inaan olkaa'ameera.",
+    "updateFailedTitle": "Fooyya'iinsi Hin Milkoofne",
+    "updateFailedMsg": "Oomisha fooyyessuun hin danda'amne.",
+    "deleteConfirmMsg": "Oomisha kana haquuf mirkanaa'aadhaa? Tarkaanfiin kun hin deebi'u.",
+    "deleteListingBtn": "Oomisha Haqi",
+    "deleteErrorMsg": "Oomisha haquun hin danda'amne.",
+    "savingChanges": "Jijjiirama Olkaa'aa Jira...",
+    "saveChangesBtn": "✓ Jijjiirama Olkaa'i"
   },
   "farmerAnalytics": {
-    "title": "Gatii Gabaa Biyyaaleessaa",
+    "title": "Hubannoo Gabaa fi Gurgurtaa",
     "thisWeek": "Torbee Kana",
     "totalProducts": "Oomishaalee",
     "totalRevenue": "Galii",
@@ -438,7 +529,16 @@
     "cropTeff": "Xaafii",
     "cropOnion": "Qullubbii Diimaa",
     "cropTomato": "Timaatima",
-    "cropWheat": "Qamadii"
+    "cropWheat": "Qamadii",
+    "storePerformance": "Raawwii Suuqii Keessanii",
+    "sellHarvest": "Omisha Gurguri",
+    "buyerDemandByLoc": "Fedhii Bittaadhaa Bakkaan",
+    "postOnionListing": "Maxxansa Shunkurtii Maxxansi →",
+    "postCoffeeListing": "Maxxansa Bunaa Maxxansi →",
+    "advisoryOnionTitle": "Adamaatti Gatiin Shunkurta Ol Ka'uu",
+    "advisoryOnionBody": "Shewa Bahaatti gatiin jumlaa shunkurtii +5.8% (ETB 4,500 / kuntaala) dabaleera. Gatii gaarii argachuuf oomisha keessan har'a maxxansaa.",
+    "advisoryCoffeeTitle": "Hararitti Fedhii Ol'aanaa Bunaa",
+    "advisoryCoffeeBody": "Hararitti bittoonni 185 Buna barbaadaa jiru. Ajaja bittootaa hatattamaan argachuuf oomisha keessan galmeessaa."
   },
   "farmerOrders": {
     "title": "Ajajawwan Gurgurta",
@@ -477,7 +577,11 @@
     "emptyFallbackMessage": "Oomishni hojiirra jiru hin jiru.\n+ cuqaasuun oomisha kee maxxansi.",
     "unableToMarkSoldTitle": "Sirreessuun Hin Danda'amne",
     "unableToMarkSoldMessage": "Sadarkaa oomishaa sirreessuun hin danda'amne. Irra deebi'ii yaali.",
-    "fallbackLocation": "Itoophiyaa"
+    "fallbackLocation": "Itoophiyaa",
+    "markSoldOut": "Gurgurameera jedhi",
+    "noCropsTitle": "Oomishni Galmaa'e Hogoftu Hin Jiru",
+    "noCropsSub": "Bittoonni jumlaa Itoophiyaa guutuu jiran oomisha keessan akka arganii fi ajajan oomisha qonnaa keessan maxxansaa.",
+    "postFirstHarvest": "+ Oomisha Keessan Isa Jalqabaa Maxxansaa"
   },
   "listingForm": {
     "errorTitle": "Dogoggora",
@@ -536,7 +640,7 @@
     "chooseFromGallery": "Galmee Suuraa Irraa Filadhu",
     "cancel": "Haqi",
     "retry": "Irra deebi'ii yaali",
-    "photoLimitTitle": "Daangaa Suuraa Geesseera",
+    "photoLimitTitle": "Dangeessaa Suuraa",
     "photoLimitMessage": "Beeksisa tokkootti suuraa {{max}} qofa dabaluu dandeessa.",
     "permissionDeniedTitle": "Eeyyama Barbaachisa",
     "permissionDeniedMessage": "OmishGo beeksisa irratti suuraa dabaluuf eeyyama kaameraa barbaada.",
@@ -552,7 +656,36 @@
     "formDesc": "Bitattoota jumlaa Itoophiyaa irraa ajaja kallattii argachuuf odeeffannoo oomisha keessan guuttaa.",
     "popularCrops": "Oomishoota Qonnaa Beekamoo",
     "stockQuantity": "Hamma Kuusaa",
-    "quantityPlaceholder": "fakkeenyaaf 100"
+    "quantityPlaceholder": "fkn. 100",
+    "photoLimitMsg": "Tarree oomishaa tokkoof suuraa 2 qofa.",
+    "permissionRequiredTitle": "Eeyyama Barbaachisa",
+    "permissionRequiredMsg": "Suuraa maxxansuuf eeyyamni kaameraa/Gaalarii barbaachisaadha.",
+    "addPhotoTitle": "Suuraa Oomishaa Dabaladhu",
+    "choosePhotoSource": "Maddaa suuraa filadhu:",
+    "chooseGallery": "Gaalarii Kessaa Filadhu",
+    "cropRequiredTitle": "Gosni Oomishaa Barbaachisaa",
+    "cropRequiredMsg": "Moocharoo gosa oomishaa filadhu.",
+    "qtyRequiredTitle": "Hammamuun Barbaachisaa",
+    "qtyRequiredMsg": "Maaloo lakkoofsa hamma kuusaa sirrii galchi.",
+    "priceRequiredTitle": "Gatiin Barbaachisaa",
+    "priceRequiredMsg": "Maaloo gatii safartuu tokkoo sirrii galchi.",
+    "locRequiredTitle": "Bakki Barbaachisaa",
+    "locRequiredMsg": "Maaloo naannoo filadhu.",
+    "listedSuccessTitle": "Oomishni Maxxanfameera!",
+    "listedSuccessMsg": "Maxxansi oomisha keessanii bitattoota gurguddoof banaa ta'eera.",
+    "submissionErrorTitle": "Dogoggora Galche",
+    "pricePerUnit": "Gatiin safartuu",
+    "harvestPhotosLabel": "Fakkiiwwan Oomishaa (Maks 2)",
+    "farmLocationSection": "Iddoo Qonnaa / Kuusaa",
+    "regionLabel": "Naannoo",
+    "selectRegionPlaceholder": "Naannoo Filadhu",
+    "zoneLabel": "Godina",
+    "selectZonePlaceholder": "Godina Filadhu",
+    "weredaLabel": "Aanaa / Wereda",
+    "selectWeredaPlaceholder": "Aanaa Filadhu",
+    "publishingBtn": "Maxxansaa Jira...",
+    "publishBtn": "🚀 Oomisha Qonnaa Maxxansi",
+    "unitPlaceholder": "Safartuu"
   },
   "myDrafts": {
     "title": "Wixineewwan Koo",
@@ -645,7 +778,9 @@
   "notificationsScreen": {
     "title": "Beeksisawwan",
     "markAllRead": "Hunda akka dubbifametti mallatteessi",
-    "empty": "Hanga ammaa beeksisni hin jiru"
+    "empty": "Hanga ammaa beeksisni hin jiru",
+    "emptySub": "Hunda ilaaltaniirtu. Beeksifni haaraan asitti mul'ata.",
+    "unreadCount": "Beeksisa hin dubbifamne {{count}}"
   },
   "orderDetail": {
     "screenTitle": "Odeeffannoo Ajajaa",
@@ -682,9 +817,11 @@
     "success": "Milkaa'ina",
     "orderStatusUpdated": "Ajajni {{status}}",
     "cancelTitle": "Ajaja Haqi",
-    "cancelMessage": "Dhuguma ajaja kana haqaa barbaaddaa?",
+    "cancelMessage": "Ajaja kana haquuf mirkanaa'aadhaa?",
     "cancelNo": "Lakkii",
-    "cancelYes": "Eeyyee, Haqi"
+    "cancelYes": "Eeyyee, Haqi",
+    "statusUpdated": "Haalli Fooyya'eera",
+    "statusChangedTo": "Haalli ajajaa gara {{status}}tti jijjiirameera"
   },
   "settingsScreen": {
     "title": "Qindaa'inoota",
@@ -766,7 +903,8 @@
     "slide4Desc": "Ajajni kee eessa akka jiru mirkaneeffadhu.",
     "skip": "Dabarsi",
     "continue": "Itti Fufi",
-    "getStarted": "Jalqabi"
+    "getStarted": "Jalqabi",
+    "stepCounter": "Tarkaanfii {{current}} {{total}} keessaa"
   },
   "priceTrendWidget": {
     "productName": "Xaafii",
@@ -792,7 +930,7 @@
   },
   "analytics": {
     "title": "Xin-xiila Gabaa",
-    "subtitle": "Gatii gabaa jumlaa kintaalaan (100 kg)",
+    "subtitle": "Reettii gabaa jumlaa kuntaalaan (100 kg)",
     "nationalCommodityIndex": "Inndeksii Oomisha Bioolessaa",
     "bestHubToSell": "Gabaa Gurgurtaaf Caalu",
     "regionalHubs": "Giduugala Gabaa Naannolee Itoophiyaa",
@@ -802,7 +940,39 @@
     "sevenDayTrend": "Adeemsa Gabaa Guyyaa 7",
     "demandIndex": "Inndeksii Dhiyeessii fi Barbaacha",
     "highActivity": "Sochii Ol'aanaa",
-    "priceOutlook": "Raaga Gatii"
+    "priceOutlook": "Raaga Gatii",
+    "marketRatesTitle": "Reettii Gabaa Kuntaalaan",
+    "demand": "FEDHII",
+    "topWanted": "Baay'ee Kan Barbaadamu",
+    "buyersCount": "Bittoota {{count}}",
+    "targetMarket": "Gabaa Kana Xiyyeeffadhu",
+    "marketTips": "Gorsa Gabaa",
+    "nationalAnalyticsTitle": "Xiinxala Gabaa Biyyooleessaa",
+    "nationalAnalyticsSub": "Tarreeffama Omisha Jumlaa fi Reettii Gabaa Itoophiyaa",
+    "alertActive": "Beeksisa Gatii Hojii Irra Jira",
+    "alertEnabled": "Beeksisi Gatii Bantee Jira",
+    "trackCropRates": "Reettii {{crop}} Hordofi",
+    "alertingDesc": "Gatiin ETB {{price}}/q gadi yoo bu'e beeksisa",
+    "getNotifiedDrop": "Gatiin gabaa yoo bu'e beeksisa argadhu",
+    "activeTag": "Hojii Irra Jira",
+    "setAlertBtn": "+ Beeksisa Kahaa",
+    "listAtMarketRate": "{{crop}} Reettii Gabaatiin Maxxansi (ETB {{price}}/q)",
+    "browseVerifiedSellers": "Gurgurtoota {{crop}} Mirkanaa'an Barbaadi",
+    "browseSellers": "Gurgurtoota {{crop}} Barbaadi",
+    "highVolume": "Oli'aanaa",
+    "lowSupply": "Dhiyeessa Gadi Aanaa",
+    "stableSupply": "Dhiyeessa Tasgabbaa'aa",
+    "bestHubToBuy": "Gabaa Bittaaf Caalu",
+    "harvestSalesIntel": "Odeeffannoo Gurgurtaa Omishaa",
+    "marketSourcingIntel": "Odeeffannoo Madda Gabaa",
+    "farmerAdvisoryBody": "Fedhiin bittaa jumlaa {{cropName}} Finfinnee fi Adaamaatti torban kana +5.8% dabaleera. Fedhiin bittootaa oli'aanaa waan ta'eef omisha keessan gurgurtaaf dhiyeessuuf yeroo gaariidha.",
+    "buyerAdvisoryBody": "Omisha {{cropName}} kallattiin gabaa Adaamaa fi Bishooftuu irraa bittingiin Mercato Finfinnee biratti %8 hir'ina gatii ni kenna.",
+    "sevenDaySurge": "+5.8% Dabaleera",
+    "bullish": "Kan Dabalu",
+    "sevenDayLow": "Gadi-aanaa 7d: ETB {{price}}/{{unit}}",
+    "sevenDayHigh": "Oli-aanaa 7d: ETB {{price}}/{{unit}}",
+    "tradedVol": "Hamma Gurgurame: {{volume}}",
+    "regionalHubsCount": "Gabaawwan Naannoo {{count}}"
   },
   "orders": {
     "totalActiveValue": "Gatii Ajajoota Socho'oo Waligalaa",
@@ -831,7 +1001,11 @@
     "marketPriceIndex": "Inndeksii Gatii Gabaa",
     "totalSpend": "Baasii Waligalaa",
     "priceTrends": "Xiinxala Gatii Gabaa",
-    "viewRegionalTrends": "Adeemsa gatii jumlaa oomisha naannolee ilaalaa"
+    "viewRegionalTrends": "Haala gatii oomishaa naannolee ilaali",
+    "preferencesAndSettings": "Filannoowwan & Qindaa'inoota",
+    "marketPriceIndexSub": "Gatii jumlaa oomishoota biyyaaleessaa ilaali",
+    "producerSupport": "Deeggarsa Qotee Bulaa & Gargaarsa",
+    "callSupportSub": "Deeggarsa rasmiitti bilbilaa (0938730818)"
   },
   "saved": {
     "loading": "Oomishoonni ol-ka'aman fe'amaa jiru...",
@@ -844,7 +1018,8 @@
     "declinedOutOfStock": "Tukameera / Dhumateera",
     "matchingHarvest": "Oomishni Walsimatu Maxxanfameera",
     "typeMessage": "Ergaa barreesaa...",
-    "messagingUnavailable": "Ergaa Erguun Hin Danda'amu"
+    "messagingUnavailable": "Ergaa Erguun Hin Danda'amu",
+    "acceptedListingLive": "Fudhatama Argateera — Maxxansi Oomishaa Banamaadha"
   },
   "help": {
     "directAdmin": "Ergaa kallattii bulchaaf"

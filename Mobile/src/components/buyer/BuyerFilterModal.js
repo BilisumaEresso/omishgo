@@ -9,10 +9,11 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
-import AppText from "../common/AppText";
+import { CROP_TYPES, getLocalizedCropName } from "../../constants/crops";
 import { useTheme } from "../../hooks/useTheme";
+import AppText from "../common/AppText";
 
-const CATEGORIES = ["All", "Tomato", "Teff", "Onion", "Garlic", "Vegetables", "Grains"];
+const CATEGORIES = ["All", "Vegetables", "Grains", ...CROP_TYPES];
 const REGIONS = ["All Regions", "Adama", "Debre Zeit", "Ziway", "Bishoftu", "Hawassa"];
 
 export default function BuyerFilterModal({
@@ -26,7 +27,7 @@ export default function BuyerFilterModal({
   onSelectSortBy,
   onReset,
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const primaryColor = theme?.colors?.primary || "#1565C0";
@@ -92,7 +93,7 @@ export default function BuyerFilterModal({
               <View style={styles.pillContainer}>
                 {CATEGORIES.map((cat) => {
                   const active = selectedCategory === cat;
-                  const displayCat = cat === "All" ? t("browse.filterAll", { defaultValue: "All" }) : t(`crops.${cat}`, { defaultValue: cat });
+                  const displayCat = getLocalizedCropName(cat, i18n.language || "en", t);
                   return (
                     <TouchableOpacity
                       key={cat}

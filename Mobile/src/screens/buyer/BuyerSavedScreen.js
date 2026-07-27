@@ -49,7 +49,7 @@ export default function BuyerSavedScreen({ navigation, onSwitchTab }) {
   return (
     <DashboardLayout
       role="buyer"
-      title={`Saved Produce (${savedProducts.length})`}
+      title={t("buyerSaved.titleWithCount", { count: savedProducts.length, defaultValue: `Saved Produce (${savedProducts.length})` })}
       showBack={false}
       onRefresh={handleRefresh}
       refreshing={refreshing}

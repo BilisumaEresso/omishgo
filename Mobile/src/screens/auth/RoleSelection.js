@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import AppButton from "../../components/common/AppButton";
 import AppText from "../../components/common/AppText";
 import ScreenWrapper from "../../components/common/ScreenWrapper";
@@ -16,30 +17,40 @@ export default function RoleSelection({ navigation }) {
 
   const { requestRole, switchRole } = useAuthStore();
 
+  const primaryColor = theme?.colors?.primary || "#15803D";
+
   const roles = [
     {
       id: ROLES.FARMER,
       title: t("roleSelection.farmerTitle", { defaultValue: "Farmer / Producer" }),
       desc: t("roleSelection.farmerDesc", { defaultValue: "List harvests and sell directly to commercial buyers" }),
-      icon: "🚜",
+      iconName: "leaf",
+      accentColor: "#15803D",
+      bgColor: "#DCFCE7",
     },
     {
       id: ROLES.BUYER,
       title: t("roleSelection.buyerTitle", { defaultValue: "Wholesale Buyer" }),
       desc: t("roleSelection.buyerDesc", { defaultValue: "Source crops directly from Ethiopian farmers in bulk" }),
-      icon: "🛒",
+      iconName: "cart",
+      accentColor: "#1565C0",
+      bgColor: "#E0F2FE",
     },
     {
       id: ROLES.SUPPLIER,
       title: t("roleSelection.supplierTitle", { defaultValue: "Agricultural Supplier" }),
       desc: t("roleSelection.supplierDesc", { defaultValue: "Supply seeds, fertilizers, and equipment to farmers" }),
-      icon: "🏪",
+      iconName: "storefront",
+      accentColor: "#D97706",
+      bgColor: "#FEF3C7",
     },
     {
       id: ROLES.DRIVER,
       title: t("auth.roleDriver", { defaultValue: "Logistics Driver" }),
       desc: t("auth.roleDriverDesc", { defaultValue: "Manage produce transport and dispatches" }),
-      icon: "🚚",
+      iconName: "bus",
+      accentColor: "#7C3AED",
+      bgColor: "#F3E8FF",
     },
   ];
 
@@ -49,24 +60,20 @@ export default function RoleSelection({ navigation }) {
     try {
       if (selectedRole === ROLES.FARMER) {
         const result = await switchRole("farmer");
-
         if (!result.success) return;
 
         navigation.reset({
           index: 0,
           routes: [{ name: "FarmerTabs" }],
         });
-
         return;
       }
 
       if (selectedRole === ROLES.BUYER || selectedRole === ROLES.DRIVER) {
         const request = await requestRole(selectedRole);
-
         if (!request.success) return;
 
         const switchRes = await switchRole(selectedRole);
-
         if (!switchRes.success) return;
 
         navigation.reset({
@@ -78,17 +85,14 @@ export default function RoleSelection({ navigation }) {
             },
           ],
         });
-
         return;
       }
 
       if (selectedRole === ROLES.SUPPLIER) {
         const request = await requestRole("supplier");
-
         if (!request.success) return;
 
         navigation.navigate("SupplierPending");
-
         return;
       }
     } catch (error) {
@@ -99,54 +103,64 @@ export default function RoleSelection({ navigation }) {
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        <AppText variant="headingMd" style={styles.heading}>
-          {t("roleSelection.title", { defaultValue: "Choose Your Role" })}
-        </AppText>
+        <View style={styles.header}>
+          <AppText style={styles.heading}>
+            {t("roleSelection.title", { defaultValue: "Choose Your Platform Role" })}
+          </AppText>
+          <AppText style={styles.subtext}>
+            {t("roleSelection.subtitle", { defaultValue: "Select how you want to trade and operate on OmishGo." })}
+          </AppText>
+        </View>
 
-        <AppText
-          variant="bodyMd"
-          color={theme?.colors?.textSecondary}
-          style={styles.subtext}
+        <ScrollView
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
         >
-          {t("roleSelection.subtitle", { defaultValue: "Select how you want to use OmishGo." })}
-        </AppText>
+          {roles.map((item) => {
+            const isSelected = selectedRole === item.id;
+            return (
+              <TouchableOpacity
+                key={item.id}
+                onPress={() => setSelectedRole(item.id)}
+                activeOpacity={0.85}
+                style={[
+                  styles.card,
+                  isSelected && {
+                    borderColor: item.accentColor,
+                    backgroundColor: item.bgColor + "40",
+                  },
+                ]}
+              >
+                <View style={[styles.iconBox, { backgroundColor: item.bgColor }]}>
+                  <Ionicons name={item.iconName} size={24} color={item.accentColor} />
+                </View>
 
-        <ScrollView contentContainerStyle={styles.list}>
-          {roles.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              onPress={() => setSelectedRole(item.id)}
-              style={[
-                styles.card,
-                selectedRole === item.id && {
-                  borderColor: theme?.colors?.primary,
-                  backgroundColor: theme?.colors?.primary + "10",
-                },
-              ]}
-            >
-              <View style={styles.iconBox}>
-                <AppText variant="displaySm">{item.icon}</AppText>
-              </View>
+                <View style={styles.cardInfo}>
+                  <AppText style={styles.roleTitle}>{item.title}</AppText>
+                  <AppText style={styles.roleDesc}>{item.desc}</AppText>
+                </View>
 
-              <View style={styles.cardInfo}>
-                <AppText variant="bodyLg" style={{ fontWeight: "600" }}>
-                  {item.title}
-                </AppText>
-
-                <AppText variant="bodySm" color={theme?.colors?.textSecondary}>
-                  {item.desc}
-                </AppText>
-              </View>
-            </TouchableOpacity>
-          ))}
+                <View
+                  style={[
+                    styles.radioCircle,
+                    isSelected && { borderColor: item.accentColor, backgroundColor: item.accentColor },
+                  ]}
+                >
+                  {isSelected && <Ionicons name="checkmark" size={14} color="#FFFFFF" />}
+                </View>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
 
-        <AppButton
-          title={t("roleSelection.continueBtn", { defaultValue: "Continue" })}
-          disabled={!selectedRole}
-          onPress={handleContinue}
-          fullWidth
-        />
+        <View style={styles.footer}>
+          <AppButton
+            title={t("roleSelection.continueBtn", { defaultValue: "Continue" })}
+            disabled={!selectedRole}
+            onPress={handleContinue}
+            fullWidth
+          />
+        </View>
       </View>
     </ScreenWrapper>
   );
@@ -155,38 +169,70 @@ export default function RoleSelection({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 20,
+    backgroundColor: "#F8FAFC",
+  },
+  header: {
+    marginTop: 10,
+    marginBottom: 20,
   },
   heading: {
-    textAlign: "center",
-    marginBottom: 8,
+    fontSize: 22,
+    fontWeight: "800",
+    color: "#0F172A",
+    marginBottom: 6,
   },
   subtext: {
-    textAlign: "center",
-    marginBottom: 24,
+    fontSize: 14,
+    color: "#64748B",
+    lineHeight: 20,
   },
   list: {
     gap: 12,
+    paddingBottom: 24,
   },
   card: {
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
     padding: 16,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: "#e6e0e9",
+    borderWidth: 1.5,
+    borderColor: "#E2E8F0",
+    gap: 14,
   },
   iconBox: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#f2f2f2",
-    justifyContent: "center",
+    width: 48,
+    height: 48,
+    borderRadius: 16,
     alignItems: "center",
-    marginRight: 16,
+    justifyContent: "center",
   },
   cardInfo: {
     flex: 1,
   },
+  roleTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginBottom: 3,
+  },
+  roleDesc: {
+    fontSize: 12.5,
+    color: "#64748B",
+    lineHeight: 18,
+  },
+  radioCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#CBD5E1",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  footer: {
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
 });
-

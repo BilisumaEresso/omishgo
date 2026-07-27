@@ -1,13 +1,15 @@
-import "react";
+import { useTranslation } from "react-i18next";
 import { View, StyleSheet } from "react-native";
 import AppText from "../common/AppText";
 import { ProductCard } from "../common/ProductCard";
 import { useTheme } from "../../hooks/useTheme";
 import { useSavedStore } from "../../store/saved.store";
+
 export default function FeaturedProductsList({
   products,
   onView
 }) {
+  const { t } = useTranslation();
   const {
     theme
   } = useTheme();
@@ -19,7 +21,7 @@ export default function FeaturedProductsList({
         color: theme?.colors?.textSecondary,
         textAlign: "center"
       }}>
-          No products match your search.
+          {t("browse.noProductsMatch", { defaultValue: "No products match your search." })}
         </AppText>
       </View>;
   }

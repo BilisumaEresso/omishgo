@@ -13,9 +13,11 @@ export default function BuyerSourcingGoalCard({ onPress }) {
       activeOpacity={0.88}
     >
       <View style={styles.content}>
-        <AppText style={styles.title}>Post Bulk Order Request</AppText>
+        <AppText style={styles.title}>
+          {t("buyerDashboard.postBulkRequest", { defaultValue: "Post Bulk Order Request" })}
+        </AppText>
         <AppText style={styles.subtitle}>
-          Get direct bulk wholesale quotes from verified local farmers.
+          {t("buyerDashboard.getDirectQuotes", { defaultValue: "Get direct bulk wholesale quotes from verified local farmers." })}
         </AppText>
       </View>
 

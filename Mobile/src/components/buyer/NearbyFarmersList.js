@@ -1,10 +1,11 @@
-// src/components/buyer/NearbyFarmersList.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 import AppText from "../common/AppText";
 
 export default function NearbyFarmersList({ farmers = [], onFarmerPress }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const primaryColor = theme?.colors?.primary || "#1565C0";
   const surfaceColor = theme?.colors?.surface || "#FFFFFF";
@@ -54,7 +55,7 @@ export default function NearbyFarmersList({ farmers = [], onFarmerPress }) {
               </View>
 
               <AppText style={[styles.farmerName, { color: textColor }]} numberOfLines={1}>
-                {farmer.name || "Farmer Producer"}
+                {farmer.name || t("farmerProfile.fallbackName", { defaultValue: "Farmer Producer" })}
               </AppText>
 
               <View style={styles.locationRow}>
@@ -67,7 +68,7 @@ export default function NearbyFarmersList({ farmers = [], onFarmerPress }) {
               <View style={styles.specialtyPill}>
                 <Ionicons name="leaf-outline" size={12} color={primaryColor} />
                 <AppText style={[styles.specialtyText, { color: primaryColor }]} numberOfLines={1}>
-                  Specializes in Teff & Onions
+                  {t("buyerDashboard.specialityDefault", { defaultValue: "Specializes in Teff & Onions" })}
                 </AppText>
               </View>
 
@@ -76,7 +77,9 @@ export default function NearbyFarmersList({ farmers = [], onFarmerPress }) {
                 onPress={() => onFarmerPress && onFarmerPress(farmer)}
                 activeOpacity={0.8}
               >
-                <AppText style={styles.contactBtnText}>View Farm & Stock</AppText>
+                <AppText style={styles.contactBtnText}>
+                  {t("buyerDashboard.viewFarmStock", { defaultValue: "View Farm & Stock" })}
+                </AppText>
               </TouchableOpacity>
             </TouchableOpacity>
           );

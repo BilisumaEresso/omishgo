@@ -1,4 +1,4 @@
-// src/components/buyer/PriceTrendWidget.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -84,6 +84,7 @@ const COMMODITY_TRENDS = [
 ];
 
 export default function PriceTrendWidget({ onPressAnalytics }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const [selectedCropId, setSelectedCropId] = useState("onion");
 
@@ -131,7 +132,9 @@ export default function PriceTrendWidget({ onPressAnalytics }) {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <AppText style={[styles.title, { color: textColor }]}>Price Trends</AppText>
+            <AppText style={[styles.title, { color: textColor }]}>
+              {t("buyerDashboard.priceTrends", { defaultValue: "Price Trends" })}
+            </AppText>
             <AppText style={[styles.subtitle, { color: textMuted }]}>{activeCommodity.market}</AppText>
           </View>
 
@@ -244,7 +247,7 @@ export default function PriceTrendWidget({ onPressAnalytics }) {
               activeOpacity={0.8}
             >
               <AppText style={[styles.analyticsBtnText, { color: primaryColor }]}>
-                View Full Market Analysis
+                {t("buyerDashboard.viewFullAnalysis", { defaultValue: "View Full Market Analysis" })}
               </AppText>
               <Ionicons name="arrow-forward" size={14} color={primaryColor} />
             </TouchableOpacity>

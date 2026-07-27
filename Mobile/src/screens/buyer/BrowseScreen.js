@@ -24,13 +24,16 @@ import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 import browseCacheService from "../../services/browseCache.service";
 import { useSavedStore } from "../../store/saved.store";
+import { CROP_TYPES, getLocalizedCropName } from "../../constants/crops";
+import { useAuthStore } from "../../store/auth.store";
 
-const CATEGORIES = ["All", "Red Onion", "White Teff", "Tomato", "Garlic", "Wheat", "Coffee Beans"];
+const CATEGORIES = ["All", ...CROP_TYPES];
 
 export default function BrowseScreen({ navigation, onSwitchTab }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const { openSidebar } = useSidebar();
+  const { user, language } = useAuthStore();
 
   // Data states
   const [allProducts, setAllProducts] = useState([]);
@@ -96,7 +99,9 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
         const crop = (p.cropType || p.name || "").toLowerCase();
         const farmer = (p.farmerId?.name || "").toLowerCase();
         const region = (p.location?.region || "").toLowerCase();
-        if (!crop.includes(q) && !farmer.includes(q) && !region.includes(q)) {
+        const zone = (p.location?.zone || "").toLowerCase();
+        const wereda = (p.location?.wereda || "").toLowerCase();
+        if (!crop.includes(q) && !farmer.includes(q) && !region.includes(q) && !zone.includes(q) && !wereda.includes(q)) {
           return false;
         }
       }
@@ -165,7 +170,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
     <>
       <DashboardLayout
         role="buyer"
-        title="Marketplace Produce"
+        title={t("browse.title", { defaultValue: "Marketplace Produce" })}
         showBack={false}
         fixedHeader={fixedSearchHeader}
         onRefresh={() => fetchProducts(true)}
@@ -176,7 +181,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
           <View style={styles.offlineBanner}>
             <Ionicons name="cloud-offline-outline" size={16} color="#B45309" />
             <AppText style={styles.offlineText}>
-              Offline Mode — Displaying cached marketplace listings
+              {t("browse.offlineBanner", { defaultValue: "Offline Mode — Displaying cached marketplace listings" })}
             </AppText>
           </View>
         )}
@@ -198,6 +203,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
           >
             {CATEGORIES.map((cat) => {
               const active = cat === selectedCategory;
+              const displayCat = getLocalizedCropName(cat, i18n.language || "en", t);
               return (
                 <TouchableOpacity
                   key={cat}
@@ -209,7 +215,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
                   activeOpacity={0.8}
                 >
                   <AppText style={[styles.categoryChipText, active && styles.activeCategoryText]}>
-                    {cat}
+                    {displayCat}
                   </AppText>
                 </TouchableOpacity>
               );
@@ -220,10 +226,10 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
         {/* 3. Section Header & Results Count */}
         <View style={styles.sectionHeader}>
           <AppText style={styles.sectionTitle}>
-            {selectedCategory === "All" ? "Wholesale Crop Listings" : `${selectedCategory} Listings`}
+            {selectedCategory === "All" ? t("browse.allListings", { defaultValue: "Wholesale Crop Listings" }) : `${getLocalizedCropName(selectedCategory, i18n.language || "en", t)} Listings`}
           </AppText>
           <AppText style={styles.resultsCount}>
-            {filteredProducts.length} Available
+            {filteredProducts.length} {t("browse.available", { defaultValue: "Available" })}
           </AppText>
         </View>
 
@@ -231,14 +237,14 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
         {loading ? (
           <View style={styles.centerLoading}>
             <ActivityIndicator size="large" color={primaryColor} />
-            <AppText style={{ marginTop: 8, color: textSecondary }}>Loading crop listings...</AppText>
+            <AppText style={{ marginTop: 8, color: textSecondary }}>{t("browse.loadingListings", { defaultValue: "Loading crop listings..." })}</AppText>
           </View>
         ) : filteredProducts.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Ionicons name="leaf-outline" size={48} color="#94A3B8" />
-            <AppText style={styles.emptyTitle}>No Produce Matches Your Filter</AppText>
+            <AppText style={styles.emptyTitle}>{t("buyerDashboard.noProduceMatch", { defaultValue: "No Produce Matches Your Filter" })}</AppText>
             <AppText style={styles.emptySub}>
-              Try clearing filters or post a custom bulk sourcing request to notify local farmers.
+              {t("buyerDashboard.clearFilterHint", { defaultValue: "Try clearing filters or post a custom bulk sourcing request to notify local farmers." })}
             </AppText>
             <TouchableOpacity
               style={[styles.resetBtn, { backgroundColor: primaryColor }]}
@@ -248,7 +254,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
                 setSelectedRegion("All Regions");
               }}
             >
-              <AppText style={styles.resetBtnText}>Reset All Filters</AppText>
+              <AppText style={styles.resetBtnText}>{t("buyerDashboard.resetFilters", { defaultValue: "Reset All Filters" })}</AppText>
             </TouchableOpacity>
           </View>
         ) : (
@@ -273,10 +279,10 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
           </View>
           <View style={{ flex: 1 }}>
             <AppText style={[styles.customSourcingTitle, { color: textPrimary }]}>
-              Need a Custom Crop Volume?
+              {t("buyerDashboard.needCustomVolume", { defaultValue: "Need a Custom Crop Volume?" })}
             </AppText>
             <AppText style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>
-              Broadcast a custom sourcing request directly to regional farmers in chat.
+              {t("buyerDashboard.postCustomDesc", { defaultValue: "Broadcast a custom sourcing request directly to regional farmers in chat." })}
             </AppText>
           </View>
           <TouchableOpacity
@@ -284,7 +290,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
             onPress={() => setIsBulkModalOpen(true)}
             activeOpacity={0.85}
           >
-            <AppText style={styles.customSourcingBtnText}>Request Quote</AppText>
+            <AppText style={styles.customSourcingBtnText}>{t("buyerDashboard.requestQuote", { defaultValue: "Request Quote" })}</AppText>
           </TouchableOpacity>
         </View>
 

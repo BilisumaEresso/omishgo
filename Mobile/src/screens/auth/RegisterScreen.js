@@ -1,3 +1,4 @@
+// Mobile/src/screens/auth/RegisterScreen.js
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -7,6 +8,7 @@ import {
   Image,
   KeyboardAvoidingView,
   LayoutAnimation,
+  Linking,
   Platform,
   Pressable,
   StatusBar,
@@ -42,13 +44,12 @@ const LANGUAGE_OPTIONS = [
   { code: "om", label: "Afaan Oromoo" },
 ];
 
-// Number of staggered form rows (0-9) + 1 dedicated footer row (index 10)
 const ROW_COUNT = 10;
-const FOOTER_ROW_INDEX = ROW_COUNT; // 10
+const FOOTER_ROW_INDEX = ROW_COUNT;
 
 export default function RegisterScreen({ navigation }) {
   const { theme } = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const register = useAuthStore((state) => state.register);
   const setAppLanguage = useAuthStore((state) => state.setLanguage);
   const currentLanguage = useAuthStore((state) => state.language);
@@ -57,6 +58,7 @@ export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [pin, setPin] = useState("");
+  const [showPin, setShowPin] = useState(false);
   const [role, setRole] = useState("farmer");
   const [email, setEmail] = useState("");
   const [region, setRegion] = useState("");
@@ -70,7 +72,7 @@ export default function RegisterScreen({ navigation }) {
   const [showZonePicker, setShowZonePicker] = useState(false);
   const [showWeredaPicker, setShowWeredaPicker] = useState(false);
 
-  const lang = "en"; // can be dynamic: i18n.language || "en"
+  const lang = i18n.language || "en";
   const regionOptions = getLocalizedRegions(lang);
   const availableZones = region ? getLocalizedZones(region, lang) : [];
   const availableWereda = zone ? getLocalizedWereda(region, zone, lang) : [];
@@ -81,27 +83,20 @@ export default function RegisterScreen({ navigation }) {
   const weredaLabel =
     availableWereda.find((w) => w.value === wereda)?.label || wereda;
 
-  const primary = theme?.colors?.primary || "#2E7D32";
-  const textPrimary = theme?.colors?.textPrimary || "#212121";
-  const textSecondary = theme?.colors?.textSecondary || "#757575";
-  const backgroundColor = theme?.colors?.background || "#FFFFFF";
+  const primary = theme?.colors?.primary || "#15803D";
+  const textPrimary = theme?.colors?.textPrimary || "#0F172A";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
+  const backgroundColor = theme?.colors?.background || "#F8FAFC";
   const surface = theme?.colors?.surface || "#FFFFFF";
-  const border = theme?.colors?.border || "#E0E0E0";
-  const errorColor = theme?.colors?.error || "#C62828";
-  const spacingXxxl = theme?.spacing?.xxxl ?? 32;
+  const border = theme?.colors?.border || "#E2E8F0";
+  const errorColor = theme?.colors?.error || "#EF4444";
 
   // Scroll animations
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const logoScale = scrollY.interpolate({
     inputRange: [0, 150],
-    outputRange: [1, 0.55],
-    extrapolate: "clamp",
-  });
-
-  const logoTranslateY = scrollY.interpolate({
-    inputRange: [0, 150],
-    outputRange: [0, -20],
+    outputRange: [1, 0.6],
     extrapolate: "clamp",
   });
 
@@ -113,7 +108,6 @@ export default function RegisterScreen({ navigation }) {
 
   // Entrance animations
   const heroAnim = useRef(new Animated.Value(0)).current;
-  // +1 extra slot for the footer row (login link row)
   const rows = useRef(
     [...Array(ROW_COUNT + 1)].map(() => new Animated.Value(0)),
   ).current;
@@ -154,31 +148,11 @@ export default function RegisterScreen({ navigation }) {
   const shake = () => {
     shakeX.setValue(0);
     Animated.sequence([
-      Animated.timing(shakeX, {
-        toValue: 8,
-        duration: 55,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeX, {
-        toValue: -8,
-        duration: 55,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeX, {
-        toValue: 6,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeX, {
-        toValue: -4,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeX, {
-        toValue: 0,
-        duration: 45,
-        useNativeDriver: true,
-      }),
+      Animated.timing(shakeX, { toValue: 8, duration: 55, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: -8, duration: 55, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: 6, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: -4, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: 0, duration: 45, useNativeDriver: true }),
     ]).start();
   };
 
@@ -189,6 +163,7 @@ export default function RegisterScreen({ navigation }) {
       speed: 40,
       bounciness: 0,
     }).start();
+
   const pressOut = () =>
     Animated.spring(ctaScale, {
       toValue: 1,
@@ -224,13 +199,13 @@ export default function RegisterScreen({ navigation }) {
 
   const validate = () => {
     const newErrors = {};
-    if (!name.trim()) newErrors.name = "Full name is required.";
-    if (!phone.trim()) newErrors.phone = "Phone number is required.";
+    if (!name.trim()) newErrors.name = t("auth.nameRequired", { defaultValue: "Full name is required." });
+    if (!phone.trim()) newErrors.phone = t("auth.phoneRequired", { defaultValue: "Phone number is required." });
     if (!pin.trim() || pin.trim().length < 4)
-      newErrors.pin = "Create a PIN with at least 4 digits.";
-    if (!region.trim()) newErrors.region = "Region is required.";
-    if (!zone.trim()) newErrors.zone = "Zone is required.";
-    if (!wereda.trim()) newErrors.wereda = "Wereda is required.";
+      newErrors.pin = t("auth.pinLengthError", { defaultValue: "Create a PIN with at least 4 digits." });
+    if (!region.trim()) newErrors.region = t("auth.regionRequired", { defaultValue: "Region is required." });
+    if (!zone.trim()) newErrors.zone = t("auth.zoneRequired", { defaultValue: "Zone is required." });
+    if (!wereda.trim()) newErrors.wereda = t("auth.weredaRequired", { defaultValue: "Wereda is required." });
     smoothLayout();
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -260,7 +235,7 @@ export default function RegisterScreen({ navigation }) {
       if (!result.success) {
         shake();
         setRegisterError(
-          result.message || t("auth.registerError") || "Registration failed.",
+          result.message || t("auth.registerError", { defaultValue: "Registration failed. Try again." }),
         );
         return;
       }
@@ -270,8 +245,7 @@ export default function RegisterScreen({ navigation }) {
       shake();
       setRegisterError(
         error.message ||
-          t("auth.registrationFailed") ||
-          "Something went wrong.",
+          t("auth.registrationFailed", { defaultValue: "Something went wrong. Please try again." }),
       );
     } finally {
       setLoading(false);
@@ -292,15 +266,13 @@ export default function RegisterScreen({ navigation }) {
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
+      {/* Header Bar */}
       <View
         style={[
           styles.header,
           {
             backgroundColor: surface,
             borderBottomColor: border,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 4 },
-            shadowRadius: 8,
             paddingTop:
               Platform.OS === "android"
                 ? (StatusBar.currentHeight || 24) + 12
@@ -310,12 +282,13 @@ export default function RegisterScreen({ navigation }) {
       >
         <TouchableOpacity
           onPress={() => navigation.goBack()}
-          style={styles.backBtn}
+          style={[styles.backBtn, { borderColor: border }]}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons name="arrow-back" size={24} color={primary} />
+          <Ionicons name="arrow-back" size={20} color={primary} />
         </TouchableOpacity>
-        <AppText variant="headingMd" style={{ color: textPrimary }}>
-          Create Account
+        <AppText style={[styles.headerTitle, { color: textPrimary }]}>
+          {t("auth.createAccountTitle", { defaultValue: "Create Account" })}
         </AppText>
         <View style={{ width: 40 }} />
       </View>
@@ -334,13 +307,13 @@ export default function RegisterScreen({ navigation }) {
           )}
           scrollEventThrottle={16}
         >
+          {/* Logo emblem */}
           <Animated.View
             style={[
               styles.logoWrapper,
               {
                 opacity: Animated.multiply(logoOpacity, heroAnim),
                 transform: [
-                  { translateY: logoTranslateY },
                   { scale: Animated.multiply(logoScale, heroAnim) },
                 ],
               },
@@ -354,50 +327,44 @@ export default function RegisterScreen({ navigation }) {
           </Animated.View>
 
           <Animated.View style={{ opacity: heroAnim }}>
-            <AppText
-              variant="headingLg"
-              style={[styles.title, { color: textPrimary }]}
-            >
-              {t("auth.registerTitle")}
+            <AppText style={[styles.title, { color: textPrimary }]}>
+              {t("auth.registerTitle", { defaultValue: "Join OmishGo Marketplace" })}
             </AppText>
-            <AppText
-              variant="bodyMd"
-              style={[styles.subtitle, { color: textSecondary }]}
-            >
-              {t("auth.registerSubtitle")}
+            <AppText style={[styles.subtitle, { color: textSecondary }]}>
+              {t("auth.registerSubtitle", { defaultValue: "Direct trade platform connecting Ethiopian producers & wholesale buyers" })}
             </AppText>
           </Animated.View>
 
           <Animated.View
             style={[styles.form, { transform: [{ translateX: shakeX }] }]}
           >
+            {/* Section 1: Account Credentials */}
+            <Animated.View style={rowStyle(0)}>
+              <AppText style={styles.sectionHeader}>
+                1. {t("auth.credentialsSection", { defaultValue: "Account Credentials" })}
+              </AppText>
+            </Animated.View>
+
             {/* Name */}
             <Animated.View style={[styles.inputGroup, rowStyle(0)]}>
-              <AppText style={[styles.label, { color: textSecondary }]}>
-                {t("auth.nameLabel")}
-              </AppText>
               <AppInput
-                placeholder={t("auth.namePlaceholder")}
+                label={t("auth.nameLabel", { defaultValue: "Full Name" })}
+                placeholder={t("auth.namePlaceholder", { defaultValue: "Enter your full name" })}
                 value={name}
                 onChangeText={(txt) => {
                   setName(txt);
                   clearFieldError("name");
                 }}
                 leftIcon="person-outline"
-                style={errors.name ? { borderColor: errorColor } : {}}
+                error={errors.name}
               />
-              {errors.name && (
-                <ErrorRow message={errors.name} errorColor={errorColor} />
-              )}
             </Animated.View>
 
             {/* Phone */}
             <Animated.View style={[styles.inputGroup, rowStyle(1)]}>
-              <AppText style={[styles.label, { color: textSecondary }]}>
-                {t("auth.phoneLabel")}
-              </AppText>
               <AppInput
-                placeholder={t("auth.phonePlaceholder")}
+                label={t("auth.phoneLabel", { defaultValue: "Phone Number" })}
+                placeholder={t("auth.phonePlaceholder", { defaultValue: "e.g. 0911234567" })}
                 keyboardType="phone-pad"
                 value={phone}
                 onChangeText={(txt) => {
@@ -405,20 +372,15 @@ export default function RegisterScreen({ navigation }) {
                   clearFieldError("phone");
                 }}
                 leftIcon="call-outline"
-                style={errors.phone ? { borderColor: errorColor } : {}}
+                error={errors.phone}
               />
-              {errors.phone && (
-                <ErrorRow message={errors.phone} errorColor={errorColor} />
-              )}
             </Animated.View>
 
             {/* PIN */}
             <Animated.View style={[styles.inputGroup, rowStyle(2)]}>
-              <AppText style={[styles.label, { color: textSecondary }]}>
-                {t("auth.pinLabel")}
-              </AppText>
               <AppInput
-                placeholder={t("auth.pinPlaceholder")}
+                label={t("auth.pinLabel", { defaultValue: "PIN (4-6 digits)" })}
+                placeholder={t("auth.pinPlaceholder", { defaultValue: "Create a 4-6 digit PIN" })}
                 keyboardType="numeric"
                 secureTextEntry
                 maxLength={6}
@@ -428,24 +390,28 @@ export default function RegisterScreen({ navigation }) {
                   clearFieldError("pin");
                 }}
                 leftIcon="lock-closed-outline"
-                style={errors.pin ? { borderColor: errorColor } : {}}
+                error={errors.pin}
               />
-              {errors.pin && (
-                <ErrorRow message={errors.pin} errorColor={errorColor} />
-              )}
             </Animated.View>
 
-            {/* Role */}
+            {/* Section 2: Account Role & Language */}
+            <Animated.View style={rowStyle(3)}>
+              <AppText style={styles.sectionHeader}>
+                2. {t("auth.roleLangSection", { defaultValue: "Account Role & Preferred Language" })}
+              </AppText>
+            </Animated.View>
+
+            {/* Role Chips */}
             <Animated.View style={[styles.inputGroup, rowStyle(3)]}>
               <AppText style={[styles.label, { color: textSecondary }]}>
-                {t("auth.roleLabel")}
+                {t("auth.roleLabel", { defaultValue: "I am joining as a..." })}
               </AppText>
               <View style={styles.roleContainer}>
                 <SelectableChip
                   active={role === "farmer"}
                   onPress={() => setRole("farmer")}
                   icon="leaf"
-                  label={t("auth.roleFarmer")}
+                  label={t("auth.roleFarmer", { defaultValue: "Farmer Producer" })}
                   primary={primary}
                   border={border}
                   textSecondary={textSecondary}
@@ -454,7 +420,7 @@ export default function RegisterScreen({ navigation }) {
                   active={role === "buyer"}
                   onPress={() => setRole("buyer")}
                   icon="cart"
-                  label={t("auth.roleBuyer")}
+                  label={t("auth.roleBuyer", { defaultValue: "Wholesale Buyer" })}
                   primary={primary}
                   border={border}
                   textSecondary={textSecondary}
@@ -462,10 +428,10 @@ export default function RegisterScreen({ navigation }) {
               </View>
             </Animated.View>
 
-            {/* Language */}
+            {/* Language Chips */}
             <Animated.View style={[styles.inputGroup, rowStyle(4)]}>
               <AppText style={[styles.label, { color: textSecondary }]}>
-                {t("auth.langLabel")}
+                {t("auth.langLabel", { defaultValue: "Preferred Language / ቋንቋ" })}
               </AppText>
               <View style={styles.languageContainer}>
                 {LANGUAGE_OPTIONS.map((opt) => (
@@ -482,20 +448,17 @@ export default function RegisterScreen({ navigation }) {
               </View>
             </Animated.View>
 
-            {/* Location Section */}
+            {/* Section 3: Location Details */}
             <Animated.View style={rowStyle(5)}>
-              <AppText
-                variant="headingSm"
-                style={[styles.sectionTitle, { color: textPrimary }]}
-              >
-                {t("postProduct.location", { defaultValue: "Location" })}
+              <AppText style={styles.sectionHeader}>
+                3. {t("postProduct.location", { defaultValue: "Location & Operation Center" })}
               </AppText>
             </Animated.View>
 
             {/* Region */}
             <Animated.View style={[styles.inputGroup, rowStyle(6)]}>
               <LocationPicker
-                label={t("auth.regionLabel")}
+                label={t("auth.regionLabel", { defaultValue: "Region" })}
                 value={region}
                 displayLabel={regionLabel}
                 options={regionOptions}
@@ -520,7 +483,7 @@ export default function RegisterScreen({ navigation }) {
             {/* Zone */}
             <Animated.View style={[styles.inputGroup, rowStyle(7)]}>
               <LocationPicker
-                label={t("auth.zoneLabel")}
+                label={t("auth.zoneLabel", { defaultValue: "Zone" })}
                 value={zone}
                 displayLabel={zoneLabel}
                 options={availableZones}
@@ -544,7 +507,7 @@ export default function RegisterScreen({ navigation }) {
             {/* Wereda */}
             <Animated.View style={[styles.inputGroup, rowStyle(8)]}>
               <LocationPicker
-                label="Wereda"
+                label={t("auth.weredaLabel", { defaultValue: "Wereda" })}
                 value={wereda}
                 displayLabel={weredaLabel}
                 options={availableWereda}
@@ -564,13 +527,11 @@ export default function RegisterScreen({ navigation }) {
               />
             </Animated.View>
 
-            {/* Email */}
+            {/* Optional Email */}
             <Animated.View style={[styles.inputGroup, rowStyle(9)]}>
-              <AppText style={[styles.label, { color: textSecondary }]}>
-                {t("auth.emailLabel")}
-              </AppText>
               <AppInput
-                placeholder={t("auth.emailPlaceholder")}
+                label={t("auth.emailLabel", { defaultValue: "Email (Optional)" })}
+                placeholder={t("auth.emailPlaceholder", { defaultValue: "e.g. user@domain.com" })}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={email}
@@ -583,6 +544,7 @@ export default function RegisterScreen({ navigation }) {
               <ErrorBanner message={registerError} errorColor={errorColor} />
             ) : null}
 
+            {/* CTA Register Button */}
             <Animated.View
               style={{ transform: [{ scale: ctaScale }], marginTop: 24 }}
             >
@@ -593,7 +555,7 @@ export default function RegisterScreen({ navigation }) {
                 disabled={loading}
               >
                 <AppButton
-                  title={loading ? t("common.loading") : t("auth.registerBtn")}
+                  title={loading ? t("common.loading", { defaultValue: "Creating Account..." }) : t("auth.registerBtn", { defaultValue: "Register Account" })}
                   onPress={handleRegister}
                   loading={loading}
                   disabled={loading}
@@ -602,53 +564,40 @@ export default function RegisterScreen({ navigation }) {
               </Pressable>
             </Animated.View>
 
+            {/* Login Link Row */}
             <Animated.View
               style={[
                 rowStyle(FOOTER_ROW_INDEX),
-                {
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  marginTop: spacingXxxl,
-                },
+                styles.footerRow,
               ]}
             >
-              <AppText variant="bodyMd" style={{ color: textSecondary }}>
-                {t("auth.hasAccount")}
+              <AppText style={styles.footerSub}>
+                {t("auth.hasAccount", { defaultValue: "Already have an account?" })}
               </AppText>
               <Pressable
                 onPress={() => navigation.navigate("Login")}
                 hitSlop={10}
               >
-                <AppText
-                  variant="bodyMd"
-                  style={{ color: primary, fontWeight: "700", marginLeft: 4 }}
-                >
-                  {t("auth.loginBtn")}
+                <AppText style={[styles.footerLink, { color: primary }]}>
+                  {t("auth.loginBtn", { defaultValue: "Login to Account" })}
                 </AppText>
               </Pressable>
             </Animated.View>
+
+            {/* Support Helpline Pill */}
+            <TouchableOpacity
+              style={styles.supportPill}
+              onPress={() => Linking.openURL("tel:0938730818")}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="headset-outline" size={14} color="#15803D" />
+              <AppText style={styles.supportPillText}>
+                {t("auth.registerSupportHelpline", { defaultValue: "Need registration help? Call Support: 0938730818" })}
+              </AppText>
+            </TouchableOpacity>
           </Animated.View>
         </Animated.ScrollView>
       </KeyboardAvoidingView>
-    </View>
-  );
-}
-
-// Small error row component (inline for simplicity)
-function ErrorRow({ message, errorColor }) {
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        marginTop: 4,
-        gap: 4,
-      }}
-    >
-      <Ionicons name="alert-circle" size={14} color={errorColor} />
-      <AppText style={{ fontSize: 12, flex: 1, color: errorColor }}>
-        {message}
-      </AppText>
     </View>
   );
 }
@@ -659,29 +608,76 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingBottom: 14,
+    borderBottomWidth: 1,
     zIndex: 10,
   },
+  headerTitle: {
+    fontSize: 17,
+    fontWeight: "800",
+  },
   backBtn: {
-    width: 40,
-    height: 40,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 8,
   },
-  scrollContent: { flexGrow: 1, paddingHorizontal: 24, paddingBottom: 40 },
-  logoWrapper: { alignItems: "center", marginTop: 24, marginBottom: 20 },
-  logo: { width: 180, height: 180 },
-  title: { textAlign: "center", fontWeight: "700", marginBottom: 8 },
-  subtitle: { textAlign: "center", marginBottom: 24 },
+  scrollContent: { flexGrow: 1, paddingHorizontal: 22, paddingBottom: 40 },
+  logoWrapper: { alignItems: "center", marginTop: 16, marginBottom: 12 },
+  logo: { width: 140, height: 140 },
+  title: { textAlign: "center", fontWeight: "800", fontSize: 22, marginBottom: 6 },
+  subtitle: { textAlign: "center", marginBottom: 20, fontSize: 13.5, lineHeight: 20 },
   form: { gap: 4 },
+  sectionHeader: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#0F172A",
+    marginTop: 12,
+    marginBottom: 8,
+  },
   inputGroup: { marginBottom: 12 },
-  label: { fontSize: 14, fontWeight: "500", marginBottom: 4 },
-  roleContainer: { flexDirection: "row", gap: 12, marginTop: 8 },
-  languageContainer: { flexDirection: "row", gap: 12, marginTop: 8 },
-  sectionTitle: { marginTop: 16, marginBottom: 8 },
-  linkButton: { alignItems: "center", marginTop: 20 },
-  linkText: { fontWeight: "600", fontSize: 14 },
+  label: { fontSize: 13, fontWeight: "600", marginBottom: 4 },
+  eyeBtn: {
+    position: "absolute",
+    right: 14,
+    top: 38,
+    zIndex: 10,
+  },
+  roleContainer: { flexDirection: "row", gap: 10, marginTop: 6 },
+  languageContainer: { flexDirection: "row", gap: 10, marginTop: 6 },
+  footerRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 24,
+    gap: 6,
+  },
+  footerSub: {
+    fontSize: 14,
+    color: "#64748B",
+  },
+  footerLink: {
+    fontSize: 14,
+    fontWeight: "800",
+  },
+  supportPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    backgroundColor: "#DCFCE7",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    marginTop: 24,
+  },
+  supportPillText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#15803D",
+  },
 });

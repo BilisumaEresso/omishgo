@@ -32,7 +32,7 @@ export default function BuyerProfileScreen({ route, navigation }) {
         const res = await api.get(API_ENDPOINTS.users.detail(buyerId));
         setBuyer(res.data?.data?.user);
       } catch (err) {
-        setError(t("buyerProfile.errorLoadProfile") || "Failed to load profile");
+        setError(t("buyerProfile.errorLoadProfile", { defaultValue: "Failed to load profile" }));
       } finally {
         setLoading(false);
       }
@@ -52,10 +52,10 @@ export default function BuyerProfileScreen({ route, navigation }) {
     return (
       <View style={[styles.center, { backgroundColor: background }]}>
         <AppText style={{ color: textSecondary }}>
-          {error || t("buyerProfile.notFound") || "Buyer not found"}
+          {error || t("buyerProfile.notFound", { defaultValue: "Buyer not found" })}
         </AppText>
         <TouchableOpacity style={{ marginTop: 20 }} onPress={() => navigation.goBack()}>
-          <AppText style={{ color: primary }}>{t("common.goBack") || "Go Back"}</AppText>
+          <AppText style={{ color: primary }}>{t("common.goBack", { defaultValue: "Go Back" })}</AppText>
         </TouchableOpacity>
       </View>
     );
@@ -66,7 +66,7 @@ export default function BuyerProfileScreen({ route, navigation }) {
 
   return (
     <View style={[styles.container, { backgroundColor: background }]}>
-      <AppHeader title={t("buyerProfile.title") || "Buyer Profile"} showBack={true} onBackPress={() => navigation.goBack()} />
+      <AppHeader title={t("buyerProfile.title", { defaultValue: "Buyer Profile" })} showBack={true} onBackPress={() => navigation.goBack()} />
       
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={[styles.profileHeader, { backgroundColor: surface }]}>
@@ -78,27 +78,27 @@ export default function BuyerProfileScreen({ route, navigation }) {
           </AppText>
           <View style={styles.rolePill}>
             <AppText style={[styles.roleText, { color: primary }]}>
-              {t("buyerProfile.roleBuyer") || "BUYER"}
+              {t("buyerProfile.roleBuyer", { defaultValue: "BUYER" })}
             </AppText>
           </View>
           
           <View style={styles.chatButtonContainer}>
             <AppButton 
-              title={t("buyerProfile.chatNow") || "Chat Now"} 
+              title={t("buyerProfile.chatNow", { defaultValue: "Chat Now" })} 
               onPress={() => navigation.navigate("Chat", { userId: buyer._id, userName: buyer.name })} 
             />
           </View>
         </View>
 
         <AppText style={[styles.sectionTitle, { color: textPrimary }]}>
-          {t("buyerProfile.sectionAccountInfo") || "Account Info"}
+          {t("buyerProfile.sectionAccountInfo", { defaultValue: "Account Info" })}
         </AppText>
         <View style={[styles.infoCard, { backgroundColor: surface }]}>
           <View style={styles.infoRow}>
             <Ionicons name="location-outline" size={20} color={textSecondary} />
             <View style={styles.infoTextContainer}>
               <AppText style={[styles.infoLabel, { color: textMuted }]}>
-                {t("buyerProfile.infoLocation") || "Location"}
+                {t("buyerProfile.infoLocation", { defaultValue: "Location" })}
               </AppText>
               <AppText style={[styles.infoValue, { color: textPrimary }]}>
                 {location.region}, {location.zone}
@@ -110,7 +110,7 @@ export default function BuyerProfileScreen({ route, navigation }) {
             <Ionicons name="call-outline" size={20} color={textSecondary} />
             <View style={styles.infoTextContainer}>
               <AppText style={[styles.infoLabel, { color: textMuted }]}>
-                {t("buyerProfile.infoPhone") || "Phone Number"}
+                {t("buyerProfile.infoPhone", { defaultValue: "Phone Number" })}
               </AppText>
               <AppText style={[styles.infoValue, { color: textPrimary }]}>
                 {phone}

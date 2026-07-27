@@ -1,10 +1,9 @@
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { getRoleColors, neutralColors } from "../constants/colors";
 import Typography from "./Typography";
-
-
 
 const styles = StyleSheet.create({
   container: {
@@ -37,7 +36,7 @@ const RememberMeCheckbox = React.forwardRef(
     {
       checked = false,
       onPress,
-      label = "Remember me",
+      label,
       role = "farmer",
       style,
       testID,
@@ -45,6 +44,8 @@ const RememberMeCheckbox = React.forwardRef(
     },
     ref,
   ) => {
+    const { t } = useTranslation();
+    const displayLabel = label || t("auth.rememberMe", "Remember me");
     const roleColor = getRoleColors(role);
 
     const checkboxStyle = [
@@ -79,7 +80,7 @@ const RememberMeCheckbox = React.forwardRef(
           style={styles.label}
           color={neutralColors.textMedium}
         >
-          {label}
+          {displayLabel}
         </Typography>
       </TouchableOpacity>
     );

@@ -99,13 +99,13 @@ export default function FarmerProfileScreen({ route, navigation }) {
         <View style={styles.locationRow}>
           <Ionicons name="location-outline" size={14} color={textSecondary} />
           <AppText style={[styles.locationText, { color: textSecondary }]}>
-            {[farmer.location?.region, farmer.location?.zone].filter(Boolean).join(", ") || "Oromia Region • 14 km away"}
+            {[farmer.location?.wereda, farmer.location?.zone, farmer.location?.region].filter(Boolean).join(", ") || "Oromia Region • 14 km away"}
           </AppText>
         </View>
 
         <View style={styles.ratingBadge}>
           <Ionicons name="star" size={13} color="#F59E0B" />
-          <AppText style={styles.ratingText}>4.9 Rating (38 Wholesale Delivery Orders)</AppText>
+          <AppText style={styles.ratingText}>{t("profile.ratingOrders", { defaultValue: "4.9 Rating (38 Wholesale Delivery Orders)" })}</AppText>
         </View>
 
         <TouchableOpacity
@@ -114,22 +114,22 @@ export default function FarmerProfileScreen({ route, navigation }) {
           activeOpacity={0.88}
         >
           <Ionicons name="chatbubble-ellipses" size={17} color="#FFFFFF" style={{ marginRight: 6 }} />
-          <AppText style={styles.chatBtnText}>Message & Negotiate Price</AppText>
+          <AppText style={styles.chatBtnText}>{t("profile.messageAndNegotiate", { defaultValue: "Message & Negotiate Price" })}</AppText>
         </TouchableOpacity>
       </View>
 
       {/* Farm Produce Listings Section */}
       <View style={styles.sectionHeader}>
         <AppText style={styles.sectionTitle}>
-          Active Harvest Listings ({products.length})
+          {t("profile.activeHarvestListingsWithCount", { count: products.length, defaultValue: `Active Harvest Listings (${products.length})` })}
         </AppText>
       </View>
 
       {products.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Ionicons name="leaf-outline" size={40} color="#94A3B8" />
-          <AppText style={styles.emptyTitle}>No Active Harvest Listings</AppText>
-          <AppText style={styles.emptySub}>This producer has no active crop listings at the moment.</AppText>
+          <AppText style={styles.emptyTitle}>{t("profile.noActiveHarvestListings", { defaultValue: "No Active Harvest Listings" })}</AppText>
+          <AppText style={styles.emptySub}>{t("profile.noActiveListingsDesc", { defaultValue: "This producer has no active crop listings at the moment." })}</AppText>
         </View>
       ) : (
         <View style={styles.productsGrid}>

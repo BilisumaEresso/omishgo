@@ -22,8 +22,9 @@
     "pickPhotoSource": "የፎቶ ምንጭ ይምረጡ፡",
     "camera": "ፎቶ አንሳ",
     "gallery": "ከጋለሪ ይምረጡ",
-    "weredaAlert": "እባክዎን ዞን ከመምረጥዎ በፊት ክልል ይምረጡ።",
-    "viewAll": "ሁሉንም ይመልከቱ"
+    "weredaAlert": "ዞን ከመምረጥዎ በፊት እባክዎ ክልል ይምረጡ።",
+    "viewAll": "ሁሉንም ተመልከት",
+    "refreshing": "በመጫን ላይ…"
   },
   "splash": {
     "title": "OmishGo",
@@ -73,7 +74,20 @@
     "hasAccount": "ከዚህ በፊት የተከፈተ መለያ አለዎት?",
     "noAccount": "መለያ የለዎትም?",
     "registerError": "ምዝገባው አልተሳካም። እባክዎ እንደገና ይሞክሩ።",
-    "registrationFailed": "ችግር አጋጥሟል። እባክዎ እንደገና ይሞክሩ።"
+    "registrationFailed": "ችግር አጋጥሟል። እባክዎ እንደገና ይሞክሩ።",
+    "nameRequired": "ሙሉ ስም ያስፈልጋል።",
+    "phoneRequired": "የስልክ ቁጥር ያስፈልጋል።",
+    "pinRequired": "ፒን ቁጥር ያስፈልጋል።",
+    "pinLengthError": "ፒን ቁጥር ከ 4 እስከ 6 አሃዞች መሆን አለበት።",
+    "regionRequired": "ክልል ያስፈልጋል።",
+    "zoneRequired": "ዞን ያስፈልጋል።",
+    "weredaRequired": "ወረዳ ያስፈልጋል።",
+    "createAccountTitle": "መለያ ፍጠር",
+    "supportHelpline": "እርዳታ ይፈልጋሉ? ድጋፍ ይደውሉ፡ 0938730818",
+    "registerSupportHelpline": "በምዝገባ እርዳታ ይፈልጋሉ? ድጋፍ ይደውሉ፡ 0938730818",
+    "rememberMe": "አስታወሰኝ",
+    "adminAccessTitle": "የአስተዳዳሪ መዳረሻ",
+    "adminAccessBody": "የአስተዳዳሪ ፓነል በድረ-ገጽ ላይ ብቻ ይገኛል።\nእባክዎ በዴስክቶፕ አሳሽ ላይ የOmishGo AdminWeb ዳሽቦርድን ይጎብኙ።"
   },
   "crops": {
     "Teff": "ጤፍ",
@@ -102,7 +116,10 @@
     "Sunflower": "ሱፍ",
     "Avocado": "አቮካዶ",
     "Banana": "ሙዝ",
-    "Mango": "ማንጎ"
+    "Mango": "ማንጎ",
+    "All": "ሁሉንም",
+    "Vegetables": "አትክልት",
+    "Grains": "እህል"
   },
   "units": {
     "kg": "ኪሎግራም (kg)",
@@ -173,7 +190,23 @@
     "resetFilters": "ማጣሪያዎችን አጽዳ",
     "noProduceMatch": "ከማጣሪያዎ ጋር የሚጣጣም ምርት አልተገኘም",
     "clearFilterHint": "ማጣሪያዎችን ያጽዱ ወይም ለአካባቢው አርሶ አደሮች ለማሳወቅ የጅምላ ግዢ ጥያቄ ይለጥፉ።",
-    "loadingListings": "የምርት ዝርዝሮች በመጫን ላይ..."
+    "loadingListings": "የምርት ዝርዝሮች በመጫን ላይ...",
+    "procurementOverview": "የግዢ እና የገበያ አጠቃላይ እይታ",
+    "procurementRate": "የግዢ ተመን",
+    "item": "ዕቃ",
+    "items": "ዕቃዎች",
+    "activeSupply": "አክቲቭ አቅርቦት",
+    "farmersCount": "{{count}} አርሶ አደሮች",
+    "verified": "የተረጋገጠ",
+    "getDirectQuotes": "ከተረጋገጡ የሀገር ውስጥ አርሶ አደሮች በቀጥታ የጅምላ ዋጋ ተመን ያግኙ።",
+    "mySpending": "የእኔ ወጪ",
+    "last4Months": "ያለፉት 4 ወራት",
+    "procurementCategories": "የግዢ መድቦች",
+    "priceTrends": "የዋጋ ሁኔታዎች",
+    "viewFullAnalysis": "ሙሉውን የገበያ ትንተና ይመልከቱ",
+    "specialityDefault": "በጤፍ እና ሸንኩርት አምራችነት የተካነ",
+    "viewFarmStock": "ማሳ እና ምርት ይመልከቱ",
+    "recentActivityTitle": "የቅርብ ጊዜ ትዕዛዞች እና እንቅስቃሴዎች"
   },
   "browse": {
     "title": "ገበያ",
@@ -202,7 +235,8 @@
     "farmerTitle": "አርሶ አደር",
     "unknownFarmer": "የማይታወቅ አርሶ አደር",
     "noPhone": "የስልክ ቁጥር የለም",
-    "noLocation": "አድራሻ የለም"
+    "noLocation": "አድራሻ የለም",
+    "noProductsMatch": "ከፍለጋዎ ጋር የሚዛመድ ምርት የለም።"
   },
   "buyerOrders": {
     "title": "የእኔ ትዕዛዞች",
@@ -223,7 +257,10 @@
     "messageFarmer": "ለአርሶ አደሩ መልዕክት ይላኩ",
     "emptyNoOrders": "እስካሁን ምንም ትዕዛዝ አላደረጉም",
     "emptyNoFilterOrders": "ምንም የ{{filter}} ትዕዛዞች የሉም",
-    "browseMarketplace": "ገበያውን ይመልከቱ"
+    "browseMarketplace": "ገበያውን ይመልከቱ",
+    "orderActivity": "የትዕዛዝ እንቅስቃሴ",
+    "activityUpdated": "እንቅስቃሴ ተዘምኗል",
+    "trackDetails": "ዝርዝር ሁኔታ ይከታተሉ →"
   },
   "buyerProfile": {
     "title": "የገዢ መለያ",
@@ -246,7 +283,12 @@
     "logoutAlertCancel": "ሰርዝ",
     "logoutAlertConfirm": "ውጣ",
     "menuSettings": "ቅንብሮች",
-    "chatNow": "አሁን ተወያይ"
+    "chatNow": "አሁን ተወያይ",
+    "preferencesTitle": "ምርጫዎች እና መቼቶች",
+    "languageLabel": "ቋንቋ / Language",
+    "helpSupport": "እርዳታ እና ድጋፍ",
+    "helpSupportSub": "ተደጋጋሚ ጥያቄዎች እና የደንበኞች አገልግሎት",
+    "signOutBtn": "ከአካውንት ውጣ"
   },
   "buyerSaved": {
     "title": "የተቀመጡ ምርቶች",
@@ -304,7 +346,39 @@
     "batchValue": "የምርት ስብስብ ዋጋ",
     "availableStock": "ያለ ክምችት",
     "listingNotFound": "ምርቱ አልተገኘም",
-    "listingRemoved": "ይህ ምርት ተሰርዟል ወይም ገቢር አይደለም።"
+    "listingRemoved": "ይህ የምርት ዝርዝር ተነስቷል ወይም አሁን ዝግጁ አይደለም።",
+    "producerUnavailableTitle": "አምራቹ አይገኝም",
+    "producerUnavailableMsg": "ከዚህ አምራች ጋር ቀጥታ መልእክት መለዋወጥ አይቻልም።",
+    "phoneUnavailableTitle": "ስልክ ቁጥር የለም",
+    "phoneUnavailableMsg": "ይህ አምራች የስልክ ቁጥር አላጋራም።",
+    "invalidVolumeTitle": "ያልተፈቀደ መጠን",
+    "invalidVolumeMsg": "እባክዎን ትክክለኛ በትእዛዝ መጠን በኩንታል ያስገቡ።",
+    "volumeExceededTitle": "ከክምችት በላይ",
+    "volumeExceededMsg": "የተጠየቀው መጠን ካለው ዝግጁ ክምችት በላይ ነው።",
+    "orderSentTitle": "ትዕዛዙ ለአምራቹ ተልኳል! 🎉",
+    "orderSentMsg": "የጅምላ ግዢ ትዕዛዝዎ በተሳካ ሁኔታ ቀርቧል።",
+    "viewOrdersBtn": "ትዕዛዞችን ተመልከት",
+    "orderErrorTitle": "የትዕዛዝ ስህተት",
+    "orderErrorMsg": "ትዕዛዙን ማቅረብ አልተቻለም。",
+    "regionalMarketPriceIndex": "የክልል ገበያ ዋጋ ጠቋሚ",
+    "regionalAvg": "የክልል አማካኝ",
+    "marketDemand": "የገበያ ፍላጎት",
+    "highDemand": "ከፍተኛ ፍላጎት",
+    "harvestStatus": "የምርት ሁኔታ",
+    "freshHarvest": "አዲስ ምርት",
+    "produceSpecifications": "የምርት ዝርዝር መግለጫዎች",
+    "cropType": "የሰብል ዓይነት",
+    "harvestLocation": "የምርት ቦታ",
+    "description": "መግለጫ",
+    "verifiedFarmProducer": "የተረጋገጠ አርሶ አደር አምራች",
+    "chatNegotiate": "ተወያይ እና ተደራደር",
+    "callProducer": "ለአምራቹ ደውል",
+    "placeWholesaleOrder": "የጅምላ ትዕዛዝ አስገባ",
+    "enterRequestedVolume": "ለ{{cropType}} የሚፈለገውን መጠን ያስገቡ (ከፍተኛ {{max}} {{unit}}):",
+    "qtyInputPlaceholder": "መጠን በ {{unit}} (ምሳሌ 10)",
+    "estimatedTotalAmount": "የተገመተው ጠቅላላ ዋጋ:",
+    "submittingOrder": "ትዕዛዝ በመላክ ላይ...",
+    "confirmSendOrder": "አረጋግጥ እና ትዕዛዝ ላክ"
   },
   "farmerDashboard": {
     "title": "የአርሶ አደር ዳሽቦርድ",
@@ -354,7 +428,15 @@
     "monthlySalesTrend": "ወርሃዊ የሽያጭ አዝማሚያ",
     "revenueTrajectory": "ያለፉት 6 ወራት የገቢ ዕድገት",
     "pendingDispatches": "የሚጠባበቁ ስርጭቶች",
-    "deliveredHarvests": "የተረከቡ ምርቶች"
+    "deliveredHarvests": "የተረከቡ ምርቶች",
+    "quickActionsTitle": "የአምራች ፈጣን እርምጃዎች",
+    "buyerChats": "የገዢ ቻቶች",
+    "notifications": "ማስታወቂያዎች",
+    "myDrafts": "ረቂቆቼ",
+    "priceTrends": "የዋጋ አዝማሚያዎች",
+    "soldBadge": "ተሸጧል",
+    "fulfillment": "ትዕዛዝ ማሟላት",
+    "completed": "ተጠናቋል"
   },
   "farmerProfile": {
     "title": "የአርሶ አደር መለያ",
@@ -419,12 +501,21 @@
     "selectRegionFirstTitle": "በቅድሚያ ክልል ይምረጡ",
     "selectRegionFirstMessage": "ዞን ከመምረጥዎ በፊት እባክዎ ክልል ይምረጡ።",
     "availabilityStatus": "የምርት ዝግጁነት ሁኔታ",
-    "activeStock": "ለሽያጭ ዝግጁ",
-    "soldOut": "ተሸጦ ያለቀ",
-    "cropSelectPlaceholder": "የሰብል ዓይነት ይምረጡ"
+    "activeStock": "ዝግጁ ክምችት",
+    "soldOut": "ተሸጧል",
+    "cropSelectPlaceholder": "የምርት ሰብል ይምረጡ",
+    "updatedSuccessTitle": "ምርቱ ተሻሽሏል!",
+    "updatedSuccessMsg": "የሰብል ምርትዎ ለውጦች በተሳካ ሁኔታ ተቀምጠዋል።",
+    "updateFailedTitle": "ማሻሻል አልተካሄደም",
+    "updateFailedMsg": "ምርቱን ማሻሻል አልተቻለም።",
+    "deleteConfirmMsg": "ይህን ምርት ለማስወገድ እርግጠኛ ነዎት? ይህ ድርጊት አይመለስም።",
+    "deleteListingBtn": "ምርቱን ሰርዝ",
+    "deleteErrorMsg": "ምርቱን መሰረዝ አልተቻለም።",
+    "savingChanges": "ለውጦችን በማስቀመጥ ላይ...",
+    "saveChangesBtn": "✓ ለውጦችን አስቀምጥ"
   },
   "farmerAnalytics": {
-    "title": "ሀገራዊ የገበያ ዋጋ",
+    "title": "የገበያ ግንዛቤዎች እና ሽያጭ",
     "thisWeek": "በዚህ ሳምንት",
     "totalProducts": "ምርቶች",
     "totalRevenue": "ገቢ",
@@ -438,7 +529,16 @@
     "cropTeff": "ጤፍ",
     "cropOnion": "ሽንኩርት",
     "cropTomato": "ቲማቲም",
-    "cropWheat": "ስንዴ"
+    "cropWheat": "ስንዴ",
+    "storePerformance": "የእርስዎ ሱቅ አፈፃፀም",
+    "sellHarvest": "ምርት ሸጥ",
+    "buyerDemandByLoc": "የገዢዎች ፍላጎት በቦታ",
+    "postOnionListing": "የሸንኩርት ምርት ለጥፍ →",
+    "postCoffeeListing": "የቡና ምርት ለጥፍ →",
+    "advisoryOnionTitle": "በአዳማ የሽንኩርት ዋጋ ጭማሪ",
+    "advisoryOnionBody": "ምስራቅ ሸዋ ውስጥ የጅምላ ሽንኩርት ዋጋ በ +5.8% (4,500 ብር / ኩንታል) ጨምሯል። ጥሩ ዋጋ ለማግኘት ምርትዎን ዛሬ ይለጥፉ።",
+    "advisoryCoffeeTitle": "በሐረር ለቡና ከፍተኛ ፍላጎት",
+    "advisoryCoffeeBody": "በሐረር 185 ገዢዎች የቡና እህል ይፈልጋሉ። ፈጣን የገዢ ትዕዛዞችን ለማግኘት ምርትዎን ይዘርዝሩ።"
   },
   "farmerOrders": {
     "title": "የምርት ሽያጭ ትዕዛዞች",
@@ -477,7 +577,11 @@
     "emptyFallbackMessage": "ምንም ንቁ ምርት የለዎትም።\nአዲስ ምርት ለማውጣት + ይጫኑ።",
     "unableToMarkSoldTitle": "ማስተካከል አልተቻለም",
     "unableToMarkSoldMessage": "የምርቱን ሁኔታ ማስተካከል አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
-    "fallbackLocation": "ኢትዮጵያ"
+    "fallbackLocation": "ኢትዮጵያ",
+    "markSoldOut": "ተሸጧል በል",
+    "noCropsTitle": "የተዘረዘሩ አዲስ ምርቶች የሉም",
+    "noCropsSub": "በመላው ኢትዮጵያ የሚገኙ የጅምላ ገዢዎች የምርትዎን ስብስብ እንዲያገኙ እና እንዲያዝዙ የግብርና ምርትዎን ይለጥፉ።",
+    "postFirstHarvest": "+ የመጀመሪያ ምርትዎን ይለጥፉ"
   },
   "listingForm": {
     "errorTitle": "ስህተት",
@@ -536,7 +640,7 @@
     "chooseFromGallery": "ከጋለሪ ይምረጡ",
     "cancel": "ሰርዝ",
     "retry": "እንደገና ይሞክሩ",
-    "photoLimitTitle": "የፎቶ ገደብ ላይ ደርሰዋል",
+    "photoLimitTitle": "የፎቶ ገደብ",
     "photoLimitMessage": "በአንድ ምርት ላይ እስከ {{max}} ፎቶዎች ብቻ ማከል ይችላሉ።",
     "permissionDeniedTitle": "ፈቃድ ያስፈልጋል",
     "permissionDeniedMessage": "OmishGo ፎቶ ለማከል የካሜራ ፈቃድ ያስፈልገዋል።",
@@ -549,10 +653,39 @@
     "savedAsDraftMessage": "እንደ ረቂቅ ተቀምጧል — ኢንተርኔት ሲኖር በራሱ ይጫናል።",
     "offlineBanner": "ከመስመር ውጭ ነዎት። ይህ ምርት ተቀምጦ ኢንተርኔት ሲኖር ይጫናል።",
     "formTitle": "የአምራች ምርት መመዝገቢያ ቅጽ",
-    "formDesc": "በኢትዮጵያ ውስጥ ካሉ የጅምላ ገዢዎች ቀጥታ ትዕዛዝ ለማግኘት የምርት ዝርዝርዎን ይሙሉ፡",
-    "popularCrops": "ታዋቂ የሰብል ምርቶች",
+    "formDesc": "በኢትዮጵያ ውስጥ ካሉ የጅምላ ገዢዎች ቀጥታ ትዕዛዝ ለማግኘት የምርት ዝርዝርዎን ይሙሉ：",
+    "popularCrops": "ተወዳጅ የምርት ሰብሎች",
     "stockQuantity": "የክምችት መጠን",
-    "quantityPlaceholder": "ምሳሌ፡ 100"
+    "quantityPlaceholder": "ምሳሌ፡ 100",
+    "photoLimitMsg": "በአንድ ሰብል ዝርዝር ቢበዛ 2 ፎቶዎች ብቻ።",
+    "permissionRequiredTitle": "ፈቃድ ያስፈልጋል",
+    "permissionRequiredMsg": "የምርት ፎቶዎችን ለማያያዝ የካሜራ/ጋለሪ ፈቃድ ያስፈልገዋል።",
+    "addPhotoTitle": "የምርት ፎቶ አክል",
+    "choosePhotoSource": "የፎቶ ምንጭ ይምረጡ፡",
+    "chooseGallery": "ከጋለሪ ይምረጡ",
+    "cropRequiredTitle": "የሰብል ዓይነት ያስፈልጋል",
+    "cropRequiredMsg": "እባክዎን የሰብል ዓይነት ይምረጡ።",
+    "qtyRequiredTitle": "የምርት መጠን ያስፈልጋል",
+    "qtyRequiredMsg": "እባክዎን ትክክለኛ የክምችት መጠን ያስገቡ።",
+    "priceRequiredTitle": "ዋጋ ያስፈልጋል",
+    "priceRequiredMsg": "እባክዎን ትክክለኛ የአንድ ክፍል ዋጋ ያስገቡ።",
+    "locRequiredTitle": "ቦታ ያስፈልጋል",
+    "locRequiredMsg": "እባክዎን ክልል ይምረጡ።",
+    "listedSuccessTitle": "ምርቱ ተመዝግቧል!",
+    "listedSuccessMsg": "የሰብል ምርትዎ አሁን ለጅምላ ገዢዎች ክፍት ሆኗል።",
+    "submissionErrorTitle": "የማስገባት ስህተት",
+    "pricePerUnit": "ዋጋ በ",
+    "harvestPhotosLabel": "የምርት ፎቶዎች (ከፍተኛ 2)",
+    "farmLocationSection": "የእርሻ / የማከማቻ ቦታ",
+    "regionLabel": "ክልል",
+    "selectRegionPlaceholder": "ክልል ይምረጡ",
+    "zoneLabel": "ዞን",
+    "selectZonePlaceholder": "ዞን ይምረጡ",
+    "weredaLabel": "ወረዳ / ወረዳ",
+    "selectWeredaPlaceholder": "ወረዳ ይምረጡ",
+    "publishingBtn": "ምርቱን በማተም ላይ...",
+    "publishBtn": "🚀 የሰብል ምርትን ልጠፍ",
+    "unitPlaceholder": "መለኪያ"
   },
   "myDrafts": {
     "title": "የእኔ ረቂቆች",
@@ -645,7 +778,9 @@
   "notificationsScreen": {
     "title": "ማስታወቂያዎች",
     "markAllRead": "ሁሉንም እንደተነበቡ ቁጠር",
-    "empty": "እስካሁን ምንም ማስታወቂያ የለም"
+    "empty": "እስካሁን ምንም ማስታወቂያ የለም",
+    "emptySub": "ሁሉንም አይተዋል። አዳዲስ ማስታወቂያዎች እዚህ ይታያሉ።",
+    "unreadCount": "{{count}} ያልተነበበ ማስታወቂያ(ዎች)"
   },
   "orderDetail": {
     "screenTitle": "የትዕዛዝ ዝርዝር",
@@ -681,10 +816,12 @@
     "updateError": "የትዕዛዙን ሁኔታ ማስተካከል አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
     "success": "ተሳክቷል",
     "orderStatusUpdated": "ትዕዛዝ {{status}}",
-    "cancelTitle": "ትዕዛዙን ሰርዝ",
-    "cancelMessage": "እርግጠኛ ነዎት ይህንን ትዕዛዝ መሰረዝ ይፈልጋሉ?",
+    "cancelTitle": "ትዕዛዝ ሰርዝ",
+    "cancelMessage": "ይህንን ትዕዛዝ ለመሰረዝ እርግጠኛ ነዎት?",
     "cancelNo": "አይ",
-    "cancelYes": "አዎ፣ ሰርዝ"
+    "cancelYes": "አዎ፣ ሰርዝ",
+    "statusUpdated": "ሁኔታው ተሻሽሏል",
+    "statusChangedTo": "የትዕዛዝ ሁኔታ ወደ {{status}} ተቀይሯል"
   },
   "settingsScreen": {
     "title": "ቅንብሮች",
@@ -766,7 +903,8 @@
     "slide4Desc": "ትዕዛዝዎ ከማሳ እስከ እጅዎ የት እንደደረሰ ይወቁ።",
     "skip": "ዝለል",
     "continue": "ቀጥል",
-    "getStarted": "ጀምር"
+    "getStarted": "ጀምር",
+    "stepCounter": "ደረጃ {{current}} ከ {{total}}"
   },
   "priceTrendWidget": {
     "productName": "ጤፍ",
@@ -794,7 +932,7 @@
     "title": "የገበያ ትንተና",
     "subtitle": "የጅምላ ገበያ ዋጋ በኩንታል (100 ኪ.ግ)",
     "nationalCommodityIndex": "ብሔራዊ የግብርና ምርቶች ኢንዴክስ",
-    "bestHubToSell": "ለመሸጥ ተመራጭ ገበያ",
+    "bestHubToSell": "ለመሸጥ ምርጥ ገበያ",
     "regionalHubs": "የኢትዮጵያ ክልላዊ ገበያ ማዕከላት",
     "keyHubs": "5 ዋና ገበያዎች",
     "ratesPerQuintal": "በክልል ገበያ ማዕከላት የግብርና ምርቶች የጅምላ ዋጋ በኩንታል (100 ኪ.ግ)",
@@ -802,7 +940,39 @@
     "sevenDayTrend": "የ7 ቀናት አዝማሚያ",
     "demandIndex": "የፍላጎት መጠን",
     "highActivity": "ከፍተኛ እንቅስቃሴ",
-    "priceOutlook": "የዋጋ ትንበያ"
+    "priceOutlook": "የዋጋ ትንበያ",
+    "marketRatesTitle": "የገበያ ዋጋ በኩንታል",
+    "demand": "ፍላጎት",
+    "topWanted": "በጣም ተፈላጊ",
+    "buyersCount": "{{count}} ገዢዎች",
+    "targetMarket": "ይህንን ገበያ ያላሙ",
+    "marketTips": "የገበያ ምክሮች",
+    "nationalAnalyticsTitle": "ብሔራዊ የገበያ ትንተና",
+    "nationalAnalyticsSub": "የኢትዮጵያ የጅምላ እቃዎች ማውጫ እና የካብ ዋጋዎች",
+    "alertActive": "የዋጋ ማሳወቂያ በርቷል",
+    "alertEnabled": "የዋጋ ማሳወቂያ ተንቀሳቅሷል",
+    "trackCropRates": "የ{{crop}} ዋጋዎችን ይከታተሉ",
+    "alertingDesc": "ዋጋ ከ ETB {{price}}/ኩንታል በታች ሲወርድ ያሳውቃል",
+    "getNotifiedDrop": "የገበያ ዋጋዎች ሲወርዱ ማሳወቂያ ያግኙ",
+    "activeTag": "በርቷል",
+    "setAlertBtn": "+ ማሳወቂያ አዘጋጅ",
+    "listAtMarketRate": "{{crop}} በገበያ ዋጋ ለጥፍ (ETB {{price}}/ኩንታል)",
+    "browseVerifiedSellers": "የተረጋገጡ የ{{crop}} ሻጮችን ይፈልጉ",
+    "browseSellers": "የ{{crop}} ሻጮችን ይፈልጉ",
+    "highVolume": "ከፍተኛ መጠን",
+    "lowSupply": "ዝቅተኛ አቅርቦት",
+    "stableSupply": "ተመሳሳይ አቅርቦት",
+    "bestHubToBuy": "ለመግዛት ምርጥ ገበያ",
+    "harvestSalesIntel": "የምርት ሽያጭ መረጃ",
+    "marketSourcingIntel": "የገበያ አቅርቦት መረጃ",
+    "farmerAdvisoryBody": "በአዲስ አበባ እና አዳማ የ{{cropName}} የጅምላ ፍላጎት በዚህ ሳምንት +5.8% ጨምሯል። የገዢዎች ጥያቄ ከፍተኛ በመሆኑ ምርትዎን ለመሸጥ ምርጥ ጊዜ ነው።",
+    "buyerAdvisoryBody": "የ{{cropName}} ምርትን ከአዳማ እና ደብረ ዘይት አምራች ገበያዎች በቀጥታ መግዛት ከአዲስ አበባ መርካቶ ጋር ሲነፃፀር በ8% አነስተኛ ዋጋ ያስገኛል።",
+    "sevenDaySurge": "+5.8% ጭማሪ",
+    "bullish": "እየጨመረ",
+    "sevenDayLow": "የ7 ቀን ዝቅተኛ፡ ETB {{price}}/{{unit}}",
+    "sevenDayHigh": "የ7 ቀን ከፍተኛ፡ ETB {{price}}/{{unit}}",
+    "tradedVol": "የተሸጠ መጠን፡ {{volume}}",
+    "regionalHubsCount": "{{count}} ክልላዊ ገበያዎች"
   },
   "orders": {
     "totalActiveValue": "የጠቅላላ ገቢር ትዕዛዞች ዋጋ",
@@ -831,7 +1001,11 @@
     "marketPriceIndex": "የገበያ ዋጋ ኢንዴክስ",
     "totalSpend": "ጠቅላላ ወጪ",
     "priceTrends": "የገበያ ዋጋ ትንተና",
-    "viewRegionalTrends": "የክልል የሰብል የጅምላ ዋጋ አዝማሚያዎችን ይመልከቱ"
+    "viewRegionalTrends": "የክልላዊ የሰብል ዋጋ አዝማሚያዎችን ይመልከቱ",
+    "preferencesAndSettings": "ምርጫዎች እና ቅንብሮች",
+    "marketPriceIndexSub": "ሀገራዊ የጅምላ የምርት ዋጋዎችን ይመልከቱ",
+    "producerSupport": "የአምራቾች ድጋፍ እና እርዳታ",
+    "callSupportSub": "ወደ ኦፊሴላዊ ድጋፍ ይደውሉ (0938730818)"
   },
   "saved": {
     "loading": "የተቀመጡ ምርቶች በመጫን ላይ...",
@@ -844,7 +1018,8 @@
     "declinedOutOfStock": "ተቀባይነት አላገኘም / አልቋል",
     "matchingHarvest": "ተመሳሳይ ምርት ተለጥፏል",
     "typeMessage": "መልእክት ይጻፉ...",
-    "messagingUnavailable": "መልእክት መላክ አይቻልም"
+    "messagingUnavailable": "መልእክት መላክ አይቻልም",
+    "acceptedListingLive": "ተቀባይነት አግኝቷል — የምርት ዝርዝር በቀጥታ ስርጭት ላይ"
   },
   "help": {
     "directAdmin": "ለአስተዳዳሪው የቀጥታ መልእክት"

@@ -19,7 +19,6 @@ import { useTranslation } from "react-i18next";
 import AppButton from "../../components/common/AppButton";
 import AppText from "../../components/common/AppText";
 
-import api from "../../config/api";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
@@ -65,17 +64,9 @@ export default function LanguagePickerScreen({ navigation }) {
 
   const handleContinue = async (language = selected) => {
     try {
-      await i18n.changeLanguage(language);
-
-      await setAppLanguage(language);
+      if (setAppLanguage) await setAppLanguage(language);
 
       await AsyncStorage.setItem("@language_selected", "true");
-
-      api
-        .patch("/api/v1/auth/me/language", {
-          preferredLang: language,
-        })
-        .catch(() => {});
     } catch (e) {}
 
     navigation.replace("Onboarding");

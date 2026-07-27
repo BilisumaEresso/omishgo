@@ -20,19 +20,19 @@ export default function FarmerOrdersFulfillmentList({
     <View style={styles.card}>
       <View style={styles.header}>
         <View>
-          <AppText style={styles.title}>{t("farmerOrders.title", "Buyer Orders & Fulfillment Feed")}</AppText>
-          <AppText style={styles.subtitle}>{t("farmerDashboard.recentOrders", "Direct wholesale purchase requests")}</AppText>
+          <AppText style={styles.title}>{t("farmerOrders.title", { defaultValue: "Buyer Orders & Fulfillment Feed" })}</AppText>
+          <AppText style={styles.subtitle}>{t("farmerDashboard.recentOrders", { defaultValue: "Direct wholesale purchase requests" })}</AppText>
         </View>
 
         <TouchableOpacity onPress={onViewAllOrders} activeOpacity={0.8}>
-          <AppText style={styles.viewAllText}>{t("farmerDashboard.viewAll", "View All Orders")}</AppText>
+          <AppText style={styles.viewAllText}>{t("farmerDashboard.viewAll", { defaultValue: "View All Orders" })}</AppText>
         </TouchableOpacity>
       </View>
 
       {orders.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Ionicons name="basket-outline" size={32} color="#94A3B8" />
-          <AppText style={styles.emptyText}>{t("farmerOrders.emptyNoOrders", "No recent buyer orders yet")}</AppText>
+          <AppText style={styles.emptyText}>{t("farmerOrders.emptyNoOrders", { defaultValue: "No recent buyer orders yet" })}</AppText>
         </View>
       ) : (
         <View style={styles.list}>
@@ -41,7 +41,7 @@ export default function FarmerOrdersFulfillmentList({
             const statusConfig = getOrderStatusConfig(o.status, currentLang);
             const cropName = getLocalizedCropName(o.cropType || "Harvest Crop", currentLang);
             const unitLabel = getLocalizedUnitName(o.unit || "q", currentLang);
-            const amount = o.totalPrice ? `${Number(o.totalPrice).toLocaleString("en-US")} ETB` : t("farmerProducts.priceUnavailable", "Pending Quote");
+            const amount = o.totalPrice ? `${Number(o.totalPrice).toLocaleString("en-US")} ETB` : t("farmerProducts.priceUnavailable", { defaultValue: "Pending Quote" });
 
             return (
               <TouchableOpacity
@@ -63,7 +63,7 @@ export default function FarmerOrdersFulfillmentList({
                   </View>
 
                   <AppText style={styles.buyerText}>
-                    {t("buyerOrders.unknownFarmer", "Buyer")}: <AppText style={styles.buyerName}>{o.buyerName || t("farmerOrders.unknownBuyer", "Wholesale Buyer")}</AppText> • {o.date || t("listingDetail.timeToday", "Today")}
+                    {t("buyerOrders.unknownFarmer", { defaultValue: "Buyer" })}: <AppText style={styles.buyerName}>{o.buyerName || t("farmerOrders.unknownBuyer", { defaultValue: "Wholesale Buyer" })}</AppText> • {o.date || t("listingDetail.timeToday", { defaultValue: "Today" })}
                   </AppText>
 
                   <View style={styles.bottomMeta}>
@@ -76,7 +76,7 @@ export default function FarmerOrdersFulfillmentList({
                         activeOpacity={0.85}
                       >
                         <Ionicons name="chatbubble-ellipses" size={14} color="#15803D" />
-                        <AppText style={styles.chatBtnText}>{t("buyerProfile.chatNow", "Chat Buyer")}</AppText>
+                        <AppText style={styles.chatBtnText}>{t("buyerProfile.chatNow", { defaultValue: "Chat Buyer" })}</AppText>
                       </TouchableOpacity>
                     )}
                   </View>

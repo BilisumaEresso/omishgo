@@ -247,8 +247,6 @@ export default function PostProductScreen({ navigation, route }) {
   const availableZones = region ? getLocalizedZones(region, lang) : [];
   const availableWereda = zone ? getLocalizedWereda(region, zone, lang) : [];
 
-  const popularCrops = ["Teff", "Red Onion", "Tomato", "Garlic", "Wheat"];
-
   useEffect(() => {
     isConnected().then(setIsOnline);
     const unsubscribe = subscribeToConnectivity(setIsOnline);
@@ -294,7 +292,10 @@ export default function PostProductScreen({ navigation, route }) {
 
   const launchPicker = async (source) => {
     if (photos.length >= MAX_PHOTOS) {
-      Alert.alert("Photo Limit", "Maximum 2 photos per crop listing.");
+      Alert.alert(
+        t("postProduct.photoLimitTitle", { defaultValue: "Photo Limit" }),
+        t("postProduct.photoLimitMsg", { defaultValue: "Maximum 2 photos per crop listing." })
+      );
       return;
     }
 
@@ -304,7 +305,10 @@ export default function PostProductScreen({ navigation, route }) {
         : await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permission.granted) {
-      Alert.alert("Permission Required", "Camera/Gallery access is required to attach product photos.");
+      Alert.alert(
+        t("postProduct.permissionRequiredTitle", { defaultValue: "Permission Required" }),
+        t("postProduct.permissionRequiredMsg", { defaultValue: "Camera/Gallery access is required to attach product photos." })
+      );
       return;
     }
 
@@ -329,12 +333,12 @@ export default function PostProductScreen({ navigation, route }) {
 
   const handleAddPhoto = () => {
     Alert.alert(
-      "Add Crop Photo",
-      "Choose photo source:",
+      t("postProduct.addPhotoTitle", { defaultValue: "Add Crop Photo" }),
+      t("postProduct.choosePhotoSource", { defaultValue: "Choose photo source:" }),
       [
-        { text: "Take Photo", onPress: () => launchPicker("camera") },
-        { text: "Choose from Gallery", onPress: () => launchPicker("gallery") },
-        { text: "Cancel", style: "cancel" },
+        { text: t("postProduct.takePhoto", { defaultValue: "Take Photo" }), onPress: () => launchPicker("camera") },
+        { text: t("postProduct.chooseGallery", { defaultValue: "Choose from Gallery" }), onPress: () => launchPicker("gallery") },
+        { text: t("common.cancel", { defaultValue: "Cancel" }), style: "cancel" },
       ],
       { cancelable: true }
     );
@@ -352,21 +356,33 @@ export default function PostProductScreen({ navigation, route }) {
 
   const handleSubmit = async () => {
     if (!cropType.trim()) {
-      Alert.alert("Crop Required", "Please select a crop type.");
+      Alert.alert(
+        t("postProduct.cropRequiredTitle", { defaultValue: "Crop Required" }),
+        t("postProduct.cropRequiredMsg", { defaultValue: "Please select a crop type." })
+      );
       return;
     }
     const qtyNum = parseFloat(quantity);
     if (!quantity || isNaN(qtyNum) || qtyNum <= 0) {
-      Alert.alert("Quantity Required", "Please enter a valid stock volume quantity.");
+      Alert.alert(
+        t("postProduct.qtyRequiredTitle", { defaultValue: "Quantity Required" }),
+        t("postProduct.qtyRequiredMsg", { defaultValue: "Please enter a valid stock volume quantity." })
+      );
       return;
     }
     const priceNum = parseFloat(price);
     if (!price || isNaN(priceNum) || priceNum <= 0) {
-      Alert.alert("Price Required", "Please enter a valid price per unit.");
+      Alert.alert(
+        t("postProduct.priceRequiredTitle", { defaultValue: "Price Required" }),
+        t("postProduct.priceRequiredMsg", { defaultValue: "Please enter a valid price per unit." })
+      );
       return;
     }
     if (!region.trim()) {
-      Alert.alert("Location Required", "Please select a region.");
+      Alert.alert(
+        t("postProduct.locRequiredTitle", { defaultValue: "Location Required" }),
+        t("postProduct.locRequiredMsg", { defaultValue: "Please select a region." })
+      );
       return;
     }
 
@@ -389,12 +405,14 @@ export default function PostProductScreen({ navigation, route }) {
       const photoUrls = photos.map((p) => p.url || p.uri).filter(Boolean);
       await api.post(API_ENDPOINTS.products.create, { ...payload, photos: photoUrls });
 
-      Alert.alert("Harvest Listed!", "Your produce listing is now live for wholesale buyers.", [
-        { text: "OK", onPress: () => navigation.goBack() },
-      ]);
+      Alert.alert(
+        t("postProduct.listedSuccessTitle", { defaultValue: "Harvest Listed!" }),
+        t("postProduct.listedSuccessMsg", { defaultValue: "Your produce listing is now live for wholesale buyers." }),
+        [{ text: t("common.ok", { defaultValue: "OK" }), onPress: () => navigation.goBack() }]
+      );
     } catch (err) {
       const msg = err?.response?.data?.message || err.message || "Failed to post listing";
-      Alert.alert("Submission Error", msg);
+      Alert.alert(t("postProduct.submissionErrorTitle", { defaultValue: "Submission Error" }), msg);
     } finally {
       setLoading(false);
     }
@@ -425,7 +443,7 @@ export default function PostProductScreen({ navigation, route }) {
           {/* Quick Select Crop Pills */}
           <AppText style={styles.inputLabel}>{t("postProduct.popularCrops", { defaultValue: "Popular Harvest Crops" })}</AppText>
           <View style={styles.popularRow}>
-            {popularCrops.map((c) => (
+            {CROP_TYPES.slice(0, 5).map((c) => (
               <TouchableOpacity
                 key={c}
                 style={[
@@ -436,7 +454,7 @@ export default function PostProductScreen({ navigation, route }) {
                 activeOpacity={0.8}
               >
                 <AppText style={[styles.popularPillText, cropType === c && { color: "#FFFFFF" }]}>
-                  {c}
+                  {cropLabels[c] || c}
                 </AppText>
               </TouchableOpacity>
             ))}
@@ -478,13 +496,15 @@ export default function PostProductScreen({ navigation, route }) {
                 onClose={() => setShowUnitPicker(false)}
                 icon="cube-outline"
                 theme={theme}
-                placeholder="Unit"
+                placeholder={t("postProduct.unitPlaceholder", "Unit")}
               />
             </View>
           </View>
 
           {/* Price per Unit */}
-          <AppText style={styles.inputLabel}>Price per {unitDisplay} (ETB)</AppText>
+          <AppText style={styles.inputLabel}>
+            {t("postProduct.pricePerUnit", { defaultValue: "Price per" })} {unitDisplay} (ETB)
+          </AppText>
           <AppInput
             placeholder="e.g. 4500"
             value={price}
@@ -494,7 +514,9 @@ export default function PostProductScreen({ navigation, route }) {
           />
 
           {/* Photos Upload Section */}
-          <AppText style={styles.inputLabel}>Harvest Photos (Max 2)</AppText>
+          <AppText style={styles.inputLabel}>
+            {t("postProduct.harvestPhotosLabel", { defaultValue: "Harvest Photos (Max 2)" })}
+          </AppText>
           <PhotoSlots
             photos={photos}
             onAdd={handleAddPhoto}
@@ -506,10 +528,12 @@ export default function PostProductScreen({ navigation, route }) {
 
           {/* Location Section */}
           <View style={styles.sectionCard}>
-            <AppText style={styles.sectionCardTitle}>Farm / Storage Location</AppText>
+            <AppText style={styles.sectionCardTitle}>
+              {t("postProduct.farmLocationSection", { defaultValue: "Farm / Storage Location" })}
+            </AppText>
 
             <DropdownPicker
-              label="Region"
+              label={t("postProduct.regionLabel", { defaultValue: "Region" })}
               value={region}
               options={regionOptions}
               onSelect={setRegion}
@@ -518,18 +542,21 @@ export default function PostProductScreen({ navigation, route }) {
               onClose={() => setShowRegionPicker(false)}
               icon="location-outline"
               theme={theme}
-              placeholder="Select Region"
+              placeholder={t("postProduct.selectRegionPlaceholder", { defaultValue: "Select Region" })}
             />
 
             <DropdownPicker
-              label="Zone"
+              label={t("postProduct.zoneLabel", { defaultValue: "Zone" })}
               value={zone}
               options={availableZones}
               onSelect={setZone}
               visible={showZonePicker}
               onOpen={() => {
                 if (!region) {
-                  Alert.alert("Select Region First", "Please pick a region before choosing a zone.");
+                  Alert.alert(
+                    t("postProduct.selectRegionFirstTitle", { defaultValue: "Select Region First" }),
+                    t("postProduct.selectRegionFirstMsg", { defaultValue: "Please pick a region before choosing a zone." })
+                  );
                   return;
                 }
                 setShowZonePicker(true);
@@ -537,14 +564,37 @@ export default function PostProductScreen({ navigation, route }) {
               onClose={() => setShowZonePicker(false)}
               icon="map-outline"
               theme={theme}
-              placeholder="Select Zone"
+              placeholder={t("postProduct.selectZonePlaceholder", { defaultValue: "Select Zone" })}
               disabled={!region}
+            />
+
+            <DropdownPicker
+              label={t("postProduct.weredaLabel", { defaultValue: "Wereda / District" })}
+              value={wereda}
+              options={availableWereda}
+              onSelect={setWereda}
+              visible={showWeredaPicker}
+              onOpen={() => {
+                if (!zone) {
+                  Alert.alert(
+                    t("postProduct.selectZoneFirstTitle", { defaultValue: "Select Zone First" }),
+                    t("postProduct.selectZoneFirstMsg", { defaultValue: "Please pick a zone before choosing a wereda." })
+                  );
+                  return;
+                }
+                setShowWeredaPicker(true);
+              }}
+              onClose={() => setShowWeredaPicker(false)}
+              icon="navigate-outline"
+              theme={theme}
+              placeholder={t("postProduct.selectWeredaPlaceholder", { defaultValue: "Select Wereda" })}
+              disabled={!zone}
             />
           </View>
 
           {/* Submit Button */}
           <AppButton
-            title={loading ? "Publishing Listing..." : "🚀 Publish Harvest Listing"}
+            title={loading ? t("postProduct.publishingBtn", { defaultValue: "Publishing Listing..." }) : t("postProduct.publishBtn", { defaultValue: "🚀 Publish Harvest Listing" })}
             onPress={handleSubmit}
             loading={loading}
             disabled={loading}

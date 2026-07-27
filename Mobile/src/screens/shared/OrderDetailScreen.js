@@ -113,7 +113,10 @@ export default function OrderDetailScreen({ route, navigation }) {
       const res = await api.patch(API_ENDPOINTS.orders.updateStatus(order._id), { status: newStatus });
       const updated = res.data?.data?.order;
       if (updated) setOrder(updated);
-      Alert.alert(t("orderDetail.statusUpdated", "Status Updated"), `${t("orderDetail.statusChangedTo", "Order status changed to")} ${newStatus.toUpperCase()}`);
+      Alert.alert(
+        t("orderDetail.statusUpdated", { defaultValue: "Status Updated" }),
+        t("orderDetail.statusChangedTo", { status: newStatus.toUpperCase(), defaultValue: "Order status changed to {{status}}" })
+      );
     } catch (err) {
       Alert.alert(t("errorMessage.title", "Update Error"), err?.response?.data?.message || t("orderDetail.failedUpdate", "Failed to update order status."));
     } finally {

@@ -16,7 +16,7 @@ export default function FarmerActionHub({
   const actions = [
     {
       id: "messages",
-      label: "Buyer Chats",
+      label: t("farmerDashboard.buyerChats", "Buyer Chats"),
       icon: "chatbubbles",
       color: "#2563EB",
       bgColor: "#EFF6FF",
@@ -25,7 +25,7 @@ export default function FarmerActionHub({
     },
     {
       id: "alerts",
-      label: "Notifications",
+      label: t("farmerDashboard.notifications", "Notifications"),
       icon: "notifications",
       color: "#D97706",
       bgColor: "#FEF3C7",
@@ -34,7 +34,7 @@ export default function FarmerActionHub({
     },
     {
       id: "drafts",
-      label: draftCount > 0 ? `Drafts (${draftCount})` : "My Drafts",
+      label: draftCount > 0 ? t("farmerDashboard.draftsCount", { count: draftCount, defaultValue: `Drafts (${draftCount})` }) : t("farmerDashboard.myDrafts", "My Drafts"),
       icon: "document-text",
       color: "#16A34A",
       bgColor: "#DCFCE7",
@@ -43,7 +43,7 @@ export default function FarmerActionHub({
     },
     {
       id: "analytics",
-      label: "Price Trends",
+      label: t("farmerDashboard.priceTrends", "Price Trends"),
       icon: "stats-chart",
       color: "#7C3AED",
       bgColor: "#F3E8FF",
@@ -54,7 +54,7 @@ export default function FarmerActionHub({
 
   return (
     <View style={styles.card}>
-      <AppText style={styles.sectionTitle}>Producer Quick Actions</AppText>
+      <AppText style={styles.sectionTitle}>{t("farmerDashboard.quickActionsTitle", "Producer Quick Actions")}</AppText>
       <View style={styles.grid}>
         {actions.map((act) => (
           <TouchableOpacity

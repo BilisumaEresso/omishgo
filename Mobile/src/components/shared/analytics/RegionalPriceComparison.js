@@ -1,8 +1,8 @@
-// src/components/shared/analytics/RegionalPriceComparison.js
 import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, View } from "react-native";
 import AppText from "../../common/AppText";
+import { getLocalizedUnitName } from "../../../constants/units";
 
 export default function RegionalPriceComparison({
   hubs = [
@@ -15,19 +15,19 @@ export default function RegionalPriceComparison({
   primaryColor = "#15803D",
   isFarmer = true,
 }) {
+  const { t, i18n } = useTranslation();
   // Find highest price hub & lowest price hub
   const maxPriceObj = hubs.reduce((max, h) => (h.rawPrice > max.rawPrice ? h : max), hubs[0]);
   const minPriceObj = hubs.reduce((min, h) => (h.rawPrice < min.rawPrice ? h : min), hubs[0]);
 
   const getSupplyBadge = (supply) => {
-  const { t } = useTranslation();
     if (supply === "high") {
-      return { label: "High Volume", color: "#16A34A", bg: "#DCFCE7" };
+      return { label: t("analytics.highVolume", { defaultValue: "High Volume" }), color: "#16A34A", bg: "#DCFCE7" };
     }
     if (supply === "scarcity") {
-      return { label: "Low Supply", color: "#DC2626", bg: "#FEF2F2" };
+      return { label: t("analytics.lowSupply", { defaultValue: "Low Supply" }), color: "#DC2626", bg: "#FEF2F2" };
     }
-    return { label: "Stable Supply", color: "#2563EB", bg: "#EFF6FF" };
+    return { label: t("analytics.stableSupply", { defaultValue: "Stable Supply" }), color: "#2563EB", bg: "#EFF6FF" };
   };
 
   return (
@@ -67,7 +67,7 @@ export default function RegionalPriceComparison({
                   {isLowest && !isFarmer && (
                     <View style={[styles.recommendTag, { backgroundColor: "#E0F2FE" }]}>
                       <Ionicons name="pricetag" size={10} color="#1565C0" />
-                      <AppText style={[styles.recommendTagText, { color: "#1565C0" }]}>Best Hub to Buy</AppText>
+                      <AppText style={[styles.recommendTagText, { color: "#1565C0" }]}>{t("analytics.bestHubToBuy", { defaultValue: "Best Hub to Buy" })}</AppText>
                     </View>
                   )}
                 </View>
@@ -85,7 +85,7 @@ export default function RegionalPriceComparison({
                 <AppText style={[styles.priceText, { color: primaryColor }]}>
                   ETB {hub.price}
                 </AppText>
-                <AppText style={styles.unitText}>/ quintal</AppText>
+                <AppText style={styles.unitText}>/ {getLocalizedUnitName(hub.unit || "quintal", i18n.language || "en", t)}</AppText>
               </View>
             </View>
           );

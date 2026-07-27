@@ -1,23 +1,34 @@
-import { useTranslation } from "react-i18next";
-import { useState } from "react";
-import { View, TextInput, TouchableOpacity, StyleSheet, Text } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { CROP_TYPES, getLocalizedCropName } from "../../constants/crops";
 import { useTheme } from "../../hooks/useTheme";
-const DEFAULT_SUGGESTIONS = ["Tomato", "Teff", "Onion", "Garlic", "Potato", "Coffee"];
+
 export default function BuyerQuickActions({
   searchQuery,
   onSearchChange,
   onFilterPress,
-  suggestions = DEFAULT_SUGGESTIONS
+  suggestions,
 }) {
-  const { t } = useTranslation();
-  const {
-    theme
-  } = useTheme();
+  const { t, i18n } = useTranslation();
+  const { theme } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
 
+  const activeSuggestions =
+    suggestions ||
+    CROP_TYPES.map((cropKey) =>
+      getLocalizedCropName(cropKey, i18n.language || "en", t)
+    );
+
   // Filter suggestions
-  const filteredSuggestions = searchQuery ? suggestions.filter(s => s.toLowerCase().includes(searchQuery.toLowerCase()) && s.toLowerCase() !== searchQuery.toLowerCase()) : [];
+  const filteredSuggestions = searchQuery
+    ? activeSuggestions.filter(
+        (s) =>
+          s.toLowerCase().includes(searchQuery.toLowerCase()) &&
+          s.toLowerCase() !== searchQuery.toLowerCase()
+      )
+    : [];
   const showDropdown = isFocused && filteredSuggestions.length > 0;
   const handleSuggestionPress = item => {
     onSearchChange(item);
@@ -32,7 +43,7 @@ export default function BuyerQuickActions({
         borderColor: isFocused ? theme?.colors?.primary : theme?.colors?.border
       }]}>
           <Ionicons name="search-outline" size={20} color={isFocused ? theme?.colors?.primary : theme?.colors?.textSecondary} style={styles.searchIcon} />
-          <TextInput placeholder="Search tomato, teff, or onions..." placeholderTextColor={theme?.colors?.textSecondary} value={searchQuery} onChangeText={onSearchChange} onFocus={() => setIsFocused(true)} onBlur={() => {
+          <TextInput placeholder={t("browse.searchPlaceholder", { defaultValue: "Search tomato, teff, or onions..." })} placeholderTextColor={theme?.colors?.textSecondary} value={searchQuery} onChangeText={onSearchChange} onFocus={() => setIsFocused(true)} onBlur={() => {
           // Delay hiding so press on suggestion registers
           setTimeout(() => setIsFocused(false), 200);
         }} style={[styles.searchInput, {

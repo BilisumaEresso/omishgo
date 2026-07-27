@@ -67,8 +67,7 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
 
   const handleChangeLanguage = async (code) => {
     try {
-      await i18n.changeLanguage(code);
-      if (setLanguage) setLanguage(code);
+      if (setLanguage) await setLanguage(code);
       setLanguageOpen(false);
     } catch (_) {}
   };
@@ -93,7 +92,7 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
         </View>
 
         <AppText style={[styles.phoneText, { color: textSecondary }]}>
-          {user?.phone || "+251 900 000 000"} • {user?.location?.region || "Addis Ababa"}
+          {user?.phone || "+251 900 000 000"} • {[user?.location?.wereda, user?.location?.zone, user?.location?.region].filter(Boolean).join(", ") || "Addis Ababa"}
         </AppText>
       </View>
 
@@ -125,7 +124,7 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
 
       {/* Account Settings List */}
       <View style={[styles.settingsGroup, { backgroundColor: surfaceColor }]}>
-        <AppText style={styles.groupTitle}>Preferences & Settings</AppText>
+        <AppText style={styles.groupTitle}>{t("buyerProfile.preferencesTitle", "Preferences & Settings")}</AppText>
 
         {/* Language Selector */}
         <TouchableOpacity
@@ -138,7 +137,7 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
               <Ionicons name="globe-outline" size={20} color={primaryColor} />
             </View>
             <View>
-              <AppText style={styles.settingTitle}>Language / ቋንቋ</AppText>
+              <AppText style={styles.settingTitle}>{t("buyerProfile.languageLabel", "Language / ቋንቋ")}</AppText>
               <AppText style={styles.settingSub}>{currentLangObj.label} ({currentLangObj.native})</AppText>
             </View>
           </View>
@@ -196,8 +195,8 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
               <Ionicons name="help-circle-outline" size={20} color="#F59E0B" />
             </View>
             <View>
-              <AppText style={styles.settingTitle}>Help & Support</AppText>
-              <AppText style={styles.settingSub}>FAQs and contact customer service</AppText>
+              <AppText style={styles.settingTitle}>{t("buyerProfile.helpSupport", "Help & Support")}</AppText>
+              <AppText style={styles.settingSub}>{t("buyerProfile.helpSupportSub", "FAQs and contact customer service")}</AppText>
             </View>
           </View>
           <Ionicons name="chevron-forward" size={18} color="#64748B" />
@@ -211,7 +210,7 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
         activeOpacity={0.85}
       >
         <Ionicons name="log-out-outline" size={18} color="#EF4444" />
-        <AppText style={styles.logoutBtnText}>Sign Out Account</AppText>
+        <AppText style={styles.logoutBtnText}>{t("buyerProfile.signOutBtn", "Sign Out Account")}</AppText>
       </TouchableOpacity>
 
       <View style={{ height: 80 }} />

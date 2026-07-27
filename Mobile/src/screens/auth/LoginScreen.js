@@ -1,3 +1,4 @@
+// Mobile/src/screens/auth/LoginScreen.js
 import Ionicons from "@expo/vector-icons/Ionicons";
 import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
@@ -6,8 +7,11 @@ import {
   Easing,
   Keyboard,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   Pressable,
+  StyleSheet,
+  TouchableOpacity,
   View,
 } from "react-native";
 import AppButton from "../../components/common/AppButton";
@@ -17,15 +21,6 @@ import AuthLayout from "../../components/layout/AuthLayout";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store.js";
 
-/**
- * Premium LoginScreen
- * - Staggered entrance (logo pop → title → fields → button)
- * - Subtle idle "breathing" on the logo/card
- * - Shake animation on validation / submit error
- * - Focus lift on inputs, press-scale on the CTA
- * - Success pulse before navigation hand-off
- * Drop-in replacement. No new required deps.
- */
 const LoginScreen = ({ navigation }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -33,11 +28,12 @@ const LoginScreen = ({ navigation }) => {
 
   const [phone, setPhone] = React.useState("");
   const [pin, setPin] = React.useState("");
+  const [showPin, setShowPin] = React.useState(false);
   const [errors, setErrors] = React.useState({});
   const [loading, setLoading] = React.useState(false);
 
   // ---- Animated values ----
-  const logoScale = useRef(new Animated.Value(0.6)).current;
+  const logoScale = useRef(new Animated.Value(0.8)).current;
   const logoBreath = useRef(new Animated.Value(1)).current;
   const titleOpacity = useRef(new Animated.Value(0)).current;
   const titleTranslate = useRef(new Animated.Value(12)).current;
@@ -84,11 +80,11 @@ const LoginScreen = ({ navigation }) => {
       ]),
     ]).start();
 
-    // Idle breathing on the logo (very subtle)
+    // Idle breathing on logo
     Animated.loop(
       Animated.sequence([
         Animated.timing(logoBreath, {
-          toValue: 1.03,
+          toValue: 1.02,
           duration: 2200,
           easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
@@ -99,11 +95,10 @@ const LoginScreen = ({ navigation }) => {
           easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
         }),
-      ]),
+      ])
     ).start();
 
     return () => {
-      // Stop all loops on unmount
       logoBreath.stopAnimation();
     };
   }, []);
@@ -120,31 +115,11 @@ const LoginScreen = ({ navigation }) => {
   const shake = () => {
     shakeX.setValue(0);
     Animated.sequence([
-      Animated.timing(shakeX, {
-        toValue: 8,
-        duration: 60,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeX, {
-        toValue: -8,
-        duration: 60,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeX, {
-        toValue: 6,
-        duration: 55,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeX, {
-        toValue: -4,
-        duration: 55,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeX, {
-        toValue: 0,
-        duration: 50,
-        useNativeDriver: true,
-      }),
+      Animated.timing(shakeX, { toValue: 8, duration: 60, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: -8, duration: 60, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: 6, duration: 55, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: -4, duration: 55, useNativeDriver: true }),
+      Animated.timing(shakeX, { toValue: 0, duration: 50, useNativeDriver: true }),
     ]).start();
   };
 
@@ -155,6 +130,7 @@ const LoginScreen = ({ navigation }) => {
       speed: 40,
       bounciness: 0,
     }).start();
+
   const pressOut = () =>
     Animated.spring(ctaScale, {
       toValue: 1,
@@ -165,10 +141,10 @@ const LoginScreen = ({ navigation }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!phone.trim()) newErrors.phone = "Phone number is required";
-    if (!pin.trim()) newErrors.pin = "PIN is required";
+    if (!phone.trim()) newErrors.phone = t("auth.phoneRequired", { defaultValue: "Phone number is required" });
+    if (!pin.trim()) newErrors.pin = t("auth.pinRequired", { defaultValue: "PIN is required" });
     else if (!/^\d{4,6}$/.test(pin))
-      newErrors.pin = "PIN must be between 4 and 6 digits";
+      newErrors.pin = t("auth.pinLengthError", { defaultValue: "PIN must be between 4 and 6 digits" });
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -184,16 +160,8 @@ const LoginScreen = ({ navigation }) => {
       const result = await login(phone, pin);
       if (!result.success) {
         shake();
-        if (result.errorType === "DEVICE_BLOCKED") {
-          navigation.navigate(
-            "DeviceBlocked" /* TODO: DeviceBlocked screen not yet registered */,
-            { phone },
-          );
-        } else {
-          setErrors({ submit: result.message || "Login failed" });
-        }
+        setErrors({ submit: result.message || t("auth.loginFailed", { defaultValue: "Login failed. Check your phone & PIN." }) });
       } else {
-        // Success pulse hand-off
         Animated.timing(successPulse, {
           toValue: 1,
           duration: 320,
@@ -203,16 +171,15 @@ const LoginScreen = ({ navigation }) => {
       }
     } catch (error) {
       shake();
-      setErrors({ submit: error.message || "Login failed" });
+      setErrors({ submit: error.message || t("auth.loginFailed", { defaultValue: "Login failed. Please try again." }) });
     } finally {
       setLoading(false);
     }
   };
 
-  const primary = theme?.colors?.primary || "#2E7D32";
-  const errorColor = theme?.colors?.error || "#C62828";
+  const primary = theme?.colors?.primary || "#15803D";
+  const errorColor = theme?.colors?.error || "#EF4444";
 
-  // Helpers for staggered row style
   const rowStyle = (val) => ({
     opacity: val,
     transform: [
@@ -232,19 +199,10 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <AuthLayout
-      title={t("auth.loginTitle")}
-      subtitle={t("auth.loginSubtitle")}
+      title={t("auth.loginTitle", { defaultValue: "Welcome Back" })}
+      subtitle={t("auth.loginSubtitle", { defaultValue: "Sign in to access produce listings & wholesale orders" })}
       logoSource={require("../../assets/images/logo.png")}
       showBack={false}
-      // If AuthLayout supports these, they'll animate the logo/title.
-      // Safe to ignore if not — layout will just render normally.
-      logoStyle={{
-        transform: [{ scale: Animated.multiply(logoScale, logoBreath) }],
-      }}
-      titleStyle={{
-        opacity: titleOpacity,
-        transform: [{ translateY: titleTranslate }],
-      }}
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -256,40 +214,19 @@ const LoginScreen = ({ navigation }) => {
             transform: [{ translateX: shakeX }, { scale: successScale }],
           }}
         >
-          <View style={{ marginTop: theme.spacing.lg }}>
+          <View style={{ marginTop: 8 }}>
             {errors.submit && (
-              <Animated.View
-                style={{
-                  backgroundColor: errorColor + "15",
-                  borderRadius: 10,
-                  padding: 12,
-                  marginBottom: theme.spacing.md,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  borderWidth: 1,
-                  borderColor: errorColor + "30",
-                }}
-              >
-                <Ionicons
-                  name="alert-circle"
-                  size={16}
-                  color={errorColor}
-                  style={{ marginRight: 8 }}
-                />
-                <AppText
-                  variant="caption"
-                  color={errorColor}
-                  style={{ flex: 1 }}
-                >
-                  {errors.submit}
-                </AppText>
+              <Animated.View style={styles.errorCard}>
+                <Ionicons name="alert-circle" size={18} color={errorColor} />
+                <AppText style={styles.errorText}>{errors.submit}</AppText>
               </Animated.View>
             )}
 
+            {/* Phone Input */}
             <Animated.View style={rowStyle(row1)}>
               <AppInput
-                label={t("auth.phoneLabel")}
-                placeholder={t("auth.phonePlaceholder")}
+                label={t("auth.phoneLabel", { defaultValue: "Phone Number" })}
+                placeholder={t("auth.phonePlaceholder", { defaultValue: "e.g. 0911234567" })}
                 value={phone}
                 onChangeText={(text) => {
                   setPhone(text);
@@ -302,10 +239,11 @@ const LoginScreen = ({ navigation }) => {
               />
             </Animated.View>
 
+            {/* PIN Input */}
             <Animated.View style={rowStyle(row2)}>
               <AppInput
-                label={t("auth.pinLabel")}
-                placeholder={t("auth.pinPlaceholder")}
+                label={t("auth.pinLabel", { defaultValue: "PIN (4-6 digits)" })}
+                placeholder={t("auth.pinPlaceholder", { defaultValue: "Enter your 4-6 digit PIN" })}
                 value={pin}
                 onChangeText={(text) => {
                   const numericText = text.replace(/[^0-9]/g, "");
@@ -322,11 +260,12 @@ const LoginScreen = ({ navigation }) => {
               />
             </Animated.View>
 
+            {/* CTA Button */}
             <Animated.View
               style={[
                 rowStyle(rowCTA),
                 {
-                  marginTop: theme.spacing.xl,
+                  marginTop: 20,
                   transform: [
                     ...rowStyle(rowCTA).transform,
                     { scale: ctaScale },
@@ -341,7 +280,7 @@ const LoginScreen = ({ navigation }) => {
                 disabled={loading}
               >
                 <AppButton
-                  title={t("auth.loginBtn")}
+                  title={t("auth.loginBtn", { defaultValue: "Login to Account" })}
                   onPress={handleSubmit}
                   loading={loading}
                   fullWidth
@@ -349,37 +288,99 @@ const LoginScreen = ({ navigation }) => {
               </Pressable>
             </Animated.View>
 
+            {/* Register Redirect Row */}
             <Animated.View
               style={[
                 rowStyle(rowFooter),
-                {
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  marginTop: theme.spacing.xxxl,
-                },
+                styles.footerRow,
               ]}
             >
-              <AppText variant="bodyMd" color={theme.colors.textSecondary}>
-                {t("auth.noAccount")}
+              <AppText style={styles.footerSub}>
+                {t("auth.noAccount", { defaultValue: "Don't have an account?" })}
               </AppText>
               <Pressable
                 onPress={() => navigation.navigate("Register")}
                 hitSlop={10}
               >
-                <AppText
-                  variant="bodyMd"
-                  color={primary}
-                  style={{ fontWeight: "700", marginLeft: 4 }}
-                >
-                  {t("auth.registerBtn")}
+                <AppText style={[styles.footerLink, { color: primary }]}>
+                  {t("auth.registerBtn", { defaultValue: "Register Account" })}
                 </AppText>
               </Pressable>
             </Animated.View>
+
+            {/* Customer Support Helpline Pill */}
+            <TouchableOpacity
+              style={styles.supportPill}
+              onPress={() => Linking.openURL("tel:0938730818")}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="headset-outline" size={14} color="#15803D" />
+              <AppText style={styles.supportPillText}>
+                {t("auth.supportHelpline", { defaultValue: "Need help? Call Support: 0938730818" })}
+              </AppText>
+            </TouchableOpacity>
           </View>
         </Animated.View>
       </KeyboardAvoidingView>
     </AuthLayout>
   );
 };
+
+const styles = StyleSheet.create({
+  errorCard: {
+    backgroundColor: "#FEF2F2",
+    borderRadius: 14,
+    padding: 12,
+    marginBottom: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    borderWidth: 1,
+    borderColor: "#FECACA",
+  },
+  errorText: {
+    fontSize: 12.5,
+    color: "#EF4444",
+    flex: 1,
+    fontWeight: "600",
+  },
+  eyeBtn: {
+    position: "absolute",
+    right: 14,
+    top: 38,
+    zIndex: 10,
+  },
+  footerRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 24,
+    gap: 6,
+  },
+  footerSub: {
+    fontSize: 14,
+    color: "#64748B",
+  },
+  footerLink: {
+    fontSize: 14,
+    fontWeight: "800",
+  },
+  supportPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    backgroundColor: "#DCFCE7",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    marginTop: 28,
+  },
+  supportPillText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#15803D",
+  },
+});
 
 export default LoginScreen;

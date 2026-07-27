@@ -1,9 +1,10 @@
 // src/components/common/AppInput.js
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, TextInput, Pressable, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AppText from "./AppText";
 import { useTheme } from "../../hooks/useTheme";
+
 const AppInput = ({
   label,
   placeholder,
@@ -18,84 +19,140 @@ const AppInput = ({
   inputStyle,
   ...rest // Allows passing autoCapitalize, returnKeyType, etc.
 }) => {
-  const {
-    theme
-  } = useTheme();
+  const { theme } = useTheme();
   const [focused, setFocused] = useState(false);
   const [secure, setSecure] = useState(secureTextEntry);
+
+  useEffect(() => {
+    setSecure(secureTextEntry);
+  }, [secureTextEntry]);
+
   const getBorderColor = () => {
-    if (error) return theme?.colors?.error || "#FF3B30";
-    if (focused) return theme?.colors?.primary || "#6B4EFF";
-    return theme?.colors?.border || "#333333";
+    if (error) return theme?.colors?.error || "#EF4444";
+    if (focused) return theme?.colors?.primary || "#15803D";
+    return theme?.colors?.border || "#E2E8F0";
   };
-  return <View style={[styles.container, style]}>
-      {label && <AppText variant="label" style={[styles.label, {
-      color: theme?.colors?.textPrimary
-    }]}>
+
+  return (
+    <View style={[styles.container, style]}>
+      {label && (
+        <AppText
+          variant="label"
+          style={[styles.label, { color: theme?.colors?.textPrimary || "#0F172A" }]}
+        >
           {label}
-        </AppText>}
+        </AppText>
+      )}
 
-      <View style={[styles.inputContainer, {
-      backgroundColor: theme?.colors?.surface || "#1A1A1A",
-      borderColor: getBorderColor()
-    }]}>
-        {leftIcon && <Ionicons name={leftIcon} size={20} color={focused ? theme?.colors?.primary || "#6B4EFF" : theme?.colors?.textSecondary || "#888888"} style={styles.leftIcon} />}
+      <View
+        style={[
+          styles.inputContainer,
+          {
+            backgroundColor: theme?.colors?.surface || "#FFFFFF",
+            borderColor: getBorderColor(),
+          },
+        ]}
+      >
+        {leftIcon && (
+          <Ionicons
+            name={leftIcon}
+            size={20}
+            color={
+              focused
+                ? theme?.colors?.primary || "#15803D"
+                : theme?.colors?.textSecondary || "#64748B"
+            }
+            style={styles.leftIcon}
+          />
+        )}
 
-        <TextInput value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={"#666666"} secureTextEntry={secure} keyboardType={keyboardType} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} style={[styles.input, {
-        color: theme?.colors?.textPrimary || "#FFFFFF"
-      }, inputStyle]} {...rest} />
+        <TextInput
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor={"#94A3B8"}
+          secureTextEntry={secure}
+          keyboardType={keyboardType}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          style={[
+            styles.input,
+            { color: theme?.colors?.textPrimary || "#0F172A" },
+            inputStyle,
+          ]}
+          {...rest}
+        />
 
-        {secureTextEntry ? <Pressable onPress={() => setSecure(!secure)} hitSlop={{
-        top: 10,
-        bottom: 10,
-        left: 10,
-        right: 10
-      }} style={styles.rightIconWrapper}>
-            <Ionicons name={secure ? "eye-off-outline" : "eye-outline"} size={20} color={theme?.colors?.textSecondary || "#888888"} />
-          </Pressable> : rightIcon ? <View style={styles.rightIconWrapper}>
-            <Ionicons name={rightIcon} size={20} color={theme?.colors?.textSecondary || "#888888"} />
-          </View> : null}
+        {secureTextEntry ? (
+          <Pressable
+            onPress={() => setSecure(!secure)}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            style={styles.rightIconWrapper}
+          >
+            <Ionicons
+              name={secure ? "eye-off-outline" : "eye-outline"}
+              size={20}
+              color={theme?.colors?.textSecondary || "#64748B"}
+            />
+          </Pressable>
+        ) : rightIcon ? (
+          <View style={styles.rightIconWrapper}>
+            <Ionicons
+              name={rightIcon}
+              size={20}
+              color={theme?.colors?.textSecondary || "#64748B"}
+            />
+          </View>
+        ) : null}
       </View>
 
-      {error && <AppText variant="caption" style={[styles.errorText, {
-      color: theme?.colors?.error || "#FF3B30"
-    }]}>
+      {error && (
+        <AppText
+          variant="caption"
+          style={[styles.errorText, { color: theme?.colors?.error || "#EF4444" }]}
+        >
           {error}
-        </AppText>}
-    </View>;
+        </AppText>
+      )}
+    </View>
+  );
 };
+
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16
+    marginBottom: 16,
   },
   label: {
-    marginBottom: 8,
-    fontWeight: "500"
+    marginBottom: 6,
+    fontWeight: "600",
+    fontSize: 13,
   },
   inputContainer: {
     borderWidth: 1.5,
-    borderRadius: 12,
+    borderRadius: 14,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 14,
-    minHeight: 52 // Standard minimum touch target size
+    minHeight: 50,
   },
   leftIcon: {
-    marginRight: 10
+    marginRight: 10,
   },
   input: {
     flex: 1,
-    paddingVertical: 14,
-    fontSize: 16
+    paddingVertical: 12,
+    fontSize: 15,
   },
   rightIconWrapper: {
     marginLeft: 10,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   errorText: {
-    marginTop: 6,
-    marginLeft: 4
-  }
+    marginTop: 5,
+    marginLeft: 4,
+    fontSize: 12,
+  },
 });
+
 export default AppInput;

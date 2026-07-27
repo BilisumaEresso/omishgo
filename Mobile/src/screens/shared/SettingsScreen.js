@@ -8,10 +8,16 @@ import DashboardLayout from "../../components/layout/DashBoardLayout";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
+const LANGUAGES = [
+  { code: "en", label: "English", native: "English" },
+  { code: "am", label: "አማርኛ", native: "Amharic" },
+  { code: "om", label: "Afaan Oromoo", native: "Afan Oromo" },
+];
+
 const SettingsScreen = ({ navigation }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { theme } = useTheme();
-  const { user } = useAuthStore();
+  const { user, setLanguage } = useAuthStore();
 
   const primary = theme?.colors?.primary || "#1565C0";
   const primaryCont = theme?.colors?.primaryContainer || "#E3F2FD";
@@ -27,6 +33,10 @@ const SettingsScreen = ({ navigation }) => {
   const [priceAlerts, setPriceAlerts] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [locationAccess, setLocationAccess] = useState(true);
+  const [languageOpen, setLanguageOpen] = useState(false);
+
+  const currentLang = i18n.language || "en";
+  const currentLangObj = LANGUAGES.find((l) => l.code === currentLang) || LANGUAGES[0];
 
   const handleComingSoon = (feature) =>
     Alert.alert(t("settingsScreen.comingSoonTitle"), t("settingsScreen.comingSoonMessage", { feature }));
@@ -61,7 +71,7 @@ const SettingsScreen = ({ navigation }) => {
     </View>
   );
 
-  const TapRow = ({ icon, label, subtitle, onPress, danger, isLast }) => (
+  const TapRow = ({ icon, label, subtitle, onPress, danger, isLast, rightElement }) => (
     <TouchableOpacity
       style={[
         styles.row,
@@ -79,7 +89,7 @@ const SettingsScreen = ({ navigation }) => {
         <AppText style={[styles.rowLabel, { color: danger ? error : textPrimary }]}>{label}</AppText>
         {subtitle && <AppText style={[styles.rowSubtitle, { color: textMuted }]}>{subtitle}</AppText>}
       </View>
-      <Ionicons name="chevron-forward" size={16} color={textMuted} />
+      {rightElement || <Ionicons name="chevron-forward" size={16} color={textMuted} />}
     </TouchableOpacity>
   );
 
@@ -107,7 +117,43 @@ const SettingsScreen = ({ navigation }) => {
       <SectionTitle title={t("settingsScreen.sectionAppearance")} />
       <Card>
         <ToggleRow icon="moon-outline" label={t("settingsScreen.darkMode")} subtitle={t("settingsScreen.comingSoon")} value={darkMode} onToggle={() => handleComingSoon(t("settingsScreen.darkMode"))} />
-        <TapRow icon="language-outline" label={t("settingsScreen.language")} subtitle={t("settingsScreen.languageSubtitle")} onPress={() => handleComingSoon(t("settingsScreen.languageChangeFromSettings"))} />
+        <TapRow
+          icon="language-outline"
+          label={t("settingsScreen.language")}
+          subtitle={`${currentLangObj.label} (${currentLangObj.native})`}
+          onPress={() => setLanguageOpen(!languageOpen)}
+          rightElement={<Ionicons name={languageOpen ? "chevron-up" : "chevron-down"} size={16} color={textMuted} />}
+        />
+        {languageOpen && (
+          <View style={[styles.languageDropdown, { backgroundColor: surface, borderBottomWidth: 1, borderBottomColor: border }]}>
+            {LANGUAGES.map((lang) => {
+              const active = currentLang === lang.code;
+              return (
+                <TouchableOpacity
+                  key={lang.code}
+                  style={[
+                    styles.langOption,
+                    active && { backgroundColor: primary + "14" },
+                  ]}
+                  onPress={() => {
+                    if (setLanguage) setLanguage(lang.code);
+                    setLanguageOpen(false);
+                  }}
+                >
+                  <AppText
+                    style={[
+                      styles.langText,
+                      { color: active ? primary : textPrimary, fontWeight: active ? "700" : "500" },
+                    ]}
+                  >
+                    {lang.label} ({lang.native})
+                  </AppText>
+                  {active && <Ionicons name="checkmark" size={16} color={primary} />}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
         <TapRow icon="text-outline" label={t("settingsScreen.fontSize")} subtitle={t("settingsScreen.fontSizeSubtitle")} onPress={() => handleComingSoon(t("settingsScreen.fontSize"))} isLast />
       </Card>
 
@@ -199,6 +245,21 @@ const styles = StyleSheet.create({
   rowText: { flex: 1 },
   rowLabel: { fontSize: 15, fontWeight: "500" },
   rowSubtitle: { fontSize: 12, marginTop: 1 },
+  languageDropdown: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    gap: 4,
+  },
+  langOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 10,
+    borderRadius: 10,
+  },
+  langText: {
+    fontSize: 13,
+  },
   version: {
     textAlign: "center",
     fontSize: 12,

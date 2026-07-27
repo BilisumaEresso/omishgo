@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StyleSheet, Text, View } from "react-native";
 import { useAuthStore } from "../store/auth.store.js";
@@ -7,16 +8,18 @@ import FarmerNavigator from "./FarmerNavigator.js";
 const Stack = createNativeStackNavigator();
 
 // Friendly screen for admin role on mobile
-const AdminMobileGuard = () => (
-  <View style={styles.guard}>
-    <Text style={styles.guardIcon}>🖥️</Text>
-    <Text style={styles.guardTitle}>Admin Access</Text>
-    <Text style={styles.guardBody}>
-      The admin panel is only available on the web.{"\n"}
-      Please visit the OmishGo AdminWeb dashboard on a desktop browser.
-    </Text>
-  </View>
-);
+const AdminMobileGuard = () => {
+  const { t } = useTranslation();
+  return (
+    <View style={styles.guard}>
+      <Text style={styles.guardIcon}>🖥️</Text>
+      <Text style={styles.guardTitle}>{t("auth.adminAccessTitle", "Admin Access")}</Text>
+      <Text style={styles.guardBody}>
+        {t("auth.adminAccessBody", "The admin panel is only available on the web.\nPlease visit the OmishGo AdminWeb dashboard on a desktop browser.")}
+      </Text>
+    </View>
+  );
+};
 
 const AppNavigator = () => {
   const role = useAuthStore((state) => state.user?.role);

@@ -1,4 +1,4 @@
-// src/components/buyer/BuyerCategorySpendingList.js
+import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../common/AppText";
@@ -39,9 +39,12 @@ export default function BuyerCategorySpendingList({
   currency = "ETB",
   onCategoryPress,
 }) {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
-      <AppText style={styles.sectionTitle}>Procurement Categories</AppText>
+      <AppText style={styles.sectionTitle}>
+        {t("buyerDashboard.procurementCategories", { defaultValue: "Procurement Categories" })}
+      </AppText>
 
       <View style={styles.list}>
         {categories.map((item) => (

@@ -21,7 +21,9 @@ export default function BuyerProcurementMetrics({
 
   return (
     <View style={styles.container}>
-      <AppText style={styles.sectionTitle}>Procurement & Market Overview</AppText>
+      <AppText style={styles.sectionTitle}>
+        {t("buyerDashboard.procurementOverview", { defaultValue: "Procurement & Market Overview" })}
+      </AppText>
 
       <View style={styles.row}>
         {/* Left Metric: Total Spend / Avg Rate */}
@@ -38,11 +40,13 @@ export default function BuyerProcurementMetrics({
             <AppText style={styles.amount}>
               {currency} {formattedSpend}
             </AppText>
-            <AppText style={styles.label}>Procurement Rate</AppText>
+            <AppText style={styles.label}>
+              {t("buyerDashboard.procurementRate", { defaultValue: "Procurement Rate" })}
+            </AppText>
           </View>
         </TouchableOpacity>
 
-        {/* Middle Metric: {t("buyerDashboard.activeOrders", { defaultValue: "Active Orders" })} / Listings */}
+        {/* Middle Metric: Active Orders / Listings */}
         <TouchableOpacity
           style={[styles.card, styles.pinkCard]}
           onPress={onActiveOrdersPress}
@@ -54,9 +58,11 @@ export default function BuyerProcurementMetrics({
 
           <View>
             <AppText style={styles.amount}>
-              {activeOrdersCount} {activeOrdersCount === 1 ? "Item" : "Items"}
+              {activeOrdersCount} {activeOrdersCount === 1 ? t("buyerDashboard.item", { defaultValue: "Item" }) : t("buyerDashboard.items", { defaultValue: "Items" })}
             </AppText>
-            <AppText style={styles.label}>Active Supply</AppText>
+            <AppText style={styles.label}>
+              {t("buyerDashboard.activeSupply", { defaultValue: "Active Supply" })}
+            </AppText>
           </View>
         </TouchableOpacity>
 
@@ -72,9 +78,11 @@ export default function BuyerProcurementMetrics({
 
           <View>
             <AppText style={styles.amount}>
-              {uniqueFarmersCount} Farmers
+              {t("buyerDashboard.farmersCount", { count: uniqueFarmersCount, defaultValue: `${uniqueFarmersCount} Farmers` })}
             </AppText>
-            <AppText style={styles.label}>Verified</AppText>
+            <AppText style={styles.label}>
+              {t("buyerDashboard.verified", { defaultValue: "Verified" })}
+            </AppText>
           </View>
         </TouchableOpacity>
       </View>
