@@ -124,6 +124,8 @@ export const sendMessage = asyncHandler(async (req, res) => {
 
   const msgObj = message.toObject ? message.toObject() : message;
   msgObj.text = msgObj.content;
+  msgObj.senderId = req.user._id.toString();
+  msgObj.receiverId = receiverId.toString();
 
   // Trigger notification for recipient
   try {
