@@ -97,7 +97,7 @@ const DropdownPicker = ({
               { color: value ? textPrimary : textSecondary },
             ]}
           >
-            {selectedLabel || placeholder || `Select ${label}`}
+            {selectedLabel || placeholder || t("common.selectRegion", { defaultValue: "Select..." })}
           </AppText>
         </View>
         <Ionicons
@@ -391,19 +391,30 @@ export default function PostProductScreen({ navigation, route }) {
       quantity: qtyNum,
       unit: unit.trim() || "quintal",
       price: priceNum,
-      description: description.trim() || `${qtyNum} ${unit} of fresh ${cropType} harvest ready for wholesale.`,
+      description: description.trim() || t("postProduct.defaultDescription", { defaultValue: "{{qty}} {{unit}} of fresh {{crop}} harvest ready for wholesale.", qty: qtyNum, unit, crop: cropType }),
       location: {
         region: region.trim(),
         zone: zone.trim(),
         kebele: "",
         wereda: wereda.trim(),
       },
+      sourcingRequestId: prefill.sourcingRequestId || undefined,
     };
 
     setLoading(true);
     try {
       const photoUrls = photos.map((p) => p.url || p.uri).filter(Boolean);
-      await api.post(API_ENDPOINTS.products.create, { ...payload, photos: photoUrls });
+      const res = await api.post(API_ENDPOINTS.products.create, { ...payload, photos: photoUrls });
+      const createdProdId = res.data?.data?.product?._id;
+
+      if (prefill.sourcingRequestId) {
+        try {
+          await api.post(API_ENDPOINTS.sourcing.respond(prefill.sourcingRequestId), {
+            action: "accepted",
+            productId: createdProdId,
+          });
+        } catch (_) {}
+      }
 
       Alert.alert(
         t("postProduct.listedSuccessTitle", { defaultValue: "Harvest Listed!" }),
@@ -411,7 +422,7 @@ export default function PostProductScreen({ navigation, route }) {
         [{ text: t("common.ok", { defaultValue: "OK" }), onPress: () => navigation.goBack() }]
       );
     } catch (err) {
-      const msg = err?.response?.data?.message || err.message || "Failed to post listing";
+      const msg = err?.response?.data?.message || err.message || t("postProduct.errorPostListing", { defaultValue: "Failed to post listing" });
       Alert.alert(t("postProduct.submissionErrorTitle", { defaultValue: "Submission Error" }), msg);
     } finally {
       setLoading(false);
@@ -496,14 +507,14 @@ export default function PostProductScreen({ navigation, route }) {
                 onClose={() => setShowUnitPicker(false)}
                 icon="cube-outline"
                 theme={theme}
-                placeholder={t("postProduct.unitPlaceholder", "Unit")}
+                placeholder={t("postProduct.unitPlaceholder", { defaultValue: "Unit" })}
               />
             </View>
           </View>
 
           {/* Price per Unit */}
           <AppText style={styles.inputLabel}>
-            {t("postProduct.pricePerUnit", { defaultValue: "Price per" })} {unitDisplay} (ETB)
+            {t("postProduct.pricePerUnitLabel", { defaultValue: "Price per {{unit}} (ETB)", unit: unitDisplay })}
           </AppText>
           <AppInput
             placeholder="e.g. 4500"

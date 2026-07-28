@@ -67,11 +67,11 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
 
   const handleLogout = () => {
     Alert.alert(
-      t("buyerProfile.logoutAlertTitle", "Sign Out"),
-      t("buyerProfile.logoutAlertMessage", "Are you sure you want to log out of your OmishGo producer account?"),
+      t("buyerProfile.logoutAlertTitle", { defaultValue: "Sign Out" }),
+      t("buyerProfile.logoutAlertMessage", { defaultValue: "Are you sure you want to log out of your OmishGo producer account?" }),
       [
-        { text: t("common.cancel", "Cancel"), style: "cancel" },
-        { text: t("buyerProfile.logoutAlertConfirm", "Log Out"), style: "destructive", onPress: () => logout() },
+        { text: t("common.cancel", { defaultValue: "Cancel" }), style: "cancel" },
+        { text: t("buyerProfile.logoutAlertConfirm", { defaultValue: "Log Out" }), style: "destructive", onPress: () => logout() },
       ]
     );
   };
@@ -90,7 +90,7 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
   return (
     <DashboardLayout
       role="farmer"
-      title={t("farmerProfile.title", "Producer Account")}
+      title={t("farmerProfile.title", { defaultValue: "Producer Account" })}
       showMenu
       onMenuPress={openSidebar}
       showNotification
@@ -118,7 +118,7 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
         </View>
 
         <AppText style={[styles.phoneText, { color: textSecondary }]}>
-          {user?.phone || "+251 900 000 000"} • {[user?.location?.wereda, user?.location?.zone, user?.location?.region].filter(Boolean).join(", ") || "Oromia, East Shewa"}
+          {user?.phone || t("common.unknownPhone", { defaultValue: "Phone Not Provided" })} • {[user?.location?.wereda, user?.location?.zone, user?.location?.region].filter(Boolean).join(", ") || t("common.unknownLocation", { defaultValue: "Location Not Provided" })}
         </AppText>
       </View>
 
@@ -166,7 +166,7 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
               <Ionicons name="globe-outline" size={20} color={primaryColor} />
             </View>
             <View>
-              <AppText style={styles.settingTitle}>{t("buyerProfile.languageLabel", "Language / ቋንቋ")}</AppText>
+              <AppText style={styles.settingTitle}>{t("buyerProfile.languageLabel", { defaultValue: "Language / ቋንቋ" })}</AppText>
               <AppText style={styles.settingSub}>{currentLangObj.label} ({currentLangObj.native})</AppText>
             </View>
           </View>

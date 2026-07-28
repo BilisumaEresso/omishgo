@@ -55,7 +55,7 @@ export default function OrderDetailScreen({ route, navigation }) {
     );
   }
 
-  const cropType = order.cropType || "Agricultural Harvest";
+  const cropType = order.cropType || t("orders.defaultCropType", { defaultValue: "Agricultural Harvest" });
   const quantity = order.quantity ?? 1;
   const unit = order.unit || "q";
   const pricePerUnit = order.pricePerUnit ?? order.price ?? 0;
@@ -70,7 +70,7 @@ export default function OrderDetailScreen({ route, navigation }) {
         month: "short",
         year: "numeric",
       })
-    : "Recently";
+    : t("common.recently", { defaultValue: "Recently" });
 
   const buyerName = order.buyerId?.name || order.buyerName || t("orders.wholesaleBuyer", { defaultValue: "Wholesale Buyer" });
   const buyerPhone = order.buyerId?.phone || order.buyerPhone || null;
@@ -80,17 +80,17 @@ export default function OrderDetailScreen({ route, navigation }) {
 
   const handleCall = (phone) => {
     if (!phone) {
-      Alert.alert(t("chat.phoneUnavailable", "Phone Unavailable"), t("chat.noPhoneProvided", "No contact phone number provided."));
+      Alert.alert(t("chat.phoneUnavailable", { defaultValue: "Phone Unavailable" }), t("chat.noPhoneProvided", { defaultValue: "No contact phone number provided." }));
       return;
     }
-    Linking.openURL(`tel:${phone}`).catch(() => Alert.alert(t("errorMessage.title", "Error"), t("chat.couldNotDial", "Could not open dialer")));
+    Linking.openURL(`tel:${phone}`).catch(() => Alert.alert(t("errorMessage.title", { defaultValue: "Error" }), t("chat.couldNotDial", { defaultValue: "Could not open dialer" })));
   };
 
   const handleMessagePartner = () => {
     const partnerId = role === "farmer" ? order.buyerId?._id || order.buyerId : farmerId;
     const partnerName = role === "farmer" ? buyerName : farmerName;
     if (!partnerId) {
-      Alert.alert(t("chat.messagingUnavailable", "Messaging Unavailable"), t("chat.cannotOpenChat", "Cannot open chat for this partner."));
+      Alert.alert(t("chat.messagingUnavailable", { defaultValue: "Messaging Unavailable" }), t("chat.cannotOpenChat", { defaultValue: "Cannot open chat for this partner." }));
       return;
     }
     navigation.navigate("Chat", { userId: partnerId, userName: partnerName });
@@ -98,9 +98,9 @@ export default function OrderDetailScreen({ route, navigation }) {
 
   const handleUpdateStatus = async (newStatus) => {
     if (newStatus === "cancelled") {
-      Alert.alert(t("orderDetail.cancelOrderTitle", "Cancel Order"), t("orderDetail.cancelOrderConfirm", "Are you sure you want to cancel this order?"), [
-        { text: t("buyerSaved.cancel", "No"), style: "cancel" },
-        { text: t("common.yesCancel", "Yes, Cancel"), style: "destructive", onPress: () => doUpdate(newStatus) },
+      Alert.alert(t("orderDetail.cancelOrderTitle", { defaultValue: "Cancel Order" }), t("orderDetail.cancelOrderConfirm", { defaultValue: "Are you sure you want to cancel this order?" }), [
+        { text: t("buyerSaved.cancel", { defaultValue: "No" }), style: "cancel" },
+        { text: t("common.yesCancel", { defaultValue: "Yes, Cancel" }), style: "destructive", onPress: () => doUpdate(newStatus) },
       ]);
     } else {
       doUpdate(newStatus);
@@ -118,7 +118,7 @@ export default function OrderDetailScreen({ route, navigation }) {
         t("orderDetail.statusChangedTo", { status: newStatus.toUpperCase(), defaultValue: "Order status changed to {{status}}" })
       );
     } catch (err) {
-      Alert.alert(t("errorMessage.title", "Update Error"), err?.response?.data?.message || t("orderDetail.failedUpdate", "Failed to update order status."));
+      Alert.alert(t("errorMessage.title", { defaultValue: "Update Error" }), err?.response?.data?.message || t("orderDetail.failedUpdate", { defaultValue: "Failed to update order status." }));
     } finally {
       setUpdating(false);
     }
@@ -217,7 +217,7 @@ export default function OrderDetailScreen({ route, navigation }) {
           activeOpacity={0.85}
         >
           <AppText style={styles.primaryActionText}>
-            {updating ? t("common.loading", "Updating...") : t("orderDetail.acceptOrder", { defaultValue: "Accept & Confirm Harvest Order" })}
+            {updating ? t("common.loading", { defaultValue: "Updating..." }) : t("orderDetail.acceptOrder", { defaultValue: "Accept & Confirm Harvest Order" })}
           </AppText>
         </TouchableOpacity>
       )}
@@ -229,7 +229,7 @@ export default function OrderDetailScreen({ route, navigation }) {
           activeOpacity={0.85}
         >
           <AppText style={styles.primaryActionText}>
-            {updating ? t("common.loading", "Updating...") : t("orderDetail.dispatchShipment", { defaultValue: "Dispatch Shipment (In Transit)" })}
+            {updating ? t("common.loading", { defaultValue: "Updating..." }) : t("orderDetail.dispatchShipment", { defaultValue: "Dispatch Shipment (In Transit)" })}
           </AppText>
         </TouchableOpacity>
       )}
@@ -241,7 +241,7 @@ export default function OrderDetailScreen({ route, navigation }) {
           activeOpacity={0.85}
         >
           <AppText style={styles.primaryActionText}>
-            {updating ? t("common.loading", "Updating...") : t("orderDetail.markDelivered", { defaultValue: "Mark Order Delivered" })}
+            {updating ? t("common.loading", { defaultValue: "Updating..." }) : t("orderDetail.markDelivered", { defaultValue: "Mark Order Delivered" })}
           </AppText>
         </TouchableOpacity>
       )}

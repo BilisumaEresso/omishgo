@@ -13,6 +13,7 @@ router.get("/conversations", getConversations);
 
 // GET /api/v1/messages/thread/:userId — full thread with a specific user
 router.get("/thread/:userId", getThread);
+router.get("/:userId", getThread);
 
 // POST /api/v1/messages — send a message
 router.post("/", requireVerified, sendMessage);

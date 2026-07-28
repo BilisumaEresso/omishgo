@@ -31,7 +31,7 @@ export const ProductCard = ({
 
   const rawUnit = product.unit || "q";
   const localizedUnit = getLocalizedUnitName(rawUnit, currentLang);
-  const rawCrop = product.cropType || product.name || "Harvest Crop";
+  const rawCrop = product.cropType || product.name || t("common.defaultHarvestCrop", { defaultValue: "Harvest Crop" });
   const localizedCrop = getLocalizedCropName(rawCrop, currentLang);
 
   const localizedWereda = getLocalizedWeredaName(loc.wereda, currentLang);
@@ -91,7 +91,7 @@ export const ProductCard = ({
         <View style={[styles.stockBadge, { backgroundColor: primaryCont }]}>
           <AppText style={[styles.stockText, { color: primary }]}>
             {product.quantity
-              ? `${product.quantity} ${localizedUnit} ${t("listingDetail.statusActive", { defaultValue: "in stock" })}`
+              ? t("productCard.inStockText", { qty: product.quantity, unit: localizedUnit, defaultValue: "{{qty}} {{unit}} in stock" })
               : t("statuses.active", { defaultValue: "Available" })}
           </AppText>
         </View>
@@ -103,7 +103,7 @@ export const ProductCard = ({
           <View style={styles.metaItem}>
             <Ionicons name="location-outline" size={14} color={textSecondary} />
             <AppText style={[styles.metaText, { color: textSecondary }]} numberOfLines={1}>
-              {[localizedWereda, localizedZone, localizedRegion].filter(Boolean).join(", ") || "Ethiopia"}
+              {[localizedWereda, localizedZone, localizedRegion].filter(Boolean).join(", ") || t("common.unknownLocation", { defaultValue: "Location Not Provided" })}
             </AppText>
           </View>
         ) : null}

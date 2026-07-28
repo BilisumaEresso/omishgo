@@ -33,7 +33,7 @@ export default function FarmerCropInventoryBreakdown({
           const isLast = idx === Math.min(products.length, 4) - 1;
           const quantity = p.quantity ?? 0;
           const rawUnit = p.unit || "q";
-          const rawCrop = p.category || p.cropType || p.name || "Harvest Crop";
+          const rawCrop = p.category || p.cropType || p.name || t("common.defaultHarvestCrop", { defaultValue: "Harvest Crop" });
           const cropName = getLocalizedCropName(rawCrop, currentLang, t);
           const unitLabel = getLocalizedUnitName(rawUnit, currentLang, t);
           const price = p.price ?? 0;

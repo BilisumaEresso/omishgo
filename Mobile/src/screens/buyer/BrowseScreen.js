@@ -76,7 +76,7 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
         setError("");
       } else {
         setError(
-          err?.response?.data?.message || err.message || "Failed to load products"
+          err?.response?.data?.message || err.message || t("browse.errorLoadProducts", { defaultValue: "Failed to load products" })
         );
       }
     } finally {
@@ -226,7 +226,12 @@ export default function BrowseScreen({ navigation, onSwitchTab }) {
         {/* 3. Section Header & Results Count */}
         <View style={styles.sectionHeader}>
           <AppText style={styles.sectionTitle}>
-            {selectedCategory === "All" ? t("browse.allListings", { defaultValue: "Wholesale Crop Listings" }) : `${getLocalizedCropName(selectedCategory, i18n.language || "en", t)} Listings`}
+            {selectedCategory === "All"
+              ? t("browse.allListings", { defaultValue: "Wholesale Crop Listings" })
+              : t("browse.cropListingsHeader", {
+                  crop: getLocalizedCropName(selectedCategory, i18n.language || "en", t),
+                  defaultValue: "{{crop}} Listings",
+                })}
           </AppText>
           <AppText style={styles.resultsCount}>
             {filteredProducts.length} {t("browse.available", { defaultValue: "Available" })}

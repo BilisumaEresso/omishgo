@@ -43,7 +43,7 @@ export default function FarmerProfileScreen({ route, navigation }) {
         setFarmer(farmerRes.data?.data?.user);
         setProducts(productsRes.data?.data?.products || []);
       } catch (err) {
-        setError(t("farmerProfile.errorLoadProfile") || "Failed to load producer profile");
+        setError(t("farmerProfile.errorLoadProfile", { defaultValue: "Failed to load producer profile" }));
       } finally {
         setLoading(false);
       }
@@ -68,7 +68,7 @@ export default function FarmerProfileScreen({ route, navigation }) {
         <View style={styles.emptyContainer}>
           <Ionicons name="alert-circle-outline" size={48} color="#94A3B8" />
           <AppText style={styles.emptyTitle}>{t("profile.producerNotFound", { defaultValue: "Producer Profile Not Found" })}</AppText>
-          <AppText style={styles.emptySub}>{error || "This farmer profile is unavailable."}</AppText>
+          <AppText style={styles.emptySub}>{error || t("farmerProfile.unavailable", { defaultValue: "This farmer profile is unavailable." })}</AppText>
           <TouchableOpacity style={[styles.backBtn, { backgroundColor: primaryColor }]} onPress={() => navigation.goBack()}>
             <AppText style={styles.backBtnText}>{t("profile.returnToMarket", { defaultValue: "Return to Marketplace" })}</AppText>
           </TouchableOpacity>
@@ -78,7 +78,7 @@ export default function FarmerProfileScreen({ route, navigation }) {
   }
 
   return (
-    <DashboardLayout role="buyer" title={farmer.name || "Farmer Producer"} showBack={true}>
+    <DashboardLayout role="buyer" title={farmer.name || t("farmerProfile.defaultProducerName", { defaultValue: "Farmer Producer" })} showBack={true}>
       {/* Producer Hero Header Card */}
       <View style={[styles.heroCard, { backgroundColor: surfaceColor }]}>
         <View style={[styles.avatarWrap, { backgroundColor: primaryColor }]}>
@@ -99,7 +99,7 @@ export default function FarmerProfileScreen({ route, navigation }) {
         <View style={styles.locationRow}>
           <Ionicons name="location-outline" size={14} color={textSecondary} />
           <AppText style={[styles.locationText, { color: textSecondary }]}>
-            {[farmer.location?.wereda, farmer.location?.zone, farmer.location?.region].filter(Boolean).join(", ") || "Oromia Region • 14 km away"}
+            {[farmer.location?.wereda, farmer.location?.zone, farmer.location?.region].filter(Boolean).join(", ") || t("common.unknownLocation", { defaultValue: "Location Not Provided" })}
           </AppText>
         </View>
 
@@ -121,7 +121,7 @@ export default function FarmerProfileScreen({ route, navigation }) {
       {/* Farm Produce Listings Section */}
       <View style={styles.sectionHeader}>
         <AppText style={styles.sectionTitle}>
-          {t("profile.activeHarvestListingsWithCount", { count: products.length, defaultValue: `Active Harvest Listings (${products.length})` })}
+          {t("profile.activeHarvestListingsWithCount", { count: products.length, defaultValue: "Active Harvest Listings ({{count}})" })}
         </AppText>
       </View>
 

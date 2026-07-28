@@ -48,7 +48,7 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
       const raw = res.data?.data?.orders || [];
       const normalized = raw.map((o) => ({
         id: o._id,
-        cropType: o.cropType || o.productId?.cropType || "Harvest Crop",
+        cropType: o.cropType || o.productId?.cropType || t("farmerOrders.defaultCropType", { defaultValue: "Harvest Crop" }),
         quantity: o.quantity || 0,
         unit: o.unit || "q",
         price: o.totalPrice || (o.priceAtOrder || 0) * (o.quantity || 1),
@@ -66,7 +66,7 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
       }));
       setOrders(normalized);
     } catch (err) {
-      setError(err?.response?.data?.message || err.message || "Failed to load harvest orders");
+      setError(err?.response?.data?.message || err.message || t("farmerOrders.errorLoadOrders", { defaultValue: "Failed to load harvest orders" }));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -188,10 +188,10 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
   };
 
   const filterTabs = [
-    { id: "all", label: `${t("buyerOrders.filterAll", { defaultValue: "All" })} (${orders.length})` },
-    { id: "pending", label: `${t("buyerOrders.filterPending", { defaultValue: "Pending" })} (${pendingCount})` },
-    { id: "in_transit", label: `${t("buyerOrders.statusInTransit", { defaultValue: "In Transit" })} (${inTransitCount})` },
-    { id: "completed", label: `${t("buyerOrders.filterDelivered", { defaultValue: "Delivered" })} (${completedCount})` },
+    { id: "all", label: t("farmerOrders.filterAllCount", { count: orders.length, defaultValue: "All ({{count}})" }) },
+    { id: "pending", label: t("farmerOrders.filterPendingCount", { count: pendingCount, defaultValue: "Pending ({{count}})" }) },
+    { id: "in_transit", label: t("farmerOrders.filterInTransitCount", { count: inTransitCount, defaultValue: "In Transit ({{count}})" }) },
+    { id: "completed", label: t("farmerOrders.filterDeliveredCount", { count: completedCount, defaultValue: "Delivered ({{count}})" }) },
   ];
 
   return (

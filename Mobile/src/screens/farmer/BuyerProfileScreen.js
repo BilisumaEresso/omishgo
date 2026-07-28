@@ -61,8 +61,10 @@ export default function BuyerProfileScreen({ route, navigation }) {
     );
   }
 
-  const phone = buyer.phone || "+251 900 000000";
-  const location = buyer.location || { region: "Unknown", zone: "Unknown" };
+  const phone = buyer.phone || t("common.unknownPhone", { defaultValue: "Phone Not Provided" });
+  const locationString = buyer.location
+    ? [buyer.location.wereda, buyer.location.zone, buyer.location.region].filter(Boolean).join(", ") || t("common.unknownLocation", { defaultValue: "Location Not Provided" })
+    : t("common.unknownLocation", { defaultValue: "Location Not Provided" });
 
   return (
     <View style={[styles.container, { backgroundColor: background }]}>
@@ -101,7 +103,7 @@ export default function BuyerProfileScreen({ route, navigation }) {
                 {t("buyerProfile.infoLocation", { defaultValue: "Location" })}
               </AppText>
               <AppText style={[styles.infoValue, { color: textPrimary }]}>
-                {location.region}, {location.zone}
+                {locationString}
               </AppText>
             </View>
           </View>

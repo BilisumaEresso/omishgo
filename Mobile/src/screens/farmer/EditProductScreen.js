@@ -86,7 +86,7 @@ const DropdownPicker = ({
               { color: value ? textPrimary : textSecondary },
             ]}
           >
-            {selectedLabel || placeholder || `Select ${label}`}
+            {selectedLabel || placeholder || t("common.selectRegion", { defaultValue: "Select..." })}
           </AppText>
         </View>
         <Ionicons
@@ -340,14 +340,14 @@ export default function EditProductScreen({ route, navigation }) {
                 onClose={() => setShowUnitPicker(false)}
                 icon="cube-outline"
                 theme={theme}
-                placeholder={t("postProduct.unitPlaceholder", "Unit")}
+                placeholder={t("postProduct.unitPlaceholder", { defaultValue: "Unit" })}
               />
             </View>
           </View>
 
           {/* Price per Unit */}
           <AppText style={styles.inputLabel}>
-            {t("postProduct.pricePerUnit", { defaultValue: "Price per" })} {unitDisplay} (ETB)
+            {t("postProduct.pricePerUnitLabel", { defaultValue: "Price per {{unit}} (ETB)", unit: unitDisplay })}
           </AppText>
           <AppInput
             placeholder="0"

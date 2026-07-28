@@ -139,7 +139,7 @@ export default function ConversationsScreen({ navigation }) {
   return (
     <DashboardLayout
       role="buyer"
-      title={t("messaging.conversations") || "Messages"}
+      title={t("messaging.conversations", { defaultValue: "Messages" })}
       showBack
       onBackPress={() => navigation.goBack()}
       scrollable={false}
@@ -186,11 +186,10 @@ export default function ConversationsScreen({ navigation }) {
                 <Ionicons name="chatbubbles-outline" size={48} color={primary} />
               </View>
               <AppText style={[styles.emptyTitle, { color: "#0F172A" }]}>
-                {t("messaging.noConversations") || "No conversations yet"}
+                {t("messaging.noConversations", { defaultValue: "No conversations yet" })}
               </AppText>
               <AppText style={[styles.emptySub, { color: textSecondary }]}>
-                {t("messaging.startConvoHint") ||
-                  "Browse a listing and message a farmer to start."}
+                {t("messaging.startConvoHint", { defaultValue: "Browse a listing and message a farmer to start." })}
               </AppText>
             </View>
           }

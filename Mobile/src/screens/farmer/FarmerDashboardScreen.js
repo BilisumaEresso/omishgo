@@ -68,8 +68,8 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
             category: p.cropType || p.category,
             quantity: p.quantity,
             unit: p.unit || "q",
-            location: [p.location?.wereda, p.location?.zone, p.location?.region].filter(Boolean).join(", ") || "Ethiopia",
-            farmerName: user?.name || "Farmer",
+            location: [p.location?.wereda, p.location?.zone, p.location?.region].filter(Boolean).join(", ") || t("common.unknownLocation", { defaultValue: "Location Not Provided" }),
+            farmerName: user?.name || t("farmerDashboard.defaultFarmerName", { defaultValue: "Farmer" }),
             photos: p.photos || [],
           }))
         );
@@ -86,7 +86,7 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
       setOrders(
         raw.map((o) => ({
           id: o._id,
-          cropType: o.productId?.cropType || o.cropType || "Harvest Crop",
+          cropType: o.productId?.cropType || o.cropType || t("farmerDashboard.defaultHarvestCrop", { defaultValue: "Harvest Crop" }),
           quantity: o.quantity || 0,
           unit: o.unit || "q",
           price: o.priceAtOrder || o.price || 0,
@@ -96,7 +96,7 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
             month: "short",
           }),
           status: o.status || "pending",
-          buyerName: o.buyerId?.name || "Buyer",
+          buyerName: o.buyerId?.name || t("farmerDashboard.defaultBuyerName", { defaultValue: "Buyer" }),
           buyerPhone: o.buyerId?.phone || null,
           buyerId: o.buyerId?._id || o.buyerId,
         }))

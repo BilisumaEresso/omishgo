@@ -39,7 +39,7 @@ export default function ListingDetailScreen({ route, navigation }) {
 
   if (!product) {
     return (
-      <DashboardLayout role="buyer" title={t("listingDetail.screenTitle", "Produce Listing")} showBack onBackPress={() => navigation.goBack()}>
+      <DashboardLayout role="buyer" title={t("listingDetail.screenTitle", { defaultValue: "Produce Listing" })} showBack onBackPress={() => navigation.goBack()}>
         <View style={styles.emptyContainer}>
           <Ionicons name="leaf-outline" size={48} color="#94A3B8" />
           <AppText style={styles.emptyTitle}>{t("listingDetail.listingNotFound", { defaultValue: "Listing Not Found" })}</AppText>
@@ -59,7 +59,7 @@ export default function ListingDetailScreen({ route, navigation }) {
 
   const farmer = product.farmerId || {};
   const loc = product.location || {};
-  const farmerName = farmer.name || "Verified Local Producer";
+  const farmerName = farmer.name || t("listingDetail.verifiedProducer", { defaultValue: "Verified Local Producer" });
   const farmerPhone = farmer.phone || null;
   const unit = product.unit || "q";
 
@@ -189,7 +189,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           <View style={styles.stockBadge}>
             <Ionicons name="cube-outline" size={14} color="#FFFFFF" />
             <AppText style={styles.stockText}>
-              {product.quantity} {unit} Available
+              {t("listingDetail.availableStockText", { qty: product.quantity, unit, defaultValue: "{{qty}} {{unit}} Available" })}
             </AppText>
           </View>
         </View>
@@ -198,35 +198,35 @@ export default function ListingDetailScreen({ route, navigation }) {
         <View style={[styles.card, { backgroundColor: surfaceColor }]}>
           <View style={styles.cardHeaderRow}>
             <Ionicons name="trending-up-outline" size={18} color={primaryColor} />
-            <AppText style={styles.cardTitle}>{t("listingDetail.regionalMarketPriceIndex", "Regional Market Price Index")}</AppText>
+            <AppText style={styles.cardTitle}>{t("listingDetail.regionalMarketPriceIndex", { defaultValue: "Regional Market Price Index" })}</AppText>
           </View>
 
           <View style={styles.insightsGrid}>
             <View style={styles.insightBox}>
-              <AppText style={styles.insightLabel}>{t("listingDetail.regionalAvg", "Regional Avg")}</AppText>
+              <AppText style={styles.insightLabel}>{t("listingDetail.regionalAvg", { defaultValue: "Regional Avg" })}</AppText>
               <AppText style={[styles.insightValue, { color: primaryColor }]}>
                 ETB {avgMarketPrice.toLocaleString()} / {unit}
               </AppText>
             </View>
             <View style={styles.insightBox}>
-              <AppText style={styles.insightLabel}>{t("listingDetail.marketDemand", "Market Demand")}</AppText>
+              <AppText style={styles.insightLabel}>{t("listingDetail.marketDemand", { defaultValue: "Market Demand" })}</AppText>
               <AppText style={[styles.insightValue, { color: "#059669" }]}>
-                {t("listingDetail.highDemand", "High Demand")}
+                {t("listingDetail.highDemand", { defaultValue: "High Demand" })}
               </AppText>
             </View>
             <View style={styles.insightBox}>
-              <AppText style={styles.insightLabel}>{t("listingDetail.harvestStatus", "Harvest Status")}</AppText>
-              <AppText style={styles.insightValue}>{t("listingDetail.freshHarvest", "Fresh Harvest")}</AppText>
+              <AppText style={styles.insightLabel}>{t("listingDetail.harvestStatus", { defaultValue: "Harvest Status" })}</AppText>
+              <AppText style={styles.insightValue}>{t("listingDetail.freshHarvest", { defaultValue: "Fresh Harvest" })}</AppText>
             </View>
           </View>
         </View>
 
         {/* Product Details Card */}
         <View style={[styles.card, { backgroundColor: surfaceColor }]}>
-          <AppText style={styles.cardTitle}>{t("listingDetail.produceSpecifications", "Produce Specifications")}</AppText>
+          <AppText style={styles.cardTitle}>{t("listingDetail.produceSpecifications", { defaultValue: "Produce Specifications" })}</AppText>
 
           <View style={styles.specRow}>
-            <AppText style={styles.specKey}>{t("listingDetail.cropType", "Crop Type")}</AppText>
+            <AppText style={styles.specKey}>{t("listingDetail.cropType", { defaultValue: "Crop Type" })}</AppText>
             <AppText style={styles.specVal}>{product.cropType}</AppText>
           </View>
           <View style={styles.specRow}>
@@ -236,14 +236,14 @@ export default function ListingDetailScreen({ route, navigation }) {
             </AppText>
           </View>
           <View style={styles.specRow}>
-            <AppText style={styles.specKey}>{t("listingDetail.harvestLocation", "Harvest Location")}</AppText>
+            <AppText style={styles.specKey}>{t("listingDetail.harvestLocation", { defaultValue: "Harvest Location" })}</AppText>
             <AppText style={styles.specVal}>
-              {[loc.wereda, loc.zone, loc.region].filter(Boolean).join(", ") || "Oromia Region"}
+              {[loc.wereda, loc.zone, loc.region].filter(Boolean).join(", ") || t("common.unknownLocation", { defaultValue: "Location Not Provided" })}
             </AppText>
           </View>
           {product.description ? (
             <View style={styles.specDescBox}>
-              <AppText style={styles.specKey}>{t("listingDetail.description", "Description")}</AppText>
+              <AppText style={styles.specKey}>{t("listingDetail.description", { defaultValue: "Description" })}</AppText>
               <AppText style={styles.specDescVal}>{product.description}</AppText>
             </View>
           ) : null}
@@ -268,7 +268,7 @@ export default function ListingDetailScreen({ route, navigation }) {
               <View style={styles.verifiedRow}>
                 <Ionicons name="checkmark-circle" size={13} color={primaryColor} />
                 <AppText style={[styles.verifiedLabel, { color: primaryColor }]}>
-                  {t("listingDetail.verifiedFarmProducer", "Verified Farm Producer")}
+                  {t("listingDetail.verifiedFarmProducer", { defaultValue: "Verified Farm Producer" })}
                 </AppText>
               </View>
             </View>
@@ -286,7 +286,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           >
             <Ionicons name="chatbubble-ellipses-outline" size={16} color={primaryColor} />
             <AppText style={[styles.outlineActionText, { color: primaryColor }]}>
-              {t("listingDetail.chatNegotiate", "Chat & Negotiate")}
+              {t("listingDetail.chatNegotiate", { defaultValue: "Chat & Negotiate" })}
             </AppText>
           </TouchableOpacity>
 
@@ -297,7 +297,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           >
             <Ionicons name="call-outline" size={16} color="#64748B" />
             <AppText style={[styles.outlineActionText, { color: "#64748B" }]}>
-              {t("listingDetail.callProducer", "Call Producer")}
+              {t("listingDetail.callProducer", { defaultValue: "Call Producer" })}
             </AppText>
           </TouchableOpacity>
         </View>
@@ -309,7 +309,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           activeOpacity={0.88}
         >
           <Ionicons name="cart-outline" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
-          <AppText style={styles.buyNowBtnText}>{t("listingDetail.placeWholesaleOrder", "Place Wholesale Order")}</AppText>
+          <AppText style={styles.buyNowBtnText}>{t("listingDetail.placeWholesaleOrder", { defaultValue: "Place Wholesale Order" })}</AppText>
         </TouchableOpacity>
 
         <View style={{ height: 40 }} />
@@ -324,7 +324,7 @@ export default function ListingDetailScreen({ route, navigation }) {
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalCard, { backgroundColor: surfaceColor }]}>
-            <AppText style={styles.modalTitle}>{t("listingDetail.placeWholesaleOrder", "Place Wholesale Order")}</AppText>
+            <AppText style={styles.modalTitle}>{t("listingDetail.placeWholesaleOrder", { defaultValue: "Place Wholesale Order" })}</AppText>
             <AppText style={styles.modalSub}>
               {t("listingDetail.enterRequestedVolume", { cropType: product.cropType, max: product.quantity, unit, defaultValue: `Enter requested volume for ${product.cropType} (Max ${product.quantity} ${unit}):` })}
             </AppText>

@@ -217,7 +217,7 @@ export default function PostBulkRequestModal({
                 numberOfLines={3}
                 value={notes}
                 onChangeText={setNotes}
-                placeholder="e.g. Minimum 10 quintals per farmer, organic grade preferred"
+                placeholder={t("sourcing.notesPlaceholder", { defaultValue: "e.g. Minimum 10 quintals per farmer, organic grade preferred" })}
                 placeholderTextColor="#94A3B8"
               />
             </View>

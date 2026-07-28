@@ -24,7 +24,11 @@
     "gallery": "Gaalarii irraa filadhaa",
     "weredaAlert": "Godina filachuun dura maaloo naannoo filadhu.",
     "viewAll": "Hunda Ilaali",
-    "refreshing": "Haaromsamaa jira…"
+    "refreshing": "Haaromsamaa jira…",
+    "unknownLocation": "Bakki hin ibsamne",
+    "unknownPhone": "Lakkoofsi bilbilaa hin ibsamne",
+    "defaultHarvestCrop": "Midhaan Haamaa",
+    "unitQuintal": "kuntaala (100 kg)"
   },
   "splash": {
     "title": "OmishGo",
@@ -193,8 +197,14 @@
     "loadingListings": "Tarreen oomishaa fe'amaa jira...",
     "procurementOverview": "Ilaalcha Waliigalaa Bittaa fi Gabaa",
     "procurementRate": "Reettii Bittaa",
-    "item": "Mi'a",
-    "items": "Mi'oota",
+    "item": "Wanta",
+    "items": "Wantoota",
+    "catVegetables": "Kuduraalee fi Raafuu",
+    "catGrains": "Tafiif Midhaan",
+    "catPulses": "Midhaan Zayitaafi Dhangaalee",
+    "thisMonth": "Ji'a Kana",
+    "recent": "Dhiyoo",
+    "verifiedOrder": "Ajaja Mirkanaa'e",
     "activeSupply": "Dhiyeessa Hojii Irra Jiru",
     "farmersCount": "Qonnaan Bultoota {{count}}",
     "verified": "Mirkanaa'aa",
@@ -209,8 +219,10 @@
     "recentActivityTitle": "Ajajawwan fi Sochii Dhiyootti"
   },
   "browse": {
-    "title": "Gabaa",
-    "searchPlaceholder": "Oomisha barbaadi...",
+    "title": "Bakka Gabaa",
+    "allListings": "Tarreeffama Oomisha Midhaanii",
+    "cropListingsHeader": "Tarreeffama {{crop}}",
+    "searchPlaceholder": "Midhaan Barbaadi...",
     "filterRegion": "Naannoodhaan adda baasi",
     "noListings": "Beeksisni hanga ammaa hin jiru — kan jalqabaa ta'uun maxxansi",
     "offlineBanner": "Bu'aawwan kuufaman agarsiisaa jira (oflaayinii)",
@@ -254,10 +266,13 @@
     "unknownFarmer": "Qotee Bulaa",
     "errorLoadOrders": "Ajajawwan fiduun hin danda'amne",
     "retry": "Irra deebi'ii yaali",
-    "messageFarmer": "Qotee bulaatti ergi",
-    "emptyNoOrders": "Hanga ammaa ajaja tokkoyyuu hin goone",
-    "emptyNoFilterOrders": "Ajajawwan {{filter}} hin jiran",
-    "browseMarketplace": "Gabaa Daawwadhu",
+    "emptyNoOrders": "Hanga ammaa ajaja hin kennine",
+    "emptyNoFilterOrders": "Ajajni {{filter}} hin jiru",
+    "filterAllCount": "Hunda ({{count}})",
+    "filterPendingCount": "Eegamaa ({{count}})",
+    "filterInTransitCount": "Karaa Irra ({{count}})",
+    "filterDeliveredCount": "Gahaa ({{count}})",
+    "defaultProduce": "Oomisha Qonnaa",
     "orderActivity": "Sochii Ajaja",
     "activityUpdated": "Sochiin haaromsameera",
     "trackDetails": "Tarreeffama Hordofi →"
@@ -306,7 +321,8 @@
     "browseMarketplace": "Gara Gabaatti Deemi"
   },
   "listingDetail": {
-    "goBack": "Duubatti Deebi'i",
+    "goBack": "Deebi'i",
+    "availableStockText": "{{qty}} {{unit}} Jira",
     "farmerUnavailableTitle": "Dogoggora",
     "farmerUnavailableMessage": "Odeeffannoon qotee bulaa hin argamu",
     "invalidQuantityTitle": "Baay'ina Sirrii Hintaane",
@@ -556,8 +572,13 @@
     "unknownBuyer": "Bitaa Gudaa",
     "errorLoadOrders": "Ajajawwan fiduun hin danda'amne. Haroomsuuf gadi harkisi.",
     "retry": "Irra deebi'ii yaali",
-    "emptyNoOrders": "Hanga ammaa ajajni hin jiru",
-    "emptyNoFilterOrders": "Ajajawwan {{filter}} hin jiran"
+    "emptyNoOrders": "Ajajni hin jiru",
+    "emptyNoFilterOrders": "Ajajni {{filter}} hin jiru",
+    "filterAllCount": "Hunda ({{count}})",
+    "filterPendingCount": "Eegamaa ({{count}})",
+    "filterInTransitCount": "Karaa Irra ({{count}})",
+    "filterDeliveredCount": "Gahaa ({{count}})",
+    "defaultCropType": "Midhaan Haamaa"
   },
   "farmerProducts": {
     "title": "Oomishailee Koo",
@@ -581,7 +602,20 @@
     "markSoldOut": "Gurgurameera jedhi",
     "noCropsTitle": "Oomishni Galmaa'e Hogoftu Hin Jiru",
     "noCropsSub": "Bittoonni jumlaa Itoophiyaa guutuu jiran oomisha keessan akka arganii fi ajajan oomisha qonnaa keessan maxxansaa.",
-    "postFirstHarvest": "+ Oomisha Keessan Isa Jalqabaa Maxxansaa"
+    "postFirstHarvest": "+ Oomisha Keessan Isa Jalqabaa Maxxansaa",
+    "filterAll": "Hunda ({{count}})",
+    "filterActive": "Gabaa Irra ({{count}})",
+    "filterSold": "Gurgurame ({{count}})",
+    "filterDraft": "Wixinee ({{count}})"
+  },
+  "sourcing": {
+    "notesPlaceholder": "fkft. Qotee bulaa tokkorraa yoo xiqqaate kuntaala 10, Uumamaa ta'uun filatamaa"
+  },
+  "priceTrends": {
+    "today": "Har'a"
+  },
+  "productCard": {
+    "inStockText": "{{qty}} {{unit}} jira"
   },
   "listingForm": {
     "errorTitle": "Dogoggora",
@@ -633,9 +667,11 @@
     "error": "Dogoggora",
     "successMessage": "Beeksisni kee milkaa'inaan maxxanfameera.",
     "defaultErrorMessage": "Rakkoon uumameera. Maaloo irra deebi'ii yaali.",
-    "photos": "Suuraa Oomishaa (Hanga 2)",
-    "photosHint": "Bitoonni beeksisa suuraa qabu caalaatti amanu. Hanga suuraa 2 dabali.",
-    "addPhoto": "Suuraa Dabali",
+    "photos": "Suuraa Midhaanii (Hanga 2)",
+    "photosHint": "Bitattoonni tarreeffama suuraa qabu caalaatti amanu. Hanga 2 dabalaatii.",
+    "defaultDescription": "{{qty}} {{unit}} omisha {{crop}} haarawaa daldala guddaaf qophaa'e.",
+    "pricePerUnitLabel": "Gatiin {{unit}} tokkoo (ETB)",
+    "errorPostListing": "Tarreeffama maxxansuu hin danda'amne",
     "takePhoto": "Suuraa Kaasi",
     "chooseFromGallery": "Galmee Suuraa Irraa Filadhu",
     "cancel": "Haqi",
@@ -755,6 +791,7 @@
     "quickContact": "Deeggarsa Qotee Bulaa fi Bitaa",
     "callSupport": "Deeggarsaaf Bilbili (0938730818)",
     "sendMessage": "Ergaa Ergi",
+    "supportAdmin": "OmishGo Support Admin",
     "faqTitle": "Gaaffilee Yeroo Baay'ee Gaafataman",
     "faq1Question": "Oomisha akkamittin maxxansa?",
     "faq1Answer": "Tabi Oomishailee Koo ykn qabduu Oomisha Maxxansi cuqaasi. Gosa midhaanii, baay'ina, gatii fi iddoo galchi.",
@@ -975,7 +1012,8 @@
     "regionalHubsCount": "Gabaawwan Naannoo {{count}}"
   },
   "orders": {
-    "totalActiveValue": "Gatii Ajajoota Socho'oo Waligalaa",
+    "totalActiveValue": "Gatii Ajajawwan Hojii Irra Jiran Hunda",
+    "activeCountText": "{{count}} Hojii Irra",
     "pending": "Eeggamaa",
     "inTransit": "Karaa Irra",
     "delivered": "Kan Dhiyaate",
@@ -1014,18 +1052,23 @@
     "browseBtn": "Gabaa Oomisha Qonnaa Ilaalaa"
   },
   "chat": {
-    "bulkSourcingReq": "Gaaffii Bittaa Jumlaa",
-    "declinedOutOfStock": "Tukameera / Dhumateera",
-    "matchingHarvest": "Oomishni Walsimatu Maxxanfameera",
-    "typeMessage": "Ergaa barreesaa...",
-    "messagingUnavailable": "Ergaa Erguun Hin Danda'amu",
-    "acceptedListingLive": "Fudhatama Argateera — Maxxansi Oomishaa Banamaadha"
+    "bulkSourcingReq": "Gaaffii Dhiyeessii Guddaa",
+    "declinedOutOfStock": "Gannameera / Oomishni Dhumera",
+    "matchingHarvest": "Midhaan Walfakkaatu Maxxanfameera",
+    "typeMessage": "Ergaa barreessi...",
+    "messagingUnavailable": "Ergaa erguun hin danda'amu",
+    "acceptedListingLive": "Fudhatameera — Oomishni Gabaa Irra Jira",
+    "acceptAndList": "✓ Fudhadhuu Maxxansi",
+    "decline": "✕ Diduu",
+    "openChat": "Haasawa Banu"
   },
   "help": {
     "directAdmin": "Ergaa kallattii bulchaaf"
   },
   "notifications": {
-    "allCaughtUp": "Ergawwan hunda ilaaltaniirtu. Beeksisni haaraan asitti mul'ata."
+    "allCaughtUp": "Hunda ilaaltaniirtu. Beeksisni haarawaa asitti mul'ata.",
+    "noContent": "Qabiyyeen bal'aan hin kennamne.",
+    "justNow": "Amma ammaa"
   },
   "locations": {
     "addisAbaba": "Finfinnee",

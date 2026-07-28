@@ -300,15 +300,15 @@ const AppSidebar = ({
 
   const confirmLogout = () => {
     Alert.alert(
-      t("appSidebar.logoutConfirmTitle", "Log out?"),
+      t("appSidebar.logoutConfirmTitle", { defaultValue: "Log out?" }),
       t(
         "appSidebar.logoutConfirmMessage",
-        "Are you sure you want to log out of your account?",
+        { defaultValue: "Are you sure you want to log out of your account?" },
       ),
       [
-        { text: t("appSidebar.cancel", "Cancel"), style: "cancel" },
+        { text: t("appSidebar.cancel", { defaultValue: "Cancel" }), style: "cancel" },
         {
-          text: t("appSidebar.logout"),
+          text: t("appSidebar.logout", { defaultValue: "Log Out" }),
           style: "destructive",
           onPress: performLogout,
         },

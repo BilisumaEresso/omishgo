@@ -57,10 +57,10 @@ const SourcingActionCard = ({ data, isMe, onAccept, onReject, role }) => {
       {!isMe && role === "farmer" && isPending && (
         <View style={styles.actionBtnRow}>
           <TouchableOpacity style={styles.acceptBtn} onPress={() => onAccept(data)} activeOpacity={0.85}>
-            <AppText style={styles.acceptBtnText}>✓ Accept & List</AppText>
+            <AppText style={styles.acceptBtnText}>{t("chat.acceptAndList", { defaultValue: "✓ Accept & List" })}</AppText>
           </TouchableOpacity>
           <TouchableOpacity style={styles.rejectBtn} onPress={() => onReject(data)} activeOpacity={0.85}>
-            <AppText style={styles.rejectBtnText}>✕ Decline</AppText>
+            <AppText style={styles.rejectBtnText}>{t("chat.decline", { defaultValue: "✕ Decline" })}</AppText>
           </TouchableOpacity>
         </View>
       )}
@@ -68,7 +68,7 @@ const SourcingActionCard = ({ data, isMe, onAccept, onReject, role }) => {
       {isAccepted && (
         <View style={styles.statusPillSuccess}>
           <Ionicons name="checkmark-circle" size={14} color="#10B981" />
-          <AppText style={styles.statusPillSuccessText}>{t("chat.acceptedListingLive", "Accepted — Produce Listing Live")}</AppText>
+          <AppText style={styles.statusPillSuccessText}>{t("chat.acceptedListingLive", { defaultValue: "Accepted — Produce Listing Live" })}</AppText>
         </View>
       )}
 
@@ -233,8 +233,14 @@ export default function ChatScreen({ route, navigation }) {
   useEffect(() => {
     fetchThread();
     const interval = setInterval(() => fetchThread(true), POLL_INTERVAL_MS);
-    return () => clearInterval(interval);
-  }, [fetchThread]);
+    const unsubscribeFocus = navigation?.addListener("focus", () => {
+      fetchThread(true);
+    });
+    return () => {
+      clearInterval(interval);
+      unsubscribeFocus?.();
+    };
+  }, [fetchThread, navigation]);
 
   const handleSend = async () => {
     const trimmed = text.trim();
@@ -370,7 +376,7 @@ export default function ChatScreen({ route, navigation }) {
     <View style={[styles.container, { backgroundColor: background }]}>
       {/* Header */}
       <AppHeader
-        title={userName || "Chat"}
+        title={userName || t("chat.defaultTitle", { defaultValue: "Chat" })}
         showBack
         onBackPress={() => navigation.goBack()}
         rightComponent={

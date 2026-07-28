@@ -28,7 +28,7 @@ export default function NearbyFarmersList({ farmers = [], onFarmerPress }) {
           const locationText =
             [farmer.location?.region || farmer.location?.zone, farmer.distance]
               .filter(Boolean)
-              .join(" • ") || "Oromia Region • 14 km away";
+              .join(" • ") || t("common.unknownLocation", { defaultValue: "Location Not Provided" });
 
           return (
             <TouchableOpacity

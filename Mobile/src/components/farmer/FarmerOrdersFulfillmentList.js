@@ -39,7 +39,7 @@ export default function FarmerOrdersFulfillmentList({
           {orders.slice(0, 4).map((o, idx) => {
             const isLast = idx === Math.min(orders.length, 4) - 1;
             const statusConfig = getOrderStatusConfig(o.status, currentLang);
-            const cropName = getLocalizedCropName(o.cropType || "Harvest Crop", currentLang);
+            const cropName = getLocalizedCropName(o.cropType || t("common.defaultHarvestCrop", { defaultValue: "Harvest Crop" }), currentLang);
             const unitLabel = getLocalizedUnitName(o.unit || "q", currentLang);
             const amount = o.totalPrice ? `${Number(o.totalPrice).toLocaleString("en-US")} ETB` : t("farmerProducts.priceUnavailable", { defaultValue: "Pending Quote" });
 

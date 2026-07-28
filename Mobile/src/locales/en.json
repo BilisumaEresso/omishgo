@@ -24,7 +24,11 @@
     "gallery": "Choose from Gallery",
     "weredaAlert": "Please pick a region before choosing a zone.",
     "viewAll": "View All",
-    "refreshing": "Refreshing…"
+    "refreshing": "Refreshing…",
+    "unknownLocation": "Location Not Provided",
+    "unknownPhone": "Phone Not Provided",
+    "defaultHarvestCrop": "Harvest Crop",
+    "unitQuintal": "quintal (100 kg)"
   },
   "splash": {
     "title": "OmishGo",
@@ -195,6 +199,12 @@
     "procurementRate": "Procurement Rate",
     "item": "Item",
     "items": "Items",
+    "catVegetables": "Vegetables & Greens",
+    "catGrains": "Teff & Grains",
+    "catPulses": "Pulses & Oilseeds",
+    "thisMonth": "This Month",
+    "recent": "Recent",
+    "verifiedOrder": "Verified Order",
     "activeSupply": "Active Supply",
     "farmersCount": "{{count}} Farmers",
     "verified": "Verified",
@@ -210,6 +220,8 @@
   },
   "browse": {
     "title": "Marketplace",
+    "allListings": "Wholesale Crop Listings",
+    "cropListingsHeader": "{{crop}} Listings",
     "searchPlaceholder": "Search crops...",
     "filterRegion": "Filter by Region",
     "noListings": "No listings yet — be the first to post",
@@ -257,6 +269,11 @@
     "messageFarmer": "Message Farmer",
     "emptyNoOrders": "You have not placed any orders yet",
     "emptyNoFilterOrders": "No {{filter}} orders",
+    "filterAllCount": "All ({{count}})",
+    "filterPendingCount": "Pending ({{count}})",
+    "filterInTransitCount": "In Transit ({{count}})",
+    "filterDeliveredCount": "Delivered ({{count}})",
+    "defaultProduce": "Agricultural Produce",
     "browseMarketplace": "Browse Marketplace",
     "orderActivity": "Order Activity",
     "activityUpdated": "Activity updated",
@@ -307,6 +324,7 @@
   },
   "listingDetail": {
     "goBack": "Go Back",
+    "availableStockText": "{{qty}} {{unit}} Available",
     "farmerUnavailableTitle": "Error",
     "farmerUnavailableMessage": "Farmer information is unavailable",
     "invalidQuantityTitle": "Invalid Quantity",
@@ -557,7 +575,12 @@
     "errorLoadOrders": "Could not load orders. Pull down to retry.",
     "retry": "Retry",
     "emptyNoOrders": "No orders yet",
-    "emptyNoFilterOrders": "No {{filter}} orders"
+    "emptyNoFilterOrders": "No {{filter}} orders",
+    "filterAllCount": "All ({{count}})",
+    "filterPendingCount": "Pending ({{count}})",
+    "filterInTransitCount": "In Transit ({{count}})",
+    "filterDeliveredCount": "Delivered ({{count}})",
+    "defaultCropType": "Harvest Crop"
   },
   "farmerProducts": {
     "title": "My Crops",
@@ -581,7 +604,20 @@
     "markSoldOut": "Mark Sold Out",
     "noCropsTitle": "No Harvest Crops Listed",
     "noCropsSub": "Post your agricultural produce so wholesale buyers across Ethiopia can discover and order your harvest.",
-    "postFirstHarvest": "+ Post Your First Harvest"
+    "postFirstHarvest": "+ Post Your First Harvest",
+    "filterAll": "All ({{count}})",
+    "filterActive": "Active ({{count}})",
+    "filterSold": "Sold ({{count}})",
+    "filterDraft": "Drafts ({{count}})"
+  },
+  "sourcing": {
+    "notesPlaceholder": "e.g. Minimum 10 quintals per farmer, organic grade preferred"
+  },
+  "priceTrends": {
+    "today": "Today"
+  },
+  "productCard": {
+    "inStockText": "{{qty}} {{unit}} in stock"
   },
   "listingForm": {
     "errorTitle": "Error",
@@ -635,7 +671,9 @@
     "defaultErrorMessage": "Something went wrong. Please try again.",
     "photos": "Harvest Photos (Max 2)",
     "photosHint": "Buyers trust listings with photos more. Add up to 2.",
-    "addPhoto": "Add Photo",
+    "defaultDescription": "{{qty}} {{unit}} of fresh {{crop}} harvest ready for wholesale.",
+    "pricePerUnitLabel": "Price per {{unit}} (ETB)",
+    "errorPostListing": "Failed to post listing",
     "takePhoto": "Take Photo",
     "chooseFromGallery": "Choose from Gallery",
     "cancel": "Cancel",
@@ -755,6 +793,7 @@
     "quickContact": "Producer & Buyer Support",
     "callSupport": "Call Support (0938730818)",
     "sendMessage": "Send Message",
+    "supportAdmin": "OmishGo Support Admin",
     "faqTitle": "Frequently Asked Questions",
     "faq1Question": "How do I post a harvest product?",
     "faq1Answer": "Tap My Crops tab or Post Listing button on your dashboard. Select crop type, quantity, price, and location.",
@@ -976,6 +1015,7 @@
   },
   "orders": {
     "totalActiveValue": "Total Active Orders Value",
+    "activeCountText": "{{count}} Active",
     "pending": "Pending",
     "inTransit": "In Transit",
     "delivered": "Delivered",
@@ -1019,13 +1059,18 @@
     "matchingHarvest": "Matching Harvest Posted",
     "typeMessage": "Type a message...",
     "messagingUnavailable": "Messaging Unavailable",
-    "acceptedListingLive": "Accepted — Produce Listing Live"
+    "acceptedListingLive": "Accepted — Produce Listing Live",
+    "acceptAndList": "✓ Accept & List",
+    "decline": "✕ Decline",
+    "openChat": "Open Chat"
   },
   "help": {
     "directAdmin": "Direct message to admin"
   },
   "notifications": {
-    "allCaughtUp": "You are all caught up. New alerts will appear here."
+    "allCaughtUp": "You are all caught up. New alerts will appear here.",
+    "noContent": "No detailed content provided.",
+    "justNow": "Just now"
   },
   "locations": {
     "addisAbaba": "Addis Ababa",

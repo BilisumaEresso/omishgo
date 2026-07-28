@@ -49,16 +49,16 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
       });
       const raw = res.data?.data?.products || [];
       const normalized = raw.map((p) => {
-        let locString = "Ethiopia";
+        let locString = t("common.unknownLocation", { defaultValue: "Location Not Provided" });
         if (p.location) {
           locString = [p.location.wereda, p.location.zone, p.location.region]
             .filter(Boolean)
-            .join(", ");
+            .join(", ") || t("common.unknownLocation", { defaultValue: "Location Not Provided" });
         }
 
         return {
           id: p._id,
-          cropType: p.cropType || p.category || "Harvest Crop",
+          cropType: p.cropType || p.category || t("farmerProducts.defaultCropType", { defaultValue: "Harvest Crop" }),
           quantity: p.quantity ?? 0,
           unit: p.unit || "q",
           price: p.price ?? 0,
@@ -143,7 +143,11 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
     const isSold = item.status === "sold";
     const statusBg = item.status === "active" ? "#DCFCE7" : item.status === "sold" ? "#F1F5F9" : "#FEF3C7";
     const statusTextColor = item.status === "active" ? "#16A34A" : item.status === "sold" ? "#64748B" : "#D97706";
-    const statusLabel = item.status === "active" ? "Active Stock" : item.status === "sold" ? "Sold Out" : "Draft";
+    const statusLabel = item.status === "active"
+      ? t("farmerProducts.statusActive", { defaultValue: "Active Stock" })
+      : item.status === "sold"
+      ? t("farmerProducts.statusSold", { defaultValue: "Sold Out" })
+      : t("farmerProducts.statusDraft", { defaultValue: "Draft" });
 
     const stockTotalVal = (Number(item.price) || 0) * (Number(item.quantity) || 1);
 
@@ -160,7 +164,9 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
             </View>
             <View>
               <AppText style={[styles.cropName, { color: textPrimary }]}>{item.cropType}</AppText>
-              <AppText style={styles.dateText}>Posted {item.postedDate}</AppText>
+              <AppText style={styles.dateText}>
+                {t("farmerProducts.postedLabel", { date: item.postedDate, defaultValue: "Posted {{date}}" })}
+              </AppText>
             </View>
           </View>
 
@@ -241,10 +247,10 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
   );
 
   const filterTabs = [
-    { id: "all", label: `All (${products.length})` },
-    { id: "active", label: `Active (${countActive})` },
-    { id: "sold", label: `Sold (${countSold})` },
-    { id: "draft", label: `Drafts (${countDraft})` },
+    { id: "all", label: t("farmerProducts.filterAll", { count: products.length, defaultValue: "All ({{count}})" }) },
+    { id: "active", label: t("farmerProducts.filterActive", { count: countActive, defaultValue: "Active ({{count}})" }) },
+    { id: "sold", label: t("farmerProducts.filterSold", { count: countSold, defaultValue: "Sold ({{count}})" }) },
+    { id: "draft", label: t("farmerProducts.filterDraft", { count: countDraft, defaultValue: "Drafts ({{count}})" }) },
   ];
 
   return (

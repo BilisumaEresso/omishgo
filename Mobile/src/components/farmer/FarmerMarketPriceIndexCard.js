@@ -58,7 +58,7 @@ export default function FarmerMarketPriceIndexCard({
                 </View>
 
                 <AppText style={styles.regionText}>
-                  {t("farmerDashboard.marketHub", { defaultValue: "Market Hub:" })} <AppText style={styles.regionVal}>{item.region || "Addis Ababa"}</AppText>
+                  {t("farmerDashboard.marketHub", { defaultValue: "Market Hub:" })} <AppText style={styles.regionVal}>{item.region || t("common.unknownLocation", { defaultValue: "Location Not Provided" })}</AppText>
                 </AppText>
               </View>
 

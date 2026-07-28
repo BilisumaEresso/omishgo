@@ -157,7 +157,6 @@ export const respondToSourcingRequest = asyncHandler(async (req, res) => {
   await Message.updateMany(
     {
       "sourcingRequestData.sourcingRequestId": request._id,
-      receiverId: farmerId,
     },
     {
       $set: {

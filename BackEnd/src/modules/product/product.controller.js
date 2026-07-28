@@ -80,6 +80,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     photos,
     location,
     status,
+    sourcingRequestId,
   } = req.body;
 
   if (!cropType || price === undefined || quantity === undefined) {
@@ -98,6 +99,48 @@ export const createProduct = asyncHandler(async (req, res) => {
     status: status || "active",
   });
 
+  // If product is created directly in response to a specific SourcingRequest
+  if (sourcingRequestId) {
+    try {
+      const request = await SourcingRequest.findById(sourcingRequestId);
+      if (request) {
+        request.responses.push({
+          farmerId: req.user._id,
+          farmerName: req.user.name || "Farmer",
+          action: "accepted",
+          productId: product._id,
+        });
+        request.status = "fulfilled";
+        await request.save();
+
+        await Message.updateMany(
+          { "sourcingRequestData.sourcingRequestId": request._id },
+          { $set: { "sourcingRequestData.status": "accepted" } }
+        );
+
+        const farmerName = req.user.name || "Farmer";
+        const responseMsgContent = `✅ Farmer ${farmerName} ACCEPTED your bulk request for ${request.cropType} (${request.quantity} ${request.unit || "q"})! A produce listing has been created.`;
+
+        await Message.create({
+          senderId: req.user._id,
+          receiverId: request.buyerId,
+          content: responseMsgContent,
+          sourcingRequestData: {
+            sourcingRequestId: request._id,
+            cropType: request.cropType,
+            quantity: request.quantity,
+            unit: request.unit || "q",
+            targetPrice: request.targetPrice,
+            deliveryRegion: request.deliveryRegion,
+            status: "accepted",
+          },
+        });
+      }
+    } catch (err) {
+      console.warn("Error processing sourcingRequestId during product creation:", err.message);
+    }
+  }
+
   // Proactively check if any active buyer SourcingRequest matches this new product
   try {
     const matchingRequests = await SourcingRequest.find({
@@ -106,6 +149,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     });
 
     for (const reqItem of matchingRequests) {
+      if (sourcingRequestId && reqItem._id.toString() === sourcingRequestId.toString()) continue;
       if (reqItem.buyerId.toString() === req.user._id.toString()) continue;
 
       const farmerName = req.user.name || "Farmer";

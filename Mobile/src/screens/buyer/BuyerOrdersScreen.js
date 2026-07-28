@@ -49,7 +49,7 @@ export default function BuyerOrdersScreen({ navigation, onSwitchTab }) {
 
       const normalized = raw.map((o) => ({
         id: o._id,
-        cropType: o.cropType || o.productId?.cropType || "Agricultural Produce",
+        cropType: o.cropType || o.productId?.cropType || t("buyerOrders.defaultProduce", { defaultValue: "Agricultural Produce" }),
         quantity: o.quantity || 1,
         unit: o.unit || "q",
         totalPrice: o.totalPrice || (o.priceAtOrder || 0) * (o.quantity || 1),
@@ -67,7 +67,7 @@ export default function BuyerOrdersScreen({ navigation, onSwitchTab }) {
 
       setOrders(normalized);
     } catch (err) {
-      setError(err?.response?.data?.message || err.message || "Failed to load orders");
+      setError(err?.response?.data?.message || err.message || t("buyerOrders.errorLoadOrders", { defaultValue: "Failed to load orders" }));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -112,10 +112,10 @@ export default function BuyerOrdersScreen({ navigation, onSwitchTab }) {
   };
 
   const filterTabs = [
-    { id: "all", label: `${t("buyerOrders.filterAll", { defaultValue: "All" })} (${orders.length})` },
-    { id: "pending", label: `${t("buyerOrders.filterPending", { defaultValue: "Pending" })} (${pendingCount})` },
-    { id: "in_transit", label: `${t("buyerOrders.statusInTransit", { defaultValue: "In Transit" })} (${inTransitCount})` },
-    { id: "completed", label: `${t("buyerOrders.filterDelivered", { defaultValue: "Delivered" })} (${completedCount})` },
+    { id: "all", label: t("buyerOrders.filterAllCount", { count: orders.length, defaultValue: "All ({{count}})" }) },
+    { id: "pending", label: t("buyerOrders.filterPendingCount", { count: pendingCount, defaultValue: "Pending ({{count}})" }) },
+    { id: "in_transit", label: t("buyerOrders.filterInTransitCount", { count: inTransitCount, defaultValue: "In Transit ({{count}})" }) },
+    { id: "completed", label: t("buyerOrders.filterDeliveredCount", { count: completedCount, defaultValue: "Delivered ({{count}})" }) },
   ];
 
   return (

@@ -189,7 +189,7 @@ export default function PriceTrendWidget({ onPressAnalytics }) {
                     isSelected && styles.selectedCropPillText,
                   ]}
                 >
-                  {item.crop}
+                  {getLocalizedCropName(item.crop, i18n.language || "en", t)}
                 </AppText>
               </TouchableOpacity>
             );
@@ -199,7 +199,7 @@ export default function PriceTrendWidget({ onPressAnalytics }) {
         {/* Price Display */}
         <View style={styles.priceRow}>
           <AppText style={styles.priceNumber}>ETB {displayPrice}</AppText>
-          <AppText style={styles.unitText}>/ quintal (100 kg)</AppText>
+          <AppText style={styles.unitText}>/ {t("common.unitQuintal", { defaultValue: "quintal (100 kg)" })}</AppText>
         </View>
 
         {/* Simple Bar Chart */}
@@ -227,7 +227,7 @@ export default function PriceTrendWidget({ onPressAnalytics }) {
                     isToday && { color: primaryColor, fontWeight: "700" },
                   ]}
                 >
-                  {point.label}
+                  {point.label === "Today" ? t("priceTrends.today", { defaultValue: "Today" }) : point.label}
                 </AppText>
               </View>
             );

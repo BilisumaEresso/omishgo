@@ -56,11 +56,11 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
 
   const handleLogout = () => {
     Alert.alert(
-      t("buyerProfile.logoutAlertTitle", "Sign Out"),
-      t("buyerProfile.logoutAlertMessage", "Are you sure you want to log out of OmishGo?"),
+      t("buyerProfile.logoutAlertTitle", { defaultValue: "Sign Out" }),
+      t("buyerProfile.logoutAlertMessage", { defaultValue: "Are you sure you want to log out of OmishGo?" }),
       [
-        { text: t("common.cancel", "Cancel"), style: "cancel" },
-        { text: t("buyerProfile.logoutAlertConfirm", "Log Out"), style: "destructive", onPress: () => logout() },
+        { text: t("common.cancel", { defaultValue: "Cancel" }), style: "cancel" },
+        { text: t("buyerProfile.logoutAlertConfirm", { defaultValue: "Log Out" }), style: "destructive", onPress: () => logout() },
       ]
     );
   };
@@ -73,7 +73,7 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
   };
 
   return (
-    <DashboardLayout role="buyer" title={t("buyerProfile.title", "Buyer Account")} showBack={false}>
+    <DashboardLayout role="buyer" title={t("buyerProfile.title", { defaultValue: "Buyer Account" })} showBack={false}>
       {/* Profile Header Card */}
       <View style={[styles.profileHeaderCard, { backgroundColor: surfaceColor }]}>
         <View style={[styles.avatar, { backgroundColor: primaryColor }]}>
@@ -81,18 +81,18 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
         </View>
 
         <AppText style={[styles.userName, { color: textPrimary }]}>
-          {user?.name || t("buyerProfile.fallbackName", "Wholesale Buyer")}
+          {user?.name || t("buyerProfile.fallbackName", { defaultValue: "Wholesale Buyer" })}
         </AppText>
 
         <View style={styles.verifiedBadge}>
           <Ionicons name="checkmark-circle" size={14} color={primaryColor} />
           <AppText style={[styles.verifiedText, { color: primaryColor }]}>
-            {t("buyerProfile.statusVerified", "Verified Procurement Partner")}
+            {t("buyerProfile.statusVerified", { defaultValue: "Verified Procurement Partner" })}
           </AppText>
         </View>
 
         <AppText style={[styles.phoneText, { color: textSecondary }]}>
-          {user?.phone || "+251 900 000 000"} • {[user?.location?.wereda, user?.location?.zone, user?.location?.region].filter(Boolean).join(", ") || "Addis Ababa"}
+          {user?.phone || t("common.unknownPhone", { defaultValue: "Phone Not Provided" })} • {[user?.location?.wereda, user?.location?.zone, user?.location?.region].filter(Boolean).join(", ") || t("common.unknownLocation", { defaultValue: "Location Not Provided" })}
         </AppText>
       </View>
 
@@ -124,7 +124,7 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
 
       {/* Account Settings List */}
       <View style={[styles.settingsGroup, { backgroundColor: surfaceColor }]}>
-        <AppText style={styles.groupTitle}>{t("buyerProfile.preferencesTitle", "Preferences & Settings")}</AppText>
+        <AppText style={styles.groupTitle}>{t("buyerProfile.preferencesTitle", { defaultValue: "Preferences & Settings" })}</AppText>
 
         {/* Language Selector */}
         <TouchableOpacity
@@ -137,7 +137,7 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
               <Ionicons name="globe-outline" size={20} color={primaryColor} />
             </View>
             <View>
-              <AppText style={styles.settingTitle}>{t("buyerProfile.languageLabel", "Language / ቋንቋ")}</AppText>
+              <AppText style={styles.settingTitle}>{t("buyerProfile.languageLabel", { defaultValue: "Language / ቋንቋ" })}</AppText>
               <AppText style={styles.settingSub}>{currentLangObj.label} ({currentLangObj.native})</AppText>
             </View>
           </View>
@@ -195,8 +195,8 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
               <Ionicons name="help-circle-outline" size={20} color="#F59E0B" />
             </View>
             <View>
-              <AppText style={styles.settingTitle}>{t("buyerProfile.helpSupport", "Help & Support")}</AppText>
-              <AppText style={styles.settingSub}>{t("buyerProfile.helpSupportSub", "FAQs and contact customer service")}</AppText>
+              <AppText style={styles.settingTitle}>{t("buyerProfile.helpSupport", { defaultValue: "Help & Support" })}</AppText>
+              <AppText style={styles.settingSub}>{t("buyerProfile.helpSupportSub", { defaultValue: "FAQs and contact customer service" })}</AppText>
             </View>
           </View>
           <Ionicons name="chevron-forward" size={18} color="#64748B" />
@@ -210,7 +210,7 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
         activeOpacity={0.85}
       >
         <Ionicons name="log-out-outline" size={18} color="#EF4444" />
-        <AppText style={styles.logoutBtnText}>{t("buyerProfile.signOutBtn", "Sign Out Account")}</AppText>
+        <AppText style={styles.logoutBtnText}>{t("buyerProfile.signOutBtn", { defaultValue: "Sign Out Account" })}</AppText>
       </TouchableOpacity>
 
       <View style={{ height: 80 }} />

@@ -74,7 +74,7 @@ export default function BuyerFilterModal({
               {activeFilterCount > 0 && (
                 <TouchableOpacity onPress={onReset} style={styles.resetBtn}>
                   <AppText style={[styles.resetText, { color: primaryColor }]}>
-                    {t("buyerSaved.cancel", { defaultValue: "Reset" })}
+                    {t("buyerDashboard.resetFilters", { defaultValue: "Reset" })}
                   </AppText>
                 </TouchableOpacity>
               )}
@@ -200,7 +200,7 @@ export default function BuyerFilterModal({
               activeOpacity={0.88}
             >
               <AppText style={styles.applyBtnText}>
-                {t("common.apply", { defaultValue: "Apply Filters" })} {activeFilterCount > 0 ? `(${activeFilterCount})` : ""}
+                {t("common.apply", { defaultValue: "Apply Filters" })}{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
               </AppText>
             </TouchableOpacity>
           </View>

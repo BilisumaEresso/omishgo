@@ -206,51 +206,7 @@ export const getOrderDetail = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Approve a product
- * @route   PUT /api/admin/products/:id/approve
- * @access  Private (Admin only)
- */
-export const approveProduct = asyncHandler(async (req, res) => {
-  const id = req.params.id;
-  const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
-  const query = isObjectId ? { _id: id } : { customId: id };
 
-  const product = await Product.findOneAndUpdate(
-    query,
-    { status: "approved" },
-    { new: true }
-  );
-
-  if (!product) throw new ApiError(404, "Product not found");
-
-  await logAction(req.user._id, "approve_product", product._id, "Product");
-
-  sendResponse(res, { statusCode: 200, message: "Product approved successfully", data: { product } });
-});
-
-/**
- * @desc    Reject a product
- * @route   PUT /api/admin/products/:id/reject
- * @access  Private (Admin only)
- */
-export const rejectProduct = asyncHandler(async (req, res) => {
-  const id = req.params.id;
-  const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
-  const query = isObjectId ? { _id: id } : { customId: id };
-
-  const product = await Product.findOneAndUpdate(
-    query,
-    { status: "rejected" },
-    { new: true }
-  );
-
-  if (!product) throw new ApiError(404, "Product not found");
-
-  await logAction(req.user._id, "reject_product", product._id, "Product");
-
-  sendResponse(res, { statusCode: 200, message: "Product rejected successfully", data: { product } });
-});
 
 /**
  * @desc    Get analytics

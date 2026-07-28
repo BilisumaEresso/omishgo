@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import request from "supertest";
+import bcrypt from "bcryptjs";
 import app from "../src/app.js";
 import Product from "../src/modules/product/product.model.js";
 import User from "../src/modules/user/user.model.js";
@@ -29,15 +30,17 @@ describe("Admin API", () => {
 
   beforeEach(async () => {
     // Setup admin
-    await request(app)
-      .post("/api/v1/auth/register")
-      .send({
-        name: "Admin",
-        phone: "0911000000",
-        pin: "1234",
-        role: "admin",
-        location: { region: "A", zone: "B", wereda: "C" },
-      });
+    const salt = await bcrypt.genSalt(10);
+    const pinHash = await bcrypt.hash("1234", salt);
+    await User.create({
+      name: "Admin",
+      phone: "0911000000",
+      pinHash,
+      role: "admin",
+      location: { region: "A", zone: "B", wereda: "C" },
+      isVerified: true
+    });
+
     const loginAdmin = await request(app)
       .post("/api/v1/auth/login")
       .send({ phone: "0911000000", pin: "1234" });
@@ -78,21 +81,5 @@ describe("Admin API", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data.user.isVerified).toBe(true);
-  });
-
-  it("should allow admin to approve a product", async () => {
-    const prodRes = await request(app)
-      .post("/api/v1/products")
-      .set("Authorization", `Bearer ${farmerToken}`)
-      .send({ title: "Wheat", price: 40 });
-
-    const productId = prodRes.body.data.product._id;
-
-    const approveRes = await request(app)
-      .put(`/api/v1/admin/products/${productId}/approve`)
-      .set("Authorization", `Bearer ${adminToken}`);
-
-    expect(approveRes.status).toBe(200);
-    expect(approveRes.body.data.product.status).toBe("approved");
   });
 });

@@ -68,7 +68,7 @@ export default function HelpScreen({ navigation }) {
 
         <TouchableOpacity
           style={[styles.contactCard, { backgroundColor: primaryContainer }]}
-          onPress={() => navigation.navigate("Chat", { userId: "admin", userName: "OmishGo Support Admin", phoneNumber: "0938730818" })}
+          onPress={() => navigation.navigate("Chat", { userId: "admin", userName: t("helpScreen.supportAdmin", { defaultValue: "OmishGo Support Admin" }), phoneNumber: "0938730818" })}
           activeOpacity={0.8}
         >
           <View style={[styles.contactIconBg, { backgroundColor: primary }]}>

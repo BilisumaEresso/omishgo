@@ -7,8 +7,6 @@ import {
   approveUser,
   rejectUser,
   getAllProducts,
-  approveProduct,
-  rejectProduct,
   getProductDetail,
   getAllOrders,
   getOrderDetail,
@@ -37,8 +35,6 @@ router.put("/users/:id/reject", rejectUser);
 // Product approvals
 router.get("/products", getAllProducts);
 router.get("/products/:id", getProductDetail);
-router.put("/products/:id/approve", approveProduct);
-router.put("/products/:id/reject", rejectProduct);
 
 // Orders
 router.get("/orders", getAllOrders);

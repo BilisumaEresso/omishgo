@@ -60,12 +60,12 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
       const fetchedProds = prodRes.data?.data?.products || [];
       const formattedProds = fetchedProds.map((p) => ({
         _id: p._id,
-        cropType: p.cropType || p.category || "Produce",
+        cropType: p.cropType || p.category || t("buyerDashboard.defaultProduce", { defaultValue: "Produce" }),
         quantity: p.quantity ?? 0,
         unit: p.unit || "kg",
         price: p.price,
         category: p.cropType || p.category,
-        farmerId: p.farmerId || { _id: p.farmerId, name: "Farmer" },
+        farmerId: p.farmerId || { _id: p.farmerId, name: t("buyerDashboard.defaultFarmer", { defaultValue: "Farmer" }) },
         location: p.location || {},
         photos: p.photos || [],
         status: p.status || "active",
@@ -82,7 +82,7 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         if (fid && !farmerMap[fid]) {
           farmerMap[fid] = {
             _id: fid,
-            name: f.name || p.farmerName || "Farmer",
+            name: f.name || p.farmerName || t("buyerDashboard.defaultFarmer", { defaultValue: "Farmer" }),
             avatar: f.avatar || null,
             distance: p.distance || "3.2 km",
             location: p.location || {},
@@ -151,39 +151,39 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
       return [
         {
           id: "c1",
-          category: "Vegetables & Greens",
+          category: t("buyerDashboard.catVegetables", { defaultValue: "Vegetables & Greens" }),
           icon: "leaf",
           bgColor: "#E0F2FE",
           iconColor: "#0284C7",
           amount: Math.round(totalSpend * 0.45) || 0,
-          date: "This Month",
+          date: t("buyerDashboard.thisMonth", { defaultValue: "This Month" }),
           method: "Mobile Money",
         },
         {
           id: "c2",
-          category: "Teff & Grains",
+          category: t("buyerDashboard.catGrains", { defaultValue: "Teff & Grains" }),
           icon: "nutrition",
           bgColor: "#EDE9FE",
           iconColor: "#7C3AED",
           amount: Math.round(totalSpend * 0.35) || 0,
-          date: "This Month",
+          date: t("buyerDashboard.thisMonth", { defaultValue: "This Month" }),
           method: "Bank Transfer",
         },
         {
           id: "c3",
-          category: "Pulses & Oilseeds",
+          category: t("buyerDashboard.catPulses", { defaultValue: "Pulses & Oilseeds" }),
           icon: "cube",
           bgColor: "#FEF3C7",
           iconColor: "#D97706",
           amount: Math.round(totalSpend * 0.2) || 0,
-          date: "This Month",
+          date: t("buyerDashboard.thisMonth", { defaultValue: "This Month" }),
           method: "CBE Birr",
         },
       ];
     }
     const catMap = {};
     orders.forEach((o) => {
-      const cat = o.cropType || o.category || "General Produce";
+      const cat = o.cropType || o.category || t("buyerDashboard.generalProduce", { defaultValue: "General Produce" });
       catMap[cat] = (catMap[cat] || 0) + (Number(o.totalPrice || o.price) || 0);
     });
     const colorPairs = [
@@ -197,8 +197,8 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         id: category,
         category,
         amount,
-        date: "Recent",
-        method: "Verified Order",
+        date: t("buyerDashboard.recent", { defaultValue: "Recent" }),
+        method: t("buyerDashboard.verifiedOrder", { defaultValue: "Verified Order" }),
         ...pair,
       };
     });
@@ -333,13 +333,13 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         {/* Featured Products */}
         <View style={styles.sectionHeader}>
           <AppText style={{ fontWeight: "700", color: textPrimary, fontSize: 17 }}>
-            {t("buyerDashboard.featuredProducts", "Featured Produce")}
+            {t("buyerDashboard.featuredProducts", { defaultValue: "Featured Produce" })}
           </AppText>
           <AppText
             style={{ color: primaryColor, fontWeight: "600" }}
             onPress={() => onSwitchTab?.("Marketplace")}
           >
-            {t("buyerDashboard.seeAll", "See All")}
+            {t("buyerDashboard.seeAll", { defaultValue: "See All" })}
           </AppText>
         </View>
         <FeaturedProductsList
@@ -352,13 +352,13 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
           <>
             <View style={styles.sectionHeader}>
               <AppText style={{ fontWeight: "700", color: textPrimary, fontSize: 17 }}>
-                {t("buyerDashboard.nearbyFarmers", "Nearby Farmers")}
+                {t("buyerDashboard.nearbyFarmers", { defaultValue: "Nearby Farmers" })}
               </AppText>
               <AppText
                 style={{ color: primaryColor, fontWeight: "600" }}
                 onPress={() => onSwitchTab?.("Marketplace")}
               >
-                {t("buyerDashboard.seeAll", "See All")}
+                {t("buyerDashboard.seeAll", { defaultValue: "See All" })}
               </AppText>
             </View>
             <NearbyFarmersList

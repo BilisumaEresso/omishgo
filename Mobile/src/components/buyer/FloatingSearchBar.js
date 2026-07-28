@@ -123,7 +123,7 @@ export default function FloatingSearchBar({
               <View style={styles.itemInfo}>
                 <AppText style={styles.itemCropTitle}>{item.cropType || item.name}</AppText>
                 <AppText style={styles.itemSubtext}>
-                  {item.farmerId?.name || "Verified Farmer"} • {[item.location?.wereda, item.location?.zone, item.location?.region].filter(Boolean).join(", ") || "Local"}
+                  {item.farmerId?.name || t("browse.verifiedFarmer", { defaultValue: "Verified Farmer" })} • {[item.location?.wereda, item.location?.zone, item.location?.region].filter(Boolean).join(", ") || t("common.unknownLocation", { defaultValue: "Location Not Provided" })}
                 </AppText>
               </View>
 

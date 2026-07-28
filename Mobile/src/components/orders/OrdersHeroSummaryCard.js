@@ -25,7 +25,7 @@ export default function OrdersHeroSummaryCard({
           <Ionicons name={isFarmer ? "cube-outline" : "cart-outline"} size={14} color={badgeColor} />
           <AppText style={[styles.badgeText, { color: badgeColor }]}>{titleText}</AppText>
         </View>
-        <AppText style={styles.activeBadgeText}>{activeCount} {t("statuses.active", { defaultValue: "Active" })}</AppText>
+        <AppText style={styles.activeBadgeText}>{t("orders.activeCountText", { count: activeCount, defaultValue: "{{count}} Active" })}</AppText>
       </View>
 
       <AppText style={styles.label}>{t("orders.totalActiveValue", { defaultValue: "Total Active Orders Value" })}</AppText>

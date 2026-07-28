@@ -211,13 +211,13 @@ export default function NotificationsScreen({ navigation }) {
                       </AppText>
 
                       <AppText style={[styles.modalBody, { color: textSecondary }]}>
-                        {selectedNotif.message || selectedNotif.body || "No detailed content provided."}
+                        {selectedNotif.message || selectedNotif.body || t("notifications.noContent", { defaultValue: "No detailed content provided." })}
                       </AppText>
 
                       <AppText style={styles.modalTime}>
                         {selectedNotif.createdAt
                           ? new Date(selectedNotif.createdAt).toLocaleString()
-                          : selectedNotif.time || "Just now"}
+                          : selectedNotif.time || t("notifications.justNow", { defaultValue: "Just now" })}
                       </AppText>
 
                       <View style={styles.modalBtnRow}>
@@ -228,7 +228,7 @@ export default function NotificationsScreen({ navigation }) {
                             activeOpacity={0.85}
                           >
                             <AppText style={styles.modalPrimaryBtnText}>
-                              {selectedNotif.type === "new_message" ? "Open Chat" : "View Order"}
+                              {selectedNotif.type === "new_message" ? t("chat.openChat", { defaultValue: "Open Chat" }) : t("orderDetail.viewOrder", { defaultValue: "View Order" })}
                             </AppText>
                           </TouchableOpacity>
                         )}
@@ -247,7 +247,7 @@ export default function NotificationsScreen({ navigation }) {
                               !hasTarget ? { color: "#FFFFFF" } : { color: textSecondary },
                             ]}
                           >
-                            {hasTarget ? "Close" : "Got It"}
+                            {hasTarget ? t("common.close", { defaultValue: "Close" }) : t("common.gotIt", { defaultValue: "Got It" })}
                           </AppText>
                         </TouchableOpacity>
                       </View>

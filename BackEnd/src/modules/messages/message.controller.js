@@ -56,10 +56,17 @@ export const getThread = asyncHandler(async (req, res) => {
     { $set: { isRead: true } },
   );
 
+  const formattedMessages = messages.map((m) => {
+    const obj = m.toObject ? m.toObject() : m;
+    obj.text = obj.content;
+    obj.read = obj.senderId?._id?.toString() === other ? true : obj.isRead;
+    return obj;
+  });
+
   return sendResponse(res, {
     statusCode: 200,
     message: "Thread retrieved successfully",
-    data: { messages, with: otherUser },
+    data: { messages: formattedMessages, with: otherUser },
   });
 });
 
@@ -69,9 +76,10 @@ export const getThread = asyncHandler(async (req, res) => {
  * @access  Private
  */
 export const sendMessage = asyncHandler(async (req, res) => {
-  let { receiverId, content } = req.body;
+  let { receiverId, content, text } = req.body;
+  const messageText = (content || text || "").trim();
 
-  if (!receiverId || !content?.trim()) {
+  if (!receiverId || !messageText) {
     throw new ApiError(400, "receiverId and content are required");
   }
 
@@ -107,12 +115,15 @@ export const sendMessage = asyncHandler(async (req, res) => {
   const message = await Message.create({
     senderId: req.user._id,
     receiverId,
-    content: content.trim(),
+    content: messageText,
   });
 
   // Populate for immediate use in the UI
   await message.populate("senderId", "name phone");
   await message.populate("receiverId", "name phone");
+
+  const msgObj = message.toObject ? message.toObject() : message;
+  msgObj.text = msgObj.content;
 
   // Trigger notification for recipient
   try {
@@ -128,7 +139,7 @@ export const sendMessage = asyncHandler(async (req, res) => {
   return sendResponse(res, {
     statusCode: 201,
     message: "Message sent",
-    data: { message },
+    data: { message: msgObj },
   });
 });
 

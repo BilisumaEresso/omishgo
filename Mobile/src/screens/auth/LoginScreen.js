@@ -95,7 +95,7 @@ const LoginScreen = ({ navigation }) => {
           easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
         }),
-      ])
+      ]),
     ).start();
 
     return () => {
@@ -115,11 +115,31 @@ const LoginScreen = ({ navigation }) => {
   const shake = () => {
     shakeX.setValue(0);
     Animated.sequence([
-      Animated.timing(shakeX, { toValue: 8, duration: 60, useNativeDriver: true }),
-      Animated.timing(shakeX, { toValue: -8, duration: 60, useNativeDriver: true }),
-      Animated.timing(shakeX, { toValue: 6, duration: 55, useNativeDriver: true }),
-      Animated.timing(shakeX, { toValue: -4, duration: 55, useNativeDriver: true }),
-      Animated.timing(shakeX, { toValue: 0, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeX, {
+        toValue: 8,
+        duration: 60,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeX, {
+        toValue: -8,
+        duration: 60,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeX, {
+        toValue: 6,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeX, {
+        toValue: -4,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeX, {
+        toValue: 0,
+        duration: 50,
+        useNativeDriver: true,
+      }),
     ]).start();
   };
 
@@ -141,10 +161,18 @@ const LoginScreen = ({ navigation }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!phone.trim()) newErrors.phone = t("auth.phoneRequired", { defaultValue: "Phone number is required" });
-    if (!pin.trim()) newErrors.pin = t("auth.pinRequired", { defaultValue: "PIN is required" });
+    if (!phone.trim())
+      newErrors.phone = t("auth.phoneRequired", {
+        defaultValue: "Phone number is required",
+      });
+    if (!pin.trim())
+      newErrors.pin = t("auth.pinRequired", {
+        defaultValue: "PIN is required",
+      });
     else if (!/^\d{4,6}$/.test(pin))
-      newErrors.pin = t("auth.pinLengthError", { defaultValue: "PIN must be between 4 and 6 digits" });
+      newErrors.pin = t("auth.pinLengthError", {
+        defaultValue: "PIN must be between 4 and 6 digits",
+      });
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -160,7 +188,13 @@ const LoginScreen = ({ navigation }) => {
       const result = await login(phone, pin);
       if (!result.success) {
         shake();
-        setErrors({ submit: result.message || t("auth.loginFailed", { defaultValue: "Login failed. Check your phone & PIN." }) });
+        setErrors({
+          submit:
+            result.message ||
+            t("auth.loginFailed", {
+              defaultValue: "Login failed. Check your phone & PIN.",
+            }),
+        });
       } else {
         Animated.timing(successPulse, {
           toValue: 1,
@@ -171,7 +205,13 @@ const LoginScreen = ({ navigation }) => {
       }
     } catch (error) {
       shake();
-      setErrors({ submit: error.message || t("auth.loginFailed", { defaultValue: "Login failed. Please try again." }) });
+      setErrors({
+        submit:
+          error.message ||
+          t("auth.loginFailed", {
+            defaultValue: "Login failed. Please try again.",
+          }),
+      });
     } finally {
       setLoading(false);
     }
@@ -200,7 +240,9 @@ const LoginScreen = ({ navigation }) => {
   return (
     <AuthLayout
       title={t("auth.loginTitle", { defaultValue: "Welcome Back" })}
-      subtitle={t("auth.loginSubtitle", { defaultValue: "Sign in to access produce listings & wholesale orders" })}
+      subtitle={t("auth.loginSubtitle", {
+        defaultValue: "Sign in to access produce listings & wholesale orders",
+      })}
       logoSource={require("../../assets/images/logo.png")}
       showBack={false}
     >
@@ -226,7 +268,9 @@ const LoginScreen = ({ navigation }) => {
             <Animated.View style={rowStyle(row1)}>
               <AppInput
                 label={t("auth.phoneLabel", { defaultValue: "Phone Number" })}
-                placeholder={t("auth.phonePlaceholder", { defaultValue: "e.g. 0911234567" })}
+                placeholder={t("auth.phonePlaceholder", {
+                  defaultValue: "e.g. 0911234567",
+                })}
                 value={phone}
                 onChangeText={(text) => {
                   setPhone(text);
@@ -243,7 +287,9 @@ const LoginScreen = ({ navigation }) => {
             <Animated.View style={rowStyle(row2)}>
               <AppInput
                 label={t("auth.pinLabel", { defaultValue: "PIN (4-6 digits)" })}
-                placeholder={t("auth.pinPlaceholder", { defaultValue: "Enter your 4-6 digit PIN" })}
+                placeholder={t("auth.pinPlaceholder", {
+                  defaultValue: "Enter your 4-6 digit PIN",
+                })}
                 value={pin}
                 onChangeText={(text) => {
                   const numericText = text.replace(/[^0-9]/g, "");
@@ -280,7 +326,9 @@ const LoginScreen = ({ navigation }) => {
                 disabled={loading}
               >
                 <AppButton
-                  title={t("auth.loginBtn", { defaultValue: "Login to Account" })}
+                  title={t("auth.loginBtn", {
+                    defaultValue: "Login to Account",
+                  })}
                   onPress={handleSubmit}
                   loading={loading}
                   fullWidth
@@ -289,14 +337,11 @@ const LoginScreen = ({ navigation }) => {
             </Animated.View>
 
             {/* Register Redirect Row */}
-            <Animated.View
-              style={[
-                rowStyle(rowFooter),
-                styles.footerRow,
-              ]}
-            >
+            <Animated.View style={[rowStyle(rowFooter), styles.footerRow]}>
               <AppText style={styles.footerSub}>
-                {t("auth.noAccount", { defaultValue: "Don't have an account?" })}
+                {t("auth.noAccount", {
+                  defaultValue: "Don't have an account?",
+                })}
               </AppText>
               <Pressable
                 onPress={() => navigation.navigate("Register")}
@@ -316,7 +361,9 @@ const LoginScreen = ({ navigation }) => {
             >
               <Ionicons name="headset-outline" size={14} color="#15803D" />
               <AppText style={styles.supportPillText}>
-                {t("auth.supportHelpline", { defaultValue: "Need help? Call Support: 0938730818" })}
+                {t("auth.supportHelpline", {
+                  defaultValue: "Need help? Call Support: 0938730818",
+                })}
               </AppText>
             </TouchableOpacity>
           </View>
