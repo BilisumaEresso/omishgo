@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
 import { getLocalizedCropName } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
+import { formatNumber } from "../../utils/formatNumber";
 
 export default function FarmerCropInventoryBreakdown({
   products = [],
@@ -57,7 +58,7 @@ export default function FarmerCropInventoryBreakdown({
               </View>
 
               <View style={{ alignItems: "flex-end" }}>
-                <AppText style={styles.priceText}>ETB {Number(price).toLocaleString("en-US")}/{unitLabel}</AppText>
+                <AppText style={styles.priceText}>ETB {formatNumber(price)}/{unitLabel}</AppText>
                 <View style={styles.statusBadge}>
                   <View style={styles.statusDot} />
                   <AppText style={styles.statusText}>{t("editProduct.activeStock", { defaultValue: "Active Stock" })}</AppText>

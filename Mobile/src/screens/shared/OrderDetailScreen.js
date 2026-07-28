@@ -18,6 +18,7 @@ import { useTheme } from "../../hooks/useTheme";
 
 import { getLocalizedCropName } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
+import { formatNumber } from "../../utils/formatNumber";
 
 const STATUS_CONFIG = {
   pending:   { bg: "#FEF3C7", text: "#B45309", icon: "time-outline",            labelKey: "buyerOrders.statusPending" },
@@ -157,12 +158,12 @@ export default function OrderDetailScreen({ route, navigation }) {
         </View>
         <View style={styles.infoRow}>
           <AppText style={styles.infoLabel}>{t("orderDetail.unitPrice", { defaultValue: "Price per Quintal" })}</AppText>
-          <AppText style={styles.infoVal}>ETB {Number(pricePerUnit).toLocaleString()}</AppText>
+          <AppText style={styles.infoVal}>ETB {formatNumber(pricePerUnit)}</AppText>
         </View>
         <View style={styles.totalRow}>
           <AppText style={styles.totalLabel}>{t("orderDetail.totalPrice", { defaultValue: "Total Wholesale Amount" })}</AppText>
           <AppText style={[styles.totalAmount, { color: primaryColor }]}>
-            ETB {Number(totalPrice).toLocaleString()}
+            ETB {formatNumber(totalPrice)}
           </AppText>
         </View>
       </View>

@@ -6,6 +6,7 @@ import AppText from "../common/AppText";
 import { getOrderStatusConfig } from "../../constants/statuses";
 import { getLocalizedCropName } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
+import { formatNumber } from "../../utils/formatNumber";
 
 export default function FarmerOrdersFulfillmentList({
   orders = [],
@@ -41,7 +42,7 @@ export default function FarmerOrdersFulfillmentList({
             const statusConfig = getOrderStatusConfig(o.status, currentLang);
             const cropName = getLocalizedCropName(o.cropType || t("common.defaultHarvestCrop", { defaultValue: "Harvest Crop" }), currentLang);
             const unitLabel = getLocalizedUnitName(o.unit || "q", currentLang);
-            const amount = o.totalPrice ? `${Number(o.totalPrice).toLocaleString("en-US")} ETB` : t("farmerProducts.priceUnavailable", { defaultValue: "Pending Quote" });
+            const amount = o.totalPrice ? `${formatNumber(o.totalPrice)} ETB` : t("farmerProducts.priceUnavailable", { defaultValue: "Pending Quote" });
 
             return (
               <TouchableOpacity

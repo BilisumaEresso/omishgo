@@ -4,6 +4,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../common/AppText";
 import { useTheme } from "../../hooks/useTheme";
+import { formatNumber } from "../../utils/formatNumber";
 
 export default function FarmerHeroHarvestCard({
   totalRevenue = 0,
@@ -33,7 +34,7 @@ export default function FarmerHeroHarvestCard({
       {/* Main Revenue Amount */}
       <AppText style={styles.label}>{t("farmerDashboard.totalHarvestRevenue", { defaultValue: "Total Harvest Revenue" })}</AppText>
       <AppText style={styles.amountText}>
-        {currency} {Number(totalRevenue).toLocaleString("en-US")}
+        {currency} {formatNumber(totalRevenue)}
       </AppText>
 
       {/* Divider */}
@@ -109,6 +110,9 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "900",
     letterSpacing: 0.5,
+    marginVertical: 6,
+    lineHeight: 36,
+    paddingBottom: 4,
   },
   divider: {
     height: 1,

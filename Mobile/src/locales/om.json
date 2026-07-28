@@ -127,7 +127,7 @@
   },
   "units": {
     "kg": "Kiiloogiraama (kg)",
-    "quintal": "Kintaala (q)",
+    "quintal": "Kunt (q)",
     "ton": "Toonii (t)",
     "bag50": "Dawwaa (50kg)",
     "bag100": "Dawwaa (100kg)",
@@ -268,6 +268,8 @@
     "retry": "Irra deebi'ii yaali",
     "emptyNoOrders": "Hanga ammaa ajaja hin kennine",
     "emptyNoFilterOrders": "Ajajni {{filter}} hin jiru",
+    "messageFarmer": "Qotee Bulaaf Ergaa Ergi",
+    "browseMarketplace": "Gabaa Daawwadhu",
     "filterAllCount": "Hunda ({{count}})",
     "filterPendingCount": "Eegamaa ({{count}})",
     "filterInTransitCount": "Karaa Irra ({{count}})",
@@ -436,7 +438,7 @@
     "listHarvest": "Oomisha Galmeessi",
     "cropStockMgmt": "Bulchiinsa Kuusaa Oomishaa",
     "totalActiveVolume": "Hamma Oomisha Socho'aa Waligalaa",
-    "quintalsAbbr": "kintaala (q)",
+    "quintalsAbbr": "kunt (q)",
     "estimatedValue": "Gatii Kuusaa Waligalaa Tilmaamame",
     "liveOnMarket": "Gabaa Irra Kan Jiru",
     "activeHarvestCrops": "Oomishoota Qonnootaa Socho'oo",
@@ -1068,7 +1070,13 @@
   "notifications": {
     "allCaughtUp": "Hunda ilaaltaniirtu. Beeksisni haarawaa asitti mul'ata.",
     "noContent": "Qabiyyeen bal'aan hin kennamne.",
-    "justNow": "Amma ammaa"
+    "justNow": "Amma ammaa",
+    "newMessage": "Ergaa haaraa qabdu",
+    "newOrder": "Ajaja haaraa isiin qaqqabeera",
+    "orderUpdate": "Haalli ajaja keessanii haaromeera",
+    "accountApproved": "Lakkoofsi keessan mirkanaa'eera",
+    "accountAlert": "Akeekkachiisa herreegaa",
+    "systemNotification": "Beeksisa sirnaa"
   },
   "locations": {
     "addisAbaba": "Finfinnee",

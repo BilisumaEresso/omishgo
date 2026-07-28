@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import AppText from "../common/AppText";
 import { useTheme } from "../../hooks/useTheme";
+import { formatNumber } from "../../utils/formatNumber";
+import { getLocalizedCropName } from "../../constants/crops";
 
 const COMMODITY_TRENDS = [
   {
@@ -84,7 +86,7 @@ const COMMODITY_TRENDS = [
 ];
 
 export default function PriceTrendWidget({ onPressAnalytics }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const [selectedCropId, setSelectedCropId] = useState("onion");
 
@@ -118,7 +120,7 @@ export default function PriceTrendWidget({ onPressAnalytics }) {
     }).start();
 
     const listener = priceAnim.addListener(({ value }) => {
-      setDisplayPrice(Math.round(value).toLocaleString());
+      setDisplayPrice(formatNumber(Math.round(value)));
     });
 
     return () => {

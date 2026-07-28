@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../common/AppText";
+import { formatNumber } from "../../utils/formatNumber";
 
 export default function BuyerCategorySpendingList({
   categories = [
@@ -67,7 +68,7 @@ export default function BuyerCategorySpendingList({
 
             <View style={styles.rightRow}>
               <AppText style={styles.amountText}>
-                {currency} {item.amount.toLocaleString()}
+                {currency} {formatNumber(item.amount)}
               </AppText>
               <AppText style={styles.methodText}>{item.method}</AppText>
             </View>
@@ -132,6 +133,8 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "800",
     color: "#0F172A",
+    lineHeight: 20,
+    paddingBottom: 2,
   },
   methodText: {
     fontSize: 12,

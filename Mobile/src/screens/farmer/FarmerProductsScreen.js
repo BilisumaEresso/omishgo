@@ -19,10 +19,19 @@ import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
-import { useAuthStore } from "../../store/auth.store";
+import { useAuthStore } from "../../store/auth.store"
+import { getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedUnitName } from "../../constants/units";
+import {
+  getLocalizedWeredaName,
+  getLocalizedZoneName,
+  getLocalizedRegionName,
+} from "../../constants/locations";
+import { formatNumber } from "../../utils/formatNumber";
 
 const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
   const { theme } = useTheme();
   const user = useAuthStore((s) => s.user);
   const { openSidebar } = useSidebar();
@@ -62,6 +71,8 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
           quantity: p.quantity ?? 0,
           unit: p.unit || "q",
           price: p.price ?? 0,
+          customId: p.customId || null,
+          locationObj: p.location || null,
           location: locString,
           status: p.status || "active",
           photos: p.photos || [],
@@ -151,6 +162,30 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
 
     const stockTotalVal = (Number(item.price) || 0) * (Number(item.quantity) || 1);
 
+    const rawId = item.customId || item.id || "";
+    const shortId = rawId.startsWith("PRD-")
+      ? rawId
+      : rawId
+      ? `PRD-${rawId.substring(rawId.length - 6).toUpperCase()}`
+      : "PRD";
+
+    const localizedCrop = getLocalizedCropName(item.cropType, currentLang, t);
+    const localizedUnit = getLocalizedUnitName(item.unit, currentLang, t);
+
+    let localizedLocation = t("common.unknownLocation", { defaultValue: "Location Not Provided" });
+    if (item.locationObj && typeof item.locationObj === "object") {
+      const parts = [
+        getLocalizedWeredaName(item.locationObj.wereda, currentLang),
+        getLocalizedZoneName(item.locationObj.zone, currentLang),
+        getLocalizedRegionName(item.locationObj.region, currentLang),
+      ].filter(Boolean);
+      if (parts.length > 0) {
+        localizedLocation = parts.join(", ");
+      }
+    } else if (typeof item.location === "string" && item.location) {
+      localizedLocation = item.location;
+    }
+
     return (
       <TouchableOpacity
         activeOpacity={0.85}
@@ -163,7 +198,10 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
               <Ionicons name="leaf" size={18} color="#15803D" />
             </View>
             <View>
-              <AppText style={[styles.cropName, { color: textPrimary }]}>{item.cropType}</AppText>
+              <View style={styles.titleRefRow}>
+                <AppText style={[styles.cropName, { color: textPrimary }]}>{localizedCrop}</AppText>
+                <AppText style={styles.refText}>#{shortId}</AppText>
+              </View>
               <AppText style={styles.dateText}>
                 {t("farmerProducts.postedLabel", { date: item.postedDate, defaultValue: "Posted {{date}}" })}
               </AppText>
@@ -178,21 +216,21 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
         <View style={styles.specGrid}>
           <View style={styles.specItem}>
             <AppText style={styles.specLabel}>{t("postProduct.stockQuantity", { defaultValue: "Available Volume" })}</AppText>
-            <AppText style={styles.specVal}>{item.quantity} {item.unit}</AppText>
+            <AppText style={styles.specVal}>{item.quantity} {localizedUnit}</AppText>
           </View>
           <View style={styles.specItem}>
             <AppText style={styles.specLabel}>{t("listingDetail.unitRate", { defaultValue: "Unit Price" })}</AppText>
-            <AppText style={styles.specVal}>ETB {Number(item.price).toLocaleString()}/{item.unit}</AppText>
+            <AppText style={styles.specVal}>ETB {formatNumber(item.price)}/{localizedUnit}</AppText>
           </View>
           <View style={styles.specItem}>
             <AppText style={styles.specLabel}>{t("listingDetail.batchValue", { defaultValue: "Batch Value" })}</AppText>
-            <AppText style={[styles.specVal, { color: primary }]}>ETB {stockTotalVal.toLocaleString()}</AppText>
+            <AppText style={[styles.specVal, { color: primary }]}>ETB {formatNumber(stockTotalVal)}</AppText>
           </View>
         </View>
 
         <View style={styles.locationRow}>
           <Ionicons name="location" size={14} color="#64748B" />
-          <AppText style={styles.locationText}>{item.location}</AppText>
+          <AppText style={styles.locationText}>{localizedLocation}</AppText>
         </View>
 
         {!isSold && (
@@ -395,6 +433,21 @@ const styles = StyleSheet.create({
   cropName: {
     fontSize: 16,
     fontWeight: "800",
+  },
+  titleRefRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  refText: {
+    fontSize: 10.5,
+    fontWeight: "800",
+    color: "#64748B",
+    backgroundColor: "#F1F5F9",
+    paddingHorizontal: 6,
+    paddingVertical: 1.5,
+    borderRadius: 6,
+    overflow: "hidden",
   },
   dateText: {
     fontSize: 11,

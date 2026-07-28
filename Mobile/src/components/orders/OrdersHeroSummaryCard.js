@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, View } from "react-native";
 import AppText from "../common/AppText";
+import { formatNumber } from "../../utils/formatNumber";
 
 export default function OrdersHeroSummaryCard({
   totalValue = 0,
@@ -30,7 +31,7 @@ export default function OrdersHeroSummaryCard({
 
       <AppText style={styles.label}>{t("orders.totalActiveValue", { defaultValue: "Total Active Orders Value" })}</AppText>
       <AppText style={styles.amountText}>
-        {currency} {Number(totalValue).toLocaleString("en-US")}
+        {currency} {formatNumber(totalValue)}
       </AppText>
     </View>
   );
@@ -83,5 +84,8 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "900",
     letterSpacing: 0.5,
+    marginVertical: 6,
+    lineHeight: 36,
+    paddingBottom: 4,
   },
 });

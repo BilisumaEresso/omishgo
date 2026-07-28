@@ -32,7 +32,7 @@ const formatTime = (iso) => {
 // ─── Sourcing Action Card ─────────────────────────────────────────────────────
 const SourcingActionCard = ({ data, isMe, onAccept, onReject, role }) => {
   const { t } = useTranslation();
-  if (!data) return null;
+  if (!data || !data.cropType || !data.quantity) return null;
   const isPending = data.status === "pending";
   const isAccepted = data.status === "accepted";
   const isRejected = data.status === "rejected";
@@ -120,7 +120,7 @@ const MessageBubble = ({ message, isMe, showAvatar, avatarLetter, theme, onAccep
           {message.content}
         </AppText>
 
-        {message.sourcingRequestData && (
+        {message.sourcingRequestData && message.sourcingRequestData.cropType && (
           <SourcingActionCard
             data={message.sourcingRequestData}
             isMe={isMe}

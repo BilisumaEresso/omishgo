@@ -8,6 +8,7 @@ import { getLocalizedCropName } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
 
 import { getLocalizedWeredaName, getLocalizedZoneName, getLocalizedRegionName } from "../../constants/locations";
+import { formatNumber } from "../../utils/formatNumber";
 
 export const ProductCard = ({
   product,
@@ -38,8 +39,15 @@ export const ProductCard = ({
   const localizedZone = getLocalizedZoneName(loc.zone, currentLang);
   const localizedRegion = getLocalizedRegionName(loc.region, currentLang);
 
+  const rawId = product.customId || product._id || product.id || "";
+  const shortId = rawId.startsWith("PRD-")
+    ? rawId
+    : rawId
+    ? `PRD-${rawId.substring(rawId.length - 6).toUpperCase()}`
+    : "PRD";
+
   const formattedPrice = product.price
-    ? `${Number(product.price).toLocaleString("en-US")} ETB / ${localizedUnit}`
+    ? `${formatNumber(product.price)} ETB / ${localizedUnit}`
     : t("farmerProducts.priceUnavailable", { defaultValue: "Price on Request" });
 
   return (
@@ -55,9 +63,12 @@ export const ProductCard = ({
       {/* Top Header: Crop Name & Bookmark Heart */}
       <View style={styles.cardHeader}>
         <View style={styles.cropTitleWrap}>
-          <AppText style={[styles.cropTitle, { color: textPrimary }]}>
-            {localizedCrop}
-          </AppText>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <AppText style={[styles.cropTitle, { color: textPrimary }]}>
+              {localizedCrop}
+            </AppText>
+            <AppText style={styles.refText}>#{shortId}</AppText>
+          </View>
           <View style={styles.verifiedRow}>
             <Ionicons name="checkmark-circle" size={14} color={primary} />
             <AppText style={[styles.verifiedText, { color: primary }]}>
@@ -207,5 +218,15 @@ const styles = StyleSheet.create({
   },
   viewBtn: {
     borderRadius: 12,
+  },
+  refText: {
+    fontSize: 10.5,
+    fontWeight: "800",
+    color: "#64748B",
+    backgroundColor: "#F1F5F9",
+    paddingHorizontal: 6,
+    paddingVertical: 1.5,
+    borderRadius: 6,
+    overflow: "hidden",
   },
 });

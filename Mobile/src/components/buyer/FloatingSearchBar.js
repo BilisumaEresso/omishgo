@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
 import { getLocalizedUnitName } from "../../constants/units";
 import { useTheme } from "../../hooks/useTheme";
+import { formatNumber } from "../../utils/formatNumber";
 
 export default function FloatingSearchBar({
   searchQuery,
@@ -128,7 +129,7 @@ export default function FloatingSearchBar({
               </View>
 
               <AppText style={styles.itemPrice}>
-                ETB {item.price?.toLocaleString() || "N/A"}/{getLocalizedUnitName(item.unit || "kg", i18n.language || "en", t)}
+                ETB {item.price ? formatNumber(item.price) : "N/A"}/{getLocalizedUnitName(item.unit || "kg", i18n.language || "en", t)}
               </AppText>
             </TouchableOpacity>
           ))}

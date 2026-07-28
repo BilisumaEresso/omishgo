@@ -327,7 +327,7 @@ export default function PostProductScreen({ navigation, route }) {
     if (result.canceled || !result.assets?.length) return;
 
     const asset = result.assets[0];
-    setPhotos((prev) => [...prev, { uri: asset.uri, url: asset.uri, uploading: false, error: false }]);
+    setPhotos((prev) => [...prev, { uri: asset.uri, url: null, uploading: true, error: false }]);
     uploadPhotoAt(asset.uri, asset);
   };
 
@@ -386,6 +386,24 @@ export default function PostProductScreen({ navigation, route }) {
       return;
     }
 
+    const isUploading = photos.some((p) => p.uploading);
+    if (isUploading) {
+      Alert.alert(
+        t("postProduct.uploadingTitle", { defaultValue: "Upload in Progress" }),
+        t("postProduct.uploadingMsg", { defaultValue: "Please wait for photos to finish uploading to Cloudinary." })
+      );
+      return;
+    }
+
+    const hasError = photos.some((p) => p.error || !p.url);
+    if (hasError) {
+      Alert.alert(
+        t("postProduct.uploadErrorTitle", { defaultValue: "Photo Upload Failed" }),
+        t("postProduct.uploadErrorMsg", { defaultValue: "One or more photos failed to upload to Cloudinary. Please tap retry or remove them." })
+      );
+      return;
+    }
+
     const payload = {
       cropType: cropType.trim(),
       quantity: qtyNum,
@@ -403,7 +421,9 @@ export default function PostProductScreen({ navigation, route }) {
 
     setLoading(true);
     try {
-      const photoUrls = photos.map((p) => p.url || p.uri).filter(Boolean);
+      const photoUrls = photos
+        .map((p) => p.url)
+        .filter((u) => u && typeof u === "string" && (u.startsWith("http://") || u.startsWith("https://")));
       const res = await api.post(API_ENDPOINTS.products.create, { ...payload, photos: photoUrls });
       const createdProdId = res.data?.data?.product?._id;
 

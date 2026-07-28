@@ -3,6 +3,13 @@ import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
 import { getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedUnitName } from "../../constants/units";
+import {
+  getLocalizedWeredaName,
+  getLocalizedZoneName,
+  getLocalizedRegionName,
+} from "../../constants/locations";
+import { formatNumber } from "../../utils/formatNumber";
 
 export default function FarmerMarketOpportunityCard({
   cropName = "Red Onion",
@@ -12,7 +19,14 @@ export default function FarmerMarketOpportunityCard({
   onSellNow,
 }) {
   const { t, i18n } = useTranslation();
-  const localizedCrop = getLocalizedCropName(cropName, i18n.language, t);
+  const currentLang = i18n.language || "en";
+  const localizedCrop = getLocalizedCropName(cropName, currentLang, t);
+  const localizedHub =
+    getLocalizedWeredaName(targetHub, currentLang) ||
+    getLocalizedZoneName(targetHub, currentLang) ||
+    getLocalizedRegionName(targetHub, currentLang) ||
+    targetHub;
+  const localizedUnit = getLocalizedUnitName("q", currentLang, t);
 
   return (
     <View style={styles.card}>
@@ -24,7 +38,7 @@ export default function FarmerMarketOpportunityCard({
           <AppText style={styles.title}>{t("farmerDashboard.wholesaleDemandAlert", { defaultValue: "High Crop Wholesale Demand Alert" })}</AppText>
           <AppText style={styles.subtitle}>
             {t("farmerDashboard.wholesaleDemandFor", { defaultValue: "Wholesale demand for" })} <AppText style={styles.highlight}>{localizedCrop}</AppText> {t("farmerDashboard.isUp", { defaultValue: "is up" })}{" "}
-            <AppText style={styles.changeText}>{demandChange}</AppText> {t("farmerDashboard.inLocation", { defaultValue: "in" })} {targetHub}.
+            <AppText style={styles.changeText}>{demandChange}</AppText> {t("farmerDashboard.inLocation", { defaultValue: "in" })} {localizedHub}.
           </AppText>
         </View>
       </View>
@@ -32,7 +46,7 @@ export default function FarmerMarketOpportunityCard({
       <View style={styles.bottomRow}>
         <View>
           <AppText style={styles.priceLabel}>{t("farmerDashboard.suggestedPrice", { defaultValue: "Suggested Listing Price" })}</AppText>
-          <AppText style={styles.priceVal}>ETB {Number(suggestedPrice).toLocaleString("en-US")} / {t("units.q", { defaultValue: "q" })}</AppText>
+          <AppText style={styles.priceVal}>ETB {formatNumber(suggestedPrice)} / {localizedUnit}</AppText>
         </View>
 
         <TouchableOpacity style={styles.sellBtn} onPress={onSellNow} activeOpacity={0.85}>

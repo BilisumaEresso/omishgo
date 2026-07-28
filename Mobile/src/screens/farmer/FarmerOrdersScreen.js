@@ -23,6 +23,7 @@ import { useTheme } from "../../hooks/useTheme";
 import { getOrderStatusConfig } from "../../constants/statuses";
 import { getLocalizedCropName } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
+import { formatNumber } from "../../utils/formatNumber";
 
 export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
   const { t, i18n } = useTranslation();
@@ -142,7 +143,7 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <AppText style={[styles.priceText, { color: primary }]}>
-              ETB {Number(item.price).toLocaleString("en-US")}
+              ETB {formatNumber(item.price)}
             </AppText>
             <AppText style={styles.dateText}>{item.date}</AppText>
           </View>

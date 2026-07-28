@@ -41,10 +41,6 @@ const uploadService = {
       return { success: false, message: response.data?.message || "Upload failed" };
     } catch (error) {
       console.warn("Upload service error:", error?.response?.data || error.message);
-      // Fallback: If network/Cloudinary error occurs in local test env, return original uri
-      if (asset?.uri) {
-        return { success: true, url: asset.uri };
-      }
       const message =
         error?.response?.data?.message ||
         error.message ||

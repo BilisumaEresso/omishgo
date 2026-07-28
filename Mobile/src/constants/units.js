@@ -23,7 +23,7 @@ export const UNITS_LOCALIZED = {
   },
   om: {
     kg: "kg",
-    quintal: "quxinxalee (q)",
+    quintal: "kunt (q)",
     ton: "tooni (1000kg)",
     bag50: "torbaan (50kg)",
     bag100: "torbaan (100kg)",

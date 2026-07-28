@@ -11,6 +11,7 @@ import { API_ENDPOINTS } from "../../constants/api";
 import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
+import { formatNumber } from "../../utils/formatNumber";
 
 const LANGUAGES = [
   { code: "en", label: "English", native: "English" },
@@ -145,7 +146,7 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
           onPress={() => navigation?.navigate("MarketAnalytics")}
         >
           <AppText style={styles.statNumber}>
-            ETB {Number(totalRevenue).toLocaleString("en-US")}
+            ETB {formatNumber(totalRevenue)}
           </AppText>
           <AppText style={styles.statLabel}>{t("profile.totalSales", { defaultValue: "Total Sales" })}</AppText>
         </TouchableOpacity>

@@ -15,6 +15,14 @@ import AppText from "../../components/common/AppText";
 import DashboardLayout from "../../components/layout/DashBoardLayout";
 import { useTheme } from "../../hooks/useTheme";
 import { useNotificationStore } from "../../store/notification.store";
+import { getLocalizedCropName, CROP_TYPES } from "../../constants/crops";
+import { getLocalizedUnitName, UNITS } from "../../constants/units";
+import {
+  getLocalizedWeredaName,
+  getLocalizedZoneName,
+  getLocalizedRegionName,
+} from "../../constants/locations";
+import { formatNumber } from "../../utils/formatNumber";
 
 const TYPE_CONFIG = {
   new_message: { icon: "chatbubbles", color: "#2563EB", label: "Message" },
@@ -26,12 +34,91 @@ const TYPE_CONFIG = {
 };
 
 export default function NotificationsScreen({ navigation }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
   const { theme } = useTheme();
   const { notifications, unreadCount, fetchNotifications, markAsRead, markAllAsRead } =
     useNotificationStore();
 
   const [selectedNotif, setSelectedNotif] = useState(null);
+
+  const getTypeLabel = (typeKey) => {
+    switch (typeKey) {
+      case "new_message":
+        return t("notifications.typeMessage", { defaultValue: "Message" });
+      case "new_order":
+        return t("notifications.typeOrder", { defaultValue: "Order" });
+      case "order_update":
+        return t("notifications.typeOrderUpdate", { defaultValue: "Order Update" });
+      case "account_approved":
+        return t("notifications.typeAccountVerified", { defaultValue: "Account Verified" });
+      case "account_rejected":
+        return t("notifications.typeAccountAlert", { defaultValue: "Account Alert" });
+      default:
+        return t("notifications.typeSystem", { defaultValue: "System Notification" });
+    }
+  };
+
+  const localizeNotificationText = (text) => {
+    if (!text || typeof text !== "string") return text;
+    let result = text;
+
+    // Translate common backend notification messages
+    const lowerText = text.toLowerCase();
+    if (lowerText === "you have a new message" || lowerText === "new message") {
+      return t("notifications.newMessage", { defaultValue: text });
+    }
+    if (lowerText === "new order received") {
+      return t("notifications.newOrder", { defaultValue: text });
+    }
+    if (lowerText === "your order status has been updated" || lowerText === "order status update") {
+      return t("notifications.orderUpdate", { defaultValue: text });
+    }
+    if (lowerText === "account verified" || lowerText === "your account has been verified") {
+      return t("notifications.accountApproved", { defaultValue: text });
+    }
+    if (lowerText === "account alert") {
+      return t("notifications.accountAlert", { defaultValue: text });
+    }
+    if (lowerText === "system notification") {
+      return t("notifications.systemNotification", { defaultValue: text });
+    }
+
+    // Localize known crop names embedded in text
+    CROP_TYPES.forEach((crop) => {
+      if (result.includes(crop)) {
+        const localized = getLocalizedCropName(crop, currentLang, t);
+        if (localized && localized !== crop) {
+          result = result.replace(new RegExp(crop, "g"), localized);
+        }
+      }
+    });
+
+    // Localize units embedded in text
+    UNITS.forEach((unit) => {
+      const localized = getLocalizedUnitName(unit, currentLang, t);
+      if (localized && localized !== unit) {
+        result = result.replace(new RegExp(`\\b${unit}\\b`, "gi"), localized);
+      }
+    });
+
+    return result;
+  };
+
+  const formatNotifTime = (createdAt, fallbackTime) => {
+    if (!createdAt) return fallbackTime || "";
+    try {
+      const d = new Date(createdAt);
+      return d.toLocaleDateString(currentLang === "am" ? "am-ET" : currentLang === "om" ? "om-ET" : "en-GB", {
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch (e) {
+      return fallbackTime || "";
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -95,13 +182,13 @@ export default function NotificationsScreen({ navigation }) {
 
         <View style={styles.textBlock}>
           <AppText style={[styles.notifTitle, { color: textPrimary }]} numberOfLines={1}>
-            {item.title}
+            {localizeNotificationText(item.title)}
           </AppText>
           <AppText style={[styles.notifBody, { color: textSecondary }]} numberOfLines={2}>
-            {item.message || item.body}
+            {localizeNotificationText(item.message || item.body)}
           </AppText>
           <AppText style={styles.notifTime}>
-            {item.createdAt ? new Date(item.createdAt).toLocaleString() : item.time}
+            {formatNotifTime(item.createdAt, item.time)}
           </AppText>
         </View>
 
@@ -201,23 +288,21 @@ export default function NotificationsScreen({ navigation }) {
                       <View style={styles.modalTagRow}>
                         <View style={[styles.modalTag, { backgroundColor: config.color + "15" }]}>
                           <AppText style={[styles.modalTagText, { color: config.color }]}>
-                            {config.label}
+                            {getTypeLabel(selectedNotif.type)}
                           </AppText>
                         </View>
                       </View>
 
                       <AppText style={[styles.modalTitle, { color: textPrimary }]}>
-                        {selectedNotif.title}
+                        {localizeNotificationText(selectedNotif.title)}
                       </AppText>
 
                       <AppText style={[styles.modalBody, { color: textSecondary }]}>
-                        {selectedNotif.message || selectedNotif.body || t("notifications.noContent", { defaultValue: "No detailed content provided." })}
+                        {localizeNotificationText(selectedNotif.message || selectedNotif.body) || t("notifications.noContent", { defaultValue: "No detailed content provided." })}
                       </AppText>
 
                       <AppText style={styles.modalTime}>
-                        {selectedNotif.createdAt
-                          ? new Date(selectedNotif.createdAt).toLocaleString()
-                          : selectedNotif.time || t("notifications.justNow", { defaultValue: "Just now" })}
+                        {formatNotifTime(selectedNotif.createdAt, selectedNotif.time) || t("notifications.justNow", { defaultValue: "Just now" })}
                       </AppText>
 
                       <View style={styles.modalBtnRow}>

@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../common/AppText";
+import { formatNumber } from "../../utils/formatNumber";
 
 export default function BuyerSpendingChartWidget({
   monthlyData = [
@@ -67,7 +68,7 @@ export default function BuyerSpendingChartWidget({
                 {isSelected && (
                   <View style={styles.tooltipCallout}>
                     <AppText style={styles.tooltipText}>
-                      {currency} {item.amount.toLocaleString()}
+                      {currency} {formatNumber(item.amount)}
                     </AppText>
                     <View style={styles.tooltipArrow} />
                   </View>

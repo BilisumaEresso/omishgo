@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../common/AppText";
+import { formatNumber } from "../../utils/formatNumber";
 
 export default function FarmerProductsHeroCard({
   totalVolume = 0,
@@ -36,7 +37,7 @@ export default function FarmerProductsHeroCard({
         <View>
           <AppText style={styles.subLabel}>{t("farmerDashboard.estimatedValue", { defaultValue: "Estimated Total Inventory Value" })}</AppText>
           <AppText style={styles.subValue}>
-            {currency} {Number(totalValuation).toLocaleString("en-US")}
+            {currency} {formatNumber(totalValuation)}
           </AppText>
         </View>
       </View>
@@ -88,6 +89,9 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "900",
     letterSpacing: 0.5,
+    marginVertical: 6,
+    lineHeight: 36,
+    paddingBottom: 4,
   },
   unitText: {
     fontSize: 16,

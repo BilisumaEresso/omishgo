@@ -9,6 +9,7 @@ import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
+import { formatNumber } from "../../utils/formatNumber";
 
 const LANGUAGES = [
   { code: "en", label: "English", native: "English" },
@@ -116,7 +117,7 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
 
         <View style={[styles.statBox, { backgroundColor: "#D1FAE5" }]}>
           <AppText style={styles.statNumber}>
-            ETB {Number(totalSpent).toLocaleString("en-US")}
+            ETB {formatNumber(totalSpent)}
           </AppText>
           <AppText style={styles.statLabel}>{t("profile.totalSpend", { defaultValue: "Total Spend" })}</AppText>
         </View>

@@ -15,9 +15,18 @@ import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
+import { getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedUnitName } from "../../constants/units";
+import {
+  getLocalizedWeredaName,
+  getLocalizedZoneName,
+  getLocalizedRegionName,
+} from "../../constants/locations";
+import { formatNumber } from "../../utils/formatNumber";
 
 export default function FarmerAnalyticsScreen({ navigation }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
   const { theme } = useTheme();
   const { openSidebar } = useSidebar();
   const [data, setData] = useState(null);
@@ -51,22 +60,31 @@ export default function FarmerAnalyticsScreen({ navigation }) {
     { label: t("farmerOrders.pendingOrders", { defaultValue: "Pending Orders" }), value: data?.pending ?? 5, icon: "time-outline" },
   ];
 
+  const getLocalizedLocationName = (locStr) => {
+    if (!locStr) return "";
+    const loc =
+      getLocalizedWeredaName(locStr, currentLang) ||
+      getLocalizedZoneName(locStr, currentLang) ||
+      getLocalizedRegionName(locStr, currentLang);
+    return loc && loc !== locStr ? loc : locStr;
+  };
+
   // Market Prices in Quintal (q)
   const marketPrices = data?.marketPrices || [
-    { crop: "Red Onion", price: 4500, unit: "q", trend: "up", change: "+5.8%", market: "Adama Market" },
-    { crop: "White Teff", price: 5200, unit: "q", trend: "up", change: "+3.2%", market: "Debre Zeit" },
-    { crop: "Fresh Tomato", price: 3800, unit: "q", trend: "down", change: "-2.4%", market: "Ziway" },
-    { crop: "Garlic", price: 12000, unit: "q", trend: "up", change: "+8.5%", market: "Bishoftu" },
+    { crop: "Red Onion", price: 4500, unit: "q", trend: "up", change: "+5.8%", market: "Adama Town" },
+    { crop: "Teff", price: 5200, unit: "q", trend: "up", change: "+3.2%", market: "Bishoftu Town" },
+    { crop: "Tomato", price: 3800, unit: "q", trend: "down", change: "-2.4%", market: "Meki Town" },
+    { crop: "Garlic", price: 12000, unit: "q", trend: "up", change: "+8.5%", market: "Bishoftu Town" },
     { crop: "Wheat", price: 4100, unit: "q", trend: "neutral", change: "0.0%", market: "Arsi" },
-    { crop: "Coffee Beans", price: 9600, unit: "q", trend: "up", change: "+4.1%", market: "Harar" },
+    { crop: "Coffee", price: 9600, unit: "q", trend: "up", change: "+4.1%", market: "Jimma Town" },
   ];
 
   // Regional Buyer Demand Heatmap
   const locationDemand = data?.locationDemand || [
-    { city: "Addis Ababa", demandLevel: "high", demandScore: 94, topCrop: "White Teff", activeBuyers: 420 },
-    { city: "Adama Hub", demandLevel: "high", demandScore: 88, topCrop: "Red Onion", activeBuyers: 310 },
-    { city: "Harar Terminal", demandLevel: "high", demandScore: 82, topCrop: "Coffee Beans", activeBuyers: 185 },
-    { city: "Bishoftu", demandLevel: "medium", demandScore: 65, topCrop: "Garlic", activeBuyers: 140 },
+    { city: "Addis Ababa", demandLevel: "high", demandScore: 94, topCrop: "Teff", activeBuyers: 420 },
+    { city: "Adama Town", demandLevel: "high", demandScore: 88, topCrop: "Red Onion", activeBuyers: 310 },
+    { city: "Jimma Town", demandLevel: "high", demandScore: 82, topCrop: "Coffee", activeBuyers: 185 },
+    { city: "Bishoftu Town", demandLevel: "medium", demandScore: 65, topCrop: "Garlic", activeBuyers: 140 },
   ];
 
   const handleSellPress = (cropItem) => {
@@ -89,7 +107,7 @@ export default function FarmerAnalyticsScreen({ navigation }) {
     <View style={[styles.screen, { backgroundColor }]}>
       <AppHeader
         title={t("farmerAnalytics.title", { defaultValue: "Market Insights & Sales" })}
-        subtitle={t("analytics.subtitle", { defaultValue: "Wholesale market rates per quintal (100 kg)" })}
+        subtitle={t("analytics.subtitle", { unit: getLocalizedUnitName("q", currentLang, t), defaultValue: `Wholesale market rates per ${getLocalizedUnitName("q", currentLang, t)}` })}
         showMenu={true}
         onMenuPress={openSidebar}
         showNotification={true}
@@ -135,19 +153,23 @@ export default function FarmerAnalyticsScreen({ navigation }) {
             {marketPrices.map((item, idx) => {
               const isUp = item.trend === "up";
               const isDown = item.trend === "down";
+              const localizedCrop = getLocalizedCropName(item.crop, currentLang, t);
+              const localizedUnit = getLocalizedUnitName(item.unit || "q", currentLang, t);
+              const localizedMarket = getLocalizedLocationName(item.market);
+
               return (
                 <View
                   key={item.crop}
                   style={[styles.priceRow, idx < marketPrices.length - 1 && { borderBottomWidth: 1, borderBottomColor: border }]}
                 >
                   <View style={styles.priceLeft}>
-                    <AppText style={[styles.cropTitle, { color: textPrimary }]}>{item.crop}</AppText>
-                    <AppText style={[styles.marketName, { color: textMuted }]}>{item.market}</AppText>
+                    <AppText style={[styles.cropTitle, { color: textPrimary }]}>{localizedCrop}</AppText>
+                    <AppText style={[styles.marketName, { color: textMuted }]}>{localizedMarket}</AppText>
                   </View>
 
                   <View style={styles.priceCenter}>
                     <AppText style={[styles.priceText, { color: textPrimary }]}>
-                      ETB {item.price.toLocaleString()} / q
+                      ETB {formatNumber(item.price)} / {localizedUnit}
                     </AppText>
                     <View style={styles.trendPillRow}>
                       <Ionicons
@@ -185,12 +207,15 @@ export default function FarmerAnalyticsScreen({ navigation }) {
           <View style={styles.locationGrid}>
             {locationDemand.map((loc) => {
               const badgeColor = getDemandColor(loc.demandLevel);
+              const localizedCity = getLocalizedLocationName(loc.city);
+              const localizedTopCrop = getLocalizedCropName(loc.topCrop, currentLang, t);
+
               return (
                 <View key={loc.city} style={[styles.locationCard, { backgroundColor: surfaceColor, borderColor: border }]}>
                   <View style={styles.locationTopRow}>
                     <View style={styles.cityRow}>
                       <Ionicons name="location-outline" size={16} color={primaryColor} />
-                      <AppText style={[styles.cityName, { color: textPrimary }]}>{loc.city}</AppText>
+                      <AppText style={[styles.cityName, { color: textPrimary }]}>{localizedCity}</AppText>
                     </View>
                     <View style={[styles.demandBadge, { backgroundColor: badgeColor + "18" }]}>
                       <AppText style={[styles.demandText, { color: badgeColor }]}>
@@ -204,7 +229,7 @@ export default function FarmerAnalyticsScreen({ navigation }) {
                   </View>
 
                   <View style={styles.locationFooterRow}>
-                    <AppText style={styles.topCropText}>{t("analytics.topWanted", { defaultValue: "Top Wanted" })}: {loc.topCrop}</AppText>
+                    <AppText style={styles.topCropText}>{t("analytics.topWanted", { defaultValue: "Top Wanted" })}: {localizedTopCrop}</AppText>
                     <AppText style={styles.buyersCountText}>{t("analytics.buyersCount", { count: loc.activeBuyers, defaultValue: `${loc.activeBuyers} Buyers` })}</AppText>
                   </View>
 
@@ -235,18 +260,20 @@ export default function FarmerAnalyticsScreen({ navigation }) {
               <View style={styles.advisoryTop}>
                 <Ionicons name="bulb-outline" size={20} color={primaryColor} />
                 <AppText style={[styles.advisoryTitle, { color: textPrimary }]}>
-                  {t("farmerAnalytics.advisoryOnionTitle", "Onion Price Rise in Adama")}
+                  {t("farmerAnalytics.advisoryOnionTitle", { crop: getLocalizedCropName("Red Onion", currentLang, t), location: getLocalizedLocationName("Adama Town"), defaultValue: `${getLocalizedCropName("Red Onion", currentLang, t)} Price Rise in ${getLocalizedLocationName("Adama Town")}` })}
                 </AppText>
               </View>
               <AppText style={[styles.advisoryBody, { color: textSecondary }]}>
-                {t("farmerAnalytics.advisoryOnionBody", "Wholesale onion prices are up +5.8% (ETB 4,500 / quintal) in East Shewa. Post your harvest today to secure good prices.")}
+                {t("farmerAnalytics.advisoryOnionBody", { crop: getLocalizedCropName("Red Onion", currentLang, t), unit: getLocalizedUnitName("q", currentLang, t), location: getLocalizedLocationName("Adama Town"), defaultValue: `Wholesale ${getLocalizedCropName("Red Onion", currentLang, t)} prices are up +5.8% (ETB 4,500 / ${getLocalizedUnitName("q", currentLang, t)}) in ${getLocalizedLocationName("Adama Town")}. Post your harvest today to secure good prices.` })}
               </AppText>
               <TouchableOpacity
                 style={[styles.advisoryActionBtn, { backgroundColor: primaryColor }]}
                 onPress={() => navigation?.navigate("PostProduct", { prefill: { cropType: "Red Onion", price: 4500, unit: "q" } })}
                 activeOpacity={0.85}
               >
-                <AppText style={styles.advisoryActionText}>{t("farmerAnalytics.postOnionListing", { defaultValue: "Post Onion Listing →" })}</AppText>
+                <AppText style={styles.advisoryActionText}>
+                  {t("farmerAnalytics.postCropListing", { crop: getLocalizedCropName("Red Onion", currentLang, t), defaultValue: `Post ${getLocalizedCropName("Red Onion", currentLang, t)} Listing →` })}
+                </AppText>
               </TouchableOpacity>
             </View>
 
@@ -254,18 +281,20 @@ export default function FarmerAnalyticsScreen({ navigation }) {
               <View style={styles.advisoryTop}>
                 <Ionicons name="location-outline" size={20} color="#D97706" />
                 <AppText style={[styles.advisoryTitle, { color: "#78350F" }]}>
-                  {t("farmerAnalytics.advisoryCoffeeTitle", "High Demand for Coffee in Harar")}
+                  {t("farmerAnalytics.advisoryCoffeeTitle", { crop: getLocalizedCropName("Coffee", currentLang, t), location: getLocalizedLocationName("Jimma Town"), defaultValue: `High Demand for ${getLocalizedCropName("Coffee", currentLang, t)} in ${getLocalizedLocationName("Jimma Town")}` })}
                 </AppText>
               </View>
               <AppText style={[styles.advisoryBody, { color: "#92400E" }]}>
-                {t("farmerAnalytics.advisoryCoffeeBody", "185 buyers are searching for Coffee Beans in Harar. List your stock to get instant buyer orders.")}
+                {t("farmerAnalytics.advisoryCoffeeBody", { crop: getLocalizedCropName("Coffee", currentLang, t), location: getLocalizedLocationName("Jimma Town"), defaultValue: `185 buyers are searching for ${getLocalizedCropName("Coffee", currentLang, t)} in ${getLocalizedLocationName("Jimma Town")}. List your stock to get instant buyer orders.` })}
               </AppText>
               <TouchableOpacity
                 style={[styles.advisoryActionBtn, { backgroundColor: "#D97706" }]}
-                onPress={() => navigation?.navigate("PostProduct", { prefill: { cropType: "Coffee Beans", price: 9600, unit: "q" } })}
+                onPress={() => navigation?.navigate("PostProduct", { prefill: { cropType: "Coffee", price: 9600, unit: "q" } })}
                 activeOpacity={0.85}
               >
-                <AppText style={styles.advisoryActionText}>{t("farmerAnalytics.postCoffeeListing", { defaultValue: "Post Coffee Listing →" })}</AppText>
+                <AppText style={styles.advisoryActionText}>
+                  {t("farmerAnalytics.postCropListing", { crop: getLocalizedCropName("Coffee", currentLang, t), defaultValue: `Post ${getLocalizedCropName("Coffee", currentLang, t)} Listing →` })}
+                </AppText>
               </TouchableOpacity>
             </View>
           </View>

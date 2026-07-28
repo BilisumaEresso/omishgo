@@ -22,6 +22,7 @@ import { getLocalizedUnitName } from "../../constants/units";
 
 import { useTheme } from "../../hooks/useTheme";
 import { API_ENDPOINTS } from "../../constants/api";
+import { formatNumber } from "../../utils/formatNumber";
 
 export default function BuyerOrdersScreen({ navigation, onSwitchTab }) {
   const { t, i18n } = useTranslation();
@@ -229,7 +230,7 @@ export default function BuyerOrdersScreen({ navigation, onSwitchTab }) {
                   </View>
                   <View style={{ alignItems: "flex-end" }}>
                     <AppText style={[styles.priceText, { color: primaryColor }]}>
-                      ETB {Number(item.totalPrice).toLocaleString()}
+                      ETB {formatNumber(item.totalPrice)}
                     </AppText>
                     <AppText style={styles.dateText}>{item.orderedDate}</AppText>
                   </View>

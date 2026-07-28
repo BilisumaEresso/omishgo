@@ -92,7 +92,9 @@ const styles = StyleSheet.create({
   metricValue: {
     fontSize: 24,
     fontWeight: "900",
-    marginBottom: 2,
+    marginVertical: 6,
+    lineHeight: 30,
+    paddingBottom: 2,
   },
   metricLabel: {
     fontSize: 12,

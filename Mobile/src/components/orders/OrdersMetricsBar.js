@@ -60,6 +60,9 @@ const styles = StyleSheet.create({
   val: {
     fontSize: 18,
     fontWeight: "900",
+    marginVertical: 6,
+    lineHeight: 24,
+    paddingBottom: 2,
   },
   label: {
     fontSize: 11,

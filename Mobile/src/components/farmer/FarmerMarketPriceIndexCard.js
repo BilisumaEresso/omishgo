@@ -3,6 +3,12 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
 import { getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedUnitName } from "../../constants/units";
+import {
+  getLocalizedWeredaName,
+  getLocalizedZoneName,
+  getLocalizedRegionName,
+} from "../../constants/locations";
 
 export default function FarmerMarketPriceIndexCard({
   trends = [],
@@ -43,6 +49,11 @@ export default function FarmerMarketPriceIndexCard({
           const isLast = idx === list.length - 1;
           const isUp = item.isUp ?? !item.demandChange?.includes("-");
           const cropName = getLocalizedCropName(item.crop, currentLang, t);
+          const localizedRegion =
+            getLocalizedWeredaName(item.region, currentLang) ||
+            getLocalizedZoneName(item.region, currentLang) ||
+            getLocalizedRegionName(item.region, currentLang) ||
+            item.region;
 
           return (
             <View key={item.crop + idx} style={[styles.row, !isLast && styles.rowBorder]}>
@@ -58,7 +69,7 @@ export default function FarmerMarketPriceIndexCard({
                 </View>
 
                 <AppText style={styles.regionText}>
-                  {t("farmerDashboard.marketHub", { defaultValue: "Market Hub:" })} <AppText style={styles.regionVal}>{item.region || t("common.unknownLocation", { defaultValue: "Location Not Provided" })}</AppText>
+                  {t("farmerDashboard.marketHub", { defaultValue: "Market Hub:" })} <AppText style={styles.regionVal}>{localizedRegion || t("common.unknownLocation", { defaultValue: "Location Not Provided" })}</AppText>
                 </AppText>
               </View>
 

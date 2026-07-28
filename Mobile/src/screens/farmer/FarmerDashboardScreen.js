@@ -18,6 +18,13 @@ import { API_ENDPOINTS } from "../../constants/api";
 import { useSidebar } from "../../context/SidebarContext";
 import draftsService from "../../services/drafts.service";
 import { useAuthStore } from "../../store/auth.store";
+import { getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedUnitName } from "../../constants/units";
+import {
+  getLocalizedWeredaName,
+  getLocalizedZoneName,
+  getLocalizedRegionName,
+} from "../../constants/locations";
 
 const mockProductsFallback = [
   { id: "p1", name: "100q White Teff", price: 5200, category: "White Teff", quantity: 100, unit: "q" },
@@ -26,12 +33,13 @@ const mockProductsFallback = [
 
 const marketTrends = [
   { crop: "Red Onion", region: "Addis Ababa", price: "4,500 ETB/q", demandChange: "+15%", isUp: true },
-  { crop: "White Teff", region: "Regional Hub", price: "5,200 ETB/q", demandChange: "+8%", isUp: true },
-  { crop: "Tomato", region: "Adama", price: "3,800 ETB/q", demandChange: "-2%", isUp: false },
+  { crop: "Teff", region: "Bishoftu Town", price: "5,200 ETB/q", demandChange: "+8%", isUp: true },
+  { crop: "Tomato", region: "Adama Town", price: "3,800 ETB/q", demandChange: "-2%", isUp: false },
 ];
 
 export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
   const user = useAuthStore((state) => state.user);
   const { openSidebar } = useSidebar();
 
@@ -68,7 +76,16 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
             category: p.cropType || p.category,
             quantity: p.quantity,
             unit: p.unit || "q",
-            location: [p.location?.wereda, p.location?.zone, p.location?.region].filter(Boolean).join(", ") || t("common.unknownLocation", { defaultValue: "Location Not Provided" }),
+            locationObj: p.location || null,
+            location: p.location
+              ? [
+                  getLocalizedWeredaName(p.location.wereda, currentLang),
+                  getLocalizedZoneName(p.location.zone, currentLang),
+                  getLocalizedRegionName(p.location.region, currentLang),
+                ]
+                  .filter(Boolean)
+                  .join(", ")
+              : t("common.unknownLocation", { defaultValue: "Location Not Provided" }),
             farmerName: user?.name || t("farmerDashboard.defaultFarmerName", { defaultValue: "Farmer" }),
             photos: p.photos || [],
           }))

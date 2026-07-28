@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../common/AppText";
+import { formatNumber } from "../../utils/formatNumber";
 
 export default function BuyerProcurementMetrics({
   totalSpend = 0,
@@ -14,10 +15,7 @@ export default function BuyerProcurementMetrics({
   onFarmersPress,
 }) {
   const { t } = useTranslation();
-  const formattedSpend = Number(totalSpend || 0).toLocaleString("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
+  const formattedSpend = formatNumber(totalSpend || 0);
 
   return (
     <View style={styles.container}>
@@ -78,7 +76,7 @@ export default function BuyerProcurementMetrics({
 
           <View>
             <AppText style={styles.amount}>
-              {t("buyerDashboard.farmersCount", { count: uniqueFarmersCount, defaultValue: `${uniqueFarmersCount} Farmers` })}
+              {t("buyerDashboard.farmersCount", { count: uniqueFarmersCount, defaultValue: "{{count}} Farmers" })}
             </AppText>
             <AppText style={styles.label}>
               {t("buyerDashboard.verified", { defaultValue: "Verified" })}
@@ -144,6 +142,8 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: "#0F172A",
     marginTop: 8,
+    lineHeight: 22,
+    paddingBottom: 2,
   },
   label: {
     fontSize: 11,

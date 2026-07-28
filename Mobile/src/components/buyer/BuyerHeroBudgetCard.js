@@ -3,6 +3,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
+import { formatNumber } from "../../utils/formatNumber";
 
 export default function BuyerHeroBudgetCard({
   totalSpend = 0,
@@ -12,18 +13,8 @@ export default function BuyerHeroBudgetCard({
 }) {
   const { t } = useTranslation();
 
-  const formattedSpend = Number(totalSpend || 0).toLocaleString("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  });
-
-  const formattedBudget = Number(monthlyBudget || 50000).toLocaleString(
-    "en-US",
-    {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }
-  );
+  const formattedSpend = formatNumber(totalSpend || 0, 2);
+  const formattedBudget = formatNumber(monthlyBudget || 50000, 2);
 
   const progressPercent = Math.min(
     100,
@@ -164,7 +155,10 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: "#FFFFFF",
     letterSpacing: -0.5,
+    marginTop: 6,
     marginBottom: 14,
+    lineHeight: 36,
+    paddingBottom: 4,
   },
   seeDetailsBtn: {
     flexDirection: "row",
@@ -204,6 +198,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "800",
     color: "#FFFFFF",
+    lineHeight: 26,
+    paddingBottom: 2,
   },
   progressTrack: {
     height: 6,

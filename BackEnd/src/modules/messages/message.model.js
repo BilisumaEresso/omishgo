@@ -1,5 +1,18 @@
 import mongoose from "mongoose";
 
+const sourcingRequestSchema = new mongoose.Schema(
+  {
+    sourcingRequestId: { type: mongoose.Schema.Types.ObjectId, ref: "SourcingRequest" },
+    cropType: String,
+    quantity: Number,
+    unit: { type: String, default: "q" },
+    targetPrice: Number,
+    deliveryRegion: String,
+    status: { type: String, enum: ["pending", "accepted", "rejected", "matched_listing"], default: "pending" },
+  },
+  { _id: false }
+);
+
 const messageSchema = new mongoose.Schema(
   {
     senderId: {
@@ -22,13 +35,8 @@ const messageSchema = new mongoose.Schema(
       default: false,
     },
     sourcingRequestData: {
-      sourcingRequestId: { type: mongoose.Schema.Types.ObjectId, ref: "SourcingRequest" },
-      cropType: String,
-      quantity: Number,
-      unit: { type: String, default: "q" },
-      targetPrice: Number,
-      deliveryRegion: String,
-      status: { type: String, enum: ["pending", "accepted", "rejected", "matched_listing"], default: "pending" },
+      type: sourcingRequestSchema,
+      default: undefined,
     },
   },
   {

@@ -19,11 +19,19 @@ import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 import { useSavedStore } from "../../store/saved.store";
+import { formatNumber } from "../../utils/formatNumber";
 
 export default function ListingDetailScreen({ route, navigation }) {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { product } = route.params || {};
+
+  const rawId = product?.customId || product?._id || product?.id || "";
+  const shortId = rawId.startsWith("PRD-")
+    ? rawId
+    : rawId
+    ? `PRD-${rawId.substring(rawId.length - 6).toUpperCase()}`
+    : "PRD";
 
   const isSaved = useSavedStore((s) => s.isSaved(product?._id || product?.id));
   const toggleSave = useSavedStore((s) => s.toggleSave);
@@ -155,9 +163,12 @@ export default function ListingDetailScreen({ route, navigation }) {
         {/* Crop Title Row */}
         <View style={styles.topTitleRow}>
           <View style={{ flex: 1 }}>
-            <AppText style={[styles.cropTitle, { color: textPrimary }]}>
-              {product.cropType}
-            </AppText>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <AppText style={[styles.cropTitle, { color: textPrimary }]}>
+                {product.cropType}
+              </AppText>
+              <AppText style={styles.refText}>#{shortId}</AppText>
+            </View>
             <AppText style={styles.cropCategory}>
               {t("listingDetail.freshProduce", { defaultValue: "Fresh Wholesale Agricultural Produce" })}
             </AppText>
@@ -181,7 +192,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           <View>
             <AppText style={styles.priceLabel}>{t("listingDetail.unitRate", { defaultValue: "Wholesale Unit Rate" })}</AppText>
             <AppText style={styles.priceAmount}>
-              ETB {Number(product.price).toLocaleString()}{" "}
+              ETB {formatNumber(product.price)}{" "}
               <AppText style={styles.priceUnit}>/ {unit}</AppText>
             </AppText>
           </View>
@@ -205,7 +216,7 @@ export default function ListingDetailScreen({ route, navigation }) {
             <View style={styles.insightBox}>
               <AppText style={styles.insightLabel}>{t("listingDetail.regionalAvg", { defaultValue: "Regional Avg" })}</AppText>
               <AppText style={[styles.insightValue, { color: primaryColor }]}>
-                ETB {avgMarketPrice.toLocaleString()} / {unit}
+                ETB {formatNumber(avgMarketPrice)} / {unit}
               </AppText>
             </View>
             <View style={styles.insightBox}>
@@ -342,7 +353,7 @@ export default function ListingDetailScreen({ route, navigation }) {
               <View style={styles.totalBox}>
                 <AppText style={styles.totalLabel}>{t("listingDetail.estimatedTotalAmount", "Estimated Total Amount:")}</AppText>
                 <AppText style={[styles.totalAmount, { color: primaryColor }]}>
-                  ETB {(parseFloat(buyQty) * product.price).toLocaleString()}
+                  ETB {formatNumber(parseFloat(buyQty) * product.price)}
                 </AppText>
               </View>
             ) : null}
@@ -410,10 +421,20 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 12,
   },
-  backBtnText: {
+  seeAllBtnText: {
     color: "#FFFFFF",
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: "800",
+  },
+  refText: {
+    fontSize: 11.5,
+    fontWeight: "800",
+    color: "#64748B",
+    backgroundColor: "#F1F5F9",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    overflow: "hidden",
   },
   topTitleRow: {
     flexDirection: "row",

@@ -1070,7 +1070,13 @@
   "notifications": {
     "allCaughtUp": "You are all caught up. New alerts will appear here.",
     "noContent": "No detailed content provided.",
-    "justNow": "Just now"
+    "justNow": "Just now",
+    "newMessage": "You have a new message",
+    "newOrder": "New order received",
+    "orderUpdate": "Your order status has been updated",
+    "accountApproved": "Your account has been verified",
+    "accountAlert": "Account alert",
+    "systemNotification": "System notification"
   },
   "locations": {
     "addisAbaba": "Addis Ababa",

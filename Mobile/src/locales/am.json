@@ -268,6 +268,8 @@
     "retry": "እንደገና ይሞክሩ",
     "emptyNoOrders": "እስካሁን ምንም ትዕዛዝ አልሰጡም",
     "emptyNoFilterOrders": "ምንም {{filter}} ትዕዛዞች የሉም",
+    "messageFarmer": "ለአርሶ አደሩ መልእክት ላክ",
+    "browseMarketplace": "ገበያውን ይመልከቱ",
     "filterAllCount": "ሁሉም ({{count}})",
     "filterPendingCount": "በመጠባበቅ ላይ ({{count}})",
     "filterInTransitCount": "በጉዞ ላይ ({{count}})",
@@ -1070,7 +1072,13 @@
   "notifications": {
     "allCaughtUp": "ሁሉንም አይተዋል። አዲስ ማስታወቂያዎች እዚህ ይታያሉ።",
     "noContent": "ዝርዝር ይዘት አልቀረበም።",
-    "justNow": "አሁን"
+    "justNow": "አሁን",
+    "newMessage": "አዲስ መልዕክት አለዎት",
+    "newOrder": "አዲስ ትዕዛዝ ደርሷል",
+    "orderUpdate": "የትዕዛዝዎ ሁኔታ ተሻሽሏል",
+    "accountApproved": "መለያዎ ተረጋግጧል",
+    "accountAlert": "የመለያ ማሳሰቢያ",
+    "systemNotification": "የስርዓት ማሳወቂያ"
   },
   "locations": {
     "addisAbaba": "አዲስ አበባ",

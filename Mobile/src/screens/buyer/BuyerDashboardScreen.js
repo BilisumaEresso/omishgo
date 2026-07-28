@@ -23,6 +23,8 @@ import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 import { useTranslation } from "react-i18next";
 import { CROP_TYPES, getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedUnitName, UNITS } from "../../constants/units";
+import { getLocalizedWeredaName, getLocalizedZoneName, getLocalizedRegionName } from "../../constants/locations";
 import { useAuthStore } from "../../store/auth.store";
 
 const CATEGORIES = ["All", "Vegetables", ...CROP_TYPES];
@@ -30,7 +32,8 @@ const CATEGORIES = ["All", "Vegetables", ...CROP_TYPES];
 export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
   const { theme } = useTheme();
   const user = useAuthStore((state) => state.user);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
   const { openSidebar } = useSidebar();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -58,20 +61,29 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
       // 1. Fetch products
       const prodRes = await api.get(API_ENDPOINTS.products.list);
       const fetchedProds = prodRes.data?.data?.products || [];
-      const formattedProds = fetchedProds.map((p) => ({
-        _id: p._id,
-        cropType: p.cropType || p.category || t("buyerDashboard.defaultProduce", { defaultValue: "Produce" }),
-        quantity: p.quantity ?? 0,
-        unit: p.unit || "kg",
-        price: p.price,
-        category: p.cropType || p.category,
-        farmerId: p.farmerId || { _id: p.farmerId, name: t("buyerDashboard.defaultFarmer", { defaultValue: "Farmer" }) },
-        location: p.location || {},
-        photos: p.photos || [],
-        status: p.status || "active",
-        createdAt: p.createdAt,
-        description: p.description,
-      }));
+      const formattedProds = fetchedProds.map((p) => {
+        const rawCrop = p.cropType || p.category || t("buyerDashboard.defaultProduce", { defaultValue: "Produce" });
+        const rawUnit = p.unit || "kg";
+        return {
+          _id: p._id,
+          cropType: getLocalizedCropName(rawCrop, currentLang, t),
+          quantity: p.quantity ?? 0,
+          unit: getLocalizedUnitName(rawUnit, currentLang, t),
+          price: p.price,
+          category: p.cropType || p.category,
+          farmerId: p.farmerId || { _id: p.farmerId, name: t("buyerDashboard.defaultFarmer", { defaultValue: "Farmer" }) },
+          location: {
+            ...p.location,
+            region: getLocalizedRegionName(p.location?.region, currentLang),
+            zone: getLocalizedZoneName(p.location?.zone, currentLang),
+            wereda: getLocalizedWeredaName(p.location?.wereda, currentLang),
+          },
+          photos: p.photos || [],
+          status: p.status || "active",
+          createdAt: p.createdAt,
+          description: p.description,
+        };
+      });
       setProducts(formattedProds);
 
       // Derive nearby farmers from real products
@@ -184,7 +196,8 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
     const catMap = {};
     orders.forEach((o) => {
       const cat = o.cropType || o.category || t("buyerDashboard.generalProduce", { defaultValue: "General Produce" });
-      catMap[cat] = (catMap[cat] || 0) + (Number(o.totalPrice || o.price) || 0);
+      const localizedCat = getLocalizedCropName(cat, currentLang, t);
+      catMap[localizedCat] = (catMap[localizedCat] || 0) + (Number(o.totalPrice || o.price) || 0);
     });
     const colorPairs = [
       { bgColor: "#E0F2FE", iconColor: "#0284C7", icon: "leaf" },

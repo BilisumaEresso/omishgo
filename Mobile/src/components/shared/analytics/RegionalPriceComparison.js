@@ -37,7 +37,7 @@ export default function RegionalPriceComparison({
           <AppText style={styles.title}>{t("analytics.regionalHubs", { defaultValue: "Ethiopian Regional Market Hubs" })}</AppText>
           <View style={styles.hubsBadge}>
             <Ionicons name="earth" size={13} color={primaryColor} />
-            <AppText style={[styles.hubsBadgeText, { color: primaryColor }]}>{t("analytics.keyHubs", { defaultValue: "5 Key Hubs" })}</AppText>
+            <AppText style={[styles.hubsBadgeText, { color: primaryColor }]}>{t("analytics.regionalHubsCount", { count: hubs.length, defaultValue: "{{count}} Regional Hubs" })}</AppText>
           </View>
         </View>
         <AppText style={styles.subtitle}>
