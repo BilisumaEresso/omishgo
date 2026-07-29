@@ -47,11 +47,12 @@ const AuthLayout = ({
   const surface = theme?.colors?.surface || "#FFFFFF";
   const border = theme?.colors?.border || "#E2E8F0";
 
-  const currentLang = i18n.language || "en";
+  const currentLang = (i18n.language || "en").split("-")[0].split("_")[0];
 
   const handleSelectLang = async (code) => {
     try {
       await setLanguage(code);
+      await i18n.changeLanguage(code);
     } catch (_) {}
     setLangOpen(false);
   };
@@ -63,7 +64,7 @@ const AuthLayout = ({
     >
       <StatusBar barStyle="dark-content" />
 
-      {/* Top Header Bar with Language Switcher */}
+      {/* Top Header Bar */}
       <View
         style={[
           styles.topBar,
@@ -85,11 +86,9 @@ const AuthLayout = ({
           </TouchableOpacity>
         ) : (
           <View style={styles.brandRow}>
-            <View style={[styles.brandIconBg, { backgroundColor: primary + "15" }]}>
-              <Ionicons name="leaf" size={18} color={primary} />
-            </View>
-            <AppText style={styles.brandTitle}>
+            <AppText style={[styles.brandTitle, { color: textPrimary }]}>
               Omish<AppText style={{ color: primary, fontWeight: "900" }}>Go</AppText>
+              <AppText style={{ color: primary, fontWeight: "900" }}>.</AppText>
             </AppText>
           </View>
         )}
@@ -102,7 +101,7 @@ const AuthLayout = ({
             activeOpacity={0.8}
           >
             <Ionicons name="globe-outline" size={15} color={primary} />
-            <AppText style={styles.langPillText}>
+            <AppText style={[styles.langPillText, { color: textPrimary }]}>
               {LANG_ITEMS.find((l) => l.code === currentLang)?.label || "EN"}
             </AppText>
             <Ionicons
@@ -126,7 +125,8 @@ const AuthLayout = ({
                   <AppText
                     style={[
                       styles.langOptionText,
-                      item.code === currentLang && { color: primary, fontWeight: "800" },
+                      { color: item.code === currentLang ? primary : textPrimary },
+                      item.code === currentLang && { fontWeight: "800" },
                     ]}
                   >
                     {item.full}
@@ -146,7 +146,7 @@ const AuthLayout = ({
           styles.scrollContent,
           {
             paddingBottom: insets.bottom + 32,
-            paddingHorizontal: 24,
+            paddingHorizontal: 20,
           },
         ]}
         keyboardShouldPersistTaps="handled"
@@ -155,28 +155,33 @@ const AuthLayout = ({
         {/* Logo / Brand emblem */}
         <View style={styles.logoWrapper}>
           {logoSource ? (
-            <Image source={logoSource} style={styles.logoImage} resizeMode="contain" />
+            <View style={[styles.logoCard, { backgroundColor: surface, borderColor: border }]}>
+              <Image source={logoSource} style={[styles.logoImage, logoStyle]} resizeMode="contain" />
+            </View>
           ) : (
-            <View style={[styles.brandEmblem, { borderColor: primary }]}>
-              <Ionicons name="leaf" size={42} color={primary} />
+            <View style={[styles.brandEmblem, { backgroundColor: primary + "12", borderColor: primary + "30" }]}>
+              <Ionicons name="leaf" size={38} color={primary} />
             </View>
           )}
         </View>
 
         {/* Title & Subtitle */}
         {title && (
-          <AppText variant="headingLg" style={[styles.title, { color: textPrimary }]}>
+          <AppText style={[styles.title, { color: textPrimary }, titleStyle]}>
             {title}
           </AppText>
         )}
 
         {subtitle && (
-          <AppText variant="bodyMd" style={[styles.subtitle, { color: textSecondary }]}>
+          <AppText style={[styles.subtitle, { color: textSecondary }]}>
             {subtitle}
           </AppText>
         )}
 
-        <View style={styles.formContainer}>{children}</View>
+        {/* Card Container for Form Content */}
+        <View style={[styles.formCard, { backgroundColor: surface, borderColor: border }]}>
+          {children}
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -191,111 +196,130 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
-    paddingBottom: 10,
+    paddingBottom: 12,
     zIndex: 50,
   },
   brandRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-  },
-  brandIconBg: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
   },
   brandTitle: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: "800",
-    color: "#0F172A",
+    letterSpacing: -0.5,
   },
   backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 2,
   },
   langPill: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 16,
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 20,
     borderWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 2,
   },
   langPillText: {
-    fontSize: 12,
+    fontSize: 12.5,
     fontWeight: "700",
-    color: "#334155",
   },
   langDropdown: {
     position: "absolute",
-    top: 38,
+    top: 42,
     right: 0,
-    width: 120,
-    borderRadius: 14,
+    width: 130,
+    borderRadius: 16,
     borderWidth: 1,
-    padding: 4,
+    padding: 6,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 10,
   },
   langOption: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
     borderRadius: 10,
   },
   langOptionText: {
-    fontSize: 12,
-    color: "#334155",
+    fontSize: 13,
     fontWeight: "600",
   },
   scrollContent: {
     flexGrow: 1,
     justifyContent: "center",
-    paddingTop: 12,
+    paddingTop: 8,
   },
   logoWrapper: {
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: 18,
+  },
+  logoCard: {
+    padding: 12,
+    borderRadius: 24,
+    borderWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 4,
   },
   brandEmblem: {
-    width: 80,
-    height: 80,
+    width: 76,
+    height: 76,
     borderRadius: 24,
-    borderWidth: 2.5,
+    borderWidth: 1.5,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "transparent",
   },
   logoImage: {
-    width: 150,
-    height: 150,
+    width: 120,
+    height: 120,
   },
   title: {
     textAlign: "center",
     fontWeight: "800",
     marginBottom: 6,
     fontSize: 24,
+    letterSpacing: -0.4,
   },
   subtitle: {
     textAlign: "center",
     marginBottom: 24,
-    lineHeight: 22,
-    fontSize: 14,
+    lineHeight: 20,
+    fontSize: 13.5,
+    alignSelf: "center",
   },
-  formContainer: {
+  formCard: {
     width: "100%",
+    borderRadius: 24,
+    padding: 20,
+    borderWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 4,
   },
 });
 

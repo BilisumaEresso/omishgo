@@ -1287,19 +1287,26 @@ export const ZONE_TRANSLATIONS = {
 };
 
 
+const normalizeLang = (lang) => {
+  if (!lang) return "en";
+  const code = String(lang).split("-")[0].split("_")[0].toLowerCase();
+  return ["en", "am", "om"].includes(code) ? code : "en";
+};
+
 export const getLocalizedRegions = (lang = "en") => {
-  const labels = REGIONS_LOCALIZED[lang] || REGIONS_LOCALIZED.en;
+  const code = normalizeLang(lang);
+  const labels = REGIONS_LOCALIZED[code] || REGIONS_LOCALIZED.en;
   return REGIONS.map((region) => ({
     value: region,
     label: labels[region] || region,
   }));
 };
 
-
 export const getLocalizedZones = (region, lang = "en") => {
+  const code = normalizeLang(lang);
   const zones = getZonesByRegion(region);
-  if (lang === "en") return zones.map((z) => ({ value: z, label: z }));
-  const dict = ZONE_TRANSLATIONS[lang] || {};
+  if (code === "en") return zones.map((z) => ({ value: z, label: z }));
+  const dict = ZONE_TRANSLATIONS[code] || {};
   return zones.map((z) => ({ value: z, label: dict[z] || z }));
 };
 
@@ -1414,26 +1421,30 @@ export const WEREDA_TRANSLATIONS = {
 };
 
 export const getLocalizedWereda = (region, zone, lang = "en") => {
+  const code = normalizeLang(lang);
   const weredas = getWeredaByZone(region, zone);
-  if (lang === "en") return weredas.map((w) => ({ value: w, label: w }));
-  const dict = WEREDA_TRANSLATIONS[lang] || {};
+  if (code === "en") return weredas.map((w) => ({ value: w, label: w }));
+  const dict = WEREDA_TRANSLATIONS[code] || {};
   return weredas.map((w) => ({ value: w, label: dict[w] || w }));
 };
 
 export const getLocalizedRegionName = (region, lang = "en") => {
   if (!region) return "";
-  if (lang === "en") return region;
-  return REGIONS_LOCALIZED[lang]?.[region] || region;
+  const code = normalizeLang(lang);
+  if (code === "en") return region;
+  return REGIONS_LOCALIZED[code]?.[region] || region;
 };
 
 export const getLocalizedZoneName = (zone, lang = "en") => {
   if (!zone) return "";
-  if (lang === "en") return zone;
-  return ZONE_TRANSLATIONS[lang]?.[zone] || zone;
+  const code = normalizeLang(lang);
+  if (code === "en") return zone;
+  return ZONE_TRANSLATIONS[code]?.[zone] || zone;
 };
 
 export const getLocalizedWeredaName = (wereda, lang = "en") => {
   if (!wereda) return "";
-  if (lang === "en") return wereda;
-  return WEREDA_TRANSLATIONS[lang]?.[wereda] || wereda;
+  const code = normalizeLang(lang);
+  if (code === "en") return wereda;
+  return WEREDA_TRANSLATIONS[code]?.[wereda] || wereda;
 };

@@ -2,7 +2,7 @@
 
 // Core Auth Components
 export { default as AppInput } from "./AppInput";
-export { default as AuthLayout } from "./AuthLayout";
+export { default as AuthLayout } from "./layout/AuthLayout";
 export { default as LogoCard } from "./LogoCard";
 export { default as PrimaryButton } from "./PrimaryButton";
 export { default as RememberMeCheckbox } from "./RememberMeCheckbox";

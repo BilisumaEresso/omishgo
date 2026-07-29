@@ -30,32 +30,14 @@
     "defaultHarvestCrop": "የሰበሰበ ምርት",
     "unitQuintal": "ኩንታል (100 ኪሎ)"
   },
-  "splash": {
-    "title": "OmishGo",
-    "subtitle": "እርሻ · ገበያ · አቅርቦት"
-  },
-  "languagePicker": {
-    "title": "ቋንቋ ይምረጡ",
-    "subtitle": "ለመቀጠል የሚፈልጉትን ቋንቋ ይምረጡ",
-    "english": "English",
-    "amharic": "አማርኛ",
-    "oromo": "Afaan Oromoo"
-  },
-  "tabs": {
-    "home": "ዋና ገጽ",
-    "marketplace": "ገበያ",
-    "orders": "ትዕዛዞች",
-    "products": "ምርቶቼ",
-    "profile": "መገለጫ",
-    "analytics": "የገበያ ዋጋ",
-    "saved": "የተቀመጡ",
-    "messages": "መልዕክቶች"
-  },
   "auth": {
     "loginTitle": "እንኳን ደህና ተመለሱ",
     "loginSubtitle": "ወደ መለያዎ ይግቡ",
     "registerTitle": "መለያ ይፍጠሩ",
     "registerSubtitle": "ዛሬውኑ OmishGoን ይቀላቀሉ",
+    "credentialsSection": "1. የአካውንት መረጃዎች",
+    "roleLangSection": "2. የአካውንት አይነት እና ቋንቋ",
+    "locationSection": "3. አድራሻ እና የስራ ማዕከል",
     "phoneLabel": "ስልክ ቁጥር",
     "phonePlaceholder": "ምሳሌ 0911234567",
     "pinLabel": "የይለፍ ቃል (ከ4-6 ቁጥሮች)",

@@ -30,32 +30,14 @@
     "defaultHarvestCrop": "Harvest Crop",
     "unitQuintal": "quintal (100 kg)"
   },
-  "splash": {
-    "title": "OmishGo",
-    "subtitle": "Farm · Market · Deliver"
-  },
-  "languagePicker": {
-    "title": "Select Language",
-    "subtitle": "Choose your preferred language to continue",
-    "english": "English",
-    "amharic": "አማርኛ",
-    "oromo": "Afaan Oromoo"
-  },
-  "tabs": {
-    "home": "Home",
-    "marketplace": "Marketplace",
-    "orders": "Orders",
-    "products": "My Crops",
-    "profile": "Profile",
-    "analytics": "Market Index",
-    "saved": "Saved",
-    "messages": "Messages"
-  },
   "auth": {
     "loginTitle": "Welcome Back",
     "loginSubtitle": "Login to your account",
     "registerTitle": "Create Account",
     "registerSubtitle": "Join OmishGo today",
+    "credentialsSection": "1. Account Credentials",
+    "roleLangSection": "2. Account Role & Preferred Language",
+    "locationSection": "3. Location & Operation Center",
     "phoneLabel": "Phone Number",
     "phonePlaceholder": "e.g. 0911234567",
     "pinLabel": "PIN (4-6 digits)",

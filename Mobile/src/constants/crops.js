@@ -1,7 +1,7 @@
 // Mobile/src/constants/crops.js
 
 export const CROP_IMAGES = {
-  Teff: "https://media.istockphoto.com/id/1130300640/photo/market.jpg?s=612x612&w=is&k=20&c=BSAmLdblVERvPZ2TQIbIbbirVGsSAg1w-LMe9AyHTXU=",
+  Teff: "https://static.dw.com/image/18271775_804.jpg",
   "Red Onion":
     "https://pixabay.com/images/download/webtechexperts-onion-5187140_1920.jpg",
   Tomato:

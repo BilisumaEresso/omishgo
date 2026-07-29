@@ -30,32 +30,14 @@
     "defaultHarvestCrop": "Midhaan Haamaa",
     "unitQuintal": "kuntaala (100 kg)"
   },
-  "splash": {
-    "title": "OmishGo",
-    "subtitle": "Qotuu · Gabaa · Dhiyeessuu"
-  },
-  "languagePicker": {
-    "title": "Afaan Filadhu",
-    "subtitle": "Itti fufuuf afaan barbaaddu filadhu",
-    "english": "English",
-    "amharic": "አማርኛ",
-    "oromo": "Afaan Oromoo"
-  },
-  "tabs": {
-    "home": "Fuula Duraa",
-    "marketplace": "Gabaa",
-    "orders": "Ajajawwan",
-    "products": "Oomisha Koo",
-    "profile": "Pirofaayilii",
-    "analytics": "Haala Gabaa",
-    "saved": "Kuusaa",
-    "messages": "Ergaawwan"
-  },
   "auth": {
     "loginTitle": "Baga Nagaan Deebitan",
     "loginSubtitle": "Akkaawuntii kee seeni",
     "registerTitle": "Akkaawuntii Uumi",
     "registerSubtitle": "Har'a OmishGotti makami",
+    "credentialsSection": "1. Ragaalee Akkaawuntii",
+    "roleLangSection": "2. Gahee Akkaawuntii fi Afaan",
+    "locationSection": "3. Teessoo fi Wiirtuu Hojii",
     "phoneLabel": "Lakkoofsa Bilbilaa",
     "phonePlaceholder": "fkn. 0911234567",
     "pinLabel": "PIN (lakkoofsa 4-6)",

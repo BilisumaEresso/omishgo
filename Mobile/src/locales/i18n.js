@@ -3,9 +3,9 @@ import { initReactI18next } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Localization from "expo-localization";
 
-import en from "./en.json";
-import am from "./am.json";
-import om from "./om.json";
+import en from "./en_v2.json";
+import am from "./am_v2.json";
+import om from "./om_v2.json";
 
 const resources = {
   en: { translation: en },
@@ -60,3 +60,5 @@ i18n
   });
 
 export default i18n;
+
+// Cache bust for JSON updates
