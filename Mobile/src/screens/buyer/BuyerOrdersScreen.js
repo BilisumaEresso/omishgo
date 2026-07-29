@@ -18,7 +18,7 @@ import OrdersHeroSummaryCard from "../../components/orders/OrdersHeroSummaryCard
 import OrdersMetricsBar from "../../components/orders/OrdersMetricsBar";
 import api from "../../config/api";
 import { getOrderStatusConfig } from "../../constants/statuses";
-import { getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedCropName, getCropFallbackImage } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
 
 import { useTheme } from "../../hooks/useTheme";
@@ -221,13 +221,13 @@ export default function BuyerOrdersScreen({ navigation, onSwitchTab }) {
                 </View>
 
                 <View style={styles.mainSpecRow}>
-                  {item._raw?.productId?.photos?.[0] ? (
-                    <Image source={{ uri: item._raw.productId.photos[0] }} style={styles.orderThumbImage} resizeMode="cover" />
-                  ) : (
-                    <View style={[styles.orderThumbFallback, { backgroundColor: primaryColor + "15" }]}>
-                      <Ionicons name="leaf" size={20} color={primaryColor} />
-                    </View>
-                  )}
+                  {(() => {
+                    const rawPhotoUrl = item._raw?.productId?.photos?.[0];
+                    const photoUrl = rawPhotoUrl || getCropFallbackImage(item.cropType);
+                    return (
+                      <Image source={{ uri: photoUrl }} style={styles.orderThumbImage} resizeMode="cover" />
+                    );
+                  })()}
                   <View style={{ flex: 1 }}>
                     <AppText style={[styles.cropTitle, { color: textPrimary }]}>
                       {getLocalizedCropName(item.cropType, currentLang, t)}

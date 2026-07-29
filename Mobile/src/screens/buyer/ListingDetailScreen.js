@@ -20,13 +20,15 @@ import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 import { useSavedStore } from "../../store/saved.store";
 import { formatNumber } from "../../utils/formatNumber";
+import { getCropFallbackImage } from "../../constants/crops";
 
 export default function ListingDetailScreen({ route, navigation }) {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { product } = route.params || {};
 
-  const photosList = (Array.isArray(product?.photos) ? product.photos : []).filter(Boolean);
+  const rawPhotos = (Array.isArray(product?.photos) ? product.photos : []).filter(Boolean);
+  const photosList = rawPhotos.length > 0 ? rawPhotos : [getCropFallbackImage(product?.cropType)];
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
 
   const rawId = product?.customId || product?._id || product?.id || "";

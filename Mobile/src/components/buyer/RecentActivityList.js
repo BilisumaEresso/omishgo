@@ -3,7 +3,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, TouchableOpacity, View, Image } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 import AppText from "../common/AppText";
-import { getLocalizedCropName, CROP_TYPES } from "../../constants/crops";
+import { getLocalizedCropName, CROP_TYPES, getCropFallbackImage } from "../../constants/crops";
 import { getLocalizedUnitName, UNITS } from "../../constants/units";
 
 export default function RecentActivityList({ activities = [], onActivityPress }) {
@@ -66,7 +66,8 @@ export default function RecentActivityList({ activities = [], onActivityPress })
       {activities.map((activity) => {
         const isOrder = activity.type === "order";
         const iconName = isOrder ? "cube-outline" : "chatbubble-ellipses-outline";
-        const photo = activity.order?.product?.photos?.[0] || activity.order?.productId?.photos?.[0] || activity.order?.photos?.[0] || null;
+        const rawCrop = activity.order?.cropType || activity.order?.productId?.cropType || "";
+        const photo = activity.order?.product?.photos?.[0] || activity.order?.productId?.photos?.[0] || activity.order?.photos?.[0] || getCropFallbackImage(rawCrop);
         const status = activity.order?.status || activity.status || "processing";
 
         let titleText = localizeText(activity.title) || t("buyerOrders.orderActivity", { defaultValue: "Order Activity" });
@@ -76,7 +77,6 @@ export default function RecentActivityList({ activities = [], onActivityPress })
           const quantity = activity.order.quantity || 0;
           const rawUnit = activity.order.unit || "kg";
           const localizedUnit = getLocalizedUnitName(rawUnit, currentLang, t);
-          const rawCrop = activity.order.cropType || activity.order.productId?.cropType || "";
           const localizedCrop = getLocalizedCropName(rawCrop, currentLang, t);
           const farmerName = activity.order.farmerId?.name || t("buyerDashboard.defaultFarmer", { defaultValue: "Farmer" });
 

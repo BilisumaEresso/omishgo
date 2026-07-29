@@ -17,6 +17,7 @@ import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
 import draftsService from "../../services/drafts.service";
 import { isConnected } from "../../utils/connectivity";
+import { getCropFallbackImage } from "../../constants/crops";
 import { useTheme } from "../../hooks/useTheme";
 
 export default function MyDraftsScreen({ navigation }) {
@@ -96,7 +97,8 @@ export default function MyDraftsScreen({ navigation }) {
   };
 
   const renderItem = ({ item }) => {
-    const thumbnail = item.photos?.find((p) => p.uri)?.uri;
+    const rawThumbnail = item.photos?.find((p) => p.uri)?.uri;
+    const thumbnail = rawThumbnail || getCropFallbackImage(item.cropType);
     const isSyncing = syncingId === item.id;
 
     return (

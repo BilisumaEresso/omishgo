@@ -22,7 +22,7 @@ import { API_ENDPOINTS } from "../../constants/api";
 import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 import { getOrderStatusConfig } from "../../constants/statuses";
-import { getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedCropName, getCropFallbackImage } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
 import { formatNumber } from "../../utils/formatNumber";
 
@@ -134,13 +134,13 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
 
         {/* Main Crop Specs & Price */}
         <View style={styles.mainSpecRow}>
-          {item._raw?.productId?.photos?.[0] ? (
-            <Image source={{ uri: item._raw.productId.photos[0] }} style={styles.orderThumbImage} resizeMode="cover" />
-          ) : (
-            <View style={[styles.orderThumbFallback, { backgroundColor: "#DCFCE7" }]}>
-              <Ionicons name="leaf" size={20} color="#15803D" />
-            </View>
-          )}
+          {(() => {
+            const rawPhotoUrl = item._raw?.productId?.photos?.[0];
+            const photoUrl = rawPhotoUrl || getCropFallbackImage(item.cropType);
+            return (
+              <Image source={{ uri: photoUrl }} style={styles.orderThumbImage} resizeMode="cover" />
+            );
+          })()}
           <View style={{ flex: 1 }}>
             <AppText style={[styles.cropTitle, { color: textPrimary }]}>
               {getLocalizedCropName(item.cropType, currentLang, t)}

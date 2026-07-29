@@ -17,7 +17,8 @@ import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 
-import { getLocalizedCropName } from "../../constants/crops";
+import OrderProgressMap from "../../components/orders/OrderProgressMap";
+import { getCropFallbackImage, getLocalizedCropName } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
 import { formatNumber } from "../../utils/formatNumber";
 
@@ -66,7 +67,8 @@ export default function OrderDetailScreen({ route, navigation }) {
   const statusStyle = STATUS_CONFIG[rawStatus] || STATUS_CONFIG.pending;
   const statusLabel = t(statusStyle.labelKey, { defaultValue: rawStatus.toUpperCase() });
 
-  const photoUrl = order.productId?.photos?.[0] || order.photos?.[0];
+  const rawPhotoUrl = order.productId?.photos?.[0] || order.photos?.[0];
+  const photoUrl = rawPhotoUrl || getCropFallbackImage(order.cropType || order.productId?.cropType);
 
   const date = order.createdAt
     ? new Date(order.createdAt).toLocaleDateString("en-GB", {
@@ -145,6 +147,9 @@ export default function OrderDetailScreen({ route, navigation }) {
 
       {/* Order Date */}
       <AppText style={styles.orderDate}>{t("orderDetail.placedOn", { defaultValue: "Placed on" })} {date}</AppText>
+
+      {/* Order Progress Map */}
+      <OrderProgressMap order={order} />
 
       {/* Product Details Card */}
       <View style={[styles.card, { backgroundColor: surfaceColor }]}>

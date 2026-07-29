@@ -21,7 +21,7 @@ import { API_ENDPOINTS } from "../../constants/api";
 import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store"
-import { getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedCropName, getCropFallbackImage } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
 import {
   getLocalizedWeredaName,
@@ -184,7 +184,8 @@ export default function FarmerProductsScreen({ navigation }) {
       localizedLocation = item.location;
     }
 
-    const photoUrl = Array.isArray(item.photos) && item.photos.length > 0 ? item.photos[0] : null;
+    const rawPhotoUrl = Array.isArray(item._raw?.photos) && item._raw.photos.length > 0 ? item._raw.photos[0] : null;
+    const photoUrl = rawPhotoUrl || getCropFallbackImage(item.cropType);
 
     return (
       <TouchableOpacity

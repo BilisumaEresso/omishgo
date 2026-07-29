@@ -3,6 +3,7 @@ import asyncHandler from "../../utils/asyncHandler.js";
 import sendResponse from "../../utils/sendResponse.js";
 import Product from "../product/product.model.js";
 import Order from "./order.model.js";
+import { createNotification } from "../notification/notification.model.js";
 
 /**
  * Helper: atomically restore stock after a cancelled or failed order.
@@ -161,7 +162,7 @@ export const getMyOrders = asyncHandler(async (req, res) => {
  */
 export const getOrderById = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id)
-    .populate("buyerId", "name phone")
+    .populate("buyerId", "name phone location")
     .populate("farmerId", "name phone")
     .populate("productId", "cropType price unit photos location");
 
@@ -244,6 +245,23 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   // transition tables above).
   if (status === "cancelled") {
     await restoreStock(order.productId, order.quantity);
+  }
+
+  // Trigger notification for real status changes
+  const recipientId = isFarmer ? order.buyerId : order.farmerId;
+  const statusMessages = {
+    confirmed: `Your order for ${order.cropType} has been confirmed.`,
+    in_transit: `Your order for ${order.cropType} is now in transit.`,
+    delivered: `Your order for ${order.cropType} has been delivered.`,
+    cancelled: `Order for ${order.cropType} has been cancelled.`,
+  };
+  if (statusMessages[status]) {
+    createNotification(
+      recipientId,
+      "order_update",
+      statusMessages[status],
+      order._id
+    );
   }
 
   const updated = await Order.findById(order._id)

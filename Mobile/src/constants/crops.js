@@ -1,5 +1,53 @@
 // Mobile/src/constants/crops.js
 
+export const CROP_IMAGES = {
+  Teff: "https://media.istockphoto.com/id/1130300640/photo/market.jpg?s=612x612&w=is&k=20&c=BSAmLdblVERvPZ2TQIbIbbirVGsSAg1w-LMe9AyHTXU=",
+  "Red Onion":
+    "https://pixabay.com/images/download/webtechexperts-onion-5187140_1920.jpg",
+  Tomato:
+    "https://images.unsplash.com/photo-1518977822534-7049a61ee0c2?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHRvbWF0b3xlbnwwfHwwfHx8MA%3D%3D",
+  Garlic:
+    "https://images.unsplash.com/photo-1615477550927-6ec8445fcfe6?q=80&w=1227&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "White Maize":
+    "https://pixabay.com/images/download/drachenfire84-corn-2228848_1920.jpg",
+  Wheat:
+    "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8d2hlYXR8ZW58MHx8MHx8fDA%3D",
+  Barley:
+    "https://plus.unsplash.com/premium_photo-1705146640695-cab3aa2005f4?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8YmFybGV5fGVufDB8fDB8fHww",
+  Sorghum:
+    "https://images.unsplash.com/photo-1714469914199-14ab69eae5f3?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8c29yZ2h1bSUyMGdyYWlufGVufDB8fDB8fHww",
+  Millet:
+    "https://images.unsplash.com/photo-1783042909392-0b8d8683e0a2?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fG1pbGxldHxlbnwwfHwwfHx8MA%3D%3D",
+  "Green Pepper":
+    "https://images.unsplash.com/photo-1524593410820-38510f580a77?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Z3JlZW4lMjBwZXBwZXJ8ZW58MHx8MHx8fDA%3D",
+  Cabbage:
+    "https://images.unsplash.com/photo-1697346327617-c333613a349a?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8Y2FiYmFnZXxlbnwwfHwwfHx8MA%3D%3D",
+  Potato:
+    "https://images.unsplash.com/photo-1675501344642-92d35d90fe51?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8cG90YXRvfGVufDB8fDB8fHww",
+  Carrot:
+    "https://images.unsplash.com/photo-1633380110125-f6e685676160?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2Fycm90fGVufDB8fDB8fHww",
+  Beetroot:
+    "https://images.unsplash.com/photo-1663961355715-cf362778dc0e?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGJlZXRyb290fGVufDB8fDB8fHww",
+  Coffee:
+    "https://plus.unsplash.com/premium_photo-1670758291967-25ed2e90f21e?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8Y29mZmVlJTIwYmVhbnN8ZW58MHx8MHx8fDA%3D",
+  Sesame:
+    "https://plus.unsplash.com/premium_photo-1674654419404-667fcdd0fe13?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8c2VzYW1lfGVufDB8fDB8fHww",
+  Lentil:
+    "https://images.unsplash.com/photo-1708436478056-1872a208c010?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGxlbnRpbHxlbnwwfHwwfHx8MA%3D%3D",
+  Chickpea:
+    "https://plus.unsplash.com/premium_photo-1675237624857-7d995e29897d?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "Haricot Bean":
+    "https://plus.unsplash.com/premium_photo-1671130295242-582789bd9861?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aGFyaWNvdCUyMGJlYW58ZW58MHx8MHx8fDA%3D",
+  Papaya:
+    "https://images.unsplash.com/photo-1581242335635-ce8631489ac5?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHBhcGF5YXxlbnwwfHwwfHx8MA%3D%3D",
+  Default:
+    "https://images.unsplash.com/photo-1575218823251-f9d243b6f720?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fGFsbCUyMHZlZ2l0YWJsZXN8ZW58MHx8MHx8fDA%3D",
+};
+
+export const getCropFallbackImage = (cropType) => {
+  return CROP_IMAGES[cropType] || CROP_IMAGES["Default"];
+};
+
 export const CROP_TYPES = [
   "Teff",
   "Red Onion",

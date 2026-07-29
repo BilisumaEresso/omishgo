@@ -39,7 +39,7 @@ export default function BuyerProcurementMetrics({
               {currency} {formattedSpend}
             </AppText>
             <AppText style={styles.label}>
-              {t("buyerDashboard.procurementRate", { defaultValue: "Procurement Rate" })}
+              {t("buyerDashboard.totalSpend", { defaultValue: "Total Spend" })}
             </AppText>
           </View>
         </TouchableOpacity>
@@ -56,10 +56,10 @@ export default function BuyerProcurementMetrics({
 
           <View>
             <AppText style={styles.amount}>
-              {activeOrdersCount} {activeOrdersCount === 1 ? t("buyerDashboard.item", { defaultValue: "Item" }) : t("buyerDashboard.items", { defaultValue: "Items" })}
+              {activeOrdersCount}
             </AppText>
             <AppText style={styles.label}>
-              {t("buyerDashboard.activeSupply", { defaultValue: "Active Supply" })}
+              {t("buyerDashboard.activeOrdersLabel", { defaultValue: "Active Orders" })}
             </AppText>
           </View>
         </TouchableOpacity>
@@ -76,10 +76,10 @@ export default function BuyerProcurementMetrics({
 
           <View>
             <AppText style={styles.amount}>
-              {t("buyerDashboard.farmersCount", { count: uniqueFarmersCount, defaultValue: "{{count}} Farmers" })}
+              {uniqueFarmersCount}
             </AppText>
             <AppText style={styles.label}>
-              {t("buyerDashboard.verified", { defaultValue: "Verified" })}
+              {t("buyerDashboard.verifiedFarmers", { defaultValue: "Verified Farmers" })}
             </AppText>
           </View>
         </TouchableOpacity>

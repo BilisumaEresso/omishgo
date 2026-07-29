@@ -7,19 +7,16 @@ import { formatNumber } from "../../utils/formatNumber";
 
 export default function BuyerHeroBudgetCard({
   totalSpend = 0,
-  monthlyBudget = 50000,
   currency = "ETB",
   onSeeDetails,
 }) {
   const { t } = useTranslation();
 
   const formattedSpend = formatNumber(totalSpend || 0, 2);
-  const formattedBudget = formatNumber(monthlyBudget || 50000, 2);
-
-  const progressPercent = Math.min(
-    100,
-    Math.max(0, (totalSpend / monthlyBudget) * 100)
-  );
+  
+  // Highlight a stat buyers care about: Money saved by skipping middlemen
+  const estimatedSavings = (totalSpend || 0) * 0.15; 
+  const formattedSavings = formatNumber(estimatedSavings, 2);
 
   return (
     <View style={styles.container}>
@@ -35,7 +32,7 @@ export default function BuyerHeroBudgetCard({
 
         <View style={styles.heroContent}>
           <AppText style={styles.label}>
-            {t("buyerDashboard.availableSpend", { defaultValue: "Available Procurement Spend" })}
+            {t("buyerDashboard.totalPurchases", { defaultValue: "Total Purchases (This Month)" })}
           </AppText>
           <AppText style={styles.amount}>
             {currency} {formattedSpend}
@@ -54,27 +51,23 @@ export default function BuyerHeroBudgetCard({
         </View>
       </View>
 
-      {/* Lower Budget Bar Strip Card */}
-      <View style={styles.budgetStripCard}>
+      {/* Lower Savings Strip Card */}
+      <View style={styles.savingsStripCard}>
         <View style={styles.stripHeader}>
-          <View>
+          <View style={styles.stripTextWrap}>
             <AppText style={styles.stripTitle}>
-              {t("buyerDashboard.budgetTitle", { defaultValue: "Procurement Budget" })}
+              {t("buyerDashboard.estimatedSavings", { defaultValue: "Estimated Savings" })}
             </AppText>
             <AppText style={styles.stripSubtitle}>
-              {t("buyerDashboard.monthlyAllocation", { defaultValue: "Monthly Allocation" })}
+              {t("buyerDashboard.savingsSubtitle", { defaultValue: "By buying directly from farmers" })}
             </AppText>
           </View>
-          <AppText style={styles.stripAmount}>
-            {currency} {formattedBudget}
-          </AppText>
-        </View>
-
-        {/* Progress Bar */}
-        <View style={styles.progressTrack}>
-          <View
-            style={[styles.progressBarFill, { width: `${progressPercent}%` }]}
-          />
+          <View style={styles.savingsBadge}>
+            <Ionicons name="trending-up" size={16} color="#10B981" />
+            <AppText style={styles.stripAmount}>
+              {currency} {formattedSavings}
+            </AppText>
+          </View>
         </View>
       </View>
     </View>
@@ -170,8 +163,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#FFFFFF",
   },
-
-  budgetStripCard: {
+  savingsStripCard: {
     backgroundColor: "#2E2A68",
     borderRadius: 20,
     paddingHorizontal: 20,
@@ -182,7 +174,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+  },
+  stripTextWrap: {
+    flex: 1,
+    paddingRight: 10,
   },
   stripTitle: {
     fontSize: 14,
@@ -190,28 +185,26 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   stripSubtitle: {
-    fontSize: 12,
+    fontSize: 11,
     color: "rgba(255, 255, 255, 0.65)",
-    marginTop: 2,
+    marginTop: 4,
+    lineHeight: 16,
+  },
+  savingsBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(16, 185, 129, 0.15)",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    gap: 6,
   },
   stripAmount: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "800",
-    color: "#FFFFFF",
-    lineHeight: 26,
+    color: "#10B981",
+    lineHeight: 22,
     paddingBottom: 2,
-  },
-  progressTrack: {
-    height: 6,
-    width: "100%",
-    backgroundColor: "rgba(255, 255, 255, 0.15)",
-    borderRadius: 3,
-    overflow: "hidden",
-  },
-  progressBarFill: {
-    height: "100%",
-    backgroundColor: "#FBBF24",
-    borderRadius: 3,
   },
 });
 

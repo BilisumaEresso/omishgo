@@ -3,7 +3,7 @@ import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import AppButton from "./AppButton";
 import AppText from "./AppText";
-import { getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedCropName, getCropFallbackImage } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
 
 import { getLocalizedWeredaName, getLocalizedZoneName, getLocalizedRegionName } from "../../constants/locations";
@@ -49,7 +49,8 @@ export const ProductCard = ({
     ? `${formatNumber(product.price)} ETB / ${localizedUnit}`
     : t("farmerProducts.priceUnavailable", { defaultValue: "Price on Request" });
 
-  const photoUrl = Array.isArray(product.photos) && product.photos.length > 0 ? product.photos[0] : null;
+  const rawPhotoUrl = Array.isArray(product.photos) && product.photos.length > 0 ? product.photos[0] : null;
+  const photoUrl = rawPhotoUrl || getCropFallbackImage(product.cropType);
 
   return (
     <View
