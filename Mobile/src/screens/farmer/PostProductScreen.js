@@ -35,6 +35,7 @@ import {
 } from "../../constants/locations";
 import { UNITS_LOCALIZED } from "../../constants/units";
 import { useTheme } from "../../hooks/useTheme";
+import { useAuthStore } from "../../store/auth.store";
 import draftsService from "../../services/drafts.service";
 import uploadService from "../../services/upload.service";
 import { isConnected, subscribeToConnectivity } from "../../utils/connectivity";
@@ -203,7 +204,12 @@ const PhotoSlots = ({ photos, onAdd, onRemove, onRetry, theme, t }) => {
 export default function PostProductScreen({ navigation, route }) {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
+  const user = useAuthStore((state) => state.user);
   const prefill = route?.params?.prefill || {};
+
+  const userRegion = user?.location?.region || user?.region || "";
+  const userZone = user?.location?.zone || user?.zone || "";
+  const userWereda = user?.location?.wereda || user?.wereda || "";
 
   const [cropType, setCropType] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -212,9 +218,9 @@ export default function PostProductScreen({ navigation, route }) {
   const [description, setDescription] = useState("");
   const [photos, setPhotos] = useState([]);
   const [isOnline, setIsOnline] = useState(true);
-  const [region, setRegion] = useState("");
-  const [zone, setZone] = useState("");
-  const [wereda, setWereda] = useState("");
+  const [region, setRegion] = useState(prefill.region || userRegion);
+  const [zone, setZone] = useState(prefill.zone || userZone);
+  const [wereda, setWereda] = useState(prefill.wereda || userWereda);
   const [loading, setLoading] = useState(false);
 
   const [showCropPicker, setShowCropPicker] = useState(false);
@@ -254,23 +260,19 @@ export default function PostProductScreen({ navigation, route }) {
   }, []);
 
   useEffect(() => {
+    const initRegion = prefill.region || userRegion;
+    const initZone = prefill.zone || userZone;
+    const initWereda = prefill.wereda || userWereda;
+
     if (prefill.cropType) setCropType(prefill.cropType);
     if (prefill.quantity) setQuantity(String(prefill.quantity));
     if (prefill.price !== undefined && prefill.price !== null) setPrice(String(prefill.price));
     if (prefill.unit) setUnit(prefill.unit);
-    if (prefill.region) setRegion(prefill.region);
-    if (prefill.zone) setZone(prefill.zone);
-    if (prefill.wereda) setWereda(prefill.wereda);
-  }, [prefill]);
 
-  useEffect(() => {
-    setZone("");
-    setWereda("");
-  }, [region]);
-
-  useEffect(() => {
-    setWereda("");
-  }, [zone]);
+    if (initRegion && !region) setRegion(initRegion);
+    if (initZone && !zone) setZone(initZone);
+    if (initWereda && !wereda) setWereda(initWereda);
+  }, [prefill, user]);
 
   const uploadPhotoAt = async (uri, asset) => {
     setPhotos((prev) =>
@@ -567,7 +569,11 @@ export default function PostProductScreen({ navigation, route }) {
               label={t("postProduct.regionLabel", { defaultValue: "Region" })}
               value={region}
               options={regionOptions}
-              onSelect={setRegion}
+              onSelect={(val) => {
+                setRegion(val);
+                setZone("");
+                setWereda("");
+              }}
               visible={showRegionPicker}
               onOpen={() => setShowRegionPicker(true)}
               onClose={() => setShowRegionPicker(false)}
@@ -580,7 +586,10 @@ export default function PostProductScreen({ navigation, route }) {
               label={t("postProduct.zoneLabel", { defaultValue: "Zone" })}
               value={zone}
               options={availableZones}
-              onSelect={setZone}
+              onSelect={(val) => {
+                setZone(val);
+                setWereda("");
+              }}
               visible={showZonePicker}
               onOpen={() => {
                 if (!region) {

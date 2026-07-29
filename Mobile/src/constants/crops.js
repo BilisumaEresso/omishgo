@@ -1,4 +1,5 @@
 // Mobile/src/constants/crops.js
+import i18n from "../locales/i18n";
 
 export const CROP_IMAGES = {
   Teff: "https://static.dw.com/image/18271775_804.jpg",
@@ -69,85 +70,29 @@ export const CROP_TYPES = [
   "Chickpea",
   "Haricot Bean",
   "Papaya",
+  "Beans",
+  "Peas",
+  "Lentils",
+  "Sunflower",
+  "Avocado",
+  "Banana",
+  "Mango",
 ];
 
-export const CROP_TYPES_LOCALIZED = {
-  en: {
-    Teff: "White Teff",
-    "Red Onion": "Red Onion",
-    Tomato: "Fresh Tomato",
-    Garlic: "White Garlic",
-    "White Maize": "White Maize",
-    Wheat: "Bread Wheat",
-    Barley: "Malt Barley",
-    Sorghum: "White Sorghum",
-    Millet: "Finger Millet",
-    "Green Pepper": "Green Pepper (Kariya)",
-    Cabbage: "Head Cabbage",
-    Potato: "White Potato",
-    Carrot: "Fresh Carrot",
-    Beetroot: "Red Beetroot",
-    Coffee: "Arabica Coffee",
-    Sesame: "Humera Sesame",
-    Lentil: "Red Lentil",
-    Chickpea: "Kabuli Chickpea",
-    "Haricot Bean": "White Pea Bean (Boleqe)",
-    Papaya: "Sweet Papaya",
-    All: "All",
-    Vegetables: "Vegetables",
-    Grains: "Grains",
-  },
-  am: {
-    Teff: "ማግና (ነጭ) ጤፍ",
-    "Red Onion": "ቀይ ሽንኩርት",
-    Tomato: "ቲማቲም",
-    Garlic: "ነጭ ሽንኩርት",
-    "White Maize": "ነጭ በቆሎ",
-    Wheat: "ስንዴ",
-    Barley: "ገብስ",
-    Sorghum: "ማሽላ",
-    Millet: "ዳጉሣ",
-    "Green Pepper": "ቃሪያ",
-    Cabbage: "ጎመን",
-    Potato: "ድንች",
-    Carrot: "ካሮት",
-    Beetroot: "ቀይ ስር",
-    Coffee: "ቡና",
-    Sesame: "ሰሊጥ",
-    Lentil: "ምስር",
-    Chickpea: "ሽምብራ",
-    "Haricot Bean": "ቦሌቄ",
-    Papaya: "ፓፓያ",
-    All: "ሁሉንም",
-    Vegetables: "አትክልት",
-    Grains: "እህል",
-  },
-  om: {
-    Teff: "Xaafii Adii (Magna)",
-    "Red Onion": "Qasaricha Diimaa",
-    Tomato: "Xaafii Diimaa (Timaatimi)",
-    Garlic: "Qasaricha Adii",
-    "White Maize": "Boqqoolloo Adii",
-    Wheat: "Qamadii",
-    Barley: "Garbuu",
-    Sorghum: "Misingaa",
-    Millet: "Dagusa",
-    "Green Pepper": "Kariyaa",
-    Cabbage: "Damma",
-    Potato: "Dinnicha",
-    Carrot: "Kaarotii",
-    Beetroot: "Dinnicha Diimaa",
-    Coffee: "Buna",
-    Sesame: "Salxiqi",
-    Lentil: "Misira",
-    Chickpea: "Shimbiraa",
-    "Haricot Bean": "Boleqe (Buna Dachee)",
-    Papaya: "Papaayyaa",
-    All: "Hunda",
-    Vegetables: "Kuduraa",
-    Grains: "Midhaan",
-  },
-};
+// Unified Proxy accessor pointing directly to i18n locale bundles
+export const CROP_TYPES_LOCALIZED = new Proxy(
+  {},
+  {
+    get: (_, langKey) =>
+      new Proxy(
+        {},
+        {
+          get: (_, cropKey) =>
+            i18n.t(`crops.${cropKey}`, { lng: langKey, defaultValue: cropKey }),
+        }
+      ),
+  }
+);
 
 export const DEFAULT_DESCRIPTIONS_LOCALIZED = {
   en: {
@@ -236,18 +181,12 @@ export const REFERENCE_PRICES = {
 };
 
 /**
- * Get localized display name for a crop key
+ * Get localized display name for a crop key directly from unified locale bundles
  */
 export const getLocalizedCropName = (cropKey, lang = "en", t = null) => {
   if (!cropKey) return "";
   if (t) {
-    return t(`crops.${cropKey}`, {
-      defaultValue: CROP_TYPES_LOCALIZED[lang]?.[cropKey] || CROP_TYPES_LOCALIZED.en?.[cropKey] || cropKey,
-    });
+    return t(`crops.${cropKey}`, { defaultValue: cropKey });
   }
-  return (
-    CROP_TYPES_LOCALIZED[lang]?.[cropKey] ||
-    CROP_TYPES_LOCALIZED.en?.[cropKey] ||
-    cropKey
-  );
+  return i18n.t(`crops.${cropKey}`, { lng: lang, defaultValue: cropKey });
 };

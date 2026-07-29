@@ -70,6 +70,10 @@ export default function OrderDetailScreen({ route, navigation }) {
   const rawPhotoUrl = order.productId?.photos?.[0] || order.photos?.[0];
   const photoUrl = rawPhotoUrl || getCropFallbackImage(order.cropType || order.productId?.cropType);
 
+  const orderIdRaw = order._id || order.id || "";
+  const shortId = orderIdRaw ? orderIdRaw.substring(orderIdRaw.length - 6).toUpperCase() : "ORD";
+  const orderIdDisplay = `#ORD-${shortId}`;
+
   const date = order.createdAt
     ? new Date(order.createdAt).toLocaleDateString("en-GB", {
         day: "numeric",
@@ -145,8 +149,14 @@ export default function OrderDetailScreen({ route, navigation }) {
         </AppText>
       </View>
 
-      {/* Order Date */}
-      <AppText style={styles.orderDate}>{t("orderDetail.placedOn", { defaultValue: "Placed on" })} {date}</AppText>
+      {/* Order Meta Row: ID Pill + Date */}
+      <View style={styles.orderMetaRow}>
+        <View style={[styles.orderIdBadge, { backgroundColor: primaryColor + "15", borderColor: primaryColor + "35" }]}>
+          <Ionicons name="receipt" size={13} color={primaryColor} />
+          <AppText style={[styles.orderIdBadgeText, { color: primaryColor }]}>{orderIdDisplay}</AppText>
+        </View>
+        <AppText style={styles.orderDate}>{t("orderDetail.placedOn", { defaultValue: "Placed on" })} {date}</AppText>
+      </View>
 
       {/* Order Progress Map */}
       <OrderProgressMap order={order} />
@@ -161,6 +171,13 @@ export default function OrderDetailScreen({ route, navigation }) {
         <AppText style={[styles.cardTitle, { color: textPrimary }]}>
           {t("orderDetail.productInfo", { defaultValue: "Harvest Order Details" })}
         </AppText>
+        <View style={styles.infoRow}>
+          <AppText style={styles.infoLabel}>{t("orderDetail.orderId", { defaultValue: "Order Ref ID" })}</AppText>
+          <View style={styles.orderIdInfoWrap}>
+            <Ionicons name="receipt-outline" size={13} color={primaryColor} />
+            <AppText style={[styles.infoVal, { color: primaryColor, fontWeight: "800" }]}>{orderIdDisplay}</AppText>
+          </View>
+        </View>
         <View style={styles.infoRow}>
           <AppText style={styles.infoLabel}>{t("orderDetail.cropType", { defaultValue: "Crop Type" })}</AppText>
           <AppText style={styles.infoVal}>{getLocalizedCropName(cropType, currentLang, t)}</AppText>
@@ -184,7 +201,9 @@ export default function OrderDetailScreen({ route, navigation }) {
       {/* Partner Info Card */}
       <View style={[styles.card, { backgroundColor: surfaceColor }]}>
         <AppText style={[styles.cardTitle, { color: textPrimary }]}>
-          {role === "farmer" ? t("orderDetail.buyerContact", { defaultValue: "Buyer Contact" }) : t("orderDetail.producerContact", { defaultValue: "Producer Contact" })}
+          {role === "farmer"
+            ? t("orderDetail.buyerContact", { defaultValue: "Buyer Contact" })
+            : t("orderDetail.producerContact", { defaultValue: "Producer Contact" })}
         </AppText>
         <View style={styles.partnerRow}>
           <View style={[styles.partnerAvatar, { backgroundColor: primaryColor }]}>
@@ -197,7 +216,9 @@ export default function OrderDetailScreen({ route, navigation }) {
             <View style={styles.verifiedRow}>
               <Ionicons name="checkmark-circle" size={13} color={primaryColor} />
               <AppText style={[styles.verifiedLabel, { color: primaryColor }]}>
-                {role === "farmer" ? t("roleSelection.buyerTitle", { defaultValue: "Registered Wholesale Buyer" }) : t("profile.verifiedProducer", { defaultValue: "Verified Farmer Producer" })}
+                {role === "farmer"
+                  ? t("orderDetail.verifiedBuyer", { defaultValue: "Registered Wholesale Buyer" })
+                  : t("orderDetail.verifiedProducer", { defaultValue: "Verified Farmer Producer" })}
               </AppText>
             </View>
           </View>
@@ -209,7 +230,9 @@ export default function OrderDetailScreen({ route, navigation }) {
             activeOpacity={0.8}
           >
             <Ionicons name="chatbubble-ellipses-outline" size={16} color={primaryColor} />
-            <AppText style={[styles.contactBtnText, { color: primaryColor }]}>{t("common.message", { defaultValue: "Message" })}</AppText>
+            <AppText style={[styles.contactBtnText, { color: primaryColor }]}>
+              {t("orderDetail.message", { defaultValue: t("common.message", { defaultValue: "Message" }) })}
+            </AppText>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.contactBtn, { borderColor: "#64748B" }]}
@@ -217,7 +240,9 @@ export default function OrderDetailScreen({ route, navigation }) {
             activeOpacity={0.8}
           >
             <Ionicons name="call-outline" size={16} color="#64748B" />
-            <AppText style={[styles.contactBtnText, { color: "#64748B" }]}>{t("common.call", { defaultValue: "Call" })}</AppText>
+            <AppText style={[styles.contactBtnText, { color: "#64748B" }]}>
+              {t("orderDetail.call", { defaultValue: t("common.call", { defaultValue: "Call" }) })}
+            </AppText>
           </TouchableOpacity>
         </View>
       </View>
@@ -305,11 +330,35 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     letterSpacing: 0.3,
   },
+  orderMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginBottom: 16,
+  },
+  orderIdBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  orderIdBadgeText: {
+    fontSize: 12,
+    fontWeight: "900",
+    letterSpacing: 0.4,
+  },
   orderDate: {
     fontSize: 12,
     color: "#94A3B8",
-    textAlign: "center",
-    marginBottom: 16,
+  },
+  orderIdInfoWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   card: {
     padding: 16,

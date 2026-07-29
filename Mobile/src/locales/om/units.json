@@ -1,0 +1,11 @@
+{
+  "units": {
+    "kg": "Kiiloogiraama (kg)",
+    "quintal": "Kuntaala (q)",
+    "ton": "Toonii (t)",
+    "bag50": "Kisaa (50kg)",
+    "bag100": "Kisaa (100kg)",
+    "crate": "Saanduqa",
+    "sack": "Jooniyaa"
+  }
+}

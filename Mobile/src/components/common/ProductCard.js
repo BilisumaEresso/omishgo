@@ -30,9 +30,9 @@ export const ProductCard = ({
   const border = theme?.colors?.border || "#E2E8F0";
 
   const rawUnit = product.unit || "q";
-  const localizedUnit = getLocalizedUnitName(rawUnit, currentLang);
+  const localizedUnit = getLocalizedUnitName(rawUnit, currentLang, t);
   const rawCrop = product.cropType || product.name || t("common.defaultHarvestCrop", { defaultValue: "Harvest Crop" });
-  const localizedCrop = getLocalizedCropName(rawCrop, currentLang);
+  const localizedCrop = getLocalizedCropName(rawCrop, currentLang, t);
 
   const localizedWereda = getLocalizedWeredaName(loc.wereda, currentLang);
   const localizedZone = getLocalizedZoneName(loc.zone, currentLang);

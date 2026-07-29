@@ -1,7 +1,7 @@
 // Mobile/src/screens/farmer/EditProductScreen.js
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -29,6 +29,7 @@ import {
 } from "../../constants/locations";
 import { UNITS_LOCALIZED } from "../../constants/units";
 import { useTheme } from "../../hooks/useTheme";
+import { useAuthStore } from "../../store/auth.store";
 import uploadService from "../../services/upload.service";
 
 const MAX_PHOTOS = 2;
@@ -195,7 +196,12 @@ const DropdownPicker = ({
 export default function EditProductScreen({ route, navigation }) {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
+  const user = useAuthStore((state) => state.user);
   const product = route.params?.product || {};
+
+  const userRegion = user?.location?.region || user?.region || "";
+  const userZone = user?.location?.zone || user?.zone || "";
+  const userWereda = user?.location?.wereda || user?.wereda || "";
 
   const [cropType, setCropType] = useState(product?.cropType || product?.category || "");
   const [quantity, setQuantity] = useState(String(product?.quantity || ""));
@@ -207,9 +213,9 @@ export default function EditProductScreen({ route, navigation }) {
     .filter(Boolean)
     .map((url) => ({ uri: url, url, uploading: false, error: false }));
   const [photos, setPhotos] = useState(initialPhotos);
-  const [region, setRegion] = useState(product?.location?.region || "");
-  const [zone, setZone] = useState(product?.location?.zone || "");
-  const [wereda, setWereda] = useState(product?.location?.wereda || "");
+  const [region, setRegion] = useState(product?.location?.region || userRegion);
+  const [zone, setZone] = useState(product?.location?.zone || userZone);
+  const [wereda, setWereda] = useState(product?.location?.wereda || userWereda);
   const [loading, setLoading] = useState(false);
 
   const [showCropPicker, setShowCropPicker] = useState(false);
@@ -240,15 +246,6 @@ export default function EditProductScreen({ route, navigation }) {
   const regionOptions = getLocalizedRegions(lang);
   const availableZones = region ? getLocalizedZones(region, lang) : [];
   const availableWereda = zone ? getLocalizedWereda(region, zone, lang) : [];
-
-  useEffect(() => {
-    setZone("");
-    setWereda("");
-  }, [region]);
-
-  useEffect(() => {
-    setWereda("");
-  }, [zone]);
 
   const uploadPhotoAt = async (uri, asset) => {
     setPhotos((prev) =>
@@ -518,7 +515,11 @@ export default function EditProductScreen({ route, navigation }) {
               label={t("postProduct.regionLabel", { defaultValue: "Region" })}
               value={region}
               options={regionOptions}
-              onSelect={setRegion}
+              onSelect={(val) => {
+                setRegion(val);
+                setZone("");
+                setWereda("");
+              }}
               visible={showRegionPicker}
               onOpen={() => setShowRegionPicker(true)}
               onClose={() => setShowRegionPicker(false)}
@@ -530,7 +531,10 @@ export default function EditProductScreen({ route, navigation }) {
               label={t("postProduct.zoneLabel", { defaultValue: "Zone" })}
               value={zone}
               options={availableZones}
-              onSelect={setZone}
+              onSelect={(val) => {
+                setZone(val);
+                setWereda("");
+              }}
               visible={showZonePicker}
               onOpen={() => {
                 if (!region) return Alert.alert(t("postProduct.selectRegionFirstTitle", { defaultValue: "Select Region First" }));

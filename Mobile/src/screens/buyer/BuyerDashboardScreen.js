@@ -62,22 +62,15 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
       const prodRes = await api.get(API_ENDPOINTS.products.list);
       const fetchedProds = prodRes.data?.data?.products || [];
       const formattedProds = fetchedProds.map((p) => {
-        const rawCrop = p.cropType || p.category || t("buyerDashboard.defaultProduce", { defaultValue: "Produce" });
-        const rawUnit = p.unit || "kg";
         return {
           _id: p._id,
-          cropType: getLocalizedCropName(rawCrop, currentLang, t),
+          cropType: p.cropType || p.category || "Red Onion",
           quantity: p.quantity ?? 0,
-          unit: getLocalizedUnitName(rawUnit, currentLang, t),
+          unit: p.unit || "q",
           price: p.price,
           category: p.cropType || p.category,
-          farmerId: p.farmerId || { _id: p.farmerId, name: t("buyerDashboard.defaultFarmer", { defaultValue: "Farmer" }) },
-          location: {
-            ...p.location,
-            region: getLocalizedRegionName(p.location?.region, currentLang),
-            zone: getLocalizedZoneName(p.location?.zone, currentLang),
-            wereda: getLocalizedWeredaName(p.location?.wereda, currentLang),
-          },
+          farmerId: p.farmerId || { _id: p.farmerId, name: p.farmerName || t("buyerDashboard.defaultFarmer", { defaultValue: "Farmer" }) },
+          location: p.location || {},
           photos: p.photos || [],
           status: p.status || "active",
           createdAt: p.createdAt,

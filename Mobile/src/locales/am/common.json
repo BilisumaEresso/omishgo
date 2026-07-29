@@ -1,0 +1,33 @@
+{
+  "common": {
+    "submit": "አስገባ",
+    "continue": "ቀጥል",
+    "cancel": "ሰርዝ",
+    "save": "አስቀምጥ",
+    "loading": "በማምጣት ላይ...",
+    "skip": "ዝለል",
+    "retry": "እንደገና ሞክር",
+    "search": "ፈልግ",
+    "delete": "አጥፋ",
+    "edit": "አስተካክል",
+    "view": "እይ",
+    "filter": "አጣራ",
+    "all": "ሁሉም",
+    "ok": "እሺ",
+    "success": "ተሳክቷል",
+    "error": "ስህተት",
+    "selectRegion": "ክልል ይምረጡ",
+    "selectZone": "ዞን ይምረጡ",
+    "selectWereda": "ወረዳ ይምረጡ",
+    "pickPhotoSource": "የፎቶ መምረጫ፡",
+    "camera": "ፎቶ አንሳ",
+    "gallery": "ከጋለሪ ምረጥ",
+    "weredaAlert": "እባክዎ ዞን ከመምረጥዎ በፊት ክልል ይምረጡ።",
+    "viewAll": "ሁሉንም እይ",
+    "refreshing": "በማደስ ላይ…",
+    "unknownLocation": "አድራሻ አልገባም",
+    "unknownPhone": "ስልክ አልገባም",
+    "defaultHarvestCrop": "የግብርና ምርት",
+    "unitQuintal": "ኩንታል (100 ኪ.ግ)"
+  }
+}

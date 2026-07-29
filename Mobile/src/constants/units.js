@@ -1,52 +1,33 @@
 // Mobile/src/constants/units.js
+import i18n from "../locales/i18n";
 
 export const UNITS = ["kg", "quintal", "ton", "bag50", "bag100", "crate", "sack"];
 
-export const UNITS_LOCALIZED = {
-  en: {
-    kg: "kg",
-    quintal: "quintal (q)",
-    ton: "ton (1000kg)",
-    bag50: "bag (50kg)",
-    bag100: "bag (100kg)",
-    crate: "crate",
-    sack: "sack",
-  },
-  am: {
-    kg: "ኪ.ግ",
-    quintal: "ኩንታል",
-    ton: "ቶን (1000ኪ.ግ)",
-    bag50: "ጆንያ (50ኪ.ግ)",
-    bag100: "ጆንያ (100ኪ.ግ)",
-    crate: "ክሬት",
-    sack: "ከረጢት",
-  },
-  om: {
-    kg: "kg",
-    quintal: "kunt (q)",
-    ton: "tooni (1000kg)",
-    bag50: "torbaan (50kg)",
-    bag100: "torbaan (100kg)",
-    crate: "kireetii",
-    sack: "qodaa",
-  },
-};
+// Unified Proxy accessor pointing directly to i18n locale bundles
+export const UNITS_LOCALIZED = new Proxy(
+  {},
+  {
+    get: (_, langKey) =>
+      new Proxy(
+        {},
+        {
+          get: (_, unitKey) => {
+            const key = unitKey === "q" ? "quintal" : unitKey;
+            return i18n.t(`units.${key}`, { lng: langKey, defaultValue: unitKey });
+          },
+        }
+      ),
+  }
+);
 
 /**
- * Get localized display label for a unit key
+ * Get localized display label for a unit key directly from unified locale bundles
  */
 export const getLocalizedUnitName = (unitKey, lang = "en", t = null) => {
   if (!unitKey) return "";
   const key = unitKey === "q" ? "quintal" : unitKey;
   if (t) {
-    return t(`units.${key}`, {
-      defaultValue: UNITS_LOCALIZED[lang]?.[key] || UNITS_LOCALIZED.en?.[key] || unitKey,
-    });
+    return t(`units.${key}`, { defaultValue: key });
   }
-  return (
-    UNITS_LOCALIZED[lang]?.[key] ||
-    UNITS_LOCALIZED.en?.[key] ||
-    unitKey
-  );
+  return i18n.t(`units.${key}`, { lng: lang, defaultValue: key });
 };
-

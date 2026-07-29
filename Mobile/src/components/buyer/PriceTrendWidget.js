@@ -13,6 +13,7 @@ import AppText from "../common/AppText";
 import { useTheme } from "../../hooks/useTheme";
 import { formatNumber } from "../../utils/formatNumber";
 import { getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedUnitName } from "../../constants/units";
 
 const COMMODITY_TRENDS = [
   {
@@ -201,7 +202,7 @@ export default function PriceTrendWidget({ onPressAnalytics }) {
         {/* Price Display */}
         <View style={styles.priceRow}>
           <AppText style={styles.priceNumber}>ETB {displayPrice}</AppText>
-          <AppText style={styles.unitText}>/ {t("common.unitQuintal", { defaultValue: "quintal (100 kg)" })}</AppText>
+          <AppText style={styles.unitText}>/ {getLocalizedUnitName(activeCommodity.unit, i18n.language || "en", t)}</AppText>
         </View>
 
         {/* Simple Bar Chart */}

@@ -1,0 +1,33 @@
+{
+  "common": {
+    "submit": "Ergi",
+    "continue": "Itti Fufi",
+    "cancel": "Haqi",
+    "save": "Olkaa'i",
+    "loading": "Fe'amaa jira...",
+    "skip": "Dabarsi",
+    "retry": "Irra deebi'ii yaali",
+    "search": "Barbaadi",
+    "delete": "Balleessi",
+    "edit": "Sirreessi",
+    "view": "Ilaali",
+    "filter": "Adda baasi",
+    "all": "Hunda",
+    "ok": "Tole",
+    "success": "Milkaa'ina",
+    "error": "Dogoggora",
+    "selectRegion": "Naannoo Filadhaa",
+    "selectZone": "Godina Filadhaa",
+    "selectWereda": "Aanaa Filadhaa",
+    "pickPhotoSource": "Madda suuraa filadhaa:",
+    "camera": "Suuraa Kaasaa",
+    "gallery": "Gaalarii irraa filadhaa",
+    "weredaAlert": "Godina filachuun dura maaloo naannoo filadhu.",
+    "viewAll": "Hunda Ilaali",
+    "refreshing": "Haaromsamaa jira…",
+    "unknownLocation": "Bakki hin ibsamne",
+    "unknownPhone": "Lakkoofsi bilbilaa hin ibsamne",
+    "defaultHarvestCrop": "Midhaan Haamaa",
+    "unitQuintal": "kuntaala (100 kg)"
+  }
+}

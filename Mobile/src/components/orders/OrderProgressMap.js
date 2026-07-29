@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -26,49 +26,73 @@ export default function OrderProgressMap({ order }) {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const mapRef = useRef(null);
+  const fittedRef = useRef(false);
 
   const isCancelled = order?.status === 'cancelled';
 
-  // Origin: Product location (where product is from)
+  // Origin: Product location
   const originLocation = order?.productId?.location;
-  const originCoords = getCoordinatesForLocation(originLocation);
+  const rawOriginCoords = useMemo(() => getCoordinatesForLocation(originLocation), [originLocation?.region, originLocation?.zone, originLocation?.wereda]);
 
   // Destination: Buyer location
   const buyerLocation = order?.buyerId?.location;
-  const destinationCoords = getCoordinatesForLocation(buyerLocation);
+  const rawDestCoords = useMemo(() => getCoordinatesForLocation(buyerLocation), [buyerLocation?.region, buyerLocation?.zone, buyerLocation?.wereda]);
+
+  // Prevent zero-distance overlap if both locations resolve identically
+  const { originCoords, destinationCoords } = useMemo(() => {
+    let orig = { ...rawOriginCoords };
+    let dest = { ...rawDestCoords };
+    const latDiff = Math.abs(orig.latitude - dest.latitude);
+    const lngDiff = Math.abs(orig.longitude - dest.longitude);
+
+    if (latDiff < 0.002 && lngDiff < 0.002) {
+      dest = {
+        latitude: dest.latitude + 0.015,
+        longitude: dest.longitude + 0.015,
+      };
+    }
+    return { originCoords: orig, destinationCoords: dest };
+  }, [rawOriginCoords, rawDestCoords]);
 
   const progressFraction = getProgressFraction(order?.status);
 
-  // Calculate position along line
-  const progressCoords = isCancelled
-    ? null
-    : {
-        latitude:
-          originCoords.latitude +
-          progressFraction * (destinationCoords.latitude - originCoords.latitude),
-        longitude:
-          originCoords.longitude +
-          progressFraction * (destinationCoords.longitude - originCoords.longitude),
-      };
+  // Position along polyline
+  const progressCoords = useMemo(() => {
+    if (isCancelled) return null;
+    return {
+      latitude: originCoords.latitude + progressFraction * (destinationCoords.latitude - originCoords.latitude),
+      longitude: originCoords.longitude + progressFraction * (destinationCoords.longitude - originCoords.longitude),
+    };
+  }, [isCancelled, originCoords, destinationCoords, progressFraction]);
 
   const fitMap = () => {
     if (mapRef.current && originCoords && destinationCoords) {
-      mapRef.current.fitToCoordinates([originCoords, destinationCoords], {
-        edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
-        animated: false,
-      });
+      try {
+        mapRef.current.fitToCoordinates([originCoords, destinationCoords], {
+          edgePadding: { top: 40, right: 40, bottom: 40, left: 40 },
+          animated: false,
+        });
+        fittedRef.current = true;
+      } catch (_) {}
     }
   };
 
   useEffect(() => {
-    fitMap();
-  }, [order?._id, order?.status]);
+    const timer = setTimeout(() => {
+      fitMap();
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [order?._id, order?.status, originCoords.latitude, originCoords.longitude, destinationCoords.latitude, destinationCoords.longitude]);
 
-  const originName = originLocation?.zone
+  const originName = originLocation?.wereda
+    ? `${originLocation.wereda}, ${originLocation.zone || originLocation.region}`
+    : originLocation?.zone
     ? `${originLocation.zone}, ${originLocation.region}`
     : t('orderDetail.originLabel', { defaultValue: 'Harvest Origin' });
 
-  const destName = buyerLocation?.zone
+  const destName = buyerLocation?.wereda
+    ? `${buyerLocation.wereda}, ${buyerLocation.zone || buyerLocation.region}`
+    : buyerLocation?.zone
     ? `${buyerLocation.zone}, ${buyerLocation.region}`
     : t('orderDetail.destinationLabel', { defaultValue: 'Buyer Destination' });
 
@@ -77,6 +101,19 @@ export default function OrderProgressMap({ order }) {
   const textPrimary = theme?.colors?.textPrimary || '#0F172A';
   const textSecondary = theme?.colors?.textSecondary || '#64748B';
 
+  const initialRegion = useMemo(() => {
+    const centerLat = (originCoords.latitude + destinationCoords.latitude) / 2;
+    const centerLng = (originCoords.longitude + destinationCoords.longitude) / 2;
+    const latDelta = Math.max(Math.abs(originCoords.latitude - destinationCoords.latitude) * 1.6, 0.08);
+    const lngDelta = Math.max(Math.abs(originCoords.longitude - destinationCoords.longitude) * 1.6, 0.08);
+    return {
+      latitude: centerLat,
+      longitude: centerLng,
+      latitudeDelta: latDelta,
+      longitudeDelta: lngDelta,
+    };
+  }, [originCoords, destinationCoords]);
+
   return (
     <View style={[styles.cardContainer, { backgroundColor: surfaceColor }]}>
       {/* Map View */}
@@ -84,19 +121,14 @@ export default function OrderProgressMap({ order }) {
         <MapView
           ref={mapRef}
           style={styles.map}
-          onLayout={fitMap}
-          initialRegion={{
-            latitude: (originCoords.latitude + destinationCoords.latitude) / 2,
-            longitude: (originCoords.longitude + destinationCoords.longitude) / 2,
-            latitudeDelta: Math.max(Math.abs(originCoords.latitude - destinationCoords.latitude) * 1.5, 0.5),
-            longitudeDelta: Math.max(Math.abs(originCoords.longitude - destinationCoords.longitude) * 1.5, 0.5),
-          }}
+          initialRegion={initialRegion}
           scrollEnabled={false}
           zoomEnabled={false}
           rotateEnabled={false}
           pitchEnabled={false}
+          onMapReady={fitMap}
         >
-          {/* Origin Marker (Farmer/Product location) */}
+          {/* Origin Marker (Farmer / Product location) */}
           <Marker coordinate={originCoords} title={originName} anchor={{ x: 0.5, y: 0.5 }}>
             <View style={[styles.markerBadge, { backgroundColor: '#2E7D32' }]}>
               <Ionicons name="leaf" size={14} color="#FFFFFF" />
@@ -110,7 +142,7 @@ export default function OrderProgressMap({ order }) {
             </View>
           </Marker>
 
-          {/* Line between Origin and Destination */}
+          {/* Connecting Polyline */}
           <Polyline
             coordinates={[originCoords, destinationCoords]}
             strokeColor={isCancelled ? '#94A3B8' : primaryColor}
@@ -118,7 +150,7 @@ export default function OrderProgressMap({ order }) {
             lineDashPattern={isCancelled ? [6, 4] : undefined}
           />
 
-          {/* Progress Dot Marker (Fixed step position based on order.status) */}
+          {/* Progress Marker along polyline */}
           {!isCancelled && progressCoords && (
             <Marker coordinate={progressCoords} anchor={{ x: 0.5, y: 0.5 }}>
               <View style={styles.progressDotOuter}>

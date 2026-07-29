@@ -1,0 +1,13 @@
+{
+  "statuses": {
+    "pending": "በመጠባበቅ ላይ",
+    "confirmed": "የተረጋገጠ",
+    "in_transit": "በመጓጓዝ ላይ",
+    "delivered": "የደረሰ",
+    "completed": "ተጠናቋል",
+    "cancelled": "የተሰረዘ",
+    "active": "ንቁ",
+    "sold": "ተሽጧል",
+    "draft": "ረቂቅ"
+  }
+}

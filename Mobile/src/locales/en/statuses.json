@@ -1,0 +1,13 @@
+{
+  "statuses": {
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "in_transit": "In Transit",
+    "delivered": "Delivered",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "active": "Active",
+    "sold": "Sold Out",
+    "draft": "Draft"
+  }
+}

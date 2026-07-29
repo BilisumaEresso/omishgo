@@ -1,0 +1,11 @@
+{
+  "units": {
+    "kg": "Kilogram (kg)",
+    "quintal": "Quintal (q)",
+    "ton": "Ton (t)",
+    "bag50": "Bag (50kg)",
+    "bag100": "Bag (100kg)",
+    "crate": "Crate",
+    "sack": "Sack"
+  }
+}

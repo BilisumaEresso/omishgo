@@ -1,0 +1,33 @@
+{
+  "common": {
+    "submit": "Submit",
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "save": "Save",
+    "loading": "Loading...",
+    "skip": "Skip",
+    "retry": "Retry",
+    "search": "Search",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "filter": "Filter",
+    "all": "All",
+    "ok": "OK",
+    "success": "Success",
+    "error": "Error",
+    "selectRegion": "Select Region",
+    "selectZone": "Select Zone",
+    "selectWereda": "Select Wereda",
+    "pickPhotoSource": "Choose photo source:",
+    "camera": "Take Photo",
+    "gallery": "Choose from Gallery",
+    "weredaAlert": "Please pick a region before choosing a zone.",
+    "viewAll": "View All",
+    "refreshing": "Refreshing…",
+    "unknownLocation": "Location Not Provided",
+    "unknownPhone": "Phone Not Provided",
+    "defaultHarvestCrop": "Harvest Crop",
+    "unitQuintal": "quintal (100 kg)"
+  }
+}

@@ -3,9 +3,9 @@ import { initReactI18next } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Localization from "expo-localization";
 
-import en from "./en_v2.json";
-import am from "./am_v2.json";
-import om from "./om_v2.json";
+import en from "./en";
+import am from "./am";
+import om from "./om";
 
 const resources = {
   en: { translation: en },

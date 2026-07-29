@@ -1,0 +1,13 @@
+{
+  "statuses": {
+    "pending": "Eegaa Jira",
+    "confirmed": "Mirkanaa'eera",
+    "in_transit": "Karaarra Jira",
+    "delivered": "Qaqqabeera",
+    "completed": "Xumurameera",
+    "cancelled": "Haqameera",
+    "active": "Gabaarra Jira",
+    "sold": "Gurgurameera",
+    "draft": "Wixinee"
+  }
+}
