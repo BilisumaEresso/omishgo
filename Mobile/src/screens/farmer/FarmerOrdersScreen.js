@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   Linking,
   ScrollView,
   StyleSheet,
@@ -133,6 +134,13 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
 
         {/* Main Crop Specs & Price */}
         <View style={styles.mainSpecRow}>
+          {item._raw?.productId?.photos?.[0] ? (
+            <Image source={{ uri: item._raw.productId.photos[0] }} style={styles.orderThumbImage} resizeMode="cover" />
+          ) : (
+            <View style={[styles.orderThumbFallback, { backgroundColor: "#DCFCE7" }]}>
+              <Ionicons name="leaf" size={20} color="#15803D" />
+            </View>
+          )}
           <View style={{ flex: 1 }}>
             <AppText style={[styles.cropTitle, { color: textPrimary }]}>
               {getLocalizedCropName(item.cropType, currentLang, t)}
@@ -346,6 +354,20 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 14,
     marginBottom: 12,
+    gap: 10,
+  },
+  orderThumbImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: "#F1F5F9",
+  },
+  orderThumbFallback: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
   cropTitle: {
     fontSize: 15,

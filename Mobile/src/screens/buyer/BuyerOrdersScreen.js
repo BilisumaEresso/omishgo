@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
+  Image,
   Linking,
   ScrollView,
   StyleSheet,
@@ -220,6 +221,13 @@ export default function BuyerOrdersScreen({ navigation, onSwitchTab }) {
                 </View>
 
                 <View style={styles.mainSpecRow}>
+                  {item._raw?.productId?.photos?.[0] ? (
+                    <Image source={{ uri: item._raw.productId.photos[0] }} style={styles.orderThumbImage} resizeMode="cover" />
+                  ) : (
+                    <View style={[styles.orderThumbFallback, { backgroundColor: primaryColor + "15" }]}>
+                      <Ionicons name="leaf" size={20} color={primaryColor} />
+                    </View>
+                  )}
                   <View style={{ flex: 1 }}>
                     <AppText style={[styles.cropTitle, { color: textPrimary }]}>
                       {getLocalizedCropName(item.cropType, currentLang, t)}
@@ -345,6 +353,20 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 14,
     marginBottom: 12,
+    gap: 10,
+  },
+  orderThumbImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: "#E2E8F0",
+  },
+  orderThumbFallback: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
   cropTitle: {
     fontSize: 15,

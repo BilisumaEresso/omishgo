@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Image,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -29,12 +30,12 @@ import {
 } from "../../constants/locations";
 import { formatNumber } from "../../utils/formatNumber";
 
-const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
+export default function FarmerProductsScreen({ navigation }) {
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language || "en";
   const { theme } = useTheme();
-  const user = useAuthStore((s) => s.user);
   const { openSidebar } = useSidebar();
+  const user = useAuthStore((s) => s.user);
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -46,128 +47,125 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
   const surface = theme?.colors?.surface || "#FFFFFF";
   const textPrimary = theme?.colors?.textPrimary || "#0F172A";
   const textSecondary = theme?.colors?.textSecondary || "#64748B";
-  const success = "#16A34A";
-  const warning = "#D97706";
-  const errorColor = "#DC2626";
 
-  const fetchMyProducts = async (isRefresh = false) => {
-    if (!isRefresh) setLoading(true);
+  const fetchProducts = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
+
     try {
       const res = await api.get(API_ENDPOINTS.products.list, {
         params: { farmerId: user?._id || user?.id },
       });
-      const raw = res.data?.data?.products || [];
-      const normalized = raw.map((p) => {
-        let locString = t("common.unknownLocation", { defaultValue: "Location Not Provided" });
-        if (p.location) {
-          locString = [p.location.wereda, p.location.zone, p.location.region]
-            .filter(Boolean)
-            .join(", ") || t("common.unknownLocation", { defaultValue: "Location Not Provided" });
-        }
+      const prods = res.data?.data?.products || [];
+
+      const formatted = prods.map((p) => {
+        const rawId = p.customId || p._id || p.id || "";
+        const shortId = rawId.startsWith("PRD-")
+          ? rawId
+          : rawId
+          ? `PRD-${rawId.substring(rawId.length - 6).toUpperCase()}`
+          : "PRD";
 
         return {
-          id: p._id,
-          cropType: p.cropType || p.category || t("farmerProducts.defaultCropType", { defaultValue: "Harvest Crop" }),
-          quantity: p.quantity ?? 0,
+          id: p._id || p.id,
+          cropType: p.cropType || p.category || t("common.defaultHarvestCrop", { defaultValue: "Harvest Crop" }),
+          quantity: p.quantity || 0,
           unit: p.unit || "q",
-          price: p.price ?? 0,
-          customId: p.customId || null,
-          locationObj: p.location || null,
-          location: locString,
+          price: p.price || 0,
           status: p.status || "active",
           photos: p.photos || [],
-          description: p.description || "",
-          postedDate: new Date(p.createdAt).toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "short",
-          }),
+          locationObj: p.location || {},
+          location: p.location?.region
+            ? `${p.location.wereda ? p.location.wereda + ", " : ""}${p.location.region}`
+            : t("common.unknownLocation", { defaultValue: "Ethiopia" }),
+          shortId,
+          postedDate: p.createdAt
+            ? new Date(p.createdAt).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short",
+              })
+            : t("common.recently", { defaultValue: "Recently" }),
           _raw: p,
         };
       });
-      setProducts(normalized);
+
+      setProducts(formatted);
     } catch (err) {
-      console.warn("FarmerProducts fetch error:", err.message);
+      console.warn("FarmerProductsScreen fetch error:", err.message);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [user?._id, user?.id, t]);
 
   useEffect(() => {
-    fetchMyProducts();
-  }, []);
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      fetchMyProducts(true);
-    });
-    return unsubscribe;
-  }, [navigation]);
+    fetchProducts();
+  }, [fetchProducts]);
 
   const handleRefresh = () => {
-    setRefreshing(true);
-    fetchMyProducts(true);
+    fetchProducts(true);
   };
 
-  // Calculations
-  const countActive = useMemo(() => products.filter((p) => p.status === "active").length, [products]);
-  const countSold = useMemo(() => products.filter((p) => p.status === "sold").length, [products]);
-  const countDraft = useMemo(() => products.filter((p) => p.status === "draft").length, [products]);
-
-  const totalVolume = useMemo(() => {
-    return products
-      .filter((p) => p.status === "active")
-      .reduce((sum, p) => sum + (Number(p.quantity) || 0), 0);
-  }, [products]);
-
-  const totalValuation = useMemo(() => {
-    return products
-      .filter((p) => p.status === "active")
-      .reduce((sum, p) => sum + (Number(p.price) || 0) * (Number(p.quantity) || 1), 0);
-  }, [products]);
-
-  const filteredProducts = useMemo(() => {
-    if (selectedFilter === "active") return products.filter((p) => p.status === "active");
-    if (selectedFilter === "sold") return products.filter((p) => p.status === "sold");
-    if (selectedFilter === "draft") return products.filter((p) => p.status === "draft");
-    return products;
-  }, [products, selectedFilter]);
-
-  const markAsSold = async (id) => {
-    setUpdatingProductId(id);
+  const markAsSold = async (productId) => {
+    setUpdatingProductId(productId);
     try {
-      await api.put(API_ENDPOINTS.products.update(id), { status: "sold" });
+      await api.put(API_ENDPOINTS.products.update(productId), { status: "sold" });
       setProducts((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, status: "sold" } : p))
+        prev.map((p) => (p.id === productId ? { ...p, status: "sold" } : p))
       );
     } catch (err) {
       Alert.alert(
-        t("farmerProducts.unableToMarkSoldTitle", { defaultValue: "Status Update Failed" }),
-        err?.response?.data?.message || t("farmerProducts.unableToMarkSoldMessage", { defaultValue: "Unable to mark crop as sold out." })
+        t("errorMessage.title", { defaultValue: "Error" }),
+        err?.response?.data?.message || t("farmerProducts.failedUpdateStatus", { defaultValue: "Failed to update listing status." })
       );
     } finally {
       setUpdatingProductId(null);
     }
   };
 
+  const { countActive, countSold, countDraft, totalVolume, totalValuation } = useMemo(() => {
+    let active = 0;
+    let sold = 0;
+    let draft = 0;
+    let vol = 0;
+    let val = 0;
+
+    products.forEach((p) => {
+      if (p.status === "active") active += 1;
+      else if (p.status === "sold") sold += 1;
+      else if (p.status === "draft") draft += 1;
+
+      vol += Number(p.quantity) || 0;
+      val += (Number(p.quantity) || 0) * (Number(p.price) || 0);
+    });
+
+    return {
+      countActive: active,
+      countSold: sold,
+      countDraft: draft,
+      totalVolume: vol,
+      totalValuation: val,
+    };
+  }, [products]);
+
+  const filteredProducts = useMemo(() => {
+    if (selectedFilter === "all") return products;
+    return products.filter((p) => p.status === selectedFilter);
+  }, [products, selectedFilter]);
+
   const renderProductCard = ({ item }) => {
     const isSold = item.status === "sold";
-    const statusBg = item.status === "active" ? "#DCFCE7" : item.status === "sold" ? "#F1F5F9" : "#FEF3C7";
-    const statusTextColor = item.status === "active" ? "#16A34A" : item.status === "sold" ? "#64748B" : "#D97706";
-    const statusLabel = item.status === "active"
-      ? t("farmerProducts.statusActive", { defaultValue: "Active Stock" })
-      : item.status === "sold"
-      ? t("farmerProducts.statusSold", { defaultValue: "Sold Out" })
-      : t("farmerProducts.statusDraft", { defaultValue: "Draft" });
 
-    const stockTotalVal = (Number(item.price) || 0) * (Number(item.quantity) || 1);
+    const statusLabel = isSold
+      ? t("statuses.sold", { defaultValue: "Sold Out" })
+      : item.status === "draft"
+      ? t("statuses.draft", { defaultValue: "Draft" })
+      : t("statuses.active", { defaultValue: "Active" });
 
-    const rawId = item.customId || item.id || "";
-    const shortId = rawId.startsWith("PRD-")
-      ? rawId
-      : rawId
-      ? `PRD-${rawId.substring(rawId.length - 6).toUpperCase()}`
-      : "PRD";
+    const statusBg = isSold ? "#FEE2E2" : item.status === "draft" ? "#FEF3C7" : "#DCFCE7";
+    const statusTextColor = isSold ? "#DC2626" : item.status === "draft" ? "#D97706" : "#15803D";
+
+    const stockTotalVal = (Number(item.quantity) || 0) * (Number(item.price) || 0);
 
     const localizedCrop = getLocalizedCropName(item.cropType, currentLang, t);
     const localizedUnit = getLocalizedUnitName(item.unit, currentLang, t);
@@ -186,6 +184,8 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
       localizedLocation = item.location;
     }
 
+    const photoUrl = Array.isArray(item.photos) && item.photos.length > 0 ? item.photos[0] : null;
+
     return (
       <TouchableOpacity
         activeOpacity={0.85}
@@ -194,13 +194,17 @@ const FarmerProductsScreen = ({ navigation, onSwitchTab }) => {
       >
         <View style={styles.cardHeaderRow}>
           <View style={styles.cropTitleWrap}>
-            <View style={styles.cropIconBg}>
-              <Ionicons name="leaf" size={18} color="#15803D" />
-            </View>
+            {photoUrl ? (
+              <Image source={{ uri: photoUrl }} style={styles.cropThumbImage} resizeMode="cover" />
+            ) : (
+              <View style={styles.cropIconBg}>
+                <Ionicons name="leaf" size={18} color="#15803D" />
+              </View>
+            )}
             <View>
               <View style={styles.titleRefRow}>
                 <AppText style={[styles.cropName, { color: textPrimary }]}>{localizedCrop}</AppText>
-                <AppText style={styles.refText}>#{shortId}</AppText>
+                <AppText style={styles.refText}>#{item.shortId}</AppText>
               </View>
               <AppText style={styles.dateText}>
                 {t("farmerProducts.postedLabel", { date: item.postedDate, defaultValue: "Posted {{date}}" })}
@@ -422,6 +426,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
+  cropThumbImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: "#F1F5F9",
+  },
   cropIconBg: {
     width: 38,
     height: 38,
@@ -563,4 +573,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FarmerProductsScreen;
+

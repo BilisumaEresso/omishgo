@@ -114,7 +114,7 @@ export const createOrder = asyncHandler(async (req, res) => {
   const populated = await Order.findById(order._id)
     .populate("buyerId", "name phone")
     .populate("farmerId", "name phone")
-    .populate("productId", "cropType price unit");
+    .populate("productId", "cropType price unit photos");
 
   return sendResponse(res, {
     statusCode: 201,
@@ -249,7 +249,7 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   const updated = await Order.findById(order._id)
     .populate("buyerId", "name phone")
     .populate("farmerId", "name phone")
-    .populate("productId", "cropType price unit");
+    .populate("productId", "cropType price unit photos");
 
   return sendResponse(res, {
     statusCode: 200,

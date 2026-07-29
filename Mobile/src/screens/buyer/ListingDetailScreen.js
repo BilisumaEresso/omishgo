@@ -1,9 +1,9 @@
-// Mobile/src/screens/buyer/ListingDetailScreen.js
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Alert,
+  Image,
   Linking,
   Modal,
   ScrollView,
@@ -25,6 +25,9 @@ export default function ListingDetailScreen({ route, navigation }) {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { product } = route.params || {};
+
+  const photosList = (Array.isArray(product?.photos) ? product.photos : []).filter(Boolean);
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
 
   const rawId = product?.customId || product?._id || product?.id || "";
   const shortId = rawId.startsWith("PRD-")
@@ -160,6 +163,34 @@ export default function ListingDetailScreen({ route, navigation }) {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
+        {/* Photo Gallery Banner */}
+        {photosList.length > 0 && (
+          <View style={styles.galleryCard}>
+            <Image
+              source={{ uri: photosList[activePhotoIndex] || photosList[0] }}
+              style={styles.heroImage}
+              resizeMode="cover"
+            />
+            {photosList.length > 1 && (
+              <View style={styles.carouselBadgeRow}>
+                {photosList.map((_, i) => (
+                  <TouchableOpacity
+                    key={i}
+                    onPress={() => setActivePhotoIndex(i)}
+                    style={[
+                      styles.carouselDot,
+                      activePhotoIndex === i && styles.carouselDotActive,
+                    ]}
+                  />
+                ))}
+                <AppText style={styles.carouselCountText}>
+                  {activePhotoIndex + 1}/{photosList.length}
+                </AppText>
+              </View>
+            )}
+          </View>
+        )}
+
         {/* Crop Title Row */}
         <View style={styles.topTitleRow}>
           <View style={{ flex: 1 }}>
@@ -705,5 +736,47 @@ const styles = StyleSheet.create({
     color: "#64748B",
     fontSize: 13,
     fontWeight: "600",
+  },
+  galleryCard: {
+    width: "100%",
+    height: 220,
+    borderRadius: 20,
+    overflow: "hidden",
+    marginBottom: 16,
+    backgroundColor: "#F1F5F9",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  heroImage: {
+    width: "100%",
+    height: "100%",
+  },
+  carouselBadgeRow: {
+    position: "absolute",
+    bottom: 10,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "rgba(15, 23, 42, 0.6)",
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 20,
+  },
+  carouselDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: "rgba(255, 255, 255, 0.4)",
+  },
+  carouselDotActive: {
+    width: 18,
+    backgroundColor: "#FFFFFF",
+  },
+  carouselCountText: {
+    fontSize: 11,
+    color: "#FFFFFF",
+    fontWeight: "700",
+    marginLeft: 4,
   },
 });

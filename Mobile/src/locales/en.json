@@ -189,6 +189,8 @@
     "needCustomVolume": "Need a Custom Crop Volume?",
     "postCustomDesc": "Post a custom sourcing request to receive direct quotes from verified local producers.",
     "requestQuote": "Request Quote",
+    "orderTitle": "Order: {{crop}}",
+    "orderShortDesc": "Ordered {{quantity}} {{unit}} from {{farmer}}",
     "postBulkRequest": "Post Bulk Sourcing Request",
     "filterProduce": "Filter Produce",
     "resetFilters": "Reset All Filters",

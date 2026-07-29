@@ -1,6 +1,5 @@
-// src/components/common/ProductCard.js
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import AppButton from "./AppButton";
 import AppText from "./AppText";
@@ -50,6 +49,8 @@ export const ProductCard = ({
     ? `${formatNumber(product.price)} ETB / ${localizedUnit}`
     : t("farmerProducts.priceUnavailable", { defaultValue: "Price on Request" });
 
+  const photoUrl = Array.isArray(product.photos) && product.photos.length > 0 ? product.photos[0] : null;
+
   return (
     <View
       style={[
@@ -60,20 +61,29 @@ export const ProductCard = ({
         },
       ]}
     >
-      {/* Top Header: Crop Name & Bookmark Heart */}
+      {/* Top Header: Crop Photo + Crop Name & Bookmark Heart */}
       <View style={styles.cardHeader}>
-        <View style={styles.cropTitleWrap}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-            <AppText style={[styles.cropTitle, { color: textPrimary }]}>
-              {localizedCrop}
-            </AppText>
-            <AppText style={styles.refText}>#{shortId}</AppText>
-          </View>
-          <View style={styles.verifiedRow}>
-            <Ionicons name="checkmark-circle" size={14} color={primary} />
-            <AppText style={[styles.verifiedText, { color: primary }]}>
-              {t("buyerProfile.statusVerified", { defaultValue: "Verified Producer" })}
-            </AppText>
+        <View style={styles.headerLeftRow}>
+          {photoUrl ? (
+            <Image source={{ uri: photoUrl }} style={styles.thumbImage} resizeMode="cover" />
+          ) : (
+            <View style={[styles.thumbFallback, { backgroundColor: primaryCont }]}>
+              <Ionicons name="leaf" size={26} color={primary} />
+            </View>
+          )}
+          <View style={styles.cropTitleWrap}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+              <AppText style={[styles.cropTitle, { color: textPrimary }]}>
+                {localizedCrop}
+              </AppText>
+              <AppText style={styles.refText}>#{shortId}</AppText>
+            </View>
+            <View style={styles.verifiedRow}>
+              <Ionicons name="checkmark-circle" size={14} color={primary} />
+              <AppText style={[styles.verifiedText, { color: primary }]}>
+                {t("buyerProfile.statusVerified", { defaultValue: "Verified Producer" })}
+              </AppText>
+            </View>
           </View>
         </View>
 
@@ -152,6 +162,25 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-start",
     marginBottom: 12,
+  },
+  headerLeftRow: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  thumbImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 14,
+    backgroundColor: "#F1F5F9",
+  },
+  thumbFallback: {
+    width: 64,
+    height: 64,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
   },
   cropTitleWrap: {
     flex: 1,

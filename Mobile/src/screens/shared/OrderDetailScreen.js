@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Linking,
   StyleSheet,
   TouchableOpacity,
@@ -64,6 +65,8 @@ export default function OrderDetailScreen({ route, navigation }) {
   const rawStatus = order.status || "pending";
   const statusStyle = STATUS_CONFIG[rawStatus] || STATUS_CONFIG.pending;
   const statusLabel = t(statusStyle.labelKey, { defaultValue: rawStatus.toUpperCase() });
+
+  const photoUrl = order.productId?.photos?.[0] || order.photos?.[0];
 
   const date = order.createdAt
     ? new Date(order.createdAt).toLocaleDateString("en-GB", {
@@ -145,6 +148,11 @@ export default function OrderDetailScreen({ route, navigation }) {
 
       {/* Product Details Card */}
       <View style={[styles.card, { backgroundColor: surfaceColor }]}>
+        {photoUrl ? (
+          <View style={styles.orderPhotoContainer}>
+            <Image source={{ uri: photoUrl }} style={styles.orderHeroPhoto} resizeMode="cover" />
+          </View>
+        ) : null}
         <AppText style={[styles.cardTitle, { color: textPrimary }]}>
           {t("orderDetail.productInfo", { defaultValue: "Harvest Order Details" })}
         </AppText>
@@ -373,5 +381,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#FECACA",
   },
-  cancelActionText: { color: "#EF4444", fontSize: 14, fontWeight: "700" },
+  cancelActionText: { color: "#DC2626", fontSize: 14, fontWeight: "700" },
+  orderPhotoContainer: {
+    width: "100%",
+    height: 160,
+    borderRadius: 14,
+    overflow: "hidden",
+    marginBottom: 14,
+    backgroundColor: "#F1F5F9",
+  },
+  orderHeroPhoto: {
+    width: "100%",
+    height: "100%",
+  },
 });

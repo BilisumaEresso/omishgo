@@ -32,7 +32,7 @@ export const getMyActivities = asyncHandler(async (req, res) => {
   const orders = await Order.find({ buyerId: req.user._id })
     .sort("-createdAt")
     .limit(5)
-    .populate("productId", "cropType price unit")
+    .populate("productId", "cropType price unit photos")
     .populate("farmerId", "name");
 
   // Map to the "Activity" format expected by the frontend
