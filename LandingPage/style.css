@@ -212,7 +212,16 @@ h1{font-size:clamp(36px,5.5vw,70px);font-weight:900;line-height:1.07;letter-spac
 }
 
 .screens-header{text-align:center;padding-top:100px}
-.screens-header .section-sub{margin-left:auto;margin-right:auto;margin-bottom:36px}
+.screens-header h2{
+  color:#ffffff;
+  text-shadow:0 2px 24px rgba(245,197,24,.18);
+}
+.screens-header .section-sub{
+  color:rgba(255,255,255,.62);
+  margin-left:auto;
+  margin-right:auto;
+  margin-bottom:36px;
+}
 
 /* Tab filter */
 .screen-tabs{
