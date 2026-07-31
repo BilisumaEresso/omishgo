@@ -1,6 +1,6 @@
+import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import request from "supertest";
-import bcrypt from "bcryptjs";
 import app from "../src/app.js";
 import Product from "../src/modules/product/product.model.js";
 import User from "../src/modules/user/user.model.js";
@@ -38,7 +38,7 @@ describe("Admin API", () => {
       pinHash,
       role: "admin",
       location: { region: "A", zone: "B", wereda: "C" },
-      isVerified: true
+      isVerified: true,
     });
 
     const loginAdmin = await request(app)
@@ -61,7 +61,7 @@ describe("Admin API", () => {
       .post("/api/v1/auth/login")
       .send({ phone: "0911000001", pin: "1234" });
     farmerToken = loginFarmer.body.data.token;
-    
+
     // Auto-verify farmer so they can create products for the tests
     await User.findByIdAndUpdate(farmerId, { isVerified: true });
   });

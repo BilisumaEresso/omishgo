@@ -6,8 +6,6 @@ import PrimaryButton from "./PrimaryButton";
 import SecondaryButton from "./SecondaryButton";
 import Typography from "./Typography";
 
-
-
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: spacing.xl,
@@ -102,7 +100,11 @@ const OnboardingFooter = React.forwardRef(
           {/* Next/Continue Button */}
           <View style={[styles.buttonHalf, !onBack && styles.buttonFull]}>
             <PrimaryButton
-              label={isLastStep ? t("onboarding.getStarted", { defaultValue: "Get Started" }) : nextLabel}
+              label={
+                isLastStep
+                  ? t("onboarding.getStarted", { defaultValue: "Get Started" })
+                  : nextLabel
+              }
               onPress={onNext}
               loading={nextLoading}
               disabled={nextDisabled}
@@ -119,7 +121,11 @@ const OnboardingFooter = React.forwardRef(
           {showStepCounter && (
             <View style={styles.stepCounter} testID={`${testID}-counter`}>
               <Typography variant="caption" color={neutralColors.textLight}>
-                {t("onboarding.stepCounter", { current: currentStep, total: totalSteps, defaultValue: `Step ${currentStep} of ${totalSteps}` })}
+                {t("onboarding.stepCounter", {
+                  current: currentStep,
+                  total: totalSteps,
+                  defaultValue: `Step ${currentStep} of ${totalSteps}`,
+                })}
               </Typography>
             </View>
           )}

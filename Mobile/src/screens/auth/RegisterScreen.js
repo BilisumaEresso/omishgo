@@ -148,11 +148,31 @@ export default function RegisterScreen({ navigation }) {
   const shake = () => {
     shakeX.setValue(0);
     Animated.sequence([
-      Animated.timing(shakeX, { toValue: 8, duration: 55, useNativeDriver: true }),
-      Animated.timing(shakeX, { toValue: -8, duration: 55, useNativeDriver: true }),
-      Animated.timing(shakeX, { toValue: 6, duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeX, { toValue: -4, duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeX, { toValue: 0, duration: 45, useNativeDriver: true }),
+      Animated.timing(shakeX, {
+        toValue: 8,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeX, {
+        toValue: -8,
+        duration: 55,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeX, {
+        toValue: 6,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeX, {
+        toValue: -4,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeX, {
+        toValue: 0,
+        duration: 45,
+        useNativeDriver: true,
+      }),
     ]).start();
   };
 
@@ -235,9 +255,7 @@ export default function RegisterScreen({ navigation }) {
       });
       if (!result.success) {
         shake();
-        setRegisterError(
-          result.message || t("auth.registerError"),
-        );
+        setRegisterError(result.message || t("auth.registerError"));
         return;
       }
       await setAppLanguage(preferredLang);
@@ -245,9 +263,7 @@ export default function RegisterScreen({ navigation }) {
       if (result.autoLoginFailed) navigation.replace("Login");
     } catch (error) {
       shake();
-      setRegisterError(
-        error.message || t("auth.registrationFailed"),
-      );
+      setRegisterError(error.message || t("auth.registrationFailed"));
     } finally {
       setLoading(false);
     }
@@ -314,9 +330,7 @@ export default function RegisterScreen({ navigation }) {
               styles.logoWrapper,
               {
                 opacity: Animated.multiply(logoOpacity, heroAnim),
-                transform: [
-                  { scale: Animated.multiply(logoScale, heroAnim) },
-                ],
+                transform: [{ scale: Animated.multiply(logoScale, heroAnim) }],
               },
             ]}
           >
@@ -567,14 +581,9 @@ export default function RegisterScreen({ navigation }) {
 
             {/* Login Link Row */}
             <Animated.View
-              style={[
-                rowStyle(FOOTER_ROW_INDEX),
-                styles.footerRow,
-              ]}
+              style={[rowStyle(FOOTER_ROW_INDEX), styles.footerRow]}
             >
-              <AppText style={styles.footerSub}>
-                {t("auth.hasAccount")}
-              </AppText>
+              <AppText style={styles.footerSub}>{t("auth.hasAccount")}</AppText>
               <Pressable
                 onPress={() => navigation.navigate("Login")}
                 hitSlop={10}
@@ -630,8 +639,18 @@ const styles = StyleSheet.create({
   scrollContent: { flexGrow: 1, paddingHorizontal: 22, paddingBottom: 40 },
   logoWrapper: { alignItems: "center", marginTop: 16, marginBottom: 12 },
   logo: { width: 140, height: 140 },
-  title: { textAlign: "center", fontWeight: "800", fontSize: 22, marginBottom: 6 },
-  subtitle: { textAlign: "center", marginBottom: 20, fontSize: 13.5, lineHeight: 20 },
+  title: {
+    textAlign: "center",
+    fontWeight: "800",
+    fontSize: 22,
+    marginBottom: 6,
+  },
+  subtitle: {
+    textAlign: "center",
+    marginBottom: 20,
+    fontSize: 13.5,
+    lineHeight: 20,
+  },
   form: { gap: 4 },
   sectionHeader: {
     fontSize: 14,

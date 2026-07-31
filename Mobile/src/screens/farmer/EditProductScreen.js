@@ -21,16 +21,16 @@ import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
-import { CROP_TYPES, CROP_TYPES_LOCALIZED } from "../../constants/crops";
+import { CROP_TYPES, CROP_TYPES_LOCALIZED, CROP_VARIETIES, getLocalizedCropDisplayName } from "../../constants/crops";
 import {
   getLocalizedRegions,
-  getLocalizedZones,
   getLocalizedWereda,
+  getLocalizedZones,
 } from "../../constants/locations";
 import { UNITS_LOCALIZED } from "../../constants/units";
 import { useTheme } from "../../hooks/useTheme";
-import { useAuthStore } from "../../store/auth.store";
 import uploadService from "../../services/upload.service";
+import { useAuthStore } from "../../store/auth.store";
 
 const MAX_PHOTOS = 2;
 
@@ -51,10 +51,15 @@ const PhotoSlots = ({ photos, onAdd, onRemove, onRetry, theme, t }) => {
             <TouchableOpacity
               key={`empty-${index}`}
               onPress={onAdd}
-              style={[styles.photoSlotEmpty, { borderColor: border, backgroundColor: surface }]}
+              style={[
+                styles.photoSlotEmpty,
+                { borderColor: border, backgroundColor: surface },
+              ]}
             >
               <Ionicons name="camera" size={26} color={primary} />
-              <AppText style={[styles.photoSlotEmptyText, { color: textSecondary }]}>
+              <AppText
+                style={[styles.photoSlotEmptyText, { color: textSecondary }]}
+              >
                 {t("postProduct.addPhoto", { defaultValue: "Add Photo" })}
               </AppText>
             </TouchableOpacity>
@@ -62,8 +67,15 @@ const PhotoSlots = ({ photos, onAdd, onRemove, onRetry, theme, t }) => {
         }
 
         return (
-          <View key={photo.uri || index} style={[styles.photoSlotFilled, { borderColor: border }]}>
-            <Image source={{ uri: photo.uri || photo.url }} style={styles.photoImg} resizeMode="cover" />
+          <View
+            key={photo.uri || index}
+            style={[styles.photoSlotFilled, { borderColor: border }]}
+          >
+            <Image
+              source={{ uri: photo.uri || photo.url }}
+              style={styles.photoImg}
+              resizeMode="cover"
+            />
 
             {photo.uploading && (
               <View style={styles.photoOverlay}>
@@ -72,13 +84,21 @@ const PhotoSlots = ({ photos, onAdd, onRemove, onRetry, theme, t }) => {
             )}
 
             {photo.error && !photo.uploading && (
-              <TouchableOpacity onPress={() => onRetry(index)} style={styles.photoOverlayError}>
+              <TouchableOpacity
+                onPress={() => onRetry(index)}
+                style={styles.photoOverlayError}
+              >
                 <Ionicons name="refresh" size={20} color="#FFFFFF" />
-                <AppText style={styles.photoRetryText}>{t("postProduct.retry", { defaultValue: "Retry" })}</AppText>
+                <AppText style={styles.photoRetryText}>
+                  {t("postProduct.retry", { defaultValue: "Retry" })}
+                </AppText>
               </TouchableOpacity>
             )}
 
-            <TouchableOpacity onPress={() => onRemove(index)} style={styles.removePhotoBtn}>
+            <TouchableOpacity
+              onPress={() => onRemove(index)}
+              style={styles.removePhotoBtn}
+            >
               <Ionicons name="close" size={13} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
@@ -91,6 +111,7 @@ const PhotoSlots = ({ photos, onAdd, onRemove, onRetry, theme, t }) => {
 const DropdownPicker = ({
   label,
   value,
+  displayValue,
   options,
   onSelect,
   visible,
@@ -112,10 +133,12 @@ const DropdownPicker = ({
   const selectedLabel = (() => {
     if (!value) return null;
     const found = safeOptions.find((opt) =>
-      typeof opt === "string" ? opt === value : opt.value === value
+      typeof opt === "string" ? opt === value : opt.value === value,
     );
     return found ? (typeof found === "string" ? found : found.label) : value;
   })();
+
+  const activeText = displayValue || selectedLabel;
 
   return (
     <View>
@@ -137,16 +160,16 @@ const DropdownPicker = ({
             <Ionicons
               name={icon}
               size={18}
-              color={value ? primary : textSecondary}
+              color={activeText ? primary : textSecondary}
             />
           )}
           <AppText
             style={[
               styles.dropdownText,
-              { color: value ? textPrimary : textSecondary },
+              { color: activeText ? textPrimary : textSecondary },
             ]}
           >
-            {selectedLabel || placeholder}
+            {activeText || placeholder}
           </AppText>
         </View>
         <Ionicons
@@ -156,29 +179,40 @@ const DropdownPicker = ({
         />
       </TouchableOpacity>
       {visible && safeOptions.length > 0 && (
-        <View style={[styles.dropdownMenu, { backgroundColor: surface, borderColor: border }]}>
+        <View
+          style={[
+            styles.dropdownMenu,
+            { backgroundColor: surface, borderColor: border },
+          ]}
+        >
           <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false}>
             {safeOptions.map((opt) => {
               const optValue = typeof opt === "string" ? opt : opt.value;
               const optLabel = typeof opt === "string" ? opt : opt.label;
+              const isIndented = typeof opt === "object" && opt.isIndented;
               const isSelected = value === optValue;
 
               return (
                 <TouchableOpacity
                   key={optValue}
                   onPress={() => {
-                    onSelect(optValue);
-                    onClose();
+                    const shouldClose = onSelect(optValue);
+                    if (shouldClose !== false) onClose();
                   }}
                   style={[
                     styles.dropdownOption,
+                    isIndented && styles.dropdownOptionIndented,
                     isSelected && { backgroundColor: primary + "15" },
                   ]}
                 >
                   <AppText
                     style={[
                       styles.dropdownOptionText,
-                      { color: isSelected ? primary : textPrimary, fontWeight: isSelected ? "700" : "400" },
+                      isIndented && styles.dropdownOptionIndentedText,
+                      {
+                        color: isSelected ? primary : textPrimary,
+                        fontWeight: isSelected ? "700" : "400",
+                      },
                     ]}
                   >
                     {optLabel}
@@ -203,7 +237,11 @@ export default function EditProductScreen({ route, navigation }) {
   const userZone = user?.location?.zone || user?.zone || "";
   const userWereda = user?.location?.wereda || user?.wereda || "";
 
-  const [cropType, setCropType] = useState(product?.cropType || product?.category || "");
+  const [cropType, setCropType] = useState(
+    product?.cropType || product?.category || "",
+  );
+  const [variety, setVariety] = useState(product?.variety || "");
+  const [expandedCrop, setExpandedCrop] = useState(null);
   const [quantity, setQuantity] = useState(String(product?.quantity || ""));
   const [unit, setUnit] = useState(product?.unit || "quintal");
   const [price, setPrice] = useState(String(product?.price || ""));
@@ -230,11 +268,74 @@ export default function EditProductScreen({ route, navigation }) {
   const background = "#F8FAFC";
   const lang = i18n.language || "en";
 
-  const cropLabels = CROP_TYPES_LOCALIZED?.[lang] || CROP_TYPES_LOCALIZED?.en || {};
-  const cropOptions = (CROP_TYPES || []).map((key) => ({
-    value: key,
-    label: cropLabels[key] || key,
-  }));
+  const cropLabels =
+    CROP_TYPES_LOCALIZED?.[lang] || CROP_TYPES_LOCALIZED?.en || {};
+  const cropOptions = (CROP_TYPES || []).reduce((acc, key) => {
+    const cropLabel = cropLabels[key] || key;
+    acc.push({
+      value: key,
+      label: cropLabel,
+    });
+
+    if (expandedCrop === key && CROP_VARIETIES[key]?.length) {
+      const anyLabel = t("postProduct.anyVariety", {
+        crop: cropLabel,
+        defaultValue: `Any ${cropLabel}`,
+      });
+      acc.push({
+        value: `any::${key}`,
+        label: anyLabel,
+        isIndented: true,
+      });
+
+      CROP_VARIETIES[key].forEach((v) => {
+        const vLocalized = t(`varieties.${v}`, { defaultValue: v });
+        acc.push({
+          value: `variety::${v}`,
+          label: vLocalized,
+          isIndented: true,
+        });
+      });
+    }
+    return acc;
+  }, []);
+
+  const handleCropSelect = (optValue) => {
+    if (optValue.startsWith("any::")) {
+      const selectedCrop = optValue.replace("any::", "");
+      setCropType(selectedCrop);
+      setVariety("");
+      setExpandedCrop(null);
+      return true;
+    }
+    if (optValue.startsWith("variety::")) {
+      const selectedVariety = optValue.replace("variety::", "");
+      setCropType(expandedCrop);
+      setVariety(selectedVariety);
+      setExpandedCrop(null);
+      return true;
+    }
+
+    if (CROP_VARIETIES[optValue]) {
+      if (optValue !== expandedCrop) {
+        setExpandedCrop(optValue);
+        return false;
+      }
+      setCropType(optValue);
+      setVariety("");
+      setExpandedCrop(null);
+      return true;
+    }
+
+    setCropType(optValue);
+    setVariety("");
+    setExpandedCrop(null);
+    return true;
+  };
+
+  const cropDisplayValue = cropType
+    ? getLocalizedCropDisplayName(cropType, variety, lang, t)
+    : "";
 
   const unitLabels = UNITS_LOCALIZED?.[lang] || UNITS_LOCALIZED?.en || {};
   const unitOptions = Object.entries(unitLabels).map(([key, label]) => ({
@@ -249,7 +350,9 @@ export default function EditProductScreen({ route, navigation }) {
 
   const uploadPhotoAt = async (uri, asset) => {
     setPhotos((prev) =>
-      prev.map((p) => (p.uri === uri ? { ...p, uploading: true, error: false } : p))
+      prev.map((p) =>
+        p.uri === uri ? { ...p, uploading: true, error: false } : p,
+      ),
     );
 
     const result = await uploadService.uploadImage(asset);
@@ -260,8 +363,8 @@ export default function EditProductScreen({ route, navigation }) {
           ? result.success
             ? { ...p, uploading: false, error: false, url: result.url }
             : { ...p, uploading: false, error: true }
-          : p
-      )
+          : p,
+      ),
     );
   };
 
@@ -269,7 +372,9 @@ export default function EditProductScreen({ route, navigation }) {
     if (photos.length >= MAX_PHOTOS) {
       Alert.alert(
         t("postProduct.photoLimitTitle", { defaultValue: "Photo Limit" }),
-        t("postProduct.photoLimitMsg", { defaultValue: "Maximum 2 photos per crop listing." })
+        t("postProduct.photoLimitMsg", {
+          defaultValue: "Maximum 2 photos per crop listing.",
+        }),
       );
       return;
     }
@@ -281,8 +386,13 @@ export default function EditProductScreen({ route, navigation }) {
 
     if (!permission.granted) {
       Alert.alert(
-        t("postProduct.permissionRequiredTitle", { defaultValue: "Permission Required" }),
-        t("postProduct.permissionRequiredMsg", { defaultValue: "Camera/Gallery access is required to attach product photos." })
+        t("postProduct.permissionRequiredTitle", {
+          defaultValue: "Permission Required",
+        }),
+        t("postProduct.permissionRequiredMsg", {
+          defaultValue:
+            "Camera/Gallery access is required to attach product photos.",
+        }),
       );
       return;
     }
@@ -302,20 +412,36 @@ export default function EditProductScreen({ route, navigation }) {
     if (result.canceled || !result.assets?.length) return;
 
     const asset = result.assets[0];
-    setPhotos((prev) => [...prev, { uri: asset.uri, url: null, uploading: true, error: false }]);
+    setPhotos((prev) => [
+      ...prev,
+      { uri: asset.uri, url: null, uploading: true, error: false },
+    ]);
     uploadPhotoAt(asset.uri, asset);
   };
 
   const handleAddPhoto = () => {
     Alert.alert(
       t("postProduct.addPhotoTitle", { defaultValue: "Add Crop Photo" }),
-      t("postProduct.choosePhotoSource", { defaultValue: "Choose photo source:" }),
+      t("postProduct.choosePhotoSource", {
+        defaultValue: "Choose photo source:",
+      }),
       [
-        { text: t("postProduct.takePhoto", { defaultValue: "Take Photo" }), onPress: () => launchPicker("camera") },
-        { text: t("postProduct.chooseGallery", { defaultValue: "Choose from Gallery" }), onPress: () => launchPicker("gallery") },
-        { text: t("common.cancel", { defaultValue: "Cancel" }), style: "cancel" },
+        {
+          text: t("postProduct.takePhoto", { defaultValue: "Take Photo" }),
+          onPress: () => launchPicker("camera"),
+        },
+        {
+          text: t("postProduct.chooseGallery", {
+            defaultValue: "Choose from Gallery",
+          }),
+          onPress: () => launchPicker("gallery"),
+        },
+        {
+          text: t("common.cancel", { defaultValue: "Cancel" }),
+          style: "cancel",
+        },
       ],
-      { cancelable: true }
+      { cancelable: true },
     );
   };
 
@@ -333,7 +459,10 @@ export default function EditProductScreen({ route, navigation }) {
     if (!cropType || !quantity || !price || !region) {
       Alert.alert(
         t("editProduct.missingFieldsTitle", { defaultValue: "Missing Fields" }),
-        t("editProduct.missingFieldsMsg", { defaultValue: "Please complete crop type, stock quantity, price, and location." })
+        t("editProduct.missingFieldsMsg", {
+          defaultValue:
+            "Please complete crop type, stock quantity, price, and location.",
+        }),
       );
       return;
     }
@@ -342,7 +471,9 @@ export default function EditProductScreen({ route, navigation }) {
     if (isUploading) {
       Alert.alert(
         t("postProduct.uploadingTitle", { defaultValue: "Upload in Progress" }),
-        t("postProduct.uploadingMsg", { defaultValue: "Please wait for photos to finish uploading." })
+        t("postProduct.uploadingMsg", {
+          defaultValue: "Please wait for photos to finish uploading.",
+        }),
       );
       return;
     }
@@ -350,8 +481,13 @@ export default function EditProductScreen({ route, navigation }) {
     const hasError = photos.some((p) => p.error || !p.url);
     if (hasError) {
       Alert.alert(
-        t("postProduct.uploadErrorTitle", { defaultValue: "Photo Upload Failed" }),
-        t("postProduct.uploadErrorMsg", { defaultValue: "One or more photos failed to upload. Please tap retry or remove them." })
+        t("postProduct.uploadErrorTitle", {
+          defaultValue: "Photo Upload Failed",
+        }),
+        t("postProduct.uploadErrorMsg", {
+          defaultValue:
+            "One or more photos failed to upload. Please tap retry or remove them.",
+        }),
       );
       return;
     }
@@ -366,6 +502,7 @@ export default function EditProductScreen({ route, navigation }) {
         API_ENDPOINTS.products.update(product?.id || product?._id),
         {
           cropType,
+          variety: variety ? variety.trim() : null,
           quantity: Number(quantity),
           unit,
           price: Number(price),
@@ -378,18 +515,32 @@ export default function EditProductScreen({ route, navigation }) {
             wereda: wereda.trim(),
             kebele: "",
           },
-        }
+        },
       );
 
       Alert.alert(
-        t("editProduct.updatedSuccessTitle", { defaultValue: "Listing Updated!" }),
-        t("editProduct.updatedSuccessMsg", { defaultValue: "Your harvest listing changes have been saved successfully." }),
-        [{ text: t("common.ok", { defaultValue: "OK" }), onPress: () => navigation.goBack() }]
+        t("editProduct.updatedSuccessTitle", {
+          defaultValue: "Listing Updated!",
+        }),
+        t("editProduct.updatedSuccessMsg", {
+          defaultValue:
+            "Your harvest listing changes have been saved successfully.",
+        }),
+        [
+          {
+            text: t("common.ok", { defaultValue: "OK" }),
+            onPress: () => navigation.goBack(),
+          },
+        ],
       );
     } catch (err) {
       Alert.alert(
         t("editProduct.updateFailedTitle", { defaultValue: "Update Failed" }),
-        err.response?.data?.message || err.message || t("editProduct.updateFailedMsg", { defaultValue: "Failed to update listing." })
+        err.response?.data?.message ||
+          err.message ||
+          t("editProduct.updateFailedMsg", {
+            defaultValue: "Failed to update listing.",
+          }),
       );
     } finally {
       setLoading(false);
@@ -399,58 +550,111 @@ export default function EditProductScreen({ route, navigation }) {
   const handleDelete = () => {
     Alert.alert(
       t("editProduct.deleteConfirmTitle", { defaultValue: "Delete Listing" }),
-      t("editProduct.deleteConfirmMsg", { cropType, defaultValue: "Are you sure you want to delete this listing?" }),
+      t("editProduct.deleteConfirmMsg", {
+        cropType,
+        defaultValue: "Are you sure you want to delete this listing?",
+      }),
       [
-        { text: t("common.cancel", { defaultValue: "Cancel" }), style: "cancel" },
         {
-          text: t("editProduct.deleteListingBtn", { defaultValue: "Delete Listing" }),
+          text: t("common.cancel", { defaultValue: "Cancel" }),
+          style: "cancel",
+        },
+        {
+          text: t("editProduct.deleteListingBtn", {
+            defaultValue: "Delete Listing",
+          }),
           style: "destructive",
           onPress: async () => {
             try {
               await api.delete(
-                API_ENDPOINTS.products.delete(product?.id || product?._id)
+                API_ENDPOINTS.products.delete(product?.id || product?._id),
               );
               navigation.goBack();
             } catch (err) {
               Alert.alert(
-                t("editProduct.deleteFailedTitle", { defaultValue: "Delete Failed" }),
-                err.response?.data?.message || err.message || t("editProduct.deleteFailedMsg", { defaultValue: "Failed to delete listing." })
+                t("editProduct.deleteFailedTitle", {
+                  defaultValue: "Delete Failed",
+                }),
+                err.response?.data?.message ||
+                  err.message ||
+                  t("editProduct.deleteFailedMsg", {
+                    defaultValue: "Failed to delete listing.",
+                  }),
               );
             }
           },
         },
-      ]
+      ],
     );
   };
 
   return (
     <View style={[styles.container, { backgroundColor: background }]}>
-      <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
-      <AppHeader title={t("editProduct.title", { defaultValue: "Edit Harvest Listing" })} showBack onBackPress={() => navigation.goBack()} />
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
+      <AppHeader
+        title={t("editProduct.title", { defaultValue: "Edit Harvest Listing" })}
+        showBack
+        onBackPress={() => navigation.goBack()}
+      />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1 }}
       >
-        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.statusCard}>
-            <AppText style={styles.statusCardTitle}>{t("editProduct.availabilityStatus", { defaultValue: "Listing Availability Status" })}</AppText>
+            <AppText style={styles.statusCardTitle}>
+              {t("editProduct.availabilityStatus", {
+                defaultValue: "Listing Availability Status",
+              })}
+            </AppText>
             <View style={styles.statusToggleRow}>
               <TouchableOpacity
-                style={[styles.statusToggleBtn, status === "active" && { backgroundColor: "#15803D" }]}
+                style={[
+                  styles.statusToggleBtn,
+                  status === "active" && { backgroundColor: "#15803D" },
+                ]}
                 onPress={() => setStatus("active")}
               >
-                <Ionicons name="checkmark-circle" size={16} color={status === "active" ? "#FFFFFF" : "#15803D"} />
-                <AppText style={[styles.statusToggleText, status === "active" && { color: "#FFFFFF" }]}>
+                <Ionicons
+                  name="checkmark-circle"
+                  size={16}
+                  color={status === "active" ? "#FFFFFF" : "#15803D"}
+                />
+                <AppText
+                  style={[
+                    styles.statusToggleText,
+                    status === "active" && { color: "#FFFFFF" },
+                  ]}
+                >
                   {t("editProduct.activeStock", { defaultValue: "Active" })}
                 </AppText>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.statusToggleBtn, status === "sold" && { backgroundColor: "#DC2626" }]}
+                style={[
+                  styles.statusToggleBtn,
+                  status === "sold" && { backgroundColor: "#DC2626" },
+                ]}
                 onPress={() => setStatus("sold")}
               >
-                <Ionicons name="archive" size={16} color={status === "sold" ? "#FFFFFF" : "#DC2626"} />
-                <AppText style={[styles.statusToggleText, status === "sold" && { color: "#FFFFFF" }]}>
+                <Ionicons
+                  name="archive"
+                  size={16}
+                  color={status === "sold" ? "#FFFFFF" : "#DC2626"}
+                />
+                <AppText
+                  style={[
+                    styles.statusToggleText,
+                    status === "sold" && { color: "#FFFFFF" },
+                  ]}
+                >
                   {t("editProduct.soldOut", { defaultValue: "Sold Out" })}
                 </AppText>
               </TouchableOpacity>
@@ -460,20 +664,32 @@ export default function EditProductScreen({ route, navigation }) {
           <DropdownPicker
             label={t("postProduct.cropType", { defaultValue: "Crop Type" })}
             value={cropType}
+            displayValue={cropDisplayValue}
             options={cropOptions}
-            onSelect={setCropType}
+            onSelect={handleCropSelect}
             visible={showCropPicker}
             onOpen={() => setShowCropPicker(true)}
             onClose={() => setShowCropPicker(false)}
             icon="leaf-outline"
             theme={theme}
-            placeholder={t("editProduct.cropSelectPlaceholder", { defaultValue: "Select Harvest Crop" })}
+            placeholder={t("editProduct.cropSelectPlaceholder", {
+              defaultValue: "Select Harvest Crop",
+            })}
           />
 
           <View style={styles.row}>
             <View style={{ flex: 2 }}>
-              <AppText style={styles.inputLabel}>{t("postProduct.stockQuantity", { defaultValue: "Stock Quantity" })}</AppText>
-              <AppInput placeholder="0" value={quantity} onChangeText={setQuantity} keyboardType="numeric" />
+              <AppText style={styles.inputLabel}>
+                {t("postProduct.stockQuantity", {
+                  defaultValue: "Stock Quantity",
+                })}
+              </AppText>
+              <AppInput
+                placeholder="0"
+                value={quantity}
+                onChangeText={setQuantity}
+                keyboardType="numeric"
+              />
             </View>
             <View style={{ flex: 1.2 }}>
               <DropdownPicker
@@ -486,22 +702,50 @@ export default function EditProductScreen({ route, navigation }) {
                 onClose={() => setShowUnitPicker(false)}
                 icon="cube-outline"
                 theme={theme}
-                placeholder={t("postProduct.unitPlaceholder", { defaultValue: "Unit" })}
+                placeholder={t("postProduct.unitPlaceholder", {
+                  defaultValue: "Unit",
+                })}
               />
             </View>
           </View>
 
           <AppText style={styles.inputLabel}>
-            {t("postProduct.pricePerUnitLabel", { defaultValue: "Price per {{unit}} (ETB)", unit: unitDisplay })}
+            {t("postProduct.pricePerUnitLabel", {
+              defaultValue: "Price per {{unit}} (ETB)",
+              unit: unitDisplay,
+            })}
           </AppText>
-          <AppInput placeholder="0" value={price} onChangeText={setPrice} keyboardType="numeric" leftIcon="pricetag-outline" />
-
-          <AppText style={styles.inputLabel}>{t("postProduct.harvestPhotosLabel", { defaultValue: "Harvest Photos (Max 2)" })}</AppText>
-          <PhotoSlots photos={photos} onAdd={handleAddPhoto} onRemove={handleRemovePhoto} onRetry={handleRetryPhoto} theme={theme} t={t} />
-
-          <AppText style={styles.inputLabel}>{t("editProduct.description", { defaultValue: "Listing Description" })}</AppText>
           <AppInput
-            placeholder={t("editProduct.descriptionPlaceholder", { defaultValue: "Add details..." })}
+            placeholder="0"
+            value={price}
+            onChangeText={setPrice}
+            keyboardType="numeric"
+            leftIcon="pricetag-outline"
+          />
+
+          <AppText style={styles.inputLabel}>
+            {t("postProduct.harvestPhotosLabel", {
+              defaultValue: "Harvest Photos (Max 2)",
+            })}
+          </AppText>
+          <PhotoSlots
+            photos={photos}
+            onAdd={handleAddPhoto}
+            onRemove={handleRemovePhoto}
+            onRetry={handleRetryPhoto}
+            theme={theme}
+            t={t}
+          />
+
+          <AppText style={styles.inputLabel}>
+            {t("editProduct.description", {
+              defaultValue: "Listing Description",
+            })}
+          </AppText>
+          <AppInput
+            placeholder={t("editProduct.descriptionPlaceholder", {
+              defaultValue: "Add details...",
+            })}
             value={description}
             onChangeText={setDescription}
             multiline
@@ -510,7 +754,11 @@ export default function EditProductScreen({ route, navigation }) {
           />
 
           <View style={styles.sectionCard}>
-            <AppText style={styles.sectionCardTitle}>{t("postProduct.farmLocationSection", { defaultValue: "Farm Location" })}</AppText>
+            <AppText style={styles.sectionCardTitle}>
+              {t("postProduct.farmLocationSection", {
+                defaultValue: "Farm Location",
+              })}
+            </AppText>
             <DropdownPicker
               label={t("postProduct.regionLabel", { defaultValue: "Region" })}
               value={region}
@@ -525,7 +773,9 @@ export default function EditProductScreen({ route, navigation }) {
               onClose={() => setShowRegionPicker(false)}
               icon="location-outline"
               theme={theme}
-              placeholder={t("postProduct.selectRegionPlaceholder", { defaultValue: "Select Region" })}
+              placeholder={t("postProduct.selectRegionPlaceholder", {
+                defaultValue: "Select Region",
+              })}
             />
             <DropdownPicker
               label={t("postProduct.zoneLabel", { defaultValue: "Zone" })}
@@ -537,13 +787,20 @@ export default function EditProductScreen({ route, navigation }) {
               }}
               visible={showZonePicker}
               onOpen={() => {
-                if (!region) return Alert.alert(t("postProduct.selectRegionFirstTitle", { defaultValue: "Select Region First" }));
+                if (!region)
+                  return Alert.alert(
+                    t("postProduct.selectRegionFirstTitle", {
+                      defaultValue: "Select Region First",
+                    }),
+                  );
                 setShowZonePicker(true);
               }}
               onClose={() => setShowZonePicker(false)}
               icon="map-outline"
               theme={theme}
-              placeholder={t("postProduct.selectZonePlaceholder", { defaultValue: "Select Zone" })}
+              placeholder={t("postProduct.selectZonePlaceholder", {
+                defaultValue: "Select Zone",
+              })}
               disabled={!region}
             />
             <DropdownPicker
@@ -553,26 +810,37 @@ export default function EditProductScreen({ route, navigation }) {
               onSelect={setWereda}
               visible={showWeredaPicker}
               onOpen={() => {
-                if (!zone) return Alert.alert(t("postProduct.selectZoneFirstTitle", { defaultValue: "Select Zone First" }));
+                if (!zone)
+                  return Alert.alert(
+                    t("postProduct.selectZoneFirstTitle", {
+                      defaultValue: "Select Zone First",
+                    }),
+                  );
                 setShowWeredaPicker(true);
               }}
               onClose={() => setShowWeredaPicker(false)}
               icon="navigate-outline"
               theme={theme}
-              placeholder={t("postProduct.selectWeredaPlaceholder", { defaultValue: "Select Wereda" })}
+              placeholder={t("postProduct.selectWeredaPlaceholder", {
+                defaultValue: "Select Wereda",
+              })}
               disabled={!zone}
             />
           </View>
 
           <AppButton
-            title={t("editProduct.saveChangesBtn", { defaultValue: "Save Changes" })}
+            title={t("editProduct.saveChangesBtn", {
+              defaultValue: "Save Changes",
+            })}
             fullWidth
             loading={loading}
             onPress={handleUpdate}
             style={styles.submitBtn}
           />
           <AppButton
-            title={t("editProduct.deleteListingBtn", { defaultValue: "Delete Listing" })}
+            title={t("editProduct.deleteListingBtn", {
+              defaultValue: "Delete Listing",
+            })}
             variant="outline"
             fullWidth
             onPress={handleDelete}
@@ -589,29 +857,125 @@ export default function EditProductScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scroll: { paddingHorizontal: 16, paddingBottom: 40, paddingTop: 10 },
-  statusCard: { backgroundColor: "#FFFFFF", borderRadius: 18, padding: 16, borderWidth: 1, borderColor: "#CBD5E1", marginBottom: 16 },
-  statusCardTitle: { fontSize: 13, fontWeight: "700", color: "#0F172A", marginBottom: 10 },
+  statusCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#CBD5E1",
+    marginBottom: 16,
+  },
+  statusCardTitle: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginBottom: 10,
+  },
   statusToggleRow: { flexDirection: "row", gap: 10 },
-  statusToggleBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 10, borderRadius: 12, borderWidth: 1.5, borderColor: "#CBD5E1" },
+  statusToggleBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: "#CBD5E1",
+  },
   statusToggleText: { fontSize: 12.5, fontWeight: "800", color: "#334155" },
-  inputLabel: { fontSize: 13, fontWeight: "700", color: "#0F172A", marginTop: 14, marginBottom: 6 },
-  dropdownBtn: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 12 },
+  inputLabel: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginTop: 14,
+    marginBottom: 6,
+  },
+  dropdownBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
   dropdownInner: { flexDirection: "row", alignItems: "center", gap: 8 },
   dropdownText: { fontSize: 14, fontWeight: "600" },
-  dropdownMenu: { borderWidth: 1, borderRadius: 14, marginTop: 4, maxHeight: 180, overflow: "hidden", elevation: 4 },
+  dropdownMenu: {
+    borderWidth: 1,
+    borderRadius: 14,
+    marginTop: 4,
+    maxHeight: 180,
+    overflow: "hidden",
+    elevation: 4,
+  },
   dropdownOption: { paddingHorizontal: 16, paddingVertical: 12 },
+  dropdownOptionIndented: { paddingLeft: 32, backgroundColor: "#F8FAFC" },
   dropdownOptionText: { fontSize: 14 },
+  dropdownOptionIndentedText: { fontSize: 13.5 },
   row: { flexDirection: "row", gap: 10 },
   textArea: { minHeight: 90, textAlignVertical: "top", paddingTop: 10 },
-  sectionCard: { backgroundColor: "#FFFFFF", borderRadius: 18, padding: 16, borderWidth: 1, borderColor: "#E2E8F0", marginTop: 18 },
-  sectionCardTitle: { fontSize: 14, fontWeight: "800", color: "#0F172A", marginBottom: 4 },
-  photoSlotEmpty: { width: 90, height: 90, borderRadius: 16, borderStyle: "dashed", borderWidth: 1.5, alignItems: "center", justifyContent: "center" },
+  sectionCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    marginTop: 18,
+  },
+  sectionCardTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#0F172A",
+    marginBottom: 4,
+  },
+  photoSlotEmpty: {
+    width: 90,
+    height: 90,
+    borderRadius: 16,
+    borderStyle: "dashed",
+    borderWidth: 1.5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   photoSlotEmptyText: { fontSize: 11, fontWeight: "700", marginTop: 4 },
-  photoSlotFilled: { width: 90, height: 90, borderRadius: 16, overflow: "hidden", borderWidth: 1 },
+  photoSlotFilled: {
+    width: 90,
+    height: 90,
+    borderRadius: 16,
+    overflow: "hidden",
+    borderWidth: 1,
+  },
   photoImg: { width: "100%", height: "100%" },
-  photoOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.4)", alignItems: "center", justifyContent: "center" },
-  photoOverlayError: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.6)", alignItems: "center", justifyContent: "center" },
+  photoOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  photoOverlayError: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   photoRetryText: { fontSize: 10, color: "#FFFFFF", fontWeight: "700" },
-  removePhotoBtn: { position: "absolute", top: 4, right: 4, backgroundColor: "rgba(0,0,0,0.6)", borderRadius: 10, width: 20, height: 20, alignItems: "center", justifyContent: "center" },
-  submitBtn: { marginTop: 22, backgroundColor: "#15803D", borderRadius: 14, paddingVertical: 14 },
+  removePhotoBtn: {
+    position: "absolute",
+    top: 4,
+    right: 4,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  submitBtn: {
+    marginTop: 22,
+    backgroundColor: "#15803D",
+    borderRadius: 14,
+    paddingVertical: 14,
+  },
 });

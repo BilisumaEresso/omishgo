@@ -1286,7 +1286,6 @@ export const ZONE_TRANSLATIONS = {
   },
 };
 
-
 const normalizeLang = (lang) => {
   if (!lang) return "en";
   const code = String(lang).split("-")[0].split("_")[0].toLowerCase();
@@ -1309,7 +1308,6 @@ export const getLocalizedZones = (region, lang = "en") => {
   const dict = ZONE_TRANSLATIONS[code] || {};
   return zones.map((z) => ({ value: z, label: dict[z] || z }));
 };
-
 
 export const WEREDA_TRANSLATIONS = {
   am: {
@@ -1406,7 +1404,7 @@ export const WEREDA_TRANSLATIONS = {
     Jeldu: "Jalduu",
     Jibat: "Jibaat",
     "Meta Robi": "Mitaa Roobii",
-    "Midakegn": "Miidaa Qannee",
+    Midakegn: "Miidaa Qannee",
     Nono: "Noonnoo",
     "Toke Kutaye": "Tookkee Kuttaayyee",
 

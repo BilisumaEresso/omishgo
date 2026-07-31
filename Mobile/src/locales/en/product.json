@@ -20,6 +20,7 @@
   "postProduct": {
     "title": "Post Harvest Listing",
     "cropType": "Crop Type",
+    "anyVariety": "Any {{crop}}",
     "quantity": "Quantity",
     "unit": "Unit",
     "pricePer": "Price per {{unit}}",

@@ -1,8 +1,8 @@
 // src/screens/auth/RoleSelection.js
-import { useState } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import AppButton from "../../components/common/AppButton";
 import AppText from "../../components/common/AppText";
 import ScreenWrapper from "../../components/common/ScreenWrapper";
@@ -22,8 +22,12 @@ export default function RoleSelection({ navigation }) {
   const roles = [
     {
       id: ROLES.FARMER,
-      title: t("roleSelection.farmerTitle", { defaultValue: "Farmer / Producer" }),
-      desc: t("roleSelection.farmerDesc", { defaultValue: "List harvests and sell directly to commercial buyers" }),
+      title: t("roleSelection.farmerTitle", {
+        defaultValue: "Farmer / Producer",
+      }),
+      desc: t("roleSelection.farmerDesc", {
+        defaultValue: "List harvests and sell directly to commercial buyers",
+      }),
       iconName: "leaf",
       accentColor: "#15803D",
       bgColor: "#DCFCE7",
@@ -31,15 +35,21 @@ export default function RoleSelection({ navigation }) {
     {
       id: ROLES.BUYER,
       title: t("roleSelection.buyerTitle", { defaultValue: "Wholesale Buyer" }),
-      desc: t("roleSelection.buyerDesc", { defaultValue: "Source crops directly from Ethiopian farmers in bulk" }),
+      desc: t("roleSelection.buyerDesc", {
+        defaultValue: "Source crops directly from Ethiopian farmers in bulk",
+      }),
       iconName: "cart",
       accentColor: "#1565C0",
       bgColor: "#E0F2FE",
     },
     {
       id: ROLES.SUPPLIER,
-      title: t("roleSelection.supplierTitle", { defaultValue: "Agricultural Supplier" }),
-      desc: t("roleSelection.supplierDesc", { defaultValue: "Supply seeds, fertilizers, and equipment to farmers" }),
+      title: t("roleSelection.supplierTitle", {
+        defaultValue: "Agricultural Supplier",
+      }),
+      desc: t("roleSelection.supplierDesc", {
+        defaultValue: "Supply seeds, fertilizers, and equipment to farmers",
+      }),
       iconName: "storefront",
       accentColor: "#D97706",
       bgColor: "#FEF3C7",
@@ -47,7 +57,9 @@ export default function RoleSelection({ navigation }) {
     {
       id: ROLES.DRIVER,
       title: t("auth.roleDriver", { defaultValue: "Logistics Driver" }),
-      desc: t("auth.roleDriverDesc", { defaultValue: "Manage produce transport and dispatches" }),
+      desc: t("auth.roleDriverDesc", {
+        defaultValue: "Manage produce transport and dispatches",
+      }),
       iconName: "bus",
       accentColor: "#7C3AED",
       bgColor: "#F3E8FF",
@@ -105,10 +117,15 @@ export default function RoleSelection({ navigation }) {
       <View style={styles.container}>
         <View style={styles.header}>
           <AppText style={styles.heading}>
-            {t("roleSelection.title", { defaultValue: "Choose Your Platform Role" })}
+            {t("roleSelection.title", {
+              defaultValue: "Choose Your Platform Role",
+            })}
           </AppText>
           <AppText style={styles.subtext}>
-            {t("roleSelection.subtitle", { defaultValue: "Select how you want to trade and operate on OmishGo." })}
+            {t("roleSelection.subtitle", {
+              defaultValue:
+                "Select how you want to trade and operate on OmishGo.",
+            })}
           </AppText>
         </View>
 
@@ -131,8 +148,14 @@ export default function RoleSelection({ navigation }) {
                   },
                 ]}
               >
-                <View style={[styles.iconBox, { backgroundColor: item.bgColor }]}>
-                  <Ionicons name={item.iconName} size={24} color={item.accentColor} />
+                <View
+                  style={[styles.iconBox, { backgroundColor: item.bgColor }]}
+                >
+                  <Ionicons
+                    name={item.iconName}
+                    size={24}
+                    color={item.accentColor}
+                  />
                 </View>
 
                 <View style={styles.cardInfo}>
@@ -143,10 +166,15 @@ export default function RoleSelection({ navigation }) {
                 <View
                   style={[
                     styles.radioCircle,
-                    isSelected && { borderColor: item.accentColor, backgroundColor: item.accentColor },
+                    isSelected && {
+                      borderColor: item.accentColor,
+                      backgroundColor: item.accentColor,
+                    },
                   ]}
                 >
-                  {isSelected && <Ionicons name="checkmark" size={14} color="#FFFFFF" />}
+                  {isSelected && (
+                    <Ionicons name="checkmark" size={14} color="#FFFFFF" />
+                  )}
                 </View>
               </TouchableOpacity>
             );

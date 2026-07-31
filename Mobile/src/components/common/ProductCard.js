@@ -3,7 +3,7 @@ import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import AppButton from "./AppButton";
 import AppText from "./AppText";
-import { getLocalizedCropName, getCropFallbackImage } from "../../constants/crops";
+import { getLocalizedCropName, getLocalizedCropDisplayName, getCropFallbackImage } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
 
 import { getLocalizedWeredaName, getLocalizedZoneName, getLocalizedRegionName } from "../../constants/locations";
@@ -32,7 +32,7 @@ export const ProductCard = ({
   const rawUnit = product.unit || "q";
   const localizedUnit = getLocalizedUnitName(rawUnit, currentLang, t);
   const rawCrop = product.cropType || product.name || t("common.defaultHarvestCrop", { defaultValue: "Harvest Crop" });
-  const localizedCrop = getLocalizedCropName(rawCrop, currentLang, t);
+  const localizedCrop = getLocalizedCropDisplayName(rawCrop, product.variety, currentLang, t);
 
   const localizedWereda = getLocalizedWeredaName(loc.wereda, currentLang);
   const localizedZone = getLocalizedZoneName(loc.zone, currentLang);

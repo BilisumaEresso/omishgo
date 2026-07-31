@@ -64,7 +64,10 @@ const BuyerNavigator = () => (
     <Stack.Screen name="Help" component={HelpScreen} />
     <Stack.Screen name="Notifications" component={NotificationsScreen} />
     <Stack.Screen name="Settings" component={SettingsScreen} />
-    <Stack.Screen name="MarketAnalytics" component={BuyerMarketAnalyticsScreen} />
+    <Stack.Screen
+      name="MarketAnalytics"
+      component={BuyerMarketAnalyticsScreen}
+    />
     <Stack.Screen name="BuyerProfile" component={BuyerProfileScreen} />
     <Stack.Screen name="Orders" component={BuyerOrdersScreen} />
   </Stack.Navigator>

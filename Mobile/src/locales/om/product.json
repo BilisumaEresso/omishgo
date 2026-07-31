@@ -20,6 +20,7 @@
   "postProduct": {
     "title": "Oomisha Maxxansi",
     "cropType": "Gosa Midhaanii",
+    "anyVariety": "{{crop}} Kamiyyuu",
     "quantity": "Hanga",
     "unit": "Safaroo",
     "pricePer": "Gatii {{unit}}",

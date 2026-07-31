@@ -3,6 +3,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation as useRNNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Animated,
   Easing,
@@ -12,7 +13,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTranslation } from "react-i18next";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 import { useNotificationStore } from "../../store/notification.store";
@@ -61,7 +61,7 @@ const HeaderIconButton = ({
             easing: Easing.inOut(Easing.quad),
             useNativeDriver: true,
           }),
-        ])
+        ]),
       );
       pulseLoop.start();
       return () => pulseLoop.stop();
@@ -130,7 +130,13 @@ const HeaderIconButton = ({
           },
         ]}
       >
-        <Animated.View style={{ transform: [{ scale }], alignItems: "center", justifyContent: "center" }}>
+        <Animated.View
+          style={{
+            transform: [{ scale }],
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <Ionicons name={iconName} size={ICON_SIZE} color={color} />
         </Animated.View>
 
@@ -144,10 +150,7 @@ const HeaderIconButton = ({
               {
                 backgroundColor: badgeColor,
                 borderColor: surfaceColor,
-                transform: [
-                  { scale: badgeScale },
-                  { scale: badgePulse },
-                ],
+                transform: [{ scale: badgeScale }, { scale: badgePulse }],
               },
             ]}
           >
@@ -197,12 +200,36 @@ const AppHeader = ({
   useEffect(() => {
     if (unreadCount > prevCountRef.current) {
       Animated.sequence([
-        Animated.timing(bellShake, { toValue: 8, duration: 60, useNativeDriver: true }),
-        Animated.timing(bellShake, { toValue: -8, duration: 60, useNativeDriver: true }),
-        Animated.timing(bellShake, { toValue: 6, duration: 50, useNativeDriver: true }),
-        Animated.timing(bellShake, { toValue: -6, duration: 50, useNativeDriver: true }),
-        Animated.timing(bellShake, { toValue: 3, duration: 40, useNativeDriver: true }),
-        Animated.timing(bellShake, { toValue: 0, duration: 40, useNativeDriver: true }),
+        Animated.timing(bellShake, {
+          toValue: 8,
+          duration: 60,
+          useNativeDriver: true,
+        }),
+        Animated.timing(bellShake, {
+          toValue: -8,
+          duration: 60,
+          useNativeDriver: true,
+        }),
+        Animated.timing(bellShake, {
+          toValue: 6,
+          duration: 50,
+          useNativeDriver: true,
+        }),
+        Animated.timing(bellShake, {
+          toValue: -6,
+          duration: 50,
+          useNativeDriver: true,
+        }),
+        Animated.timing(bellShake, {
+          toValue: 3,
+          duration: 40,
+          useNativeDriver: true,
+        }),
+        Animated.timing(bellShake, {
+          toValue: 0,
+          duration: 40,
+          useNativeDriver: true,
+        }),
       ]).start();
     }
     prevCountRef.current = unreadCount;
@@ -215,8 +242,11 @@ const AppHeader = ({
 
   // Determine active role theme colors
   const activeRole = authRole || user?.role || "farmer";
-  const primaryColor = theme?.colors?.primary || (activeRole === "buyer" ? "#1565C0" : "#2E7D32");
-  const primaryDark = theme?.colors?.primaryDark || (activeRole === "buyer" ? "#0D47A1" : "#1B5E20");
+  const primaryColor =
+    theme?.colors?.primary || (activeRole === "buyer" ? "#1565C0" : "#2E7D32");
+  const primaryDark =
+    theme?.colors?.primaryDark ||
+    (activeRole === "buyer" ? "#0D47A1" : "#1B5E20");
   const textColor = "#FFFFFF";
   const secondaryTextColor = "rgba(255, 255, 255, 0.85)";
   const notificationColor = "#FF355E";
@@ -282,7 +312,9 @@ const AppHeader = ({
       onNotificationPress();
     } else {
       // Always attempt navigation — useRNNavigation() gives us access from any screen
-      try { navigation?.navigate("Notifications"); } catch (_) {}
+      try {
+        navigation?.navigate("Notifications");
+      } catch (_) {}
     }
   };
 
@@ -409,7 +441,9 @@ const AppHeader = ({
             {!showBack && (
               <Animated.View style={{ transform: [{ translateX: bellShake }] }}>
                 <HeaderIconButton
-                  iconName={unreadCount > 0 ? "notifications" : "notifications-outline"}
+                  iconName={
+                    unreadCount > 0 ? "notifications" : "notifications-outline"
+                  }
                   color={textColor}
                   accessibilityLabel={
                     unreadCount > 0
@@ -440,7 +474,10 @@ const AppHeader = ({
                     {
                       backgroundColor: profileHighlight.interpolate({
                         inputRange: [0, 1],
-                        outputRange: ["rgba(255,255,255,0)", "rgba(255,255,255,0.2)"],
+                        outputRange: [
+                          "rgba(255,255,255,0)",
+                          "rgba(255,255,255,0.2)",
+                        ],
                       }),
                     },
                   ]}

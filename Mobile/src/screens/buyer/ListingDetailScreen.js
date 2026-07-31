@@ -20,10 +20,11 @@ import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 import { useSavedStore } from "../../store/saved.store";
 import { formatNumber } from "../../utils/formatNumber";
-import { getCropFallbackImage } from "../../constants/crops";
+import { getCropFallbackImage, getLocalizedCropDisplayName } from "../../constants/crops";
 
 export default function ListingDetailScreen({ route, navigation }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
   const { theme } = useTheme();
   const { product } = route.params || {};
 
@@ -198,7 +199,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           <View style={{ flex: 1 }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <AppText style={[styles.cropTitle, { color: textPrimary }]}>
-                {product.cropType}
+                {getLocalizedCropDisplayName(product.cropType, product.variety, currentLang, t)}
               </AppText>
               <AppText style={styles.refText}>#{shortId}</AppText>
             </View>
@@ -271,7 +272,7 @@ export default function ListingDetailScreen({ route, navigation }) {
 
           <View style={styles.specRow}>
             <AppText style={styles.specKey}>{t("listingDetail.cropType", { defaultValue: "Crop Type" })}</AppText>
-            <AppText style={styles.specVal}>{product.cropType}</AppText>
+            <AppText style={styles.specVal}>{getLocalizedCropDisplayName(product.cropType, product.variety, currentLang, t)}</AppText>
           </View>
           <View style={styles.specRow}>
             <AppText style={styles.specKey}>{t("listingDetail.availableStock", { defaultValue: "Available Stock" })}</AppText>

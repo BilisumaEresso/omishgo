@@ -10,8 +10,6 @@ import {
 import { neutralColors } from "../constants/colors";
 import { gaps, spacing } from "../constants/layout";
 
-
-
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,

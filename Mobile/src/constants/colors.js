@@ -1,5 +1,3 @@
-
-
 export const neutralColors = {
   // Backgrounds
   backgroundLight: "#FAFAFA",
@@ -29,7 +27,6 @@ export const neutralColors = {
   disabled: "#D1D5DB",
 };
 
-
 export const roleColors = {
   farmer: {
     primary: "#059669", // Green
@@ -52,7 +49,6 @@ export const roleColors = {
     lighter: "#F0F4FF",
   },
 };
-
 
 export const getRoleColors = (role = "farmer") => {
   return roleColors[role] || roleColors.farmer;

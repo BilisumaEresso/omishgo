@@ -1,17 +1,17 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useMemo, useState } from "react";
-import { StyleSheet, View, TouchableOpacity } from "react-native";
+import { useTranslation } from "react-i18next";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import BuyerCategorySpendingList from "../../components/buyer/BuyerCategorySpendingList";
 import BuyerFilterModal from "../../components/buyer/BuyerFilterModal";
-import PostBulkRequestModal from "../../components/buyer/PostBulkRequestModal";
 import BuyerHeroBudgetCard from "../../components/buyer/BuyerHeroBudgetCard";
 import BuyerProcurementMetrics from "../../components/buyer/BuyerProcurementMetrics";
 import BuyerSourcingGoalCard from "../../components/buyer/BuyerSourcingGoalCard";
 import BuyerSpendingChartWidget from "../../components/buyer/BuyerSpendingChartWidget";
-import CategoryFilters from "../../components/buyer/CategoryFilters";
 import FeaturedProductsList from "../../components/buyer/FeaturedProductsList";
 import FloatingSearchBar from "../../components/buyer/FloatingSearchBar";
 import NearbyFarmersList from "../../components/buyer/NearbyFarmersList";
+import PostBulkRequestModal from "../../components/buyer/PostBulkRequestModal";
 import PriceTrendWidget from "../../components/buyer/PriceTrendWidget";
 import RecentActivityList from "../../components/buyer/RecentActivityList";
 import AppText from "../../components/common/AppText";
@@ -19,12 +19,9 @@ import DashboardLayout from "../../components/layout/DashBoardLayout";
 import FloatingActionButton from "../../components/layout/FloatingActionBotton";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
+import { CROP_TYPES, getLocalizedCropName } from "../../constants/crops";
 import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
-import { useTranslation } from "react-i18next";
-import { CROP_TYPES, getLocalizedCropName } from "../../constants/crops";
-import { getLocalizedUnitName, UNITS } from "../../constants/units";
-import { getLocalizedWeredaName, getLocalizedZoneName, getLocalizedRegionName } from "../../constants/locations";
 import { useAuthStore } from "../../store/auth.store";
 
 const CATEGORIES = ["All", "Vegetables", ...CROP_TYPES];
@@ -69,7 +66,12 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
           unit: p.unit || "q",
           price: p.price,
           category: p.cropType || p.category,
-          farmerId: p.farmerId || { _id: p.farmerId, name: p.farmerName || t("buyerDashboard.defaultFarmer", { defaultValue: "Farmer" }) },
+          farmerId: p.farmerId || {
+            _id: p.farmerId,
+            name:
+              p.farmerName ||
+              t("buyerDashboard.defaultFarmer", { defaultValue: "Farmer" }),
+          },
           location: p.location || {},
           photos: p.photos || [],
           status: p.status || "active",
@@ -87,7 +89,10 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         if (fid && !farmerMap[fid]) {
           farmerMap[fid] = {
             _id: fid,
-            name: f.name || p.farmerName || t("buyerDashboard.defaultFarmer", { defaultValue: "Farmer" }),
+            name:
+              f.name ||
+              p.farmerName ||
+              t("buyerDashboard.defaultFarmer", { defaultValue: "Farmer" }),
             avatar: f.avatar || null,
             distance: p.distance || "3.2 km",
             location: p.location || {},
@@ -119,7 +124,7 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
           time: a.time,
           order: a._raw || a.order || null,
           farmerId: a.farmerId || null,
-        }))
+        })),
       );
     } catch (err) {
       console.warn("Buyer Dashboard data fetch error:", err.message);
@@ -140,13 +145,13 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
   const totalSpend = useMemo(() => {
     return orders.reduce(
       (sum, o) => sum + (Number(o.totalPrice || o.price) || 0),
-      0
+      0,
     );
   }, [orders]);
 
   const activeOrdersCount = useMemo(() => {
     return orders.filter(
-      (o) => o.status !== "delivered" && o.status !== "cancelled"
+      (o) => o.status !== "delivered" && o.status !== "cancelled",
     ).length;
   }, [orders]);
 
@@ -156,7 +161,9 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
       return [
         {
           id: "c1",
-          category: t("buyerDashboard.catVegetables", { defaultValue: "Vegetables & Greens" }),
+          category: t("buyerDashboard.catVegetables", {
+            defaultValue: "Vegetables & Greens",
+          }),
           icon: "leaf",
           bgColor: "#E0F2FE",
           iconColor: "#0284C7",
@@ -166,7 +173,9 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         },
         {
           id: "c2",
-          category: t("buyerDashboard.catGrains", { defaultValue: "Teff & Grains" }),
+          category: t("buyerDashboard.catGrains", {
+            defaultValue: "Teff & Grains",
+          }),
           icon: "nutrition",
           bgColor: "#EDE9FE",
           iconColor: "#7C3AED",
@@ -176,7 +185,9 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         },
         {
           id: "c3",
-          category: t("buyerDashboard.catPulses", { defaultValue: "Pulses & Oilseeds" }),
+          category: t("buyerDashboard.catPulses", {
+            defaultValue: "Pulses & Oilseeds",
+          }),
           icon: "cube",
           bgColor: "#FEF3C7",
           iconColor: "#D97706",
@@ -188,9 +199,13 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
     }
     const catMap = {};
     orders.forEach((o) => {
-      const cat = o.cropType || o.category || t("buyerDashboard.generalProduce", { defaultValue: "General Produce" });
+      const cat =
+        o.cropType ||
+        o.category ||
+        t("buyerDashboard.generalProduce", { defaultValue: "General Produce" });
       const localizedCat = getLocalizedCropName(cat, currentLang, t);
-      catMap[localizedCat] = (catMap[localizedCat] || 0) + (Number(o.totalPrice || o.price) || 0);
+      catMap[localizedCat] =
+        (catMap[localizedCat] || 0) + (Number(o.totalPrice || o.price) || 0);
     });
     const colorPairs = [
       { bgColor: "#E0F2FE", iconColor: "#0284C7", icon: "leaf" },
@@ -204,7 +219,9 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         category,
         amount,
         date: t("buyerDashboard.recent", { defaultValue: "Recent" }),
-        method: t("buyerDashboard.verifiedOrder", { defaultValue: "Verified Order" }),
+        method: t("buyerDashboard.verifiedOrder", {
+          defaultValue: "Verified Order",
+        }),
         ...pair,
       };
     });
@@ -249,7 +266,7 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
       result = [...result].sort((a, b) => (b.price || 0) - (a.price || 0));
     } else {
       result = [...result].sort(
-        (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+        (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0),
       );
     }
     return result;
@@ -279,7 +296,9 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
       <DashboardLayout
         title={t("buyerDashboard.title", { defaultValue: "Dashboard" })}
         subtitle={t("buyerDashboard.welcomeMessage", {
-          name: user?.name || t("buyerDashboard.fallbackName", { defaultValue: "Buyer" }),
+          name:
+            user?.name ||
+            t("buyerDashboard.fallbackName", { defaultValue: "Buyer" }),
           defaultValue: "Welcome, {{name}}!",
         })}
         role="buyer"
@@ -321,9 +340,7 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         />
 
         {/* 3. Post Bulk Sourcing Banner (Matching Image 1 Middle Card) */}
-        <BuyerSourcingGoalCard
-          onPress={() => onSwitchTab?.("Marketplace")}
-        />
+        <BuyerSourcingGoalCard onPress={() => onSwitchTab?.("Marketplace")} />
 
         {/* 4. Spending Chart Analytics (Matching Image 2 Top Area Chart) */}
         <BuyerSpendingChartWidget currency="ETB" />
@@ -334,12 +351,18 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
           currency="ETB"
           onCategoryPress={() => onSwitchTab?.("Marketplace")}
         />
-        <PriceTrendWidget onPressAnalytics={() => navigation?.navigate("MarketAnalytics")} />
+        <PriceTrendWidget
+          onPressAnalytics={() => navigation?.navigate("MarketAnalytics")}
+        />
 
         {/* Featured Products */}
         <View style={styles.sectionHeader}>
-          <AppText style={{ fontWeight: "700", color: textPrimary, fontSize: 17 }}>
-            {t("buyerDashboard.featuredProducts", { defaultValue: "Featured Produce" })}
+          <AppText
+            style={{ fontWeight: "700", color: textPrimary, fontSize: 17 }}
+          >
+            {t("buyerDashboard.featuredProducts", {
+              defaultValue: "Featured Produce",
+            })}
           </AppText>
           <AppText
             style={{ color: primaryColor, fontWeight: "600" }}
@@ -357,8 +380,12 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         {farmers.length > 0 && (
           <>
             <View style={styles.sectionHeader}>
-              <AppText style={{ fontWeight: "700", color: textPrimary, fontSize: 17 }}>
-                {t("buyerDashboard.nearbyFarmers", { defaultValue: "Nearby Farmers" })}
+              <AppText
+                style={{ fontWeight: "700", color: textPrimary, fontSize: 17 }}
+              >
+                {t("buyerDashboard.nearbyFarmers", {
+                  defaultValue: "Nearby Farmers",
+                })}
               </AppText>
               <AppText
                 style={{ color: primaryColor, fontWeight: "600" }}
@@ -383,24 +410,51 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         )}
 
         {/* Custom Wholesale Sourcing Request Card */}
-        <View style={[styles.customSourcingCard, { backgroundColor: primaryColor + "0D", borderColor: primaryColor + "30" }]}>
-          <View style={[styles.customSourcingIconWrap, { backgroundColor: primaryColor + "1A" }]}>
+        <View
+          style={[
+            styles.customSourcingCard,
+            {
+              backgroundColor: primaryColor + "0D",
+              borderColor: primaryColor + "30",
+            },
+          ]}
+        >
+          <View
+            style={[
+              styles.customSourcingIconWrap,
+              { backgroundColor: primaryColor + "1A" },
+            ]}
+          >
             <Ionicons name="bulb-outline" size={20} color={primaryColor} />
           </View>
           <View style={{ flex: 1 }}>
-            <AppText style={[styles.customSourcingTitle, { color: textPrimary }]}>
-              {t("buyerDashboard.needCustomVolume", { defaultValue: "Need a Custom Crop Volume?" })}
+            <AppText
+              style={[styles.customSourcingTitle, { color: textPrimary }]}
+            >
+              {t("buyerDashboard.needCustomVolume", {
+                defaultValue: "Need a Custom Crop Volume?",
+              })}
             </AppText>
             <AppText style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>
-              {t("buyerDashboard.postCustomDesc", { defaultValue: "Post a custom sourcing request to receive direct quotes from verified local producers." })}
+              {t("buyerDashboard.postCustomDesc", {
+                defaultValue:
+                  "Post a custom sourcing request to receive direct quotes from verified local producers.",
+              })}
             </AppText>
           </View>
           <TouchableOpacity
-            style={[styles.customSourcingBtn, { backgroundColor: primaryColor }]}
+            style={[
+              styles.customSourcingBtn,
+              { backgroundColor: primaryColor },
+            ]}
             onPress={() => setIsBulkModalOpen(true)}
             activeOpacity={0.85}
           >
-            <AppText style={styles.customSourcingBtnText}>{t("buyerDashboard.requestQuote", { defaultValue: "Request Quote" })}</AppText>
+            <AppText style={styles.customSourcingBtnText}>
+              {t("buyerDashboard.requestQuote", {
+                defaultValue: "Request Quote",
+              })}
+            </AppText>
           </TouchableOpacity>
         </View>
 

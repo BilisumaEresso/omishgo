@@ -2,8 +2,6 @@ import React from "react";
 import { StyleSheet, Text } from "react-native";
 import { neutralColors } from "../constants/colors";
 
-
-
 const styles = StyleSheet.create({
   title: {
     fontSize: 28,
@@ -59,7 +57,6 @@ const styles = StyleSheet.create({
     color: neutralColors.error,
   },
 });
-
 
 export const Typography = React.forwardRef(
   (

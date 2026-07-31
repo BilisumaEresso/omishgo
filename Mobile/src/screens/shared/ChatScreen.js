@@ -22,6 +22,8 @@ import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
+import { getLocalizedCropDisplayName } from "../../constants/crops";
+
 const POLL_INTERVAL_MS = 5000;
 
 const formatTime = (iso) => {
@@ -31,12 +33,15 @@ const formatTime = (iso) => {
 
 // ─── Sourcing Action Card ─────────────────────────────────────────────────────
 const SourcingActionCard = ({ data, isMe, onAccept, onReject, role }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n?.language || "en";
   if (!data || !data.cropType || !data.quantity) return null;
   const isPending = data.status === "pending";
   const isAccepted = data.status === "accepted";
   const isRejected = data.status === "rejected";
   const isMatched = data.status === "matched_listing";
+
+  const cropDisplay = getLocalizedCropDisplayName(data.cropType, data.variety, currentLang, t);
 
   return (
     <View style={styles.actionCard}>
@@ -48,7 +53,7 @@ const SourcingActionCard = ({ data, isMe, onAccept, onReject, role }) => {
       </View>
 
       <AppText style={styles.actionSpecs}>
-        • Crop: {data.cropType}{"\n"}
+        • Crop: {cropDisplay}{"\n"}
         • Quantity: {data.quantity} {data.unit || "q"}{"\n"}
         • Target Rate: ETB {data.targetPrice} / {data.unit || "q"}{"\n"}
         • Destination: {data.deliveryRegion}

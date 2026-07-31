@@ -3,8 +3,6 @@ import { ActivityIndicator, StyleSheet, TouchableOpacity } from "react-native";
 import { getRoleColors } from "../constants/colors";
 import Typography from "./Typography";
 
-
-
 const styles = StyleSheet.create({
   button: {
     borderRadius: 12,

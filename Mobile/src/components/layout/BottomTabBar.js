@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as NavigationBar from "expo-navigation-bar";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   Animated,
   Easing,
@@ -69,9 +69,14 @@ export default function BottomTabBar({ role, activeTab, onTabPress }) {
   const activeRole = role || authRole || user?.role || "farmer";
   const tabs = ROLE_TABS[activeRole] || ROLE_TABS[ROLES.FARMER];
 
-  const activeColor = theme?.colors?.primary || (activeRole === "buyer" ? "#1565C0" : "#2E7D32");
-  const primaryDark = theme?.colors?.primaryDark || (activeRole === "buyer" ? "#0D47A1" : "#1B5E20");
-  const gradientContainer = theme?.colors?.primaryContainer || (activeRole === "buyer" ? "#E3F2FD" : "#E8F5E9");
+  const activeColor =
+    theme?.colors?.primary || (activeRole === "buyer" ? "#1565C0" : "#2E7D32");
+  const primaryDark =
+    theme?.colors?.primaryDark ||
+    (activeRole === "buyer" ? "#0D47A1" : "#1B5E20");
+  const gradientContainer =
+    theme?.colors?.primaryContainer ||
+    (activeRole === "buyer" ? "#E3F2FD" : "#E8F5E9");
   const inactiveColor = theme?.colors?.textSecondary || "#5A6072";
 
   const anim = useTabAnimations(tabs, activeTab);
@@ -172,7 +177,7 @@ export default function BottomTabBar({ role, activeTab, onTabPress }) {
 
   const calculatedBottomPadding = Math.max(
     insets.bottom,
-    Platform.OS === "android" ? 14 : 8
+    Platform.OS === "android" ? 14 : 8,
   );
 
   return (
@@ -230,9 +235,13 @@ export default function BottomTabBar({ role, activeTab, onTabPress }) {
 
         {/* Bar */}
         <View style={styles.bar}>
-          <View style={styles.side}>{leftTabs.map((t) => renderTabItem(t))}</View>
+          <View style={styles.side}>
+            {leftTabs.map((t) => renderTabItem(t))}
+          </View>
           <View style={styles.gap} />
-          <View style={styles.side}>{rightTabs.map((t) => renderTabItem(t))}</View>
+          <View style={styles.side}>
+            {rightTabs.map((t) => renderTabItem(t))}
+          </View>
         </View>
       </LinearGradient>
     </View>

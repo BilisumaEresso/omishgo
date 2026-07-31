@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
 
     marginBottom: 15,
     padding: 5,
-    lineHeight:30
+    lineHeight: 30,
   },
 
   description: {

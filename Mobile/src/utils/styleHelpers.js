@@ -1,9 +1,6 @@
-
-
 import { Platform } from "react-native";
 import { neutralColors } from "./colors";
 import { borderRadius, shadows } from "./layout";
-
 
 export const getShadow = (intensity = "md") => {
   const shadowPreset = shadows[intensity] || shadows.md;
@@ -21,7 +18,6 @@ export const getShadow = (intensity = "md") => {
   });
 };
 
-
 export const getInputBorderColor = ({
   error = false,
   focused = false,
@@ -34,13 +30,11 @@ export const getInputBorderColor = ({
   return neutralColors.borderSubtle;
 };
 
-
 export const getInputBgColor = ({ error = false, disabled = false }) => {
   if (error) return neutralColors.errorLight;
   if (disabled) return neutralColors.surfaceLight;
   return neutralColors.cardBg;
 };
-
 
 export const getButtonOpacity = ({
   disabled = false,
@@ -52,7 +46,6 @@ export const getButtonOpacity = ({
   return 1;
 };
 
-
 export const combineStyles = (...styles) => {
   return styles.filter(Boolean).reduce((acc, style) => {
     if (Array.isArray(style)) {
@@ -62,14 +55,12 @@ export const combineStyles = (...styles) => {
   }, []);
 };
 
-
 export const getRoleFocusStyle = (roleColor) => {
   return {
     borderColor: roleColor,
     borderWidth: 2,
   };
 };
-
 
 export const getContrastTextColor = (bgColor) => {
   // Simple luminance calculation
@@ -83,7 +74,6 @@ export const getContrastTextColor = (bgColor) => {
   return luminance > 0.5 ? neutralColors.textDark : "#FFFFFF";
 };
 
-
 export const getDisabledStyle = (disabled) => {
   if (!disabled) return {};
 
@@ -92,7 +82,6 @@ export const getDisabledStyle = (disabled) => {
     pointerEvents: "none",
   };
 };
-
 
 export const getBorderRadius = (size = "md") => {
   const radiusMap = {

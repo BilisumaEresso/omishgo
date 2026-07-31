@@ -1,7 +1,7 @@
-// src/locales/en/index.js
 import common from "./common.json";
 import auth from "./auth.json";
 import crops from "./crops.json";
+import varieties from "./varieties.json";
 import units from "./units.json";
 import statuses from "./statuses.json";
 import product from "./product.json";
@@ -13,6 +13,7 @@ export default {
   ...common,
   ...auth,
   ...crops,
+  ...varieties,
   ...units,
   ...statuses,
   ...product,

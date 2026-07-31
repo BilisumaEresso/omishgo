@@ -9,8 +9,6 @@ import {
 } from "react-native";
 import { neutralColors } from "../constants/colors";
 
-
-
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,

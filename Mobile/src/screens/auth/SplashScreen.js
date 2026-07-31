@@ -449,13 +449,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginTop: 40,
     lineHeight: 40,
-    padding:8
+    padding: 8,
   },
   brand: {
     fontSize: 34,
     fontWeight: "800",
     letterSpacing: 0.4,
-    lineHeight: 40
+    lineHeight: 40,
   },
   hairline: {
     height: 1.5,

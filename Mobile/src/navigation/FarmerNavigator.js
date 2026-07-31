@@ -4,21 +4,21 @@ import { View } from "react-native";
 import BottomTabBar from "../components/layout/BottomTabBar";
 import { ROLES } from "../constants/roles";
 import { SidebarProvider } from "../context/SidebarContext";
+import BuyerProfileScreen from "../screens/farmer/BuyerProfileScreen";
+import EditProductScreen from "../screens/farmer/EditProductScreen";
 import FarmerAnalyticsScreen from "../screens/farmer/FarmerAnalyticsScreen";
 import FarmerDashboardScreen from "../screens/farmer/FarmerDashboardScreen";
 import FarmerOrdersScreen from "../screens/farmer/FarmerOrdersScreen";
 import FarmerProductsScreen from "../screens/farmer/FarmerProductsScreen";
 import FarmerProfileScreen from "../screens/farmer/FarmerProfileScreen";
-import PostProductScreen from "../screens/farmer/PostProductScreen";
 import MyDraftsScreen from "../screens/farmer/MyDraftsScreen";
+import PostProductScreen from "../screens/farmer/PostProductScreen";
 import ChatScreen from "../screens/shared/ChatScreen";
 import ConversationsScreen from "../screens/shared/ConversationsScreen";
 import HelpScreen from "../screens/shared/HelpScreen";
 import NotificationsScreen from "../screens/shared/NotificationsScreen";
 import OrderDetailScreen from "../screens/shared/OrderDetailScreen";
-import EditProductScreen from "../screens/farmer/EditProductScreen";
 import SettingsScreen from "../screens/shared/SettingsScreen";
-import BuyerProfileScreen from "../screens/farmer/BuyerProfileScreen";
 
 const Stack = createNativeStackNavigator();
 

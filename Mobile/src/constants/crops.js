@@ -180,6 +180,11 @@ export const REFERENCE_PRICES = {
   Papaya: { kg: 25, quintal: 2500 },
 };
 
+export const CROP_VARIETIES = {
+  "Tomato": ["Gelila", "Marglobe", "Chali"],
+  "Red Onion": ["Bombay Red", "Adama Red"],
+};
+
 /**
  * Get localized display name for a crop key directly from unified locale bundles
  */
@@ -189,4 +194,16 @@ export const getLocalizedCropName = (cropKey, lang = "en", t = null) => {
     return t(`crops.${cropKey}`, { defaultValue: cropKey });
   }
   return i18n.t(`crops.${cropKey}`, { lng: lang, defaultValue: cropKey });
+};
+
+/**
+ * Get localized display name for cropType + optional variety
+ */
+export const getLocalizedCropDisplayName = (cropType, variety, lang = "en", t = null) => {
+  const cropName = getLocalizedCropName(cropType, lang, t);
+  if (!variety) return cropName;
+  const varietyName = t
+    ? t(`varieties.${variety}`, { defaultValue: variety })
+    : i18n.t(`varieties.${variety}`, { lng: lang, defaultValue: variety });
+  return `${cropName} (${varietyName})`;
 };

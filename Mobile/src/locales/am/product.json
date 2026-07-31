@@ -20,6 +20,7 @@
   "postProduct": {
     "title": "ምርት አቅርብ",
     "cropType": "የምርት አይነት",
+    "anyVariety": "ማንኛውም {{crop}}",
     "quantity": "መጠን",
     "unit": "መለኪያ",
     "pricePer": "ዋጋ በ{{unit}}",

@@ -2,8 +2,6 @@ import React from "react";
 import { Image, Platform, StyleSheet, View } from "react-native";
 import { neutralColors } from "../constants/colors";
 
-
-
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",

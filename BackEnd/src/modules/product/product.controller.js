@@ -73,6 +73,7 @@ export const getProductById = asyncHandler(async (req, res) => {
 export const createProduct = asyncHandler(async (req, res) => {
   const {
     cropType,
+    variety,
     quantity,
     unit,
     price,
@@ -90,6 +91,7 @@ export const createProduct = asyncHandler(async (req, res) => {
   const product = await Product.create({
     farmerId: req.user._id,
     cropType,
+    variety: variety || null,
     quantity,
     unit, // defaults to "kg" in schema
     price,

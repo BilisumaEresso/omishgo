@@ -15,6 +15,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Animated,
@@ -30,11 +31,10 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTranslation } from "react-i18next";
-import AppText from "../common/AppText";
-import { useTheme } from "../../hooks/useTheme";
 import { ROLES } from "../../constants/roles";
+import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
+import AppText from "../common/AppText";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.82, 320);
@@ -301,12 +301,14 @@ const AppSidebar = ({
   const confirmLogout = () => {
     Alert.alert(
       t("appSidebar.logoutConfirmTitle", { defaultValue: "Log out?" }),
-      t(
-        "appSidebar.logoutConfirmMessage",
-        { defaultValue: "Are you sure you want to log out of your account?" },
-      ),
+      t("appSidebar.logoutConfirmMessage", {
+        defaultValue: "Are you sure you want to log out of your account?",
+      }),
       [
-        { text: t("appSidebar.cancel", { defaultValue: "Cancel" }), style: "cancel" },
+        {
+          text: t("appSidebar.cancel", { defaultValue: "Cancel" }),
+          style: "cancel",
+        },
         {
           text: t("appSidebar.logout", { defaultValue: "Log Out" }),
           style: "destructive",

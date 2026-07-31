@@ -4,8 +4,6 @@ import { getRoleColors, neutralColors } from "../constants/colors";
 import { borderRadius, gaps, shadows, spacing } from "../constants/layout";
 import Typography from "./Typography";
 
-
-
 const styles = StyleSheet.create({
   card: {
     backgroundColor: neutralColors.cardBg,

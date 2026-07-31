@@ -21,13 +21,7 @@ import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
-import {
-  CROP_TYPES,
-  CROP_TYPES_LOCALIZED,
-  DEFAULT_DESCRIPTIONS,
-  DEFAULT_DESCRIPTIONS_LOCALIZED,
-  REFERENCE_PRICES,
-} from "../../constants/crops";
+import { CROP_TYPES, CROP_TYPES_LOCALIZED, CROP_VARIETIES, getLocalizedCropDisplayName } from "../../constants/crops";
 import {
   getLocalizedRegions,
   getLocalizedWereda,
@@ -35,14 +29,14 @@ import {
 } from "../../constants/locations";
 import { UNITS_LOCALIZED } from "../../constants/units";
 import { useTheme } from "../../hooks/useTheme";
-import { useAuthStore } from "../../store/auth.store";
-import draftsService from "../../services/drafts.service";
 import uploadService from "../../services/upload.service";
+import { useAuthStore } from "../../store/auth.store";
 import { isConnected, subscribeToConnectivity } from "../../utils/connectivity";
 
 const DropdownPicker = ({
   label,
   value,
+  displayValue,
   options,
   onSelect,
   visible,
@@ -64,10 +58,12 @@ const DropdownPicker = ({
   const selectedLabel = (() => {
     if (!value) return null;
     const found = safeOptions.find((opt) =>
-      typeof opt === "string" ? opt === value : opt.value === value
+      typeof opt === "string" ? opt === value : opt.value === value,
     );
     return found ? (typeof found === "string" ? found : found.label) : value;
   })();
+
+  const activeText = displayValue || selectedLabel;
 
   return (
     <View>
@@ -89,16 +85,18 @@ const DropdownPicker = ({
             <Ionicons
               name={icon}
               size={18}
-              color={value ? primary : textSecondary}
+              color={activeText ? primary : textSecondary}
             />
           )}
           <AppText
             style={[
               styles.dropdownText,
-              { color: value ? textPrimary : textSecondary },
+              { color: activeText ? textPrimary : textSecondary },
             ]}
           >
-            {selectedLabel || placeholder || t("common.selectRegion", { defaultValue: "Select..." })}
+            {activeText ||
+              placeholder ||
+              "Select..."}
           </AppText>
         </View>
         <Ionicons
@@ -108,29 +106,40 @@ const DropdownPicker = ({
         />
       </TouchableOpacity>
       {visible && safeOptions.length > 0 && (
-        <View style={[styles.dropdownMenu, { backgroundColor: surface, borderColor: border }]}>
+        <View
+          style={[
+            styles.dropdownMenu,
+            { backgroundColor: surface, borderColor: border },
+          ]}
+        >
           <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false}>
             {safeOptions.map((opt) => {
               const optValue = typeof opt === "string" ? opt : opt.value;
               const optLabel = typeof opt === "string" ? opt : opt.label;
+              const isIndented = typeof opt === "object" && opt.isIndented;
               const isSelected = value === optValue;
 
               return (
                 <TouchableOpacity
                   key={optValue}
                   onPress={() => {
-                    onSelect(optValue);
-                    onClose();
+                    const shouldClose = onSelect(optValue);
+                    if (shouldClose !== false) onClose();
                   }}
                   style={[
                     styles.dropdownOption,
+                    isIndented && styles.dropdownOptionIndented,
                     isSelected && { backgroundColor: primary + "15" },
                   ]}
                 >
                   <AppText
                     style={[
                       styles.dropdownOptionText,
-                      { color: isSelected ? primary : textPrimary, fontWeight: isSelected ? "700" : "400" },
+                      isIndented && styles.dropdownOptionIndentedText,
+                      {
+                        color: isSelected ? primary : textPrimary,
+                        fontWeight: isSelected ? "700" : "400",
+                      },
                     ]}
                   >
                     {optLabel}
@@ -164,10 +173,15 @@ const PhotoSlots = ({ photos, onAdd, onRemove, onRetry, theme, t }) => {
             <TouchableOpacity
               key={`empty-${index}`}
               onPress={() => onAdd(index)}
-              style={[styles.photoSlotEmpty, { borderColor: border, backgroundColor: surface }]}
+              style={[
+                styles.photoSlotEmpty,
+                { borderColor: border, backgroundColor: surface },
+              ]}
             >
               <Ionicons name="camera" size={26} color={primary} />
-              <AppText style={[styles.photoSlotEmptyText, { color: textSecondary }]}>
+              <AppText
+                style={[styles.photoSlotEmptyText, { color: textSecondary }]}
+              >
                 {t("postProduct.addPhoto", "Add Photo")}
               </AppText>
             </TouchableOpacity>
@@ -175,8 +189,15 @@ const PhotoSlots = ({ photos, onAdd, onRemove, onRetry, theme, t }) => {
         }
 
         return (
-          <View key={photo.uri} style={[styles.photoSlotFilled, { borderColor: border }]}>
-            <Image source={{ uri: photo.uri }} style={styles.photoImg} resizeMode="cover" />
+          <View
+            key={photo.uri}
+            style={[styles.photoSlotFilled, { borderColor: border }]}
+          >
+            <Image
+              source={{ uri: photo.uri }}
+              style={styles.photoImg}
+              resizeMode="cover"
+            />
 
             {photo.uploading && (
               <View style={styles.photoOverlay}>
@@ -185,13 +206,21 @@ const PhotoSlots = ({ photos, onAdd, onRemove, onRetry, theme, t }) => {
             )}
 
             {photo.error && !photo.uploading && (
-              <TouchableOpacity onPress={() => onRetry(index)} style={styles.photoOverlayError}>
+              <TouchableOpacity
+                onPress={() => onRetry(index)}
+                style={styles.photoOverlayError}
+              >
                 <Ionicons name="refresh" size={20} color="#FFFFFF" />
-                <AppText style={styles.photoRetryText}>{t("postProduct.retry", "Retry")}</AppText>
+                <AppText style={styles.photoRetryText}>
+                  {t("postProduct.retry", "Retry")}
+                </AppText>
               </TouchableOpacity>
             )}
 
-            <TouchableOpacity onPress={() => onRemove(index)} style={styles.removePhotoBtn}>
+            <TouchableOpacity
+              onPress={() => onRemove(index)}
+              style={styles.removePhotoBtn}
+            >
               <Ionicons name="close" size={13} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
@@ -212,6 +241,8 @@ export default function PostProductScreen({ navigation, route }) {
   const userWereda = user?.location?.wereda || user?.wereda || "";
 
   const [cropType, setCropType] = useState("");
+  const [variety, setVariety] = useState("");
+  const [expandedCrop, setExpandedCrop] = useState(null);
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("quintal");
   const [price, setPrice] = useState("");
@@ -236,11 +267,74 @@ export default function PostProductScreen({ navigation, route }) {
 
   const lang = i18n.language || "en";
 
-  const cropLabels = CROP_TYPES_LOCALIZED?.[lang] || CROP_TYPES_LOCALIZED?.en || {};
-  const cropOptions = (CROP_TYPES || []).map((key) => ({
-    value: key,
-    label: cropLabels[key] || key,
-  }));
+  const cropLabels =
+    CROP_TYPES_LOCALIZED?.[lang] || CROP_TYPES_LOCALIZED?.en || {};
+  const cropOptions = (CROP_TYPES || []).reduce((acc, key) => {
+    const cropLabel = cropLabels[key] || key;
+    acc.push({
+      value: key,
+      label: cropLabel,
+    });
+
+    if (expandedCrop === key && CROP_VARIETIES[key]?.length) {
+      const anyLabel = t("postProduct.anyVariety", {
+        crop: cropLabel,
+        defaultValue: `Any ${cropLabel}`,
+      });
+      acc.push({
+        value: `any::${key}`,
+        label: anyLabel,
+        isIndented: true,
+      });
+
+      CROP_VARIETIES[key].forEach((v) => {
+        const vLocalized = t(`varieties.${v}`, { defaultValue: v });
+        acc.push({
+          value: `variety::${v}`,
+          label: vLocalized,
+          isIndented: true,
+        });
+      });
+    }
+    return acc;
+  }, []);
+
+  const handleCropSelect = (optValue) => {
+    if (optValue.startsWith("any::")) {
+      const selectedCrop = optValue.replace("any::", "");
+      setCropType(selectedCrop);
+      setVariety("");
+      setExpandedCrop(null);
+      return true;
+    }
+    if (optValue.startsWith("variety::")) {
+      const selectedVariety = optValue.replace("variety::", "");
+      setCropType(expandedCrop);
+      setVariety(selectedVariety);
+      setExpandedCrop(null);
+      return true;
+    }
+
+    if (CROP_VARIETIES[optValue]) {
+      if (optValue !== expandedCrop) {
+        setExpandedCrop(optValue);
+        return false;
+      }
+      setCropType(optValue);
+      setVariety("");
+      setExpandedCrop(null);
+      return true;
+    }
+
+    setCropType(optValue);
+    setVariety("");
+    setExpandedCrop(null);
+    return true;
+  };
+
+  const cropDisplayValue = cropType
+    ? getLocalizedCropDisplayName(cropType, variety, lang, t)
+    : "";
 
   const unitLabels = UNITS_LOCALIZED?.[lang] || UNITS_LOCALIZED?.en || {};
   const unitOptions = Object.entries(unitLabels).map(([key, label]) => ({
@@ -265,8 +359,10 @@ export default function PostProductScreen({ navigation, route }) {
     const initWereda = prefill.wereda || userWereda;
 
     if (prefill.cropType) setCropType(prefill.cropType);
+    if (prefill.variety) setVariety(prefill.variety);
     if (prefill.quantity) setQuantity(String(prefill.quantity));
-    if (prefill.price !== undefined && prefill.price !== null) setPrice(String(prefill.price));
+    if (prefill.price !== undefined && prefill.price !== null)
+      setPrice(String(prefill.price));
     if (prefill.unit) setUnit(prefill.unit);
 
     if (initRegion && !region) setRegion(initRegion);
@@ -276,7 +372,9 @@ export default function PostProductScreen({ navigation, route }) {
 
   const uploadPhotoAt = async (uri, asset) => {
     setPhotos((prev) =>
-      prev.map((p) => (p.uri === uri ? { ...p, uploading: true, error: false } : p))
+      prev.map((p) =>
+        p.uri === uri ? { ...p, uploading: true, error: false } : p,
+      ),
     );
 
     const result = await uploadService.uploadImage(asset);
@@ -287,8 +385,8 @@ export default function PostProductScreen({ navigation, route }) {
           ? result.success
             ? { ...p, uploading: false, error: false, url: result.url }
             : { ...p, uploading: false, error: true }
-          : p
-      )
+          : p,
+      ),
     );
   };
 
@@ -296,7 +394,9 @@ export default function PostProductScreen({ navigation, route }) {
     if (photos.length >= MAX_PHOTOS) {
       Alert.alert(
         t("postProduct.photoLimitTitle", { defaultValue: "Photo Limit" }),
-        t("postProduct.photoLimitMsg", { defaultValue: "Maximum 2 photos per crop listing." })
+        t("postProduct.photoLimitMsg", {
+          defaultValue: "Maximum 2 photos per crop listing.",
+        }),
       );
       return;
     }
@@ -308,8 +408,13 @@ export default function PostProductScreen({ navigation, route }) {
 
     if (!permission.granted) {
       Alert.alert(
-        t("postProduct.permissionRequiredTitle", { defaultValue: "Permission Required" }),
-        t("postProduct.permissionRequiredMsg", { defaultValue: "Camera/Gallery access is required to attach product photos." })
+        t("postProduct.permissionRequiredTitle", {
+          defaultValue: "Permission Required",
+        }),
+        t("postProduct.permissionRequiredMsg", {
+          defaultValue:
+            "Camera/Gallery access is required to attach product photos.",
+        }),
       );
       return;
     }
@@ -329,20 +434,36 @@ export default function PostProductScreen({ navigation, route }) {
     if (result.canceled || !result.assets?.length) return;
 
     const asset = result.assets[0];
-    setPhotos((prev) => [...prev, { uri: asset.uri, url: null, uploading: true, error: false }]);
+    setPhotos((prev) => [
+      ...prev,
+      { uri: asset.uri, url: null, uploading: true, error: false },
+    ]);
     uploadPhotoAt(asset.uri, asset);
   };
 
   const handleAddPhoto = () => {
     Alert.alert(
       t("postProduct.addPhotoTitle", { defaultValue: "Add Crop Photo" }),
-      t("postProduct.choosePhotoSource", { defaultValue: "Choose photo source:" }),
+      t("postProduct.choosePhotoSource", {
+        defaultValue: "Choose photo source:",
+      }),
       [
-        { text: t("postProduct.takePhoto", { defaultValue: "Take Photo" }), onPress: () => launchPicker("camera") },
-        { text: t("postProduct.chooseGallery", { defaultValue: "Choose from Gallery" }), onPress: () => launchPicker("gallery") },
-        { text: t("common.cancel", { defaultValue: "Cancel" }), style: "cancel" },
+        {
+          text: t("postProduct.takePhoto", { defaultValue: "Take Photo" }),
+          onPress: () => launchPicker("camera"),
+        },
+        {
+          text: t("postProduct.chooseGallery", {
+            defaultValue: "Choose from Gallery",
+          }),
+          onPress: () => launchPicker("gallery"),
+        },
+        {
+          text: t("common.cancel", { defaultValue: "Cancel" }),
+          style: "cancel",
+        },
       ],
-      { cancelable: true }
+      { cancelable: true },
     );
   };
 
@@ -360,15 +481,21 @@ export default function PostProductScreen({ navigation, route }) {
     if (!cropType.trim()) {
       Alert.alert(
         t("postProduct.cropRequiredTitle", { defaultValue: "Crop Required" }),
-        t("postProduct.cropRequiredMsg", { defaultValue: "Please select a crop type." })
+        t("postProduct.cropRequiredMsg", {
+          defaultValue: "Please select a crop type.",
+        }),
       );
       return;
     }
     const qtyNum = parseFloat(quantity);
     if (!quantity || isNaN(qtyNum) || qtyNum <= 0) {
       Alert.alert(
-        t("postProduct.qtyRequiredTitle", { defaultValue: "Quantity Required" }),
-        t("postProduct.qtyRequiredMsg", { defaultValue: "Please enter a valid stock volume quantity." })
+        t("postProduct.qtyRequiredTitle", {
+          defaultValue: "Quantity Required",
+        }),
+        t("postProduct.qtyRequiredMsg", {
+          defaultValue: "Please enter a valid stock volume quantity.",
+        }),
       );
       return;
     }
@@ -376,14 +503,20 @@ export default function PostProductScreen({ navigation, route }) {
     if (!price || isNaN(priceNum) || priceNum <= 0) {
       Alert.alert(
         t("postProduct.priceRequiredTitle", { defaultValue: "Price Required" }),
-        t("postProduct.priceRequiredMsg", { defaultValue: "Please enter a valid price per unit." })
+        t("postProduct.priceRequiredMsg", {
+          defaultValue: "Please enter a valid price per unit.",
+        }),
       );
       return;
     }
     if (!region.trim()) {
       Alert.alert(
-        t("postProduct.locRequiredTitle", { defaultValue: "Location Required" }),
-        t("postProduct.locRequiredMsg", { defaultValue: "Please select a region." })
+        t("postProduct.locRequiredTitle", {
+          defaultValue: "Location Required",
+        }),
+        t("postProduct.locRequiredMsg", {
+          defaultValue: "Please select a region.",
+        }),
       );
       return;
     }
@@ -392,7 +525,10 @@ export default function PostProductScreen({ navigation, route }) {
     if (isUploading) {
       Alert.alert(
         t("postProduct.uploadingTitle", { defaultValue: "Upload in Progress" }),
-        t("postProduct.uploadingMsg", { defaultValue: "Please wait for photos to finish uploading to Cloudinary." })
+        t("postProduct.uploadingMsg", {
+          defaultValue:
+            "Please wait for photos to finish uploading to Cloudinary.",
+        }),
       );
       return;
     }
@@ -400,18 +536,32 @@ export default function PostProductScreen({ navigation, route }) {
     const hasError = photos.some((p) => p.error || !p.url);
     if (hasError) {
       Alert.alert(
-        t("postProduct.uploadErrorTitle", { defaultValue: "Photo Upload Failed" }),
-        t("postProduct.uploadErrorMsg", { defaultValue: "One or more photos failed to upload to Cloudinary. Please tap retry or remove them." })
+        t("postProduct.uploadErrorTitle", {
+          defaultValue: "Photo Upload Failed",
+        }),
+        t("postProduct.uploadErrorMsg", {
+          defaultValue:
+            "One or more photos failed to upload to Cloudinary. Please tap retry or remove them.",
+        }),
       );
       return;
     }
 
     const payload = {
       cropType: cropType.trim(),
+      variety: variety ? variety.trim() : null,
       quantity: qtyNum,
       unit: unit.trim() || "quintal",
       price: priceNum,
-      description: description.trim() || t("postProduct.defaultDescription", { defaultValue: "{{qty}} {{unit}} of fresh {{crop}} harvest ready for wholesale.", qty: qtyNum, unit, crop: cropType }),
+      description:
+        description.trim() ||
+        t("postProduct.defaultDescription", {
+          defaultValue:
+            "{{qty}} {{unit}} of fresh {{crop}} harvest ready for wholesale.",
+          qty: qtyNum,
+          unit,
+          crop: cropType,
+        }),
       location: {
         region: region.trim(),
         zone: zone.trim(),
@@ -425,27 +575,58 @@ export default function PostProductScreen({ navigation, route }) {
     try {
       const photoUrls = photos
         .map((p) => p.url)
-        .filter((u) => u && typeof u === "string" && (u.startsWith("http://") || u.startsWith("https://")));
-      const res = await api.post(API_ENDPOINTS.products.create, { ...payload, photos: photoUrls });
+        .filter(
+          (u) =>
+            u &&
+            typeof u === "string" &&
+            (u.startsWith("http://") || u.startsWith("https://")),
+        );
+      const res = await api.post(API_ENDPOINTS.products.create, {
+        ...payload,
+        photos: photoUrls,
+      });
       const createdProdId = res.data?.data?.product?._id;
 
       if (prefill.sourcingRequestId) {
         try {
-          await api.post(API_ENDPOINTS.sourcing.respond(prefill.sourcingRequestId), {
-            action: "accepted",
-            productId: createdProdId,
-          });
+          await api.post(
+            API_ENDPOINTS.sourcing.respond(prefill.sourcingRequestId),
+            {
+              action: "accepted",
+              productId: createdProdId,
+            },
+          );
         } catch (_) {}
       }
 
       Alert.alert(
-        t("postProduct.listedSuccessTitle", { defaultValue: "Harvest Listed!" }),
-        t("postProduct.listedSuccessMsg", { defaultValue: "Your produce listing is now live for wholesale buyers." }),
-        [{ text: t("common.ok", { defaultValue: "OK" }), onPress: () => navigation.goBack() }]
+        t("postProduct.listedSuccessTitle", {
+          defaultValue: "Harvest Listed!",
+        }),
+        t("postProduct.listedSuccessMsg", {
+          defaultValue:
+            "Your produce listing is now live for wholesale buyers.",
+        }),
+        [
+          {
+            text: t("common.ok", { defaultValue: "OK" }),
+            onPress: () => navigation.goBack(),
+          },
+        ],
       );
     } catch (err) {
-      const msg = err?.response?.data?.message || err.message || t("postProduct.errorPostListing", { defaultValue: "Failed to post listing" });
-      Alert.alert(t("postProduct.submissionErrorTitle", { defaultValue: "Submission Error" }), msg);
+      const msg =
+        err?.response?.data?.message ||
+        err.message ||
+        t("postProduct.errorPostListing", {
+          defaultValue: "Failed to post listing",
+        });
+      Alert.alert(
+        t("postProduct.submissionErrorTitle", {
+          defaultValue: "Submission Error",
+        }),
+        msg,
+      );
     } finally {
       setLoading(false);
     }
@@ -453,40 +634,77 @@ export default function PostProductScreen({ navigation, route }) {
 
   return (
     <View style={[styles.container, { backgroundColor: background }]}>
-      <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
-      <AppHeader title={t("postProduct.title", { defaultValue: "Post Harvest Produce" })} showBack onBackPress={() => navigation.goBack()} />
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
+      <AppHeader
+        title={t("postProduct.title", { defaultValue: "Post Harvest Produce" })}
+        showBack
+        onBackPress={() => navigation.goBack()}
+      />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1 }}
       >
-        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Hero Form Header Card */}
           <View style={styles.heroBanner}>
             <View style={styles.heroBadge}>
               <Ionicons name="leaf" size={14} color="#A7F3D0" />
-              <AppText style={styles.heroBadgeText}>{t("postProduct.formTitle", { defaultValue: "Producer Listing Form" })}</AppText>
+              <AppText style={styles.heroBadgeText}>
+                {t("postProduct.formTitle", {
+                  defaultValue: "Producer Listing Form",
+                })}
+              </AppText>
             </View>
-            <AppText style={styles.heroTitle}>{t("postProduct.title", { defaultValue: "Post New Harvest Listing" })}</AppText>
+            <AppText style={styles.heroTitle}>
+              {t("postProduct.title", {
+                defaultValue: "Post New Harvest Listing",
+              })}
+            </AppText>
             <AppText style={styles.heroSub}>
-              {t("postProduct.formDesc", { defaultValue: "Fill in your crop details to receive direct purchase orders from wholesale buyers across Ethiopia." })}
+              {t("postProduct.formDesc", {
+                defaultValue:
+                  "Fill in your crop details to receive direct purchase orders from wholesale buyers across Ethiopia.",
+              })}
             </AppText>
           </View>
 
           {/* Quick Select Crop Pills */}
-          <AppText style={styles.inputLabel}>{t("postProduct.popularCrops", { defaultValue: "Popular Harvest Crops" })}</AppText>
+          <AppText style={styles.inputLabel}>
+            {t("postProduct.popularCrops", {
+              defaultValue: "Popular Harvest Crops",
+            })}
+          </AppText>
           <View style={styles.popularRow}>
             {CROP_TYPES.slice(0, 5).map((c) => (
               <TouchableOpacity
                 key={c}
                 style={[
                   styles.popularPill,
-                  cropType === c ? { backgroundColor: primary } : { backgroundColor: "#FFFFFF" },
+                  cropType === c
+                    ? { backgroundColor: primary }
+                    : { backgroundColor: "#FFFFFF" },
                 ]}
-                onPress={() => setCropType(c)}
+                onPress={() => {
+                  setCropType(c);
+                  setVariety("");
+                  setExpandedCrop(null);
+                }}
                 activeOpacity={0.8}
               >
-                <AppText style={[styles.popularPillText, cropType === c && { color: "#FFFFFF" }]}>
+                <AppText
+                  style={[
+                    styles.popularPillText,
+                    cropType === c && { color: "#FFFFFF" },
+                  ]}
+                >
                   {cropLabels[c] || c}
                 </AppText>
               </TouchableOpacity>
@@ -495,24 +713,35 @@ export default function PostProductScreen({ navigation, route }) {
 
           {/* Crop Type Dropdown */}
           <DropdownPicker
-            label={t("postProduct.cropType", { defaultValue: "Crop Type / Commodity" })}
+            label={t("postProduct.cropType", {
+              defaultValue: "Crop Type / Commodity",
+            })}
             value={cropType}
+            displayValue={cropDisplayValue}
             options={cropOptions}
-            onSelect={setCropType}
+            onSelect={handleCropSelect}
             visible={showCropPicker}
             onOpen={() => setShowCropPicker(true)}
             onClose={() => setShowCropPicker(false)}
             icon="leaf-outline"
             theme={theme}
-            placeholder={t("editProduct.cropSelectPlaceholder", { defaultValue: "Select Harvest Crop" })}
+            placeholder={t("editProduct.cropSelectPlaceholder", {
+              defaultValue: "Select Harvest Crop",
+            })}
           />
 
           {/* Quantity & Unit Row */}
           <View style={styles.row}>
             <View style={{ flex: 2 }}>
-              <AppText style={styles.inputLabel}>{t("postProduct.stockQuantity", { defaultValue: "Stock Quantity" })}</AppText>
+              <AppText style={styles.inputLabel}>
+                {t("postProduct.stockQuantity", {
+                  defaultValue: "Stock Quantity",
+                })}
+              </AppText>
               <AppInput
-                placeholder={t("postProduct.quantityPlaceholder", { defaultValue: "e.g. 100" })}
+                placeholder={t("postProduct.quantityPlaceholder", {
+                  defaultValue: "e.g. 100",
+                })}
                 value={quantity}
                 onChangeText={setQuantity}
                 keyboardType="numeric"
@@ -529,14 +758,19 @@ export default function PostProductScreen({ navigation, route }) {
                 onClose={() => setShowUnitPicker(false)}
                 icon="cube-outline"
                 theme={theme}
-                placeholder={t("postProduct.unitPlaceholder", { defaultValue: "Unit" })}
+                placeholder={t("postProduct.unitPlaceholder", {
+                  defaultValue: "Unit",
+                })}
               />
             </View>
           </View>
 
           {/* Price per Unit */}
           <AppText style={styles.inputLabel}>
-            {t("postProduct.pricePerUnitLabel", { defaultValue: "Price per {{unit}} (ETB)", unit: unitDisplay })}
+            {t("postProduct.pricePerUnitLabel", {
+              defaultValue: "Price per {{unit}} (ETB)",
+              unit: unitDisplay,
+            })}
           </AppText>
           <AppInput
             placeholder="e.g. 4500"
@@ -548,7 +782,9 @@ export default function PostProductScreen({ navigation, route }) {
 
           {/* Photos Upload Section */}
           <AppText style={styles.inputLabel}>
-            {t("postProduct.harvestPhotosLabel", { defaultValue: "Harvest Photos (Max 2)" })}
+            {t("postProduct.harvestPhotosLabel", {
+              defaultValue: "Harvest Photos (Max 2)",
+            })}
           </AppText>
           <PhotoSlots
             photos={photos}
@@ -562,7 +798,9 @@ export default function PostProductScreen({ navigation, route }) {
           {/* Location Section */}
           <View style={styles.sectionCard}>
             <AppText style={styles.sectionCardTitle}>
-              {t("postProduct.farmLocationSection", { defaultValue: "Farm / Storage Location" })}
+              {t("postProduct.farmLocationSection", {
+                defaultValue: "Farm / Storage Location",
+              })}
             </AppText>
 
             <DropdownPicker
@@ -579,7 +817,9 @@ export default function PostProductScreen({ navigation, route }) {
               onClose={() => setShowRegionPicker(false)}
               icon="location-outline"
               theme={theme}
-              placeholder={t("postProduct.selectRegionPlaceholder", { defaultValue: "Select Region" })}
+              placeholder={t("postProduct.selectRegionPlaceholder", {
+                defaultValue: "Select Region",
+              })}
             />
 
             <DropdownPicker
@@ -594,8 +834,13 @@ export default function PostProductScreen({ navigation, route }) {
               onOpen={() => {
                 if (!region) {
                   Alert.alert(
-                    t("postProduct.selectRegionFirstTitle", { defaultValue: "Select Region First" }),
-                    t("postProduct.selectRegionFirstMsg", { defaultValue: "Please pick a region before choosing a zone." })
+                    t("postProduct.selectRegionFirstTitle", {
+                      defaultValue: "Select Region First",
+                    }),
+                    t("postProduct.selectRegionFirstMsg", {
+                      defaultValue:
+                        "Please pick a region before choosing a zone.",
+                    }),
                   );
                   return;
                 }
@@ -604,12 +849,16 @@ export default function PostProductScreen({ navigation, route }) {
               onClose={() => setShowZonePicker(false)}
               icon="map-outline"
               theme={theme}
-              placeholder={t("postProduct.selectZonePlaceholder", { defaultValue: "Select Zone" })}
+              placeholder={t("postProduct.selectZonePlaceholder", {
+                defaultValue: "Select Zone",
+              })}
               disabled={!region}
             />
 
             <DropdownPicker
-              label={t("postProduct.weredaLabel", { defaultValue: "Wereda / District" })}
+              label={t("postProduct.weredaLabel", {
+                defaultValue: "Wereda / District",
+              })}
               value={wereda}
               options={availableWereda}
               onSelect={setWereda}
@@ -617,8 +866,13 @@ export default function PostProductScreen({ navigation, route }) {
               onOpen={() => {
                 if (!zone) {
                   Alert.alert(
-                    t("postProduct.selectZoneFirstTitle", { defaultValue: "Select Zone First" }),
-                    t("postProduct.selectZoneFirstMsg", { defaultValue: "Please pick a zone before choosing a wereda." })
+                    t("postProduct.selectZoneFirstTitle", {
+                      defaultValue: "Select Zone First",
+                    }),
+                    t("postProduct.selectZoneFirstMsg", {
+                      defaultValue:
+                        "Please pick a zone before choosing a wereda.",
+                    }),
                   );
                   return;
                 }
@@ -627,14 +881,24 @@ export default function PostProductScreen({ navigation, route }) {
               onClose={() => setShowWeredaPicker(false)}
               icon="navigate-outline"
               theme={theme}
-              placeholder={t("postProduct.selectWeredaPlaceholder", { defaultValue: "Select Wereda" })}
+              placeholder={t("postProduct.selectWeredaPlaceholder", {
+                defaultValue: "Select Wereda",
+              })}
               disabled={!zone}
             />
           </View>
 
           {/* Submit Button */}
           <AppButton
-            title={loading ? t("postProduct.publishingBtn", { defaultValue: "Publishing Listing..." }) : t("postProduct.publishBtn", { defaultValue: "🚀 Publish Harvest Listing" })}
+            title={
+              loading
+                ? t("postProduct.publishingBtn", {
+                    defaultValue: "Publishing Listing...",
+                  })
+                : t("postProduct.publishBtn", {
+                    defaultValue: "🚀 Publish Harvest Listing",
+                  })
+            }
             onPress={handleSubmit}
             loading={loading}
             disabled={loading}
@@ -668,10 +932,26 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   heroBadgeText: { color: "#A7F3D0", fontSize: 11.5, fontWeight: "700" },
-  heroTitle: { fontSize: 18, fontWeight: "800", color: "#FFFFFF", marginBottom: 4 },
+  heroTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#FFFFFF",
+    marginBottom: 4,
+  },
   heroSub: { fontSize: 12.5, color: "#DCFCE7", lineHeight: 18 },
-  inputLabel: { fontSize: 13, fontWeight: "700", color: "#0F172A", marginTop: 14, marginBottom: 6 },
-  popularRow: { flexDirection: "row", gap: 8, flexWrap: "wrap", marginBottom: 6 },
+  inputLabel: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginTop: 14,
+    marginBottom: 6,
+  },
+  popularRow: {
+    flexDirection: "row",
+    gap: 8,
+    flexWrap: "wrap",
+    marginBottom: 6,
+  },
   popularPill: {
     paddingHorizontal: 12,
     paddingVertical: 7,
@@ -700,7 +980,9 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   dropdownOption: { paddingHorizontal: 16, paddingVertical: 12 },
+  dropdownOptionIndented: { paddingLeft: 32, backgroundColor: "#F8FAFC" },
   dropdownOptionText: { fontSize: 14 },
+  dropdownOptionIndentedText: { fontSize: 13.5 },
   row: { flexDirection: "row", gap: 10 },
   sectionCard: {
     backgroundColor: "#FFFFFF",
@@ -710,7 +992,12 @@ const styles = StyleSheet.create({
     borderColor: "#E2E8F0",
     marginTop: 18,
   },
-  sectionCardTitle: { fontSize: 14, fontWeight: "800", color: "#0F172A", marginBottom: 4 },
+  sectionCardTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#0F172A",
+    marginBottom: 4,
+  },
   photoSlotEmpty: {
     width: 90,
     height: 90,
@@ -721,7 +1008,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   photoSlotEmptyText: { fontSize: 11, fontWeight: "700", marginTop: 4 },
-  photoSlotFilled: { width: 90, height: 90, borderRadius: 16, overflow: "hidden", borderWidth: 1 },
+  photoSlotFilled: {
+    width: 90,
+    height: 90,
+    borderRadius: 16,
+    overflow: "hidden",
+    borderWidth: 1,
+  },
   photoImg: { width: "100%", height: "100%" },
   photoOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -747,5 +1040,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  submitBtn: { marginTop: 22, backgroundColor: "#15803D", borderRadius: 14, paddingVertical: 14 },
+  submitBtn: {
+    marginTop: 22,
+    backgroundColor: "#15803D",
+    borderRadius: 14,
+    paddingVertical: 14,
+  },
 });

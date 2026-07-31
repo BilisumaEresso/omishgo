@@ -3,8 +3,6 @@ import { Image, StyleSheet, View } from "react-native";
 import { getRoleColors } from "../constants/colors";
 import { borderRadius, gaps } from "../constants/layout";
 
-
-
 const styles = StyleSheet.create({
   container: {
     borderRadius: borderRadius.xl,

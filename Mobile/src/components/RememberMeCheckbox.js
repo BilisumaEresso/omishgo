@@ -1,6 +1,6 @@
-import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { getRoleColors, neutralColors } from "../constants/colors";
 import Typography from "./Typography";

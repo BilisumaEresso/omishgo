@@ -18,16 +18,20 @@ import DashboardLayout from "../../components/layout/DashBoardLayout";
 import FloatingActionButton from "../../components/layout/FloatingActionBotton";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
-import { useSidebar } from "../../context/SidebarContext";
-import { useTheme } from "../../hooks/useTheme";
-import { useAuthStore } from "../../store/auth.store"
-import { getLocalizedCropName, getCropFallbackImage } from "../../constants/crops";
-import { getLocalizedUnitName } from "../../constants/units";
 import {
+  getCropFallbackImage,
+  getLocalizedCropName,
+  getLocalizedCropDisplayName,
+} from "../../constants/crops";
+import {
+  getLocalizedRegionName,
   getLocalizedWeredaName,
   getLocalizedZoneName,
-  getLocalizedRegionName,
 } from "../../constants/locations";
+import { getLocalizedUnitName } from "../../constants/units";
+import { useSidebar } from "../../context/SidebarContext";
+import { useTheme } from "../../hooks/useTheme";
+import { useAuthStore } from "../../store/auth.store";
 import { formatNumber } from "../../utils/formatNumber";
 
 export default function FarmerProductsScreen({ navigation }) {
@@ -48,55 +52,61 @@ export default function FarmerProductsScreen({ navigation }) {
   const textPrimary = theme?.colors?.textPrimary || "#0F172A";
   const textSecondary = theme?.colors?.textSecondary || "#64748B";
 
-  const fetchProducts = useCallback(async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true);
-    else setLoading(true);
+  const fetchProducts = useCallback(
+    async (isRefresh = false) => {
+      if (isRefresh) setRefreshing(true);
+      else setLoading(true);
 
-    try {
-      const res = await api.get(API_ENDPOINTS.products.list, {
-        params: { farmerId: user?._id || user?.id },
-      });
-      const prods = res.data?.data?.products || [];
+      try {
+        const res = await api.get(API_ENDPOINTS.products.list, {
+          params: { farmerId: user?._id || user?.id },
+        });
+        const prods = res.data?.data?.products || [];
 
-      const formatted = prods.map((p) => {
-        const rawId = p.customId || p._id || p.id || "";
-        const shortId = rawId.startsWith("PRD-")
-          ? rawId
-          : rawId
-          ? `PRD-${rawId.substring(rawId.length - 6).toUpperCase()}`
-          : "PRD";
+        const formatted = prods.map((p) => {
+          const rawId = p.customId || p._id || p.id || "";
+          const shortId = rawId.startsWith("PRD-")
+            ? rawId
+            : rawId
+              ? `PRD-${rawId.substring(rawId.length - 6).toUpperCase()}`
+              : "PRD";
 
-        return {
-          id: p._id || p.id,
-          cropType: p.cropType || p.category || t("common.defaultHarvestCrop", { defaultValue: "Harvest Crop" }),
-          quantity: p.quantity || 0,
-          unit: p.unit || "q",
-          price: p.price || 0,
-          status: p.status || "active",
-          photos: p.photos || [],
-          locationObj: p.location || {},
-          location: p.location?.region
-            ? `${p.location.wereda ? p.location.wereda + ", " : ""}${p.location.region}`
-            : t("common.unknownLocation", { defaultValue: "Ethiopia" }),
-          shortId,
-          postedDate: p.createdAt
-            ? new Date(p.createdAt).toLocaleDateString("en-GB", {
-                day: "numeric",
-                month: "short",
-              })
-            : t("common.recently", { defaultValue: "Recently" }),
-          _raw: p,
-        };
-      });
+          return {
+            id: p._id || p.id,
+            cropType:
+              p.cropType ||
+              p.category ||
+              t("common.defaultHarvestCrop", { defaultValue: "Harvest Crop" }),
+            quantity: p.quantity || 0,
+            unit: p.unit || "q",
+            price: p.price || 0,
+            status: p.status || "active",
+            photos: p.photos || [],
+            locationObj: p.location || {},
+            location: p.location?.region
+              ? `${p.location.wereda ? p.location.wereda + ", " : ""}${p.location.region}`
+              : t("common.unknownLocation", { defaultValue: "Ethiopia" }),
+            shortId,
+            postedDate: p.createdAt
+              ? new Date(p.createdAt).toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                })
+              : t("common.recently", { defaultValue: "Recently" }),
+            _raw: p,
+          };
+        });
 
-      setProducts(formatted);
-    } catch (err) {
-      console.warn("FarmerProductsScreen fetch error:", err.message);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [user?._id, user?.id, t]);
+        setProducts(formatted);
+      } catch (err) {
+        console.warn("FarmerProductsScreen fetch error:", err.message);
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    },
+    [user?._id, user?.id, t],
+  );
 
   useEffect(() => {
     fetchProducts();
@@ -109,44 +119,50 @@ export default function FarmerProductsScreen({ navigation }) {
   const markAsSold = async (productId) => {
     setUpdatingProductId(productId);
     try {
-      await api.put(API_ENDPOINTS.products.update(productId), { status: "sold" });
+      await api.put(API_ENDPOINTS.products.update(productId), {
+        status: "sold",
+      });
       setProducts((prev) =>
-        prev.map((p) => (p.id === productId ? { ...p, status: "sold" } : p))
+        prev.map((p) => (p.id === productId ? { ...p, status: "sold" } : p)),
       );
     } catch (err) {
       Alert.alert(
         t("errorMessage.title", { defaultValue: "Error" }),
-        err?.response?.data?.message || t("farmerProducts.failedUpdateStatus", { defaultValue: "Failed to update listing status." })
+        err?.response?.data?.message ||
+          t("farmerProducts.failedUpdateStatus", {
+            defaultValue: "Failed to update listing status.",
+          }),
       );
     } finally {
       setUpdatingProductId(null);
     }
   };
 
-  const { countActive, countSold, countDraft, totalVolume, totalValuation } = useMemo(() => {
-    let active = 0;
-    let sold = 0;
-    let draft = 0;
-    let vol = 0;
-    let val = 0;
+  const { countActive, countSold, countDraft, totalVolume, totalValuation } =
+    useMemo(() => {
+      let active = 0;
+      let sold = 0;
+      let draft = 0;
+      let vol = 0;
+      let val = 0;
 
-    products.forEach((p) => {
-      if (p.status === "active") active += 1;
-      else if (p.status === "sold") sold += 1;
-      else if (p.status === "draft") draft += 1;
+      products.forEach((p) => {
+        if (p.status === "active") active += 1;
+        else if (p.status === "sold") sold += 1;
+        else if (p.status === "draft") draft += 1;
 
-      vol += Number(p.quantity) || 0;
-      val += (Number(p.quantity) || 0) * (Number(p.price) || 0);
-    });
+        vol += Number(p.quantity) || 0;
+        val += (Number(p.quantity) || 0) * (Number(p.price) || 0);
+      });
 
-    return {
-      countActive: active,
-      countSold: sold,
-      countDraft: draft,
-      totalVolume: vol,
-      totalValuation: val,
-    };
-  }, [products]);
+      return {
+        countActive: active,
+        countSold: sold,
+        countDraft: draft,
+        totalVolume: vol,
+        totalValuation: val,
+      };
+    }, [products]);
 
   const filteredProducts = useMemo(() => {
     if (selectedFilter === "all") return products;
@@ -159,18 +175,29 @@ export default function FarmerProductsScreen({ navigation }) {
     const statusLabel = isSold
       ? t("statuses.sold", { defaultValue: "Sold Out" })
       : item.status === "draft"
-      ? t("statuses.draft", { defaultValue: "Draft" })
-      : t("statuses.active", { defaultValue: "Active" });
+        ? t("statuses.draft", { defaultValue: "Draft" })
+        : t("statuses.active", { defaultValue: "Active" });
 
-    const statusBg = isSold ? "#FEE2E2" : item.status === "draft" ? "#FEF3C7" : "#DCFCE7";
-    const statusTextColor = isSold ? "#DC2626" : item.status === "draft" ? "#D97706" : "#15803D";
+    const statusBg = isSold
+      ? "#FEE2E2"
+      : item.status === "draft"
+        ? "#FEF3C7"
+        : "#DCFCE7";
+    const statusTextColor = isSold
+      ? "#DC2626"
+      : item.status === "draft"
+        ? "#D97706"
+        : "#15803D";
 
-    const stockTotalVal = (Number(item.quantity) || 0) * (Number(item.price) || 0);
+    const stockTotalVal =
+      (Number(item.quantity) || 0) * (Number(item.price) || 0);
 
-    const localizedCrop = getLocalizedCropName(item.cropType, currentLang, t);
+    const localizedCrop = getLocalizedCropDisplayName(item.cropType, item._raw?.variety, currentLang, t);
     const localizedUnit = getLocalizedUnitName(item.unit, currentLang, t);
 
-    let localizedLocation = t("common.unknownLocation", { defaultValue: "Location Not Provided" });
+    let localizedLocation = t("common.unknownLocation", {
+      defaultValue: "Location Not Provided",
+    });
     if (item.locationObj && typeof item.locationObj === "object") {
       const parts = [
         getLocalizedWeredaName(item.locationObj.wereda, currentLang),
@@ -184,19 +211,28 @@ export default function FarmerProductsScreen({ navigation }) {
       localizedLocation = item.location;
     }
 
-    const rawPhotoUrl = Array.isArray(item._raw?.photos) && item._raw.photos.length > 0 ? item._raw.photos[0] : null;
+    const rawPhotoUrl =
+      Array.isArray(item._raw?.photos) && item._raw.photos.length > 0
+        ? item._raw.photos[0]
+        : null;
     const photoUrl = rawPhotoUrl || getCropFallbackImage(item.cropType);
 
     return (
       <TouchableOpacity
         activeOpacity={0.85}
         style={[styles.card, { backgroundColor: surface }]}
-        onPress={() => navigation?.navigate("EditProduct", { product: item._raw })}
+        onPress={() =>
+          navigation?.navigate("EditProduct", { product: item._raw })
+        }
       >
         <View style={styles.cardHeaderRow}>
           <View style={styles.cropTitleWrap}>
             {photoUrl ? (
-              <Image source={{ uri: photoUrl }} style={styles.cropThumbImage} resizeMode="cover" />
+              <Image
+                source={{ uri: photoUrl }}
+                style={styles.cropThumbImage}
+                resizeMode="cover"
+              />
             ) : (
               <View style={styles.cropIconBg}>
                 <Ionicons name="leaf" size={18} color="#15803D" />
@@ -204,32 +240,53 @@ export default function FarmerProductsScreen({ navigation }) {
             )}
             <View>
               <View style={styles.titleRefRow}>
-                <AppText style={[styles.cropName, { color: textPrimary }]}>{localizedCrop}</AppText>
+                <AppText style={[styles.cropName, { color: textPrimary }]}>
+                  {localizedCrop}
+                </AppText>
                 <AppText style={styles.refText}>#{item.shortId}</AppText>
               </View>
               <AppText style={styles.dateText}>
-                {t("farmerProducts.postedLabel", { date: item.postedDate, defaultValue: "Posted {{date}}" })}
+                {t("farmerProducts.postedLabel", {
+                  date: item.postedDate,
+                  defaultValue: "Posted {{date}}",
+                })}
               </AppText>
             </View>
           </View>
 
           <View style={[styles.badge, { backgroundColor: statusBg }]}>
-            <AppText style={[styles.badgeText, { color: statusTextColor }]}>{statusLabel}</AppText>
+            <AppText style={[styles.badgeText, { color: statusTextColor }]}>
+              {statusLabel}
+            </AppText>
           </View>
         </View>
 
         <View style={styles.specGrid}>
           <View style={styles.specItem}>
-            <AppText style={styles.specLabel}>{t("postProduct.stockQuantity", { defaultValue: "Available Volume" })}</AppText>
-            <AppText style={styles.specVal}>{item.quantity} {localizedUnit}</AppText>
+            <AppText style={styles.specLabel}>
+              {t("postProduct.stockQuantity", {
+                defaultValue: "Available Volume",
+              })}
+            </AppText>
+            <AppText style={styles.specVal}>
+              {item.quantity} {localizedUnit}
+            </AppText>
           </View>
           <View style={styles.specItem}>
-            <AppText style={styles.specLabel}>{t("listingDetail.unitRate", { defaultValue: "Unit Price" })}</AppText>
-            <AppText style={styles.specVal}>ETB {formatNumber(item.price)}/{localizedUnit}</AppText>
+            <AppText style={styles.specLabel}>
+              {t("listingDetail.unitRate", { defaultValue: "Unit Price" })}
+            </AppText>
+            <AppText style={styles.specVal}>
+              ETB {formatNumber(item.price)}/{localizedUnit}
+            </AppText>
           </View>
           <View style={styles.specItem}>
-            <AppText style={styles.specLabel}>{t("listingDetail.batchValue", { defaultValue: "Batch Value" })}</AppText>
-            <AppText style={[styles.specVal, { color: primary }]}>ETB {formatNumber(stockTotalVal)}</AppText>
+            <AppText style={styles.specLabel}>
+              {t("listingDetail.batchValue", { defaultValue: "Batch Value" })}
+            </AppText>
+            <AppText style={[styles.specVal, { color: primary }]}>
+              ETB {formatNumber(stockTotalVal)}
+            </AppText>
           </View>
         </View>
 
@@ -242,11 +299,15 @@ export default function FarmerProductsScreen({ navigation }) {
           <View style={styles.actionsRow}>
             <TouchableOpacity
               style={[styles.actionBtn, styles.editBtn]}
-              onPress={() => navigation?.navigate("EditProduct", { product: item._raw })}
+              onPress={() =>
+                navigation?.navigate("EditProduct", { product: item._raw })
+              }
               activeOpacity={0.8}
             >
               <Ionicons name="create-outline" size={14} color="#15803D" />
-              <AppText style={styles.editBtnText}>{t("common.edit", { defaultValue: "Edit Listing" })}</AppText>
+              <AppText style={styles.editBtnText}>
+                {t("common.edit", { defaultValue: "Edit Listing" })}
+              </AppText>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -260,7 +321,9 @@ export default function FarmerProductsScreen({ navigation }) {
               ) : (
                 <>
                   <Ionicons name="checkmark-done" size={14} color="#DC2626" />
-                  <AppText style={styles.soldBtnText}>{t("farmerProducts.markSoldOut", "Mark Sold Out")}</AppText>
+                  <AppText style={styles.soldBtnText}>
+                    {t("farmerProducts.markSoldOut", "Mark Sold Out")}
+                  </AppText>
                 </>
               )}
             </TouchableOpacity>
@@ -275,31 +338,64 @@ export default function FarmerProductsScreen({ navigation }) {
       <View style={styles.emptyIconBg}>
         <Ionicons name="leaf-outline" size={48} color={primary} />
       </View>
-      <AppText style={[styles.emptyTitle, { color: textPrimary }]}>{t("farmerProducts.noCropsTitle", "No Harvest Crops Listed")}</AppText>
+      <AppText style={[styles.emptyTitle, { color: textPrimary }]}>
+        {t("farmerProducts.noCropsTitle", "No Harvest Crops Listed")}
+      </AppText>
       <AppText style={styles.emptySub}>
-        {t("farmerProducts.noCropsSub", "Post your agricultural produce so wholesale buyers across Ethiopia can discover and order your harvest.")}
+        {t(
+          "farmerProducts.noCropsSub",
+          "Post your agricultural produce so wholesale buyers across Ethiopia can discover and order your harvest.",
+        )}
       </AppText>
       <TouchableOpacity
         style={[styles.postFirstBtn, { backgroundColor: primary }]}
         onPress={() => navigation?.navigate("PostProduct")}
         activeOpacity={0.85}
       >
-        <AppText style={styles.postFirstBtnText}>{t("farmerProducts.postFirstHarvest", "+ Post Your First Harvest")}</AppText>
+        <AppText style={styles.postFirstBtnText}>
+          {t("farmerProducts.postFirstHarvest", "+ Post Your First Harvest")}
+        </AppText>
       </TouchableOpacity>
     </View>
   );
 
   const filterTabs = [
-    { id: "all", label: t("farmerProducts.filterAll", { count: products.length, defaultValue: "All ({{count}})" }) },
-    { id: "active", label: t("farmerProducts.filterActive", { count: countActive, defaultValue: "Active ({{count}})" }) },
-    { id: "sold", label: t("farmerProducts.filterSold", { count: countSold, defaultValue: "Sold ({{count}})" }) },
-    { id: "draft", label: t("farmerProducts.filterDraft", { count: countDraft, defaultValue: "Drafts ({{count}})" }) },
+    {
+      id: "all",
+      label: t("farmerProducts.filterAll", {
+        count: products.length,
+        defaultValue: "All ({{count}})",
+      }),
+    },
+    {
+      id: "active",
+      label: t("farmerProducts.filterActive", {
+        count: countActive,
+        defaultValue: "Active ({{count}})",
+      }),
+    },
+    {
+      id: "sold",
+      label: t("farmerProducts.filterSold", {
+        count: countSold,
+        defaultValue: "Sold ({{count}})",
+      }),
+    },
+    {
+      id: "draft",
+      label: t("farmerProducts.filterDraft", {
+        count: countDraft,
+        defaultValue: "Drafts ({{count}})",
+      }),
+    },
   ];
 
   return (
     <DashboardLayout
       title={t("farmerProducts.title", { defaultValue: "My Crop Stock" })}
-      subtitle={t("farmerProducts.subtitle", { defaultValue: "Manage harvest inventory & wholesale listings" })}
+      subtitle={t("farmerProducts.subtitle", {
+        defaultValue: "Manage harvest inventory & wholesale listings",
+      })}
       role="farmer"
       showMenu
       onMenuPress={openSidebar}
@@ -338,7 +434,9 @@ export default function FarmerProductsScreen({ navigation }) {
               key={tab.id}
               style={[
                 styles.filterPill,
-                isActive ? { backgroundColor: primary } : { backgroundColor: "#F1F5F9" },
+                isActive
+                  ? { backgroundColor: primary }
+                  : { backgroundColor: "#F1F5F9" },
               ]}
               onPress={() => setSelectedFilter(tab.id)}
               activeOpacity={0.8}
@@ -383,7 +481,7 @@ export default function FarmerProductsScreen({ navigation }) {
       />
     </DashboardLayout>
   );
-};
+}
 
 const styles = StyleSheet.create({
   filterRow: {
@@ -573,5 +671,3 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
 });
-
-

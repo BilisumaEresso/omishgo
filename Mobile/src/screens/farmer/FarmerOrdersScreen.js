@@ -22,7 +22,7 @@ import { API_ENDPOINTS } from "../../constants/api";
 import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 import { getOrderStatusConfig } from "../../constants/statuses";
-import { getLocalizedCropName, getCropFallbackImage } from "../../constants/crops";
+import { getLocalizedCropName, getLocalizedCropDisplayName, getCropFallbackImage } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
 import { formatNumber } from "../../utils/formatNumber";
 

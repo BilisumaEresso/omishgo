@@ -62,7 +62,9 @@ const DashboardLayout = ({
                   onRefresh={onRefresh}
                   colors={[primaryColor]}
                   tintColor={primaryColor}
-                  title={t("common.refreshing", { defaultValue: "Refreshing…" })}
+                  title={t("common.refreshing", {
+                    defaultValue: "Refreshing…",
+                  })}
                   titleColor={primaryColor}
                 />
               ) : undefined

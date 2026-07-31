@@ -3,8 +3,6 @@ import { StyleSheet, View } from "react-native";
 import { getRoleColors, neutralColors } from "../constants/colors";
 import { spacing } from "../constants/layout";
 
-
-
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",

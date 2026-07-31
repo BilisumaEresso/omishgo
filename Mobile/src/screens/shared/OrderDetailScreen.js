@@ -18,7 +18,7 @@ import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 
 import OrderProgressMap from "../../components/orders/OrderProgressMap";
-import { getCropFallbackImage, getLocalizedCropName } from "../../constants/crops";
+import { getCropFallbackImage, getLocalizedCropName, getLocalizedCropDisplayName } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
 import { formatNumber } from "../../utils/formatNumber";
 
@@ -180,7 +180,7 @@ export default function OrderDetailScreen({ route, navigation }) {
         </View>
         <View style={styles.infoRow}>
           <AppText style={styles.infoLabel}>{t("orderDetail.cropType", { defaultValue: "Crop Type" })}</AppText>
-          <AppText style={styles.infoVal}>{getLocalizedCropName(cropType, currentLang, t)}</AppText>
+          <AppText style={styles.infoVal}>{getLocalizedCropDisplayName(cropType, order.variety || order.productId?.variety, currentLang, t)}</AppText>
         </View>
         <View style={styles.infoRow}>
           <AppText style={styles.infoLabel}>{t("orderDetail.quantity", { defaultValue: "Order Volume" })}</AppText>

@@ -1,8 +1,8 @@
 // src/screens/farmer/FarmerDashboardScreen.js
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { View } from "react-native";
 import FarmerActionHub from "../../components/farmer/FarmerActionHub";
 import FarmerCropInventoryBreakdown from "../../components/farmer/FarmerCropInventoryBreakdown";
 import FarmerHeroHarvestCard from "../../components/farmer/FarmerHeroHarvestCard";
@@ -15,26 +15,56 @@ import DashboardLayout from "../../components/layout/DashBoardLayout";
 import FloatingActionButton from "../../components/layout/FloatingActionBotton";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
+import {
+  getLocalizedRegionName,
+  getLocalizedWeredaName,
+  getLocalizedZoneName,
+} from "../../constants/locations";
 import { useSidebar } from "../../context/SidebarContext";
 import draftsService from "../../services/drafts.service";
 import { useAuthStore } from "../../store/auth.store";
-import { getLocalizedCropName } from "../../constants/crops";
-import { getLocalizedUnitName } from "../../constants/units";
-import {
-  getLocalizedWeredaName,
-  getLocalizedZoneName,
-  getLocalizedRegionName,
-} from "../../constants/locations";
 
 const mockProductsFallback = [
-  { id: "p1", name: "100q White Teff", price: 5200, category: "White Teff", quantity: 100, unit: "q" },
-  { id: "p2", name: "50q Red Onion", price: 4500, category: "Red Onion", quantity: 50, unit: "q" },
+  {
+    id: "p1",
+    name: "100q White Teff",
+    price: 5200,
+    category: "White Teff",
+    quantity: 100,
+    unit: "q",
+  },
+  {
+    id: "p2",
+    name: "50q Red Onion",
+    price: 4500,
+    category: "Red Onion",
+    quantity: 50,
+    unit: "q",
+  },
 ];
 
 const marketTrends = [
-  { crop: "Red Onion", region: "Addis Ababa", price: "4,500 ETB/q", demandChange: "+15%", isUp: true },
-  { crop: "Teff", region: "Bishoftu Town", price: "5,200 ETB/q", demandChange: "+8%", isUp: true },
-  { crop: "Tomato", region: "Adama Town", price: "3,800 ETB/q", demandChange: "-2%", isUp: false },
+  {
+    crop: "Red Onion",
+    region: "Addis Ababa",
+    price: "4,500 ETB/q",
+    demandChange: "+15%",
+    isUp: true,
+  },
+  {
+    crop: "Teff",
+    region: "Bishoftu Town",
+    price: "5,200 ETB/q",
+    demandChange: "+8%",
+    isUp: true,
+  },
+  {
+    crop: "Tomato",
+    region: "Adama Town",
+    price: "3,800 ETB/q",
+    demandChange: "-2%",
+    isUp: false,
+  },
 ];
 
 export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
@@ -58,8 +88,8 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
     hours < 12
       ? t("farmerDashboard.goodMorning", { defaultValue: "Good Morning" })
       : hours < 17
-      ? t("farmerDashboard.goodAfternoon", { defaultValue: "Good Afternoon" })
-      : t("farmerDashboard.goodEvening", { defaultValue: "Good Evening" });
+        ? t("farmerDashboard.goodAfternoon", { defaultValue: "Good Afternoon" })
+        : t("farmerDashboard.goodEvening", { defaultValue: "Good Evening" });
 
   const fetchProducts = async () => {
     try {
@@ -85,10 +115,16 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
                 ]
                   .filter(Boolean)
                   .join(", ")
-              : t("common.unknownLocation", { defaultValue: "Location Not Provided" }),
-            farmerName: user?.name || t("farmerDashboard.defaultFarmerName", { defaultValue: "Farmer" }),
+              : t("common.unknownLocation", {
+                  defaultValue: "Location Not Provided",
+                }),
+            farmerName:
+              user?.name ||
+              t("farmerDashboard.defaultFarmerName", {
+                defaultValue: "Farmer",
+              }),
             photos: p.photos || [],
-          }))
+          })),
         );
       }
     } catch (e) {
@@ -103,7 +139,12 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
       setOrders(
         raw.map((o) => ({
           id: o._id,
-          cropType: o.productId?.cropType || o.cropType || t("farmerDashboard.defaultHarvestCrop", { defaultValue: "Harvest Crop" }),
+          cropType:
+            o.productId?.cropType ||
+            o.cropType ||
+            t("farmerDashboard.defaultHarvestCrop", {
+              defaultValue: "Harvest Crop",
+            }),
           quantity: o.quantity || 0,
           unit: o.unit || "q",
           price: o.priceAtOrder || o.price || 0,
@@ -113,10 +154,12 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
             month: "short",
           }),
           status: o.status || "pending",
-          buyerName: o.buyerId?.name || t("farmerDashboard.defaultBuyerName", { defaultValue: "Buyer" }),
+          buyerName:
+            o.buyerId?.name ||
+            t("farmerDashboard.defaultBuyerName", { defaultValue: "Buyer" }),
           buyerPhone: o.buyerId?.phone || null,
           buyerId: o.buyerId?._id || o.buyerId,
-        }))
+        })),
       );
     } catch (e) {
       console.warn("fetchOrders failed:", e.message);
@@ -137,7 +180,7 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
         fetchOrders();
       }
       draftsService.count().then(setDraftCount);
-    }, [user?.id, user?._id])
+    }, [user?.id, user?._id]),
   );
 
   const handleRefresh = async () => {
@@ -149,7 +192,12 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
   // Real-time calculations
   const totalRevenue = useMemo(() => {
     return orders
-      .filter((o) => o.status === "completed" || o.status === "delivered" || o.status === "confirmed")
+      .filter(
+        (o) =>
+          o.status === "completed" ||
+          o.status === "delivered" ||
+          o.status === "confirmed",
+      )
       .reduce((sum, o) => sum + (o.totalPrice || 0), 0);
   }, [orders]);
 
@@ -158,11 +206,18 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
   }, [products]);
 
   const pendingDispatchesCount = useMemo(() => {
-    return orders.filter((o) => o.status !== "completed" && o.status !== "cancelled" && o.status !== "delivered").length;
+    return orders.filter(
+      (o) =>
+        o.status !== "completed" &&
+        o.status !== "cancelled" &&
+        o.status !== "delivered",
+    ).length;
   }, [orders]);
 
   const completedOrdersCount = useMemo(() => {
-    return orders.filter((o) => o.status === "completed" || o.status === "delivered").length;
+    return orders.filter(
+      (o) => o.status === "completed" || o.status === "delivered",
+    ).length;
   }, [orders]);
 
   const handleOpportunitySell = () => {
@@ -176,7 +231,9 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
   };
 
   const handleListCropAtRate = (item) => {
-    const priceNum = item.price ? parseInt(item.price.replace(/[^0-9]/g, ""), 10) : 4500;
+    const priceNum = item.price
+      ? parseInt(item.price.replace(/[^0-9]/g, ""), 10)
+      : 4500;
     navigation.navigate("PostProduct", {
       prefill: {
         cropType: item.crop,
@@ -192,7 +249,11 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
         title={t("farmerDashboard.title", { defaultValue: "Farmer Dashboard" })}
         subtitle={t("farmerDashboard.subtitle", {
           greeting: greetingText,
-          name: user?.name || t("farmerDashboard.fallbackName", { defaultValue: "Farmer Producer" }),
+          name:
+            user?.name ||
+            t("farmerDashboard.fallbackName", {
+              defaultValue: "Farmer Producer",
+            }),
           defaultValue: "{{greeting}}, {{name}}!",
         })}
         role="farmer"
@@ -243,7 +304,9 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
         <FarmerCropInventoryBreakdown
           products={products}
           onManageProducts={() => onSwitchTab?.("Products")}
-          onProductPress={(p) => navigation.navigate("PostProduct", { prefill: p })}
+          onProductPress={(p) =>
+            navigation.navigate("PostProduct", { prefill: p })
+          }
         />
 
         {/* ─── BELOW INVENTORY STREAMLINED SECTIONS ─── */}
@@ -269,7 +332,9 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
         <FarmerOrdersFulfillmentList
           orders={orders}
           onViewAllOrders={() => onSwitchTab?.("Orders")}
-          onOrderPress={(o) => navigation.navigate("OrderDetail", { order: o, role: "farmer" })}
+          onOrderPress={(o) =>
+            navigation.navigate("OrderDetail", { order: o, role: "farmer" })
+          }
           onChatBuyer={(o) =>
             navigation.navigate("Chat", {
               userId: o.buyerId,
