@@ -44,6 +44,7 @@
         <li><a href="#demo"        data-i18n="nav_demo">Demo</a></li>
         <li><a href="#screenshots" data-i18n="nav_screens">App</a></li>
         <li><a href="#contact"     data-i18n="nav_contact">Contact</a></li>
+        <li class="nav-mobile-cta"><a href="https://github.com/BilisumaEresso/omishgo/releases/download/v1.0.0-pilot/application-cc25adc4-057a-4fcc-81a7-e7143b75e4df.apk" class="btn btn-primary" data-i18n="nav_cta" download>Get the App</a></li>
       </ul>
       <div class="nav-actions">
         <div class="lang-switcher" id="lang-switcher" role="group" aria-label="Language selector">
@@ -67,14 +68,18 @@
     <div class="container hero-content">
       <div class="hero-text" data-reveal>
 
+        <div class="hero-badge">
+          <span class="hero-badge-dot" aria-hidden="true"></span>
+          <span data-i18n="hero_badge">Meki, Ethiopia · Pilot Live</span>
+        </div>
         <h1 id="hero-heading">
           <span class="hero-line-1"        data-i18n="hero_h1a">Empowering</span>
           <span class="hero-line-gradient" data-i18n="hero_h1b">Ethiopia's Farmers</span>
         </h1>
-        <p class="hero-amharic" lang="am" data-i18n="hero_amharic">ያለ ደላሎ ቀጥታ ከሻጭ ወደ ገዢ</p>
+        <p class="hero-amharic" lang="am" data-i18n="hero_amharic">ያለ ደላላ — ቀጥታ ከአርሶ አደር ወደ ገዢ</p>
         <!-- B1: corrected lang="om" (Oromo ISO 639-1 is "om", not "or" which is Odia) -->
-        <p class="hero-oromo" lang="om" data-i18n="hero_oromo">Gabatee irraa bitaa-gurgurtaa karaa salphaa</p>
-        <p class="hero-sub" data-i18n="hero_sub">The mobile marketplace that cuts out middlemen — farmers post listings, buyers discover them instantly, deals happen in real time.</p>
+        <p class="hero-oromo" lang="om" data-i18n="hero_oromo">Qonnaan bulaa irraa gara bitataatti — karaa salphaa</p>
+        <p class="hero-sub" data-i18n="hero_sub">A mobile marketplace connecting Ethiopian farmers directly with buyers. Post produce, find it, agree on a price — no middleman involved.</p>
         <div class="hero-ctas">
           <a href="https://github.com/BilisumaEresso/omishgo/releases/download/v1.0.0-pilot/application-cc25adc4-057a-4fcc-81a7-e7143b75e4df.apk" class="btn btn-primary btn-lg" id="hero-download" download>
             <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true"><path d="M12 16l-5-5 1.41-1.41L11 13.17V4h2v9.17l2.59-2.58L17 11l-5 5zM5 20h14v-2H5v2z"/></svg>
@@ -86,7 +91,7 @@
           </a>
         </div>
         <!-- A5: hero_trust — see launch-report.md for flag -->
-        <div class="hero-trust"><span data-i18n="hero_trust">Trusted by Farmers' Union • Meki Pilot 2026</span></div>
+        <div class="hero-trust"><span data-i18n="hero_trust">In partnership with the Meki Farmers' Union • 2026 Pilot</span></div>
       </div>
       <div class="hero-phones" data-reveal data-delay="200" aria-hidden="true">
         <picture>
@@ -103,8 +108,8 @@
   <section id="problem" aria-labelledby="problem-heading">
     <div class="container">
 
-      <h2 id="problem-heading" data-reveal data-i18n="problem_h2">Ethiopian farmers lose most of their earnings before reaching the market</h2>
-      <p class="section-sub" data-reveal data-i18n="problem_sub">Informal traders control pricing, access, and distribution — leaving smallholder farmers with no leverage and no alternatives.</p>
+      <h2 id="problem-heading" data-reveal data-i18n="problem_h2">Most of a farmer's earnings never reach them</h2>
+      <p class="section-sub" data-reveal data-i18n="problem_sub">Middlemen set the prices, control access to markets, and take the largest share — smallholder farmers have no alternative.</p>
       <div class="stats-grid">
 
         <article class="stat-card" data-reveal data-delay="0">
@@ -116,7 +121,7 @@
             </svg>
           </div>
           <div><span class="stat-number" data-count="40">0</span><span class="stat-unit">%</span></div>
-          <p class="stat-label" data-i18n="stat1_label">of crop value lost to trader markups</p>
+          <p class="stat-label" data-i18n="stat1_label">of crop value lost to middleman markups</p>
         </article>
 
         <article class="stat-card" data-reveal data-delay="100">
@@ -130,7 +135,7 @@
             </svg>
           </div>
           <div><span class="stat-number" data-count="30">0</span><span class="stat-unit">%</span></div>
-          <p class="stat-label" data-i18n="stat2_label">of final market price reaches the farmer</p>
+          <p class="stat-label" data-i18n="stat2_label">of the market price is all the farmer receives</p>
         </article>
 
         <!-- B2: Rewritten stat-card — no fake animated counter, honest text claim -->
@@ -144,7 +149,7 @@
               <circle cx="256" cy="160" r="64"/>
             </svg>
           </div>
-          <p class="stat-claim" data-i18n="stat3_claim">Ethiopia's first direct digital marketplace for smallholder farmers</p>
+          <p class="stat-claim" data-i18n="stat3_claim">A direct digital marketplace built for Ethiopian smallholder farmers</p>
         </article>
 
       </div>
@@ -166,7 +171,7 @@
             </svg>
           </div>
           <h3 data-i18n="step1_h">Farmer Posts a Listing</h3>
-          <p data-i18n="step1_p">Snap a photo, set a price in Birr, describe the product. Live in seconds — even on 2G.</p>
+          <p data-i18n="step1_p">Take a photo, set a price in Birr, describe the produce. Listed in seconds — works on 2G.</p>
         </article>
         <div class="step-arrow" aria-hidden="true">→</div>
         <article class="step-card" data-reveal data-delay="150">
@@ -178,8 +183,8 @@
               <path d="M338.29 338.29 448 448" stroke-linecap="round" stroke-miterlimit="10"/>
             </svg>
           </div>
-          <h3 data-i18n="step2_h">Buyer Discovers &amp; Messages</h3>
-          <p data-i18n="step2_p">Buyers browse live listings, filter by crop type or location, and message the farmer directly in-app.</p>
+          <h3 data-i18n="step2_h">Buyer Finds It, Messages Directly</h3>
+          <p data-i18n="step2_p">Buyers browse listings, filter by crop or location, and message the farmer directly inside the app.</p>
         </article>
         <div class="step-arrow" aria-hidden="true">→</div>
         <article class="step-card" data-reveal data-delay="300">
@@ -191,15 +196,15 @@
               <path d="M352 176 217.6 336 160 272" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
-          <h3 data-i18n="step3_h">Deal Confirmed, Order Tracked</h3>
-          <p data-i18n="step3_p">Order placed, stock updated, both parties notified. No paperwork. No phone tag with a middleman.</p>
+          <h3 data-i18n="step3_h">Deal Agreed, Order Placed</h3>
+          <p data-i18n="step3_p">Both sides get notified, stock updates automatically. No paperwork, no chasing a middleman by phone.</p>
         </article>
       </div>
       <div class="lang-strip" data-reveal>
         <span class="lang-pill">🇪🇹 English</span>
         <span class="lang-pill">አማርኛ</span>
         <span class="lang-pill">Afaan Oromoo</span>
-        <p class="lang-strip-note" data-i18n="lang_note">All three languages are first-class — not an afterthought.</p>
+        <p class="lang-strip-note" data-i18n="lang_note">Every screen works fully in all three languages.</p>
       </div>
     </div>
   </section>
@@ -208,8 +213,8 @@
   <section id="demo" aria-labelledby="demo-heading">
     <div class="demo-bg" aria-hidden="true"></div>
     <div class="container demo-inner">
-      <h2 id="demo-heading" data-reveal data-i18n="demo_h2">Listing to message — under 20 seconds</h2>
-      <p class="section-sub light" data-reveal data-i18n="demo_sub">A farmer posts produce. A buyer finds it and messages directly. No agent, no phone call.</p>
+      <h2 id="demo-heading" data-reveal data-i18n="demo_h2">From listing to first message — under 20 seconds</h2>
+      <p class="section-sub light" data-reveal data-i18n="demo_sub">A farmer posts produce, a buyer sees it and sends a message. No agent, no phone call needed.</p>
       <div class="video-wrapper" data-reveal>
         <div class="video-player" id="video-player">
           <picture>
@@ -230,8 +235,8 @@
   <!-- ══════════ SCREENSHOTS — CINEMATIC 3D CAROUSEL ══════════ -->
   <section id="screenshots" aria-labelledby="screenshots-heading">
     <div class="container screens-header">
-      <h2 id="screenshots-heading" data-reveal data-i18n="screens_h2">The app, in three languages</h2>
-      <p class="section-sub" data-reveal data-i18n="screens_sub">9 real screens from the current build. PIN login. Works offline.</p>
+      <h2 id="screenshots-heading" data-reveal data-i18n="screens_h2">Built for how farmers actually work</h2>
+      <p class="section-sub" data-reveal data-i18n="screens_sub">PIN login, offline support, three languages. 9 screens from the current build.</p>
       <div class="screen-tabs" data-reveal role="tablist" aria-label="Filter app screens by role">
         <button class="screen-tab active" data-filter="all"     role="tab" aria-selected="true"  data-i18n="tab_all">All Screens</button>
         <button class="screen-tab"        data-filter="onboard" role="tab" aria-selected="false" data-i18n="tab_onboard">Onboarding</button>
@@ -413,8 +418,8 @@
             Farmers' Union admin
           </span>
         </div>
-        <h2 id="pilot-heading" data-i18n="pilot_h2">Closed pilot — Meki, Q3 2026</h2>
-        <p data-i18n="pilot_p">OmishGo is running a closed pilot in the Meki area with the local Farmers' Union acting as platform administrators — approving every user, ensuring quality, and building trust on the ground before we scale.</p>
+        <h2 id="pilot-heading" data-i18n="pilot_h2">Running a closed pilot in Meki</h2>
+        <p data-i18n="pilot_p">The local Farmers' Union manages the pilot — they approve every user, oversee produce quality, and build trust on the ground. We scale only after this works.</p>
       </div>
       <div class="funders-row" data-reveal data-delay="200">
         <p class="funders-label" data-i18n="funders_label">Target funders &amp; accelerators</p>
@@ -435,8 +440,8 @@
     <div class="container download-inner" data-reveal>
       <div class="download-text">
         <div class="section-label dark" data-i18n="dl_label">Get OmishGo</div>
-        <h2 id="download-heading" data-i18n="dl_h2">Join the future of Ethiopian farming</h2>
-        <p data-i18n="dl_p">Android APK — optimized for 2G, PIN-based login, works offline. Free during the pilot.</p>
+        <h2 id="download-heading" data-i18n="dl_h2">Try OmishGo</h2>
+        <p data-i18n="dl_p">Android APK. Works on 2G, PIN login, offline support. Free during the pilot.</p>
         <div class="download-ctas">
           <!--
             A1: APK download — href="#waitlist" (safe inert fallback) until a real APK URL is available.
@@ -503,7 +508,7 @@
           <img src="assets/omishgo_new_general_logo-.png" class="logo-img" alt="OmishGo logo" />
           <span class="logo-text">OmishGo</span>
         </a>
-        <p class="footer-tagline" data-i18n="footer_tagline">Ethiopia's direct farm-to-buyer marketplace. No middlemen. Better prices. Real impact.</p>
+        <p class="footer-tagline" data-i18n="footer_tagline">Connecting Ethiopian farmers directly with buyers. No middlemen. Better prices.</p>
         <!--
           C5: FLAG — confirm each social link is live before launch. See launch-report.md.
           t.me/omishgo · tiktok.com/@omishgo · hello@omishgo.et
@@ -554,7 +559,7 @@
     <div class="footer-bottom">
       <div class="container footer-bottom-inner">
         <p data-i18n="footer_copy">© 2026 OmishGo. Built in Ethiopia 🇪🇹</p>
-        <p class="footer-privacy" data-i18n="footer_privacy">Your contact info is only used to notify you about the pilot. We don't sell or share it.</p>
+        <p class="footer-privacy" data-i18n="footer_privacy">Your contact info is used only to notify you about the pilot. We do not sell or share it.</p>
       </div>
     </div>
   </footer>

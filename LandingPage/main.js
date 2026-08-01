@@ -371,19 +371,31 @@ window.addEventListener('scroll', () => {
    ══════════════════════════════════════════════════════════════ */
 const hamburger = document.getElementById('hamburger');
 const navLinks  = document.getElementById('nav-links');
-hamburger.addEventListener('click', () => {
-  const open = hamburger.getAttribute('aria-expanded') === 'true';
-  hamburger.setAttribute('aria-expanded', String(!open));
-  hamburger.classList.toggle('open');
-  navLinks.classList.toggle('open');
-  document.body.style.overflow = open ? '' : 'hidden';
-});
-navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-  hamburger.classList.remove('open');
-  navLinks.classList.remove('open');
-  hamburger.setAttribute('aria-expanded', 'false');
-  document.body.style.overflow = '';
-}));
+if (hamburger && navLinks) {
+  function toggleMobileMenu(forceClose) {
+    const isCurrentlyOpen = hamburger.classList.contains('open');
+    const shouldOpen = forceClose === undefined ? !isCurrentlyOpen : !forceClose;
+    hamburger.setAttribute('aria-expanded', String(shouldOpen));
+    hamburger.classList.toggle('open', shouldOpen);
+    navLinks.classList.toggle('open', shouldOpen);
+    document.body.style.overflow = shouldOpen ? 'hidden' : '';
+  }
+
+  hamburger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleMobileMenu();
+  });
+
+  navLinks.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => toggleMobileMenu(true));
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && hamburger.classList.contains('open')) {
+      toggleMobileMenu(true);
+    }
+  });
+}
 
 /* ══════════════════════════════════════════════════════════════
    5. REVEAL
