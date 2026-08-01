@@ -2,164 +2,324 @@
 
 /* ══════════════════════════════════════════════════════════════
    1. TRANSLATIONS
+   A3: screen_s5/s8 — removed fake ETB figures; now match am/or ("Farmer Dashboard" / "Buyer Dashboard")
+   A4: screen_s4/s9 — "live tracking" language corrected
+   B2: stat3_claim key added in all three languages (text claim replaces broken counter)
+   D:  hero_badge no longer contains rocket emoji — icon is in HTML; key is text only
+       form_success no longer contains 🎉 emoji — icon injected by JS
    ══════════════════════════════════════════════════════════════ */
 const translations = {
   en: {
-    nav_problem:'Problem', nav_solution:'How It Works', nav_demo:'Demo',
-    nav_screens:'App', nav_contact:'Contact', nav_cta:'Get the App',
-    hero_badge:'🚀 Pilot Launching — Meki, Rift Valley',
-    hero_h1a:'Empowering', hero_h1b:"Ethiopia's Farmers",
-    hero_amharic:'ያለ ደላሎ ቀጥታ ከሻጭ ወደ ገዢ',
-    hero_oromo:'Gabatee irraa bitaa-gurgurtaa karaa salphaa',
-    hero_sub:"The mobile marketplace that cuts out middlemen — farmers post listings, buyers discover them instantly, deals happen in real time.",
-    hero_cta1:'Download APK', hero_cta2:'Join the Pilot Waitlist',
-    hero_trust:"Trusted by Farmers' Union • Meki Pilot 2026",
-    problem_label:'The Problem',
-    problem_h2:'Ethiopian farmers lose most of their earnings before reaching the market',
-    problem_sub:'Informal traders control pricing, access, and distribution — leaving smallholder farmers with no leverage and no alternatives.',
-    stat1_label:'of crop value lost to trader markups',
-    stat2_label:'of final market price reaches the farmer',
-    stat3_label:'direct digital channels existed before OmishGo',
-    solution_label:'How It Works', solution_h2:'Three steps. Zero middlemen.',
-    solution_sub:"OmishGo is built around the core loop that actually matters — getting a farmer's product in front of a buyer, fast.",
-    step1_h:'Farmer Posts a Listing', step1_p:'Snap a photo, set a price in Birr, describe the product. Live in seconds — even on 2G.',
-    step2_h:'Buyer Discovers & Messages', step2_p:'Buyers browse live listings, filter by crop type or location, and message the farmer directly in-app.',
-    step3_h:'Deal Confirmed, Order Tracked', step3_p:"Order placed, stock updated, both parties notified. No paperwork. No phone tag with a middleman.",
-    lang_note:'All three languages are first-class — not an afterthought.',
-    demo_label:'See It Live', demo_h2:'A real listing placed in under 20 seconds',
-    demo_sub:'Watch how a farmer in Meki posts a tomato listing and a buyer messages them — end to end, no training required.',
-    demo_caption:'Demo coming soon — uploading to YouTube shortly',
-    screens_label:'Built for the Ethiopian Market', screens_h2:'Every screen speaks your language',
-    screens_sub:'9 real app screens. PIN-based login. Works offline. Three languages out of the box.',
-    tab_all:'All Screens', tab_onboard:'Onboarding', tab_farmer:'Farmer', tab_buyer:'Buyer',
-    screen_s1:'Sell Your Harvest Directly', screen_s2:'Browse Fresh from the Farm',
-    screen_s3:'Farm Inputs at Your Door', screen_s4:'Track Every Delivery',
-    screen_s5:'Farmer Dashboard — ETB 270,000 Revenue', screen_s6:'Verified Producer Profile',
-    screen_s7:'Direct In-App Messaging', screen_s8:'Buyer Dashboard — ETB 45,900 Saved',
-    screen_s9:'My Orders — Live Order Tracking',
-    pilot_h2:'A structured pilot, not a prototype',
-    pilot_p:"OmishGo is running a closed pilot in the Meki area with the local Farmers' Union acting as platform administrators — approving every user, ensuring quality, and building trust on the ground before we scale.",
-    funders_label:'Target funders & accelerators',
-    dl_label:'Get OmishGo', dl_h2:'Join the future of Ethiopian farming',
-    dl_p:'Android APK — optimized for 2G, PIN-based login, works offline. Free during the pilot.',
-    dl_btn_apk:'Download APK', dl_btn_waitlist:'Join Pilot Waitlist', dl_btn_waitlist_sub:'Farmers & Buyers',
-    form_h:'Stay in the loop', form_p:"We'll notify you when the public pilot opens in your area.",
-    form_name:'Full Name', form_phone:'Phone Number', form_role:'I am a…',
-    form_role_placeholder:'Select your role', form_role_farmer:'Farmer (Qonnaan Bulaa / አርሶ አደር)',
-    form_role_buyer:'Buyer / Trader', form_role_investor:'Investor / Funder', form_role_other:'Other',
-    form_submit:'Join Waitlist →', form_success:"🎉 You're on the list! We'll be in touch soon.",
-    footer_tagline:"Ethiopia's direct farm-to-buyer marketplace. No middlemen. Better prices. Real impact.",
-    footer_product:'Product', footer_how:'How It Works', footer_screens:'App Screens',
-    footer_demo:'Demo Video', footer_download:'Download APK', footer_pilot:'Pilot',
-    footer_about:'About the Pilot', footer_join:'Join Waitlist', footer_contact_link:'Contact Us',
-    footer_lang_title:'Language / ቋንቋ / Afaan',
-    footer_copy:'© 2026 OmishGo. Built in Ethiopia 🇪🇹',
-    footer_privacy:"Your contact info is only used to notify you about the pilot. We don't sell or share it.",
+    nav_problem: "Problem",
+    nav_solution: "How It Works",
+    nav_demo: "Demo",
+    nav_screens: "App",
+    nav_contact: "Contact",
+    nav_cta: "Get the App",
+    /* D: no emoji — rocket SVG is a sibling element in HTML */
+    hero_badge: "Pilot Launching — Meki, Rift Valley",
+    hero_h1a: "Empowering",
+    hero_h1b: "Ethiopia's Farmers",
+    hero_amharic: "ያለ ደላሎ ቀጥታ ከሻጭ ወደ ገዢ",
+    hero_oromo: "Gabatee irraa bitaa-gurgurtaa karaa salphaa",
+    hero_sub:
+      "The mobile marketplace that cuts out middlemen — farmers post listings, buyers discover them instantly, deals happen in real time.",
+    hero_cta1: "Download APK",
+    hero_cta2: "Join the Pilot Waitlist",
+    /* A5: deliberately unchanged — see launch-report.md for the flag */
+    hero_trust: "Trusted by Farmers' Union • Meki Pilot 2026",
+    problem_label: "The Problem",
+    problem_h2:
+      "Ethiopian farmers lose most of their earnings before reaching the market",
+    problem_sub:
+      "Informal traders control pricing, access, and distribution — leaving smallholder farmers with no leverage and no alternatives.",
+    stat1_label: "of crop value lost to trader markups",
+    stat2_label: "of final market price reaches the farmer",
+    /* B2: text claim replaces broken 0-counter */
+    stat3_claim:
+      "Ethiopia's first direct digital marketplace for smallholder farmers",
+    solution_label: "How It Works",
+    solution_h2: "Three steps. Zero middlemen.",
+    solution_sub:
+      "OmishGo is built around the core loop that actually matters — getting a farmer's product in front of a buyer, fast.",
+    step1_h: "Farmer Posts a Listing",
+    step1_p:
+      "Snap a photo, set a price in Birr, describe the product. Live in seconds — even on 2G.",
+    step2_h: "Buyer Discovers & Messages",
+    step2_p:
+      "Buyers browse live listings, filter by crop type or location, and message the farmer directly in-app.",
+    step3_h: "Deal Confirmed, Order Tracked",
+    step3_p:
+      "Order placed, stock updated, both parties notified. No paperwork. No phone tag with a middleman.",
+    lang_note: "All three languages are first-class — not an afterthought.",
+    demo_label: "See It Live",
+    demo_h2: "A real listing placed in under 20 seconds",
+    demo_sub:
+      "Watch how a farmer in Meki posts a tomato listing and a buyer messages them — end to end, no training required.",
+    demo_caption: "Demo coming soon — uploading to YouTube shortly",
+    screens_label: "Built for the Ethiopian Market",
+    screens_h2: "Every screen speaks your language",
+    screens_sub:
+      "9 real app screens. PIN-based login. Works offline. Three languages out of the box.",
+    tab_all: "All Screens",
+    tab_onboard: "Onboarding",
+    tab_farmer: "Farmer",
+    tab_buyer: "Buyer",
+    screen_s1: "Sell Your Harvest Directly",
+    screen_s2: "Browse Fresh from the Farm",
+    screen_s3: "Farm Inputs at Your Door",
+    /* A4: "Track Every Delivery" → honest framing */
+    screen_s4: "See Delivery Progress",
+    /* A3: fake ETB figures removed */
+    screen_s5: "Farmer Dashboard",
+    screen_s6: "Verified Producer Profile",
+    screen_s7: "Direct In-App Messaging",
+    /* A3: fake ETB figures removed */
+    screen_s8: "Buyer Dashboard",
+    /* A4: "Live Order Tracking" → honest framing */
+    screen_s9: "My Orders — Order Progress",
+    pilot_h2: "A structured pilot, not a prototype",
+    pilot_p:
+      "OmishGo is running a closed pilot in the Meki area with the local Farmers' Union acting as platform administrators — approving every user, ensuring quality, and building trust on the ground before we scale.",
+    funders_label: "Target funders & accelerators",
+    dl_label: "Get OmishGo",
+    dl_h2: "Join the future of Ethiopian farming",
+    dl_p: "Android APK — optimized for 2G, PIN-based login, works offline. Free during the pilot.",
+    dl_btn_apk: "Download APK",
+    dl_apk_sub: "APK coming soon — join the waitlist",
+    dl_btn_waitlist: "Join Pilot Waitlist",
+    dl_btn_waitlist_sub: "Farmers & Buyers",
+    form_h: "Stay in the loop",
+    form_p: "We'll notify you when the public pilot opens in your area.",
+    form_name: "Full Name",
+    form_phone: "Phone Number",
+    form_role: "I am a…",
+    form_role_placeholder: "Select your role",
+    form_role_farmer: "Farmer (Qonnaan Bulaa / አርሶ አደር)",
+    form_role_buyer: "Buyer / Trader",
+    form_role_investor: "Investor / Funder",
+    form_role_other: "Other",
+    form_submit: "Join Waitlist →",
+    /* D: no emoji — success icon injected by JS */
+    form_success: "You're on the list! We'll be in touch soon.",
+    footer_tagline:
+      "Ethiopia's direct farm-to-buyer marketplace. No middlemen. Better prices. Real impact.",
+    footer_product: "Product",
+    footer_how: "How It Works",
+    footer_screens: "App Screens",
+    footer_demo: "Demo Video",
+    footer_download: "Download APK",
+    footer_pilot: "Pilot",
+    footer_about: "About the Pilot",
+    footer_join: "Join Waitlist",
+    footer_contact_link: "Contact Us",
+    footer_lang_title: "Language / ቋንቋ / Afaan",
+    footer_copy: "© 2026 OmishGo. Built in Ethiopia 🇪🇹",
+    footer_privacy:
+      "Your contact info is only used to notify you about the pilot. We don't sell or share it.",
   },
   am: {
-    nav_problem:'ችግሩ', nav_solution:'አሠራር', nav_demo:'ቪዲዮ',
-    nav_screens:'መተግበሪያ', nav_contact:'ያግኙን', nav_cta:'አፕሊኬሽኑን ያውርዱ',
-    hero_badge:'🚀 ሙከራ እያሄደ ነው — መኪ፣ ሸለቆ',
-    hero_h1a:'ስልጣን እናሰጣቸዋለን', hero_h1b:'የኢትዮጵያ ገበሬዎች',
-    hero_amharic:'ያለ ደላሎ ቀጥታ ከሻጭ ወደ ገዢ',
-    hero_oromo:'Gabatee irraa bitaa-gurgurtaa karaa salphaa',
-    hero_sub:'ገበሬዎች ምርቶቻቸውን ቀጥታ ለሻጮች ይሸጣሉ — ያለ ደላሎ፣ ዋጋ በትክክለኛ ዕምቅ ደረጃ።',
-    hero_cta1:'APK ያውርዱ', hero_cta2:'ለሙከራ ይመዝገቡ',
-    hero_trust:"የገበሬዎች ህብረት ታምኖበታል • የሜኪ ሙከራ 2026",
-    problem_label:'ችግሩ',
-    problem_h2:'የኢትዮጵያ ገበሬዎች ዋና ዋና ገቢያቸውን ወደ ገበያ ከመድረሳቸው በፊት ያጣሉ',
-    problem_sub:'ደላሎ ዋጋ፣ ተደራሽነትና ስርጭት ይቆጣጠራሉ — ትናንሽ ገበሬዎችን ያለ አስተዳዳሪ ትልሚ ያስቀምጧቸዋል።',
-    stat1_label:'የሰብል ዋጋ ለደላሎ ይሄዳል',
-    stat2_label:'ብቻ ነው ወደ ገበሬ የሚደርሰው',
-    stat3_label:'ቀጥታ ዲጂታል ቻናል አልነበረም',
-    solution_label:'አሠራር', solution_h2:'ሦስት ደረጃዎች። ምንም ደላሎ የለም።',
-    solution_sub:'OmishGo የሚሠራው ዋናውን ዑደት ዙሪያ ነው — የገበሬ ምርት ወዲያው ለሻጭ እንዲደርስ።',
-    step1_h:'ገበሬ ምርቱን ያስተዋውቃል', step1_p:'ፎቶ ያንሱ፣ ዋጋ በብር ይምረጡ፣ ምርቱን ይግለጹ። ወዲያው ይሰተዋወቃል — 2G ላይ እንኳ።',
-    step2_h:'ሻጭ ያገኛል እና ይልካል', step2_p:'ሻጮች ቀጥታ ዝርዝሮችን ያሻሽላሉ፣ ወዲያው ይልካሉ።',
-    step3_h:'ስምምነት ተረጋገጠ፣ ትዕዛዝ ይከታተላል', step3_p:'ትዕዛዝ ተቀምጧል፣ ክምችት ተዘምኗል። ወረቀት አያስፈልግም።',
-    lang_note:'ሦስቱ ቋንቋዎች በእኩል ደረጃ ናቸው — ቀዳሚ ናቸው።',
-    demo_label:'ቀጥታ ይመልከቱ', demo_h2:'ምርት ዝርዝር ከ20 ሴኮንድ ባነሰ ጊዜ',
-    demo_sub:'አንድ ገበሬ ቲማቲሙን እንዴት ያስተዋውቅ — ያለ ስልጠና።',
-    demo_caption:'ቪዲዮ ቶሎ ይመጣል — ወደ YouTube እያወጣን ነው',
-    screens_label:'ለኢትዮጵያ ገበያ ተሠርቷል', screens_h2:'እያንዳንዱ ማሳያ በቋንቋዎ ይናገራል',
-    screens_sub:'9 እውነተኛ የመተግበሪያ ማሳያዎች። PIN ላይ ተደራሽ። ሦስት ቋንቋ።',
-    tab_all:'ሁሉም', tab_onboard:'መግቢያ', tab_farmer:'ገበሬ', tab_buyer:'ሻጭ',
-    screen_s1:'ምርቶን ቀጥታ ሸጡ', screen_s2:'ከእርሻ ቀጥታ ያስሱ',
-    screen_s3:'ምርት ወደ እርስዎ ቤት', screen_s4:'ማዳረሻ ይከታተሉ',
-    screen_s5:'የገበሬ ዳሽቦርድ', screen_s6:'ማረጋገጫ ፕሮፋይል',
-    screen_s7:'ቀጥታ መልዕክት', screen_s8:'የሻጭ ዳሽቦርድ',
-    screen_s9:'ትዕዛዞቼ',
-    pilot_h2:'ሙከራ — ምርት አይደለም',
-    pilot_p:'OmishGo በሜኪ አካባቢ ዝጉ ሙከራ እያደረገ ነው — የሜኪ ገበሬዎች ህብረት አስተዳዳሪ ሆኗል።',
-    funders_label:'ዒላማ ፈንዶዎች',
-    dl_label:'OmishGoን ያውርዱ', dl_h2:'የኢትዮጵያ ግብርና ወደፊት ይቀላቀሉ',
-    dl_p:'Android APK — 2Gን ያስተዋውቃል፣ PIN ያስፈልጋል፣ ኦፍላይን ይሠራል። ሙከራ ወቅት ነፃ።',
-    dl_btn_apk:'APK ያውርዱ', dl_btn_waitlist:'ለሙከራ ይቀላቀሉ', dl_btn_waitlist_sub:'ገበሬዎች እና ሻጮች',
-    form_h:'ውስጥ ቆዩ', form_p:'ሙከራ ሲጀምር እናሳውቅዎታለን።',
-    form_name:'ሙሉ ስም', form_phone:'ስልክ ቁጥር', form_role:'እኔ ነኝ…',
-    form_role_placeholder:'ሚናዎን ይምረጡ', form_role_farmer:'ገበሬ (አርሶ አደር)',
-    form_role_buyer:'ሻጭ / ነጋዴ', form_role_investor:'ባለሀብት', form_role_other:'ሌላ',
-    form_submit:'ይቀላቀሉ →', form_success:'🎉 ዝርዝሩ ውስጥ ነዎት! ቶሎ እናሳውቅዎታለን።',
-    footer_tagline:'የኢትዮጵያ ቀጥታ የእርሻ-ወደ-ሻጭ ገበያ። ምንም ደላሎ። የተሻለ ዋጋ። እውነተኛ ለውጥ።',
-    footer_product:'ምርት', footer_how:'አሠራር', footer_screens:'ማሳያዎች',
-    footer_demo:'ቪዲዮ', footer_download:'APK ያውርዱ', footer_pilot:'ሙከራ',
-    footer_about:'ስለ ሙከራ', footer_join:'ይቀላቀሉ', footer_contact_link:'ያግኙን',
-    footer_lang_title:'Language / ቋንቋ / Afaan',
-    footer_copy:'© 2026 OmishGo. በኢትዮጵያ ተሠርቷል 🇪🇹',
-    footer_privacy:'የእርስዎ ኮንታክት ለሙከራ ማሳወቂያ ብቻ ነው።',
+    nav_problem: "ችግሩ",
+    nav_solution: "አሠራር",
+    nav_demo: "ቪዲዮ",
+    nav_screens: "መተግበሪያ",
+    nav_contact: "ያግኙን",
+    nav_cta: "መተግበሪያውን ያውርዱ",
+    hero_badge: "የሙከራ ትግበራ — መቂ፣ ስምጥ ሸለቆ",
+    hero_h1a: "አቅም መፍጠር ለ",
+    hero_h1b: "የኢትዮጵያ አርሶ አደሮች",
+    hero_amharic: "ያለ ደላሎ ቀጥታ ከሻጭ ወደ ገዢ",
+    hero_oromo: "Gabatee irraa bitaa-gurgurtaa karaa salphaa",
+    hero_sub:
+      "አርሶ አደሮች ምርታቸውን በቀጥታ የሚሸጡበት፣ ገዢዎች በፍጥነት የሚያገኙበት እና ግብይት በቅጽበት የሚፈጸምበት ዲጂታል ገበያ።",
+    hero_cta1: "APK ያውርዱ",
+    hero_cta2: "ለሙከራ ይመዝገቡ",
+    hero_trust: "በአርሶ አደሮች ህብረት የታመነ • የመቂ የሙከራ ትግበራ 2026",
+    problem_label: "ችግሩ",
+    problem_h2: "የኢትዮጵያ አርሶ አደሮች ምርታቸው ገበያ ከመድረሱ በፊት አብዛኛውን ትርፋቸውን ያጣሉ",
+    problem_sub:
+      "ህገ-ወጥ ደላሎች የገበያ ዋጋን እና ስርጭትን ይቆጣጠራሉ — ይህ ደግሞ አነስተኛ አርሶ አደሮችን ያለምንም አማራጭ ለኪሳራ ይዳርጋል።",
+    stat1_label: "የምርት ትርፍ ለደላላ ይሄዳል",
+    stat2_label: "የገበያ ዋጋ ብቻ ለአርሶ አደሩ ይደርሳል",
+    /* B2: Amharic version of the text claim */
+    stat3_claim: "ለአነስተኛ አርሶ አደሮች የተሰራ የኢትዮጵያ ቀዳሚው ቀጥታ ዲጂታል ገበያ",
+    solution_label: "አሠራር",
+    solution_h2: "ሦስት ደረጃዎች። ምንም ደላላ የለም።",
+    solution_sub: "OmishGo የተሰራው የአርሶ አደሩን ምርት በፍጥነት ከገዢው ጋር በቀጥታ ለማገናኘት ነው።",
+    step1_h: "አርሶ አደሩ ምርቱን ያቀርባል",
+    step1_p:
+      "ፎቶ ያንሱ፣ ዋጋ በብር ይወስኑ፣ ምርቱን ይግለጹ። ወዲያውኑ ገበያ ላይ ይወጣል — በ2G ኢንተርኔትም ጭምር።",
+    step2_h: "ገዢዎች ያገኟቸዋል፣ መልዕክት ይልካሉ",
+    step2_p:
+      "ገዢዎች የቀረቡ ምርቶችን ይመለከታሉ፣ በምርት አይነት ወይም በቦታ ያጣራሉ፣ ለአርሶ አደሩም በቀጥታ መልዕክት ይልካሉ።",
+    step3_h: "ስምምነት ይረጋገጣል፣ ትዕዛዝ ይከታተላሉ",
+    step3_p:
+      "ትዕዛዝ ይላካል፣ ክምችት ይዘመናል፣ ሁለቱም ወገኖች ማሳወቂያ ይደርሳቸዋል። ወረቀት ወይም ከደላላ ጋር ስልክ መደዋወል አያስፈልግም።",
+    lang_note: "ሦስቱም ቋንቋዎች በእኩል ደረጃ የተካተቱ ናቸው።",
+    demo_label: "አሰራሩን ይመልከቱ",
+    demo_h2: "ከ20 ሴኮንድ ባነሰ ጊዜ ውስጥ ምርትን ማቅረብ",
+    demo_sub:
+      "በመቂ የሚገኝ አርሶ አደር የቲማቲም ምርቱን እንዴት በቀላሉ እንደሚያቀርብ እና ገዢ መልዕክት እንደሚልክለት ይመልከቱ — ምንም ስልጠና አያስፈልግም።",
+    demo_caption: "ቪዲዮው በቅርቡ ይመጣል — ወደ YouTube በመጫን ላይ ነን",
+    screens_label: "ለኢትዮጵያ ገበያ የተሰራ",
+    screens_h2: "መተግበሪያው በራስዎ ቋንቋ ቀርቧል",
+    screens_sub:
+      "9 እውነተኛ የመተግበሪያ ገጾች። በPIN የሚሰራ መግቢያ። ያለ ኢንተርኔት ይሰራል (Offline)። በሶስት ቋንቋዎች የቀረበ።",
+    tab_all: "ሁሉም ማሳያዎች",
+    tab_onboard: "መግቢያ",
+    tab_farmer: "አርሶ አደር",
+    tab_buyer: "ገዢ",
+    screen_s1: "ምርትዎን በቀጥታ ይሸጡ",
+    screen_s2: "ትኩስ ምርት ከማሳው ያስሱ",
+    screen_s3: "የግብርና ግብዓቶች እስከ ደጃፍዎ",
+    screen_s4: "የአቅርቦት ሂደትን ይከታተሉ",
+    screen_s5: "የአርሶ አደር ማዕከል",
+    screen_s6: "የተረጋገጠ የአምራች መለያ",
+    screen_s7: "ቀጥታ የመልዕክት ልውውጥ",
+    screen_s8: "የገዢ ማዕከል",
+    screen_s9: "ትዕዛዞቼ — የትዕዛዝ ሂደት",
+    pilot_h2: "የተደራጀ የሙከራ ትግበራ",
+    pilot_p:
+      "OmishGo በመቂ አካባቢ ከተደራጁ የአርሶ አደሮች ህብረት ጋር በመተባበር የሙከራ ትግበራ እያደረገ ነው። ህብረቱ ተጠቃሚዎችን በማረጋገጥ፣ ጥራትን በመቆጣጠር እና እምነትን በመገንባት ላይ ይገኛል።",
+    funders_label: "ለፋይናንስ አቅራቢዎች",
+    dl_label: "OmishGoን ያግኙ",
+    dl_h2: "የኢትዮጵያን ግብርና የወደፊት ዕጣ ፈንታ ይቀላቀሉ",
+    dl_p: "Android APK — ለ2G ኢንተርኔት የተመቻቸ፣ በPIN የሚሰራ መግቢያ፣ ያለ ኢንተርኔት ይሰራል (Offline)። በሙከራ ጊዜ ነፃ ነው።",
+    dl_btn_apk: "APK ያውርዱ",
+    dl_apk_sub: "APK በቅርቡ ይመጣል — ተራዎን ይጠብቁ",
+    dl_btn_waitlist: "የሙከራ ትግበራውን ይቀላቀሉ",
+    dl_btn_waitlist_sub: "አርሶ አደሮች እና የጅምላ ገዢዎች",
+    form_h: "አዳዲስ መረጃዎችን ያግኙ",
+    form_p: "የሙከራ ትግበራው በአካባቢዎ ሲጀመር እናሳውቅዎታለን።",
+    form_name: "ሙሉ ስም",
+    form_phone: "ስልክ ቁጥር",
+    form_role: "እኔ...",
+    form_role_placeholder: "ሚናዎን ይምረጡ",
+    form_role_farmer: "አርሶ አደር / አምራች",
+    form_role_buyer: "ገዢ / ነጋዴ",
+    form_role_investor: "ባለሀብት / ፋይናንስ አቅራቢ",
+    form_role_other: "ሌላ",
+    form_submit: "ይመዝገቡ →",
+    form_success: "በተሳካ ሁኔታ ተመዝግበዋል! በቅርቡ እናገኝዎታለን።",
+    footer_tagline:
+      "የኢትዮጵያ ቀጥታ የአርሶ-አደር-ለገዢ ገበያ። ምንም ደላላ የለም። የተሻለ ዋጋ። እውነተኛ ለውጥ።",
+    footer_product: "ምርት",
+    footer_how: "አሠራር",
+    footer_screens: "የመተግበሪያ ገጾች",
+    footer_demo: "የቪዲዮ ማሳያ",
+    footer_download: "APK ያውርዱ",
+    footer_pilot: "የሙከራ ትግበራ",
+    footer_about: "ስለ ሙከራው",
+    footer_join: "ይመዝገቡ",
+    footer_contact_link: "ያግኙን",
+    footer_lang_title: "Language / ቋንቋ / Afaan",
+    footer_copy: "© 2026 OmishGo. በኢትዮጵያ ተሰራ 🇪🇹",
+    footer_privacy: "የመገናኛ መረጃዎ ለሙከራ ትግበራው ማሳወቂያ ብቻ ያገለግላል። ለማንም አሳልፈን አንሰጥም።",
   },
   or: {
-    nav_problem:'Rakkoo', nav_solution:'Hojii Akkamii', nav_demo:'Fakkeenyaa',
-    nav_screens:'App', nav_contact:'Quunnamtii', nav_cta:'App Buufadhu',
-    hero_badge:'🚀 Yaaliif Jira — Maqii, Gama Horaa',
-    hero_h1a:'Humnaa Kennina', hero_h1b:'Qonnaan Bultoota Itoophiyaa',
-    hero_amharic:'ያለ ደላሎ ቀጥታ ከሻጭ ወደ ገዢ',
-    hero_oromo:'Gabatee irraa bitaa-gurgurtaa karaa salphaa',
-    hero_sub:'Gabatee moobaayilaa daldalaa gidduutti kutuu — qonnaan bulaatti omishaa maakeetii siif argisiisa.',
-    hero_cta1:'APK Buufadhu', hero_cta2:'Yaaliif Galmaai',
-    hero_trust:"Waldaa Qonnaan Bulaa Amanteef • Yaalii Maqii 2026",
-    problem_label:'Rakkoo',
-    problem_h2:'Qonnaan bultooti Itoophiyaa galii caaluutti dura dhabaniiru',
-    problem_sub:'Daldaltooti gidduun gatii, argamuu, fi raabsuu to\'atu — qonnaan bultoota xiqqaa carraa malee dhiisu.',
-    stat1_label:'gatii omishaa maddaatti darbaa jira',
-    stat2_label:'gatii maakeetii qonnaan bulaatti gaha',
-    stat3_label:'karaa dijitaalaa kallattii dura hin turre',
-    solution_label:'Akkamitti Hojjeta', solution_h2:'Tarkaanfii sadi. Daldalaa gidduun hin jiru.',
-    solution_sub:'OmishGo hojii waliigalaa ijoo kan dhugaa baatu irratti ijaarame.',
-    step1_h:'Qonnaan Bulaan Omisha Galcha', step1_p:'Suuraa kaasi, gatii Birridhaan kaa\'i. Sekoondoota muraasaan jira.',
-    step2_h:'Bitataan Argata fi Ergaa Erga', step2_p:'Bitataan tarreeffama kallattii ilaaluu, siif ergaa erguu.',
-    step3_h:'Waliigaltee Mirkanaái, Ajajni Hordofama', step3_p:'Ajajni kaa\'ame, kuusni haaromse. Waraqaa hin barbaachisu.',
-    lang_note:'Afaanota sadanuu app keessatti walqixa jiru.',
-    demo_label:'Kallattii Ilaali', demo_h2:'Tarreeffamni sekoondii 20 jalatti galcha',
-    demo_sub:'Qonnaan bulaan Maqii keessaa akkamitti maakeetii kaa\'u ilaali.',
-    demo_caption:'Viidiyoon dhufa — gara YouTube\'itti olkaasaa jirra',
-    screens_label:'Gabatee Itoophiyaaf Ijaarame', screens_h2:'Maasqalli kam iyyuu afaan keetiitti dubbata',
-    screens_sub:'Maasqala app 9 dhugaa. PIN. Offlaayinitti hojjeta. Afaanota sadi.',
-    tab_all:'Hunda', tab_onboard:'Seensuu', tab_farmer:'Qonnaan Bulaa', tab_buyer:'Bitataa',
-    screen_s1:'Omisha Kee Kallattii Gurguuri', screen_s2:'Gabatee Irraa Sakkata\'i',
-    screen_s3:'Kutaa Qonnaa Balbalaatti', screen_s4:'Geejjiba Hordofi',
-    screen_s5:'Daashboordii Qonnaan Bulaa', screen_s6:'Profaayilii Mirkanaa\'aa',
-    screen_s7:'Ergaa Kallattii', screen_s8:'Daashboordii Bitataa',
-    screen_s9:'Ajajawwan Koo',
-    pilot_h2:'Yaalii qindaa\'e — muuxannoo miti',
-    pilot_p:'OmishGo Maqii naannoo keessatti yaalii cufame geggeessaa jira — Waldaan Qonnaan Bulaa fayyadamoota hundu mirkaneessiti.',
-    funders_label:'Leenjistootaa fi Deggartoota Kaayyoo',
-    dl_label:'OmishGo Argadhu', dl_h2:'Qonnaan bulummaa Itoophiyaa gara fuulduraatti makamaa',
-    dl_p:'Android APK — 2Gf ta\'aa, PIN seensuu, offlaayinitti hojjeta. Yaalii yeroo hin kafalamu.',
-    dl_btn_apk:'APK Buufadhu', dl_btn_waitlist:'Yaalii Galmaai', dl_btn_waitlist_sub:'Qonnaan Bultootaa fi Bitattoota',
-    form_h:'Gara Keessaatti Turaa', form_p:'Yaaliin naannoo keetitti banaamu yoo ta\'e beeksifna.',
-    form_name:'Maqaa Guutuu', form_phone:'Lakkofsa Bilbilaa', form_role:'Ani…',
-    form_role_placeholder:'Gahee kee fili', form_role_farmer:'Qonnaan Bulaa',
-    form_role_buyer:'Bitataa / Daldalaa', form_role_investor:'Maallaqqa galchaa', form_role_other:'Kan biraa',
-    form_submit:'Galmaa\'i →', form_success:'🎉 Tarreeffama irra jirta! Dafnee si beeksifna.',
-    footer_tagline:"Gabatee kallattii qonna–bitataa Itoophiyaa. Daldalaa gidduun hin jiru. Gatiin caala. Faaydaan dhugaa.",
-    footer_product:'Oomisha', footer_how:'Akkamitti Hojjeta', footer_screens:'Maasqala App',
-    footer_demo:'Viidiyoo', footer_download:'APK Buufadhu', footer_pilot:'Yaalii',
-    footer_about:'Yaalii Irraa', footer_join:'Galmaai', footer_contact_link:'Nu Quunnamaa',
-    footer_lang_title:'Language / ቋንቋ / Afaan',
-    footer_copy:'© 2026 OmishGo. Itoophiyaa keessatti ijaarame 🇪🇹',
-    footer_privacy:'Quunnamtiin kee yaalii irratti qofa fayyadama.',
-  }
+    nav_problem: "Rakkoo",
+    nav_solution: "Akkaataa Itti Hojjetu",
+    nav_demo: "Agarsiisa",
+    nav_screens: "Appii",
+    nav_contact: "Nu Quunnamaa",
+    nav_cta: "Appii Buufadhu",
+    hero_badge: "Piilootiin Eegaleera — Maqii, Sulula Riftii",
+    hero_h1a: "Humna Kennuu",
+    hero_h1b: "Qonnaan Bultoota Itoophiyaaf",
+    hero_amharic: "ያለ ደላሎ ቀጥታ ከሻጭ ወደ ገዢ",
+    hero_oromo: "Gabatee irraa bitaa-gurgurtaa karaa salphaa",
+    hero_sub:
+      "Gabaa moobaayilaa daldaltoota giddu-galeessaa hambisu — qonnaan bultoonni oomisha isaanii maxxansu, bitattoonni hatattamaan argatu, gabaan kallattiin raawwatama.",
+    hero_cta1: "APK Buufadhu",
+    hero_cta2: "Yaaliif Galmaa'i",
+    hero_trust:
+      "Waldaa Qonnaan Bultootaatiin Kan Mirkanaa'e • Yaalii Maqii 2026",
+    problem_label: "Rakkoo",
+    problem_h2:
+      "Qonnaan bultoonni Itoophiyaa oomishni isaanii gabaa gahuun dura irra caalaa bu'aa isaanii ni dhabu",
+    problem_sub:
+      "Daldaltoonni seeraan alaa gatii fi raabsa to'atu — kunis qonnaan bultoota xixinnoo filannoo malee miidhamaaf saaxaala.",
+    stat1_label: "gatii oomishaa daldaltootaaf darba",
+    stat2_label: "gatii gabaa qofaatu qonnaan bulaa dhaqqaba",
+    /* B2: Oromo version of the text claim */
+    stat3_claim:
+      "Gabaa dijitaalaa kallattii jalqabaa Itoophiyaa kan qonnaan bultoota xixinnootiif ijaarame",
+    solution_label: "Akkaataa Itti Hojjetu",
+    solution_h2: "Tarkaanfii sadii. Daldalaan giddu-galeessaa hin jiru.",
+    solution_sub:
+      "OmishGo uumame oomisha qonnaan bulaa saffisaan kallattiin bitataatti akka dhaqqabu gochuufi.",
+    step1_h: "Qonnaan Bulaan Oomisha Maxxansa",
+    step1_p:
+      "Suuraa kaasi, gatii Birriin murteessi, oomishicha ibsi. Sekoondii muraasa keessatti gabaarra ba'a — intarneetii 2G irrattillee.",
+    step2_h: "Bitataan Ni Argata Ergaas Ni Erga",
+    step2_p:
+      "Bitattoonni oomishaalee dhiyaatan ni daawwatu, gosa midhaanii ykn iddoon ni calalu, kallattiinis qonnaan bulaaf ergaa ergu.",
+    step3_h: "Waliigalteen Mirkanaa'e, Ajajni Ni Hordofama",
+    step3_p:
+      "Ajajni ergameera, kuusaan haaromfameera, qaamoleen lamaanuu beeksisa argatu. Waraqaas ta'e daldalaa giddu-galeessaa wajjin bilbilaan wal-barbaaduun hin jiru.",
+    lang_note: "Afaanonni sadanuu iddoo walqixa qabu.",
+    demo_label: "Kallattiin Daawwadhu",
+    demo_h2: "Oomishni sekoondii 20 gadiitti gabaarra ba'e",
+    demo_sub:
+      "Qonnaan bulaan Maqii tokko akkamitti oomisha timaatimaa maxxansuu fi bitataanis akkamitti ergaa akka ergu daawwadhaa — leenjii hin barbaadu.",
+    demo_caption:
+      "Viidiyoon dhiyootti ni dhufa — gara YouTube'itti fe'amaa jira",
+    screens_label: "Gabaa Itoophiyaaf Ijaarame",
+    screens_h2: "Fuulli kamiyyuu afaan keetiin dubbata",
+    screens_sub:
+      "Fuulota appii dhugaa 9. PIN'n kan seenamu. Toora interneetiin alatti (Offline) ni hojjeta. Afaanota sadiin qophaa'e.",
+    tab_all: "Fuulota Hunda",
+    tab_onboard: "Seensa",
+    tab_farmer: "Qonnaan Bulaa",
+    tab_buyer: "Bitataa",
+    screen_s1: "Oomisha Kee Kallattiin Gurguri",
+    screen_s2: "Oomisha Haaraa Maasii Irraa Daawwadhu",
+    screen_s3: "Galtee Qonnaa Balbala Keetti",
+    screen_s4: "Adeemsa Dhiyeessaa Hordofi",
+    screen_s5: "Daashboordii Qonnaan Bulaa",
+    screen_s6: "Profaayilii Oomishtaa Mirkanaa'e",
+    screen_s7: "Ergaa Kallattii Appii Keessatti",
+    screen_s8: "Daashboordii Bitataa",
+    screen_s9: "Ajajoota Koo — Adeemsa Ajajaa",
+    pilot_h2: "Piilootii qindaa'e, pirootootaayipii miti",
+    pilot_p:
+      "OmishGo naannoo Maqiitti Waldaa Qonnaan Bultootaa waliin ta'uun piilootii geggeessaa jira — waldaan fayyadamtoota mirkaneessa, qulqullina to'ata, akkasumas amantaa ijaaraa jira.",
+    funders_label: "Qaamolee Maallaqa Dhiyeessaniif",
+    dl_label: "OmishGo Argadhu",
+    dl_h2: "Qonna Itoophiyaa gara fuulduraatti makamaa",
+    dl_p: "Android APK — 2G'f mijataa, PIN'n kan seenamu, toora interneetiin alatti ni hojjeta. Yeroo yaaliitti bilisa.",
+    dl_btn_apk: "APK Buufadhu",
+    dl_apk_sub: "APK dhiyootti ni dhufa — tarree eegdotaatti makami",
+    dl_btn_waitlist: "Tarree Yaaliitti Makami",
+    dl_btn_waitlist_sub: "Qonnaan Bultoota fi Bitattootaaf",
+    form_h: "Odeeffannoo Argadhu",
+    form_p: "Yaaliin ummataaf naannoo keessanitti yeroo banamu isin beeksifna.",
+    form_name: "Maqaa Guutuu",
+    form_phone: "Lakkoofsa Bilbilaa",
+    form_role: "Ani…",
+    form_role_placeholder: "Gahee kee filadhu",
+    form_role_farmer: "Qonnaan Bulaa / Oomishtaa",
+    form_role_buyer: "Bitataa / Daldalaa",
+    form_role_investor: "Investerii / Maallaqa Dhiyeessaa",
+    form_role_other: "Kan biroo",
+    form_submit: "Tarreetti Makami →",
+    form_success: "Milkiin galmoofteetta! Dhiyootti si quunnamna.",
+    footer_tagline:
+      "Gabaa kallattii qonnaan-bulaa irraa bitataatti Itoophiyaa. Daldalaan giddu-galeessaa hin jiru. Gatii fooya'aa. Bu'aa dhugaa.",
+    footer_product: "Oomisha",
+    footer_how: "Akkaataa Itti Hojjetu",
+    footer_screens: "Fuulota Appii",
+    footer_demo: "Agarsiisa Viidiyoo",
+    footer_download: "APK Buufadhu",
+    footer_pilot: "Piilootii",
+    footer_about: "Waa'ee Piilootichaa",
+    footer_join: "Tarreetti Makami",
+    footer_contact_link: "Nu Quunnamaa",
+    footer_lang_title: "Language / ቋንቋ / Afaan",
+    footer_copy: "© 2026 OmishGo. Itoophiyaa keessatti ijaarame 🇪🇹",
+    footer_privacy:
+      "Ragaan quunnamtii kee waa'ee piilootichaa beeksisuuf qofa fayyada. Eenyuufiyyuu dabarsee hin kennamu.",
+  },
 };
 
 /* ══════════════════════════════════════════════════════════════
@@ -188,6 +348,9 @@ function applyLanguage(lang) {
     const cap = slide.querySelector('.c-caption');
     if (cap && key && d[key]) cap.textContent = d[key];
   });
+  // B2: update text-claim stat card
+  const claimEl = document.querySelector('.stat-claim');
+  if (claimEl && d.stat3_claim) claimEl.textContent = d.stat3_claim;
 }
 document.querySelectorAll('.lang-btn, .lang-footer-btn').forEach(btn =>
   btn.addEventListener('click', () => applyLanguage(btn.getAttribute('data-lang')))
@@ -230,7 +393,7 @@ const revealObs = new IntersectionObserver((entries) => {
 document.querySelectorAll('[data-reveal]').forEach(el => revealObs.observe(el));
 
 /* ══════════════════════════════════════════════════════════════
-   6. COUNTER ANIMATION
+   6. COUNTER ANIMATION (only for stat cards with data-count)
    ══════════════════════════════════════════════════════════════ */
 function animateCounter(el) {
   const target = parseInt(el.getAttribute('data-count'), 10);
@@ -270,17 +433,24 @@ if (statsGrid) {
 
 /* ══════════════════════════════════════════════════════════════
    8. VIDEO PLAYER
+   Replace YOUTUBE_ID value once the demo is uploaded.
    ══════════════════════════════════════════════════════════════ */
-const YOUTUBE_ID = 'YOUR_YOUTUBE_VIDEO_ID';
+const YOUTUBE_ID = "en4wYb-TkdM";
 const playBtn     = document.getElementById('play-btn');
 const videoPlayer = document.getElementById('video-player');
 const ytContainer = document.getElementById('yt-frame-container');
 if (playBtn) {
   playBtn.addEventListener('click', () => {
     if (YOUTUBE_ID === 'YOUR_YOUTUBE_VIDEO_ID') {
-      const cap = videoPlayer.querySelector('.video-caption');
+      /* D: time-outline SVG used for "uploading soon" state */
+      const cap = document.getElementById('video-caption');
       if (cap) {
-        cap.textContent = '⏳ Video uploading soon — join our Telegram for updates!';
+        cap.innerHTML =
+          '<svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" width="14" height="14" aria-hidden="true" style="margin-right:5px;vertical-align:middle">' +
+            '<path d="M256 64C150 64 64 150 64 256s86 192 192 192 192-86 192-192S362 64 256 64Z"/>' +
+            '<path d="M256 128v144h96" stroke-linecap="round" stroke-linejoin="round"/>' +
+          '</svg>' +
+          'Video uploading soon — join our Telegram for updates!';
         cap.style.background = 'rgba(245,197,24,.92)';
         cap.style.color = '#111';
       }
@@ -296,7 +466,7 @@ if (playBtn) {
     playBtn.style.display = 'none';
     const poster = document.getElementById('video-poster');
     if (poster) poster.style.display = 'none';
-    const cap = videoPlayer.querySelector('.video-caption');
+    const cap = document.getElementById('video-caption');
     if (cap) cap.style.display = 'none';
   });
 }
@@ -305,23 +475,22 @@ if (playBtn) {
    9. CINEMATIC 3D SCREENSHOT CAROUSEL
    ══════════════════════════════════════════════════════════════ */
 (function initCarousel() {
-  const track     = document.getElementById('carousel-track');
-  const stage     = document.getElementById('carousel-stage');
-  const prevBtn   = document.getElementById('carousel-prev');
-  const nextBtn   = document.getElementById('carousel-next');
-  const dotsEl    = document.getElementById('carousel-dots');
-  const tabBtns   = document.querySelectorAll('.screen-tab');
+  const track   = document.getElementById('carousel-track');
+  const stage   = document.getElementById('carousel-stage');
+  const prevBtn = document.getElementById('carousel-prev');
+  const nextBtn = document.getElementById('carousel-next');
+  const dotsEl  = document.getElementById('carousel-dots');
+  const tabBtns = document.querySelectorAll('.screen-tab');
   if (!track || !stage) return;
 
   let allSlides = Array.from(track.querySelectorAll('.c-slide'));
-  let visible   = [...allSlides]; // slides currently shown
+  let visible   = [...allSlides];
   let current   = 0;
   let isDragging = false;
   let dragStartX = 0;
   let dragDeltaX = 0;
   let autoTimer  = null;
 
-  // ── Build dots ─────────────────────────────────────────────
   function buildDots() {
     dotsEl.innerHTML = '';
     visible.forEach((_, i) => {
@@ -334,27 +503,23 @@ if (playBtn) {
     });
   }
 
-  // ── Apply 3D states ────────────────────────────────────────
   function applyStates() {
     const classes = ['is-active','is-left','is-right','is-far','is-hidden'];
     visible.forEach((slide, i) => {
       slide.classList.remove(...classes);
       const diff = i - current;
-      if      (diff === 0)              slide.classList.add('is-active');
-      else if (diff === -1)             slide.classList.add('is-left');
-      else if (diff === 1)              slide.classList.add('is-right');
-      else if (Math.abs(diff) <= 3)    slide.classList.add('is-far');
-      else                              slide.classList.add('is-hidden');
+      if      (diff === 0)             slide.classList.add('is-active');
+      else if (diff === -1)            slide.classList.add('is-left');
+      else if (diff === 1)             slide.classList.add('is-right');
+      else if (Math.abs(diff) <= 3)   slide.classList.add('is-far');
+      else                             slide.classList.add('is-hidden');
     });
-    // Update dots
     dotsEl.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
-
-    // Scroll the active card into horizontal center
     const active = visible[current];
     if (!active) return;
-    const stageRect = stage.getBoundingClientRect();
+    const stageRect  = stage.getBoundingClientRect();
     const activeRect = active.getBoundingClientRect();
-    const center = stageRect.left + stageRect.width / 2;
+    const center     = stageRect.left + stageRect.width / 2;
     const cardCenter = activeRect.left + activeRect.width / 2;
     const currentOffset = parseFloat(track.style.transform?.match(/-?[\d.]+/)?.[0] || 0);
     const newOffset = currentOffset - (cardCenter - center);
@@ -368,26 +533,17 @@ if (playBtn) {
     resetAuto();
   }
 
-  // ── Tab filter ─────────────────────────────────────────────
   function applyFilter(group) {
-    // Show/hide slides
     allSlides.forEach(slide => {
       const g = slide.getAttribute('data-group');
-      const show = group === 'all' || g === group;
-      slide.style.display = show ? '' : 'none';
+      slide.style.display = (group === 'all' || g === group) ? '' : 'none';
     });
     visible = allSlides.filter(s => s.style.display !== 'none');
     current = 0;
-    // Reset track position
     track.style.transition = 'none';
     track.style.transform = 'translateX(0)';
     buildDots();
-    // Allow layout to settle before animating
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        applyStates();
-      });
-    });
+    requestAnimationFrame(() => requestAnimationFrame(() => applyStates()));
   }
 
   tabBtns.forEach(btn => {
@@ -399,17 +555,13 @@ if (playBtn) {
     });
   });
 
-  // ── Prev / Next ────────────────────────────────────────────
   prevBtn.addEventListener('click', () => goTo(current - 1));
   nextBtn.addEventListener('click', () => goTo(current + 1));
-
-  // ── Keyboard ───────────────────────────────────────────────
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft')  goTo(current - 1);
     if (e.key === 'ArrowRight') goTo(current + 1);
   });
 
-  // ── Mouse drag ─────────────────────────────────────────────
   stage.addEventListener('mousedown', e => {
     isDragging = true;
     dragStartX = e.clientX;
@@ -419,7 +571,7 @@ if (playBtn) {
     if (!isDragging) return;
     dragDeltaX = e.clientX - dragStartX;
     const base = parseFloat(track.style.transform?.match(/-?[\d.]+/)?.[0] || 0);
-    track.style.transform = `translateX(${base + dragDeltaX - (dragDeltaX > 0 ? 0 : 0)}px)`;
+    track.style.transform = `translateX(${base + dragDeltaX}px)`;
   });
   window.addEventListener('mouseup', () => {
     if (!isDragging) return;
@@ -430,7 +582,6 @@ if (playBtn) {
     dragDeltaX = 0;
   });
 
-  // ── Touch swipe ────────────────────────────────────────────
   let touchX = 0;
   stage.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; track.style.transition = 'none'; }, { passive: true });
   stage.addEventListener('touchmove',  e => {
@@ -438,33 +589,27 @@ if (playBtn) {
     const base  = parseFloat(track.style.transform?.match(/-?[\d.]+/)?.[0] || 0);
     track.style.transform = `translateX(${base + delta * 0.4}px)`;
   }, { passive: true });
-  stage.addEventListener('touchend',   e => {
+  stage.addEventListener('touchend', e => {
     const diff = touchX - e.changedTouches[0].clientX;
     if      (diff >  40) goTo(current + 1);
     else if (diff < -40) goTo(current - 1);
     else                  applyStates();
   }, { passive: true });
 
-  // ── Click on non-active slide ──────────────────────────────
-  allSlides.forEach((slide, i) => {
+  allSlides.forEach(slide => {
     slide.addEventListener('click', () => {
       const visIdx = visible.indexOf(slide);
       if (visIdx !== -1 && visIdx !== current) goTo(visIdx);
     });
   });
 
-  // ── Auto-advance ───────────────────────────────────────────
   function resetAuto() {
     clearInterval(autoTimer);
     autoTimer = setInterval(() => goTo(current + 1 < visible.length ? current + 1 : 0), 4500);
   }
 
-  // ── Init ───────────────────────────────────────────────────
-  // Centre the track initially so first card appears centred
   const stageW = stage.offsetWidth;
-  const trackChildren = Array.from(track.children);
-  if (trackChildren.length) {
-    // Add left padding = half stage width so first card is centred
+  if (track.children.length) {
     track.style.paddingLeft  = `${stageW / 2 - 110}px`;
     track.style.paddingRight = `${stageW / 2 - 110}px`;
   }
@@ -474,7 +619,6 @@ if (playBtn) {
   applyStates();
   resetAuto();
 
-  // Pause auto on hover/focus
   stage.addEventListener('mouseenter', () => clearInterval(autoTimer));
   stage.addEventListener('mouseleave', resetAuto);
 })();
@@ -491,17 +635,29 @@ if (form) {
     if (!form.checkValidity()) { form.reportValidity(); return; }
     const d = translations[currentLang];
     submitBtn.disabled = true;
-    submitBtn.textContent = '⏳ Sending…';
+    /* D: time-outline SVG used in button sending state */
+    submitBtn.innerHTML =
+      '<svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" width="16" height="16" aria-hidden="true" style="margin-right:6px">' +
+        '<path d="M256 64C150 64 64 150 64 256s86 192 192 192 192-86 192-192S362 64 256 64Z"/>' +
+        '<path d="M256 128v144h96" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</svg>Sending…';
     try {
       const res = await fetch(form.action, { method:'POST', body:new FormData(form), headers:{ Accept:'application/json' } });
       if (res.ok) {
         form.style.display = 'none';
-        successMsg.style.display = 'block';
-        successMsg.textContent = d.form_success;
+        /* D: checkmark-circle-outline SVG replaces 🎉 emoji in success message */
+        successMsg.innerHTML =
+          '<svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="32" width="20" height="20" aria-hidden="true" style="margin-right:8px;flex-shrink:0">' +
+            '<path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192Z" stroke-miterlimit="10"/>' +
+            '<path d="M352 176 217.6 336 160 272" stroke-linecap="round" stroke-linejoin="round"/>' +
+          '</svg>' +
+          (d.form_success || "You're on the list! We'll be in touch soon.");
+        successMsg.style.display = 'flex';
+        successMsg.style.alignItems = 'center';
       } else throw new Error();
     } catch {
       submitBtn.disabled = false;
-      submitBtn.textContent = d.form_submit;
+      submitBtn.textContent = translations[currentLang].form_submit || 'Join Waitlist →';
       alert('Submission failed — please email hello@omishgo.et');
     }
   });
@@ -513,14 +669,6 @@ if (form) {
 (function trackSections() {
   const sections = document.querySelectorAll('section[id],footer[id]');
   const links    = document.querySelectorAll('.nav-links a');
-  new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        const id = e.target.getAttribute('id');
-        links.forEach(a => { a.style.color = a.getAttribute('href') === `#${id}` ? '#fff' : ''; });
-      }
-    });
-  }, { threshold: 0.4 }).observe(document.querySelector('#hero'));
   sections.forEach(s => {
     new IntersectionObserver(entries => {
       entries.forEach(e => {
