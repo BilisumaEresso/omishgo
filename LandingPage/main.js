@@ -2,11 +2,11 @@
 
 /* ══════════════════════════════════════════════════════════════
    1. TRANSLATIONS
-   A3: screen_s5/s8 — removed fake ETB figures; now match am/or ("Farmer Dashboard" / "Buyer Dashboard")
-   A4: screen_s4/s9 — "live tracking" language corrected
+   A3: screen_s5/s8 , removed fake ETB figures; now match am/or ("Farmer Dashboard" / "Buyer Dashboard")
+   A4: screen_s4/s9 , "live tracking" language corrected
    B2: stat3_claim key added in all three languages (text claim replaces broken counter)
-   D:  hero_badge no longer contains rocket emoji — icon is in HTML; key is text only
-       form_success no longer contains 🎉 emoji — icon injected by JS
+   D:  hero_badge no longer contains rocket emoji , icon is in HTML; key is text only
+       form_success no longer contains 🎉 emoji , icon injected by JS
    ══════════════════════════════════════════════════════════════ */
 const translations = {
   en: {
@@ -16,51 +16,51 @@ const translations = {
     nav_screens: "App",
     nav_contact: "Contact",
     nav_cta: "Get the App",
-    /* D: no emoji — rocket SVG is a sibling element in HTML */
-    hero_badge: "Pilot Launching — Meki, Rift Valley",
+    /* D: no emoji , rocket SVG is a sibling element in HTML */
+    hero_badge: "Meki, Ethiopia · Open Pilot",
     hero_h1a: "Empowering",
     hero_h1b: "Ethiopia's Farmers",
-    hero_amharic: "ያለ ደላሎ ቀጥታ ከሻጭ ወደ ገዢ",
+    hero_amharic: "ያለ ደላላ ቀጥታ ከሻጭ ወደ ገዢ",
     hero_oromo: "Gabatee irraa bitaa-gurgurtaa karaa salphaa",
     hero_sub:
-      "The mobile marketplace that cuts out middlemen — farmers post listings, buyers discover them instantly, deals happen in real time.",
+      "The mobile marketplace that cuts out middlemen , farmers post listings, buyers discover them instantly, deals happen in real time.",
     hero_cta1: "Download APK",
     hero_cta2: "Join the Pilot Waitlist",
-    /* A5: deliberately unchanged — see launch-report.md for the flag */
+    /* A5: deliberately unchanged , see launch-report.md for the flag */
     hero_trust: "Trusted by Farmers' Union • Meki Pilot 2026",
     problem_label: "The Problem",
     problem_h2:
       "Ethiopian farmers lose most of their earnings before reaching the market",
     problem_sub:
-      "Informal traders control pricing, access, and distribution — leaving smallholder farmers with no leverage and no alternatives.",
+      "Informal traders control pricing, access, and distribution , leaving smallholder farmers with no leverage and no alternatives.",
     stat1_label: "of crop value lost to trader markups",
     stat2_label: "of final market price reaches the farmer",
     /* B2: text claim replaces broken 0-counter */
     stat3_claim:
       "Ethiopia's first direct digital marketplace for smallholder farmers",
     solution_label: "How It Works",
-    solution_h2: "Three steps. Zero middlemen.",
+    solution_h2: "Post a listing. Find it. Deal done.",
     solution_sub:
-      "OmishGo is built around the core loop that actually matters — getting a farmer's product in front of a buyer, fast.",
+      "OmishGo is built around the core loop that actually matters , getting a farmer's product in front of a buyer, fast.",
     step1_h: "Farmer Posts a Listing",
     step1_p:
-      "Snap a photo, set a price in Birr, describe the product. Live in seconds — even on 2G.",
+      "Snap a photo, set a price in Birr, describe the product. Live in seconds , even on 2G.",
     step2_h: "Buyer Discovers & Messages",
     step2_p:
       "Buyers browse live listings, filter by crop type or location, and message the farmer directly in-app.",
     step3_h: "Deal Confirmed, Order Tracked",
     step3_p:
       "Order placed, stock updated, both parties notified. No paperwork. No phone tag with a middleman.",
-    lang_note: "All three languages are first-class — not an afterthought.",
+    lang_note: "All three languages are first-class , not an afterthought.",
     demo_label: "See It Live",
-    demo_h2: "A real listing placed in under 20 seconds",
+    demo_h2: "Listing to message , under 20 seconds",
     demo_sub:
-      "Watch how a farmer in Meki posts a tomato listing and a buyer messages them — end to end, no training required.",
-    demo_caption: "Demo coming soon — uploading to YouTube shortly",
+      "A farmer posts produce. A buyer finds it and messages directly. No agent, no phone call.",
+    demo_caption: "Demo coming soon , uploading to YouTube shortly",
     screens_label: "Built for the Ethiopian Market",
-    screens_h2: "Every screen speaks your language",
+    screens_h2: "The app, in three languages",
     screens_sub:
-      "9 real app screens. PIN-based login. Works offline. Three languages out of the box.",
+      "9 real screens from the current build. PIN login. Works offline.",
     tab_all: "All Screens",
     tab_onboard: "Onboarding",
     tab_farmer: "Farmer",
@@ -77,16 +77,16 @@ const translations = {
     /* A3: fake ETB figures removed */
     screen_s8: "Buyer Dashboard",
     /* A4: "Live Order Tracking" → honest framing */
-    screen_s9: "My Orders — Order Progress",
-    pilot_h2: "A structured pilot, not a prototype",
+    screen_s9: "My Orders , Order Progress",
+    pilot_h2: "Closed pilot , Meki, Q3 2026",
     pilot_p:
-      "OmishGo is running a closed pilot in the Meki area with the local Farmers' Union acting as platform administrators — approving every user, ensuring quality, and building trust on the ground before we scale.",
+      "OmishGo is running a closed pilot in the Meki area with the local Farmers' Union acting as platform administrators , approving every user, ensuring quality, and building trust on the ground before we scale.",
     funders_label: "Target funders & accelerators",
     dl_label: "Get OmishGo",
     dl_h2: "Join the future of Ethiopian farming",
-    dl_p: "Android APK — optimized for 2G, PIN-based login, works offline. Free during the pilot.",
+    dl_p: "Android APK , optimized for 2G, PIN-based login, works offline. Free during the pilot.",
     dl_btn_apk: "Download APK",
-    dl_apk_sub: "APK coming soon — join the waitlist",
+    dl_apk_sub: "APK coming soon , join the waitlist",
     dl_btn_waitlist: "Join Pilot Waitlist",
     dl_btn_waitlist_sub: "Farmers & Buyers",
     form_h: "Stay in the loop",
@@ -100,7 +100,7 @@ const translations = {
     form_role_investor: "Investor / Funder",
     form_role_other: "Other",
     form_submit: "Join Waitlist →",
-    /* D: no emoji — success icon injected by JS */
+    /* D: no emoji , success icon injected by JS */
     form_success: "You're on the list! We'll be in touch soon.",
     footer_tagline:
       "Ethiopia's direct farm-to-buyer marketplace. No middlemen. Better prices. Real impact.",
@@ -121,50 +121,51 @@ const translations = {
   am: {
     nav_problem: "ችግሩ",
     nav_solution: "አሠራር",
-    nav_demo: "ቪዲዮ",
+    nav_demo: "ማሳያ",
     nav_screens: "መተግበሪያ",
     nav_contact: "ያግኙን",
     nav_cta: "መተግበሪያውን ያውርዱ",
-    hero_badge: "የሙከራ ትግበራ — መቂ፣ ስምጥ ሸለቆ",
-    hero_h1a: "አቅም መፍጠር ለ",
-    hero_h1b: "የኢትዮጵያ አርሶ አደሮች",
-    hero_amharic: "ያለ ደላሎ ቀጥታ ከሻጭ ወደ ገዢ",
+    hero_badge: "መቂ፣ ኢትዮጵያ · ክፍት የሙከራ ትግበራ",
+    hero_h1a: "የኢትዮጵያ አርሶ አደሮችን",
+    hero_h1b: "አቅም ማጎልበት",
+    hero_amharic: "ያለ ደላላ ቀጥታ ከሻጭ ወደ ገዢ",
     hero_oromo: "Gabatee irraa bitaa-gurgurtaa karaa salphaa",
     hero_sub:
-      "አርሶ አደሮች ምርታቸውን በቀጥታ የሚሸጡበት፣ ገዢዎች በፍጥነት የሚያገኙበት እና ግብይት በቅጽበት የሚፈጸምበት ዲጂታል ገበያ።",
+      "ደላሎችን በማስቀረት አርሶ አደሮች ምርታቸውን በቀጥታ የሚሸጡበት፣ ገዢዎች በፍጥነት የሚያገኙበት እና ግብይት በቅጽበት የሚፈጸምበት ዲጂታል የገበያ ትስስር።",
     hero_cta1: "APK ያውርዱ",
-    hero_cta2: "ለሙከራ ይመዝገቡ",
+    hero_cta2: "ለሙከራ ትግበራው ይመዝገቡ",
     hero_trust: "በአርሶ አደሮች ህብረት የታመነ • የመቂ የሙከራ ትግበራ 2026",
-    problem_label: "ችግሩ",
+    problem_label: "ዋናው ችግር",
     problem_h2: "የኢትዮጵያ አርሶ አደሮች ምርታቸው ገበያ ከመድረሱ በፊት አብዛኛውን ትርፋቸውን ያጣሉ",
     problem_sub:
-      "ህገ-ወጥ ደላሎች የገበያ ዋጋን እና ስርጭትን ይቆጣጠራሉ — ይህ ደግሞ አነስተኛ አርሶ አደሮችን ያለምንም አማራጭ ለኪሳራ ይዳርጋል።",
-    stat1_label: "የምርት ትርፍ ለደላላ ይሄዳል",
-    stat2_label: "የገበያ ዋጋ ብቻ ለአርሶ አደሩ ይደርሳል",
+      "መደበኛ ያልሆኑ ደላሎች የገበያ ዋጋን እና ስርጭትን ይቆጣጠራሉ  ይህ ደግሞ አነስተኛ አርሶ አደሮችን ያለምንም አማራጭ ለኪሳራ ይዳርጋል።",
+    stat1_label: "ከምርቱ ዋጋ በደላሎች ምክንያት የሚጠፋ",
+    stat2_label: "የመጨረሻው የገበያ ዋጋ ለአርሶ አደሩ ይደርሳል",
     /* B2: Amharic version of the text claim */
     stat3_claim: "ለአነስተኛ አርሶ አደሮች የተሰራ የኢትዮጵያ ቀዳሚው ቀጥታ ዲጂታል ገበያ",
-    solution_label: "አሠራር",
-    solution_h2: "ሦስት ደረጃዎች። ምንም ደላላ የለም።",
-    solution_sub: "OmishGo የተሰራው የአርሶ አደሩን ምርት በፍጥነት ከገዢው ጋር በቀጥታ ለማገናኘት ነው።",
+    solution_label: "አሠራሩ",
+    solution_h2: "ምርት ያቅርቡ። ገዢ ያግኙ። ስምምነት ይፈጽሙ።",
+    solution_sub:
+      "OmishGo የተገነባው እጅግ ወሳኝ በሆነው አላማ ላይ ነው , የአርሶ አደሩን ምርት በፍጥነት ከገዢው ጋር ማገናኘት።",
     step1_h: "አርሶ አደሩ ምርቱን ያቀርባል",
     step1_p:
-      "ፎቶ ያንሱ፣ ዋጋ በብር ይወስኑ፣ ምርቱን ይግለጹ። ወዲያውኑ ገበያ ላይ ይወጣል — በ2G ኢንተርኔትም ጭምር።",
-    step2_h: "ገዢዎች ያገኟቸዋል፣ መልዕክት ይልካሉ",
+      "ፎቶ ያንሱ፣ ዋጋ በብር ይወስኑ፣ ምርቱን ይግለጹ። ወዲያውኑ ገበያ ላይ ይወጣል  በ2G ኢንተርኔትም ጭምር።",
+    step2_h: "ገዢዎች ያገኛሉ፣ መልዕክትም ይልካሉ",
     step2_p:
       "ገዢዎች የቀረቡ ምርቶችን ይመለከታሉ፣ በምርት አይነት ወይም በቦታ ያጣራሉ፣ ለአርሶ አደሩም በቀጥታ መልዕክት ይልካሉ።",
     step3_h: "ስምምነት ይረጋገጣል፣ ትዕዛዝ ይከታተላሉ",
     step3_p:
       "ትዕዛዝ ይላካል፣ ክምችት ይዘመናል፣ ሁለቱም ወገኖች ማሳወቂያ ይደርሳቸዋል። ወረቀት ወይም ከደላላ ጋር ስልክ መደዋወል አያስፈልግም።",
-    lang_note: "ሦስቱም ቋንቋዎች በእኩል ደረጃ የተካተቱ ናቸው።",
-    demo_label: "አሰራሩን ይመልከቱ",
-    demo_h2: "ከ20 ሴኮንድ ባነሰ ጊዜ ውስጥ ምርትን ማቅረብ",
+    lang_note: "ሦስቱም ቋንቋዎች በአግባቡ የተካተቱ ናቸው።",
+    demo_label: "በቀጥታ ይመልከቱ",
+    demo_h2: "ምርት ከማቅረብ እስከ መልዕክት , ከ20 ሴኮንድ ባነሰ ጊዜ",
     demo_sub:
-      "በመቂ የሚገኝ አርሶ አደር የቲማቲም ምርቱን እንዴት በቀላሉ እንደሚያቀርብ እና ገዢ መልዕክት እንደሚልክለት ይመልከቱ — ምንም ስልጠና አያስፈልግም።",
-    demo_caption: "ቪዲዮው በቅርቡ ይመጣል — ወደ YouTube በመጫን ላይ ነን",
+      "አርሶ አደር ምርት ያቀርባል። ገዢ ያገኛል፣ በቀጥታ መልዕክት ይልካል። ደላላ ወይም የስልክ ጥሪ አያስፈልግም።",
+    demo_caption: "ቪዲዮው በቅርቡ ይመጣል  ወደ YouTube በመጫን ላይ ነን",
     screens_label: "ለኢትዮጵያ ገበያ የተሰራ",
-    screens_h2: "መተግበሪያው በራስዎ ቋንቋ ቀርቧል",
+    screens_h2: "መተግበሪያው በሶስት ቋንቋዎች",
     screens_sub:
-      "9 እውነተኛ የመተግበሪያ ገጾች። በPIN የሚሰራ መግቢያ። ያለ ኢንተርኔት ይሰራል (Offline)። በሶስት ቋንቋዎች የቀረበ።",
+      "9 እውነተኛ የመተግበሪያ ገጾች። በPIN የሚሰራ መግቢያ። ያለ በይነመረብ (Offline) ይሰራል።",
     tab_all: "ሁሉም ማሳያዎች",
     tab_onboard: "መግቢያ",
     tab_farmer: "አርሶ አደር",
@@ -173,33 +174,33 @@ const translations = {
     screen_s2: "ትኩስ ምርት ከማሳው ያስሱ",
     screen_s3: "የግብርና ግብዓቶች እስከ ደጃፍዎ",
     screen_s4: "የአቅርቦት ሂደትን ይከታተሉ",
-    screen_s5: "የአርሶ አደር ማዕከል",
+    screen_s5: "የአርሶ አደር ዳሽቦርድ",
     screen_s6: "የተረጋገጠ የአምራች መለያ",
     screen_s7: "ቀጥታ የመልዕክት ልውውጥ",
-    screen_s8: "የገዢ ማዕከል",
-    screen_s9: "ትዕዛዞቼ — የትዕዛዝ ሂደት",
-    pilot_h2: "የተደራጀ የሙከራ ትግበራ",
+    screen_s8: "የገዢ ዳሽቦርድ",
+    screen_s9: "ትዕዛዞቼ , የትዕዛዝ ሂደት",
+    pilot_h2: "ዝግ የሙከራ ትግበራ  መቂ፣ 3ኛው ሩብ ዓመት 2026",
     pilot_p:
-      "OmishGo በመቂ አካባቢ ከተደራጁ የአርሶ አደሮች ህብረት ጋር በመተባበር የሙከራ ትግበራ እያደረገ ነው። ህብረቱ ተጠቃሚዎችን በማረጋገጥ፣ ጥራትን በመቆጣጠር እና እምነትን በመገንባት ላይ ይገኛል።",
+      "OmishGo ወደ ሌሎች አካባቢዎች ከማስፋፋቱ በፊት በመቂ አካባቢ ከአካባቢው የአርሶ አደሮች ህብረት ጋር በመተባበር ዝግ የሙከራ ትግበራ እያካሄደ ይገኛል። ህብረቱም እያንዳንዱን ተጠቃሚ በማረጋገጥ፣ ጥራትን በመቆጣጠር እና መሬት ላይ እምነትን በመገንባት ላይ ይገኛል።",
     funders_label: "ለፋይናንስ አቅራቢዎች",
     dl_label: "OmishGoን ያግኙ",
     dl_h2: "የኢትዮጵያን ግብርና የወደፊት ዕጣ ፈንታ ይቀላቀሉ",
-    dl_p: "Android APK — ለ2G ኢንተርኔት የተመቻቸ፣ በPIN የሚሰራ መግቢያ፣ ያለ ኢንተርኔት ይሰራል (Offline)። በሙከራ ጊዜ ነፃ ነው።",
+    dl_p: "Android APK  ለ2G ኢንተርኔት የተመቻቸ፣ በPIN የሚሰራ መግቢያ፣ ያለ በይነመረብ (Offline) ይሰራል:: በሙከራ ጊዜ ነፃ ነው።",
     dl_btn_apk: "APK ያውርዱ",
-    dl_apk_sub: "APK በቅርቡ ይመጣል — ተራዎን ይጠብቁ",
+    dl_apk_sub: "APK በቅርቡ ይመጣል , የተጠባባቂዎች ዝርዝርን ይቀላቀሉ",
     dl_btn_waitlist: "የሙከራ ትግበራውን ይቀላቀሉ",
-    dl_btn_waitlist_sub: "አርሶ አደሮች እና የጅምላ ገዢዎች",
+    dl_btn_waitlist_sub: "አርሶ አደሮች እና ገዢዎች",
     form_h: "አዳዲስ መረጃዎችን ያግኙ",
     form_p: "የሙከራ ትግበራው በአካባቢዎ ሲጀመር እናሳውቅዎታለን።",
     form_name: "ሙሉ ስም",
     form_phone: "ስልክ ቁጥር",
     form_role: "እኔ...",
     form_role_placeholder: "ሚናዎን ይምረጡ",
-    form_role_farmer: "አርሶ አደር / አምራች",
+    form_role_farmer: "አርሶ አደር (Farmer / Qonnaan Bulaa)",
     form_role_buyer: "ገዢ / ነጋዴ",
     form_role_investor: "ባለሀብት / ፋይናንስ አቅራቢ",
     form_role_other: "ሌላ",
-    form_submit: "ይመዝገቡ →",
+    form_submit: "የተጠባባቂዎች ዝርዝሩን ይቀላቀሉ →",
     form_success: "በተሳካ ሁኔታ ተመዝግበዋል! በቅርቡ እናገኝዎታለን።",
     footer_tagline:
       "የኢትዮጵያ ቀጥታ የአርሶ-አደር-ለገዢ ገበያ። ምንም ደላላ የለም። የተሻለ ዋጋ። እውነተኛ ለውጥ።",
@@ -210,7 +211,7 @@ const translations = {
     footer_download: "APK ያውርዱ",
     footer_pilot: "የሙከራ ትግበራ",
     footer_about: "ስለ ሙከራው",
-    footer_join: "ይመዝገቡ",
+    footer_join: "የተጠባባቂ ዝርዝሩን ይቀላቀሉ",
     footer_contact_link: "ያግኙን",
     footer_lang_title: "Language / ቋንቋ / Afaan",
     footer_copy: "© 2026 OmishGo. በኢትዮጵያ ተሰራ 🇪🇹",
@@ -223,34 +224,34 @@ const translations = {
     nav_screens: "Appii",
     nav_contact: "Nu Quunnamaa",
     nav_cta: "Appii Buufadhu",
-    hero_badge: "Piilootiin Eegaleera — Maqii, Sulula Riftii",
-    hero_h1a: "Humna Kennuu",
-    hero_h1b: "Qonnaan Bultoota Itoophiyaaf",
-    hero_amharic: "ያለ ደላሎ ቀጥታ ከሻጭ ወደ ገዢ",
+    hero_badge: "Maqii, Itoophiyaa · Yaalii Banaa",
+    hero_h1a: "Qonnaan Bultoota Itoophiyaaf",
+    hero_h1b: "Humna Uumuu",
+    hero_amharic: "ያለ ደላላ ቀጥታ ከሻጭ ወደ ገዢ",
     hero_oromo: "Gabatee irraa bitaa-gurgurtaa karaa salphaa",
     hero_sub:
-      "Gabaa moobaayilaa daldaltoota giddu-galeessaa hambisu — qonnaan bultoonni oomisha isaanii maxxansu, bitattoonni hatattamaan argatu, gabaan kallattiin raawwatama.",
+      "Gabaa moobaayilaa daldaltoota giddu-galeessaa hambisu , qonnaan bultoonni oomisha isaanii maxxansu, bitattoonni hatattamaan argatu, gabaan kallattiin raawwatama.",
     hero_cta1: "APK Buufadhu",
-    hero_cta2: "Yaaliif Galmaa'i",
+    hero_cta2: "Tarree Eegdota Yaaliitti Makami",
     hero_trust:
       "Waldaa Qonnaan Bultootaatiin Kan Mirkanaa'e • Yaalii Maqii 2026",
     problem_label: "Rakkoo",
     problem_h2:
       "Qonnaan bultoonni Itoophiyaa oomishni isaanii gabaa gahuun dura irra caalaa bu'aa isaanii ni dhabu",
     problem_sub:
-      "Daldaltoonni seeraan alaa gatii fi raabsa to'atu — kunis qonnaan bultoota xixinnoo filannoo malee miidhamaaf saaxaala.",
-    stat1_label: "gatii oomishaa daldaltootaaf darba",
-    stat2_label: "gatii gabaa qofaatu qonnaan bulaa dhaqqaba",
+      "Daldaltoonni al-idilee gatii fi raabsa to'atu , kunis qonnaan bultoota xixinnoo filannoo dhabsiisuudhaan miidhamaaf saaxila.",
+    stat1_label: "gatii oomishaa daldaltoota giddu-galeessatiif bada",
+    stat2_label: "gatii gabaa dhumaa irraa qonnaan bulaa qaqqaba",
     /* B2: Oromo version of the text claim */
     stat3_claim:
       "Gabaa dijitaalaa kallattii jalqabaa Itoophiyaa kan qonnaan bultoota xixinnootiif ijaarame",
     solution_label: "Akkaataa Itti Hojjetu",
-    solution_h2: "Tarkaanfii sadii. Daldalaan giddu-galeessaa hin jiru.",
+    solution_h2: "Oomisha maxxansi. Argadhu. Waliigaltee xumuuri.",
     solution_sub:
-      "OmishGo uumame oomisha qonnaan bulaa saffisaan kallattiin bitataatti akka dhaqqabu gochuufi.",
+      "OmishGo'n kan ijaarame adeemsa bu'uuraa dhugumaan barbaachisaa ta'e irratti dha , oomisha qonnaan bulaa bitataa duratti saffisaan dhiyeessuu.",
     step1_h: "Qonnaan Bulaan Oomisha Maxxansa",
     step1_p:
-      "Suuraa kaasi, gatii Birriin murteessi, oomishicha ibsi. Sekoondii muraasa keessatti gabaarra ba'a — intarneetii 2G irrattillee.",
+      "Suuraa kaasi, gatii Birriin murteessi, oomishicha ibsi. Sekoondii muraasa keessatti gabaarra ba'a , intarneetii 2G irrattillee.",
     step2_h: "Bitataan Ni Argata Ergaas Ni Erga",
     step2_p:
       "Bitattoonni oomishaalee dhiyaatan ni daawwatu, gosa midhaanii ykn iddoon ni calalu, kallattiinis qonnaan bulaaf ergaa ergu.",
@@ -259,15 +260,15 @@ const translations = {
       "Ajajni ergameera, kuusaan haaromfameera, qaamoleen lamaanuu beeksisa argatu. Waraqaas ta'e daldalaa giddu-galeessaa wajjin bilbilaan wal-barbaaduun hin jiru.",
     lang_note: "Afaanonni sadanuu iddoo walqixa qabu.",
     demo_label: "Kallattiin Daawwadhu",
-    demo_h2: "Oomishni sekoondii 20 gadiitti gabaarra ba'e",
+    demo_h2: "Maxxansa irraa gara ergaatti , sekoondii 20 gadiitti",
     demo_sub:
-      "Qonnaan bulaan Maqii tokko akkamitti oomisha timaatimaa maxxansuu fi bitataanis akkamitti ergaa akka ergu daawwadhaa — leenjii hin barbaadu.",
+      "Qonnaan bulaan oomisha maxxansa. Bitataan argata, kallattiin ergaa erga. Daldalaan giddu-galeessaa hin jiru.",
     demo_caption:
-      "Viidiyoon dhiyootti ni dhufa — gara YouTube'itti fe'amaa jira",
-    screens_label: "Gabaa Itoophiyaaf Ijaarame",
-    screens_h2: "Fuulli kamiyyuu afaan keetiin dubbata",
+      "Viidiyoon dhiyootti ni dhufa , gara YouTube'itti fe'amaa jira",
+    screens_label: "Gabaa Itoophiyaatiif Kan Ijaarame",
+    screens_h2: "Appii , afaanota sadiin",
     screens_sub:
-      "Fuulota appii dhugaa 9. PIN'n kan seenamu. Toora interneetiin alatti (Offline) ni hojjeta. Afaanota sadiin qophaa'e.",
+      "Fuulota appii dhugaa 9. PIN'n kan seenamu. Toora interneetiin alatti (Offline) ni hojjeta.",
     tab_all: "Fuulota Hunda",
     tab_onboard: "Seensa",
     tab_farmer: "Qonnaan Bulaa",
@@ -280,17 +281,17 @@ const translations = {
     screen_s6: "Profaayilii Oomishtaa Mirkanaa'e",
     screen_s7: "Ergaa Kallattii Appii Keessatti",
     screen_s8: "Daashboordii Bitataa",
-    screen_s9: "Ajajoota Koo — Adeemsa Ajajaa",
-    pilot_h2: "Piilootii qindaa'e, pirootootaayipii miti",
+    screen_s9: "Ajajoota Koo , Adeemsa Ajajaa",
+    pilot_h2: "Yaalii cufame , Maqii, Q3 2026",
     pilot_p:
-      "OmishGo naannoo Maqiitti Waldaa Qonnaan Bultootaa waliin ta'uun piilootii geggeessaa jira — waldaan fayyadamtoota mirkaneessa, qulqullina to'ata, akkasumas amantaa ijaaraa jira.",
-    funders_label: "Qaamolee Maallaqa Dhiyeessaniif",
+      "OmishGoon naannoo Maqiitti piilootii cufaa Waldaa Qonnaan Bultootaa naannichaa kan akka bulchitoota waltajjichaatti tajaajilan waliin ta'uun geggeessaa jira , waldaan tokkoon tokkoon fayyadamaa mirkaneessa, qulqullina to'ata, akkasumas osoo hin babal'isin dura lafarratti amantaa ijaaraa jira.",
+    funders_label: "Qaamolee Maallaqa Dhiyeessanii fi Aksilareetarootaaf",
     dl_label: "OmishGo Argadhu",
     dl_h2: "Qonna Itoophiyaa gara fuulduraatti makamaa",
-    dl_p: "Android APK — 2G'f mijataa, PIN'n kan seenamu, toora interneetiin alatti ni hojjeta. Yeroo yaaliitti bilisa.",
+    dl_p: "Android APK , 2G'f mijataa, PIN'n kan seenamu, toora interneetiin alatti ni hojjeta. Yeroo yaaliitti bilisa.",
     dl_btn_apk: "APK Buufadhu",
-    dl_apk_sub: "APK dhiyootti ni dhufa — tarree eegdotaatti makami",
-    dl_btn_waitlist: "Tarree Yaaliitti Makami",
+    dl_apk_sub: "APK dhiyootti ni dhufa , tarree eegdotaatti makami",
+    dl_btn_waitlist: "Tarree Eegdota Yaaliitti Makami",
     dl_btn_waitlist_sub: "Qonnaan Bultoota fi Bitattootaaf",
     form_h: "Odeeffannoo Argadhu",
     form_p: "Yaaliin ummataaf naannoo keessanitti yeroo banamu isin beeksifna.",
@@ -298,7 +299,7 @@ const translations = {
     form_phone: "Lakkoofsa Bilbilaa",
     form_role: "Ani…",
     form_role_placeholder: "Gahee kee filadhu",
-    form_role_farmer: "Qonnaan Bulaa / Oomishtaa",
+    form_role_farmer: "Qonnaan Bulaa (Farmer / አርሶ አደር)",
     form_role_buyer: "Bitataa / Daldalaa",
     form_role_investor: "Investerii / Maallaqa Dhiyeessaa",
     form_role_other: "Kan biroo",
@@ -313,7 +314,7 @@ const translations = {
     footer_download: "APK Buufadhu",
     footer_pilot: "Piilootii",
     footer_about: "Waa'ee Piilootichaa",
-    footer_join: "Tarreetti Makami",
+    footer_join: "Tarree Eegdotaatti Makami",
     footer_contact_link: "Nu Quunnamaa",
     footer_lang_title: "Language / ቋንቋ / Afaan",
     footer_copy: "© 2026 OmishGo. Itoophiyaa keessatti ijaarame 🇪🇹",
@@ -450,7 +451,7 @@ if (playBtn) {
             '<path d="M256 64C150 64 64 150 64 256s86 192 192 192 192-86 192-192S362 64 256 64Z"/>' +
             '<path d="M256 128v144h96" stroke-linecap="round" stroke-linejoin="round"/>' +
           '</svg>' +
-          'Video uploading soon — join our Telegram for updates!';
+          'Video uploading soon , join our Telegram for updates!';
         cap.style.background = 'rgba(245,197,24,.92)';
         cap.style.color = '#111';
       }
@@ -658,7 +659,7 @@ if (form) {
     } catch {
       submitBtn.disabled = false;
       submitBtn.textContent = translations[currentLang].form_submit || 'Join Waitlist →';
-      alert('Submission failed — please email hello@omishgo.et');
+      alert('Submission failed , please email hello@omishgo.et');
     }
   });
 }

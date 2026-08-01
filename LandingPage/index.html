@@ -15,9 +15,12 @@
   <meta property="og:url"         content="https://omishgo.et" />
   <meta name="twitter:card"       content="summary_large_image" />
 
-  <!-- C2: Favicon -->
-  <link rel="icon"             type="image/png" sizes="32x32"   href="assets/favicon-32.png" />
-  <link rel="apple-touch-icon"                  sizes="180x180" href="assets/favicon-180.png" />
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -63,14 +66,7 @@
     <div class="hero-grain" aria-hidden="true"></div>
     <div class="container hero-content">
       <div class="hero-text" data-reveal>
-        <!-- D: rocket icon pulled out of translation string; text key no longer contains emoji -->
-        <div class="hero-badge">
-          <svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" width="16" height="16" aria-hidden="true">
-            <path d="M461.81 53.81a4.4 4.4 0 0 0-3.3-3.39c-54.38-13.3-180 34.09-248.13 102.17a295 295 0 0 0-33.09 39.08c-21-1.9-42-.3-59.88 7.5-50.49 22.2-65.18 80.18-69.28 105.07a9 9 0 0 0 9.8 10.4l81.07-8.9a180 180 0 0 0 1.1 18.3 18.15 18.15 0 0 0 5.3 11.09l31.39 31.39a18.15 18.15 0 0 0 11.1 5.3 180 180 0 0 0 18.19 1.1l-8.89 81a9 9 0 0 0 10.39 9.79c24.9-4 83-18.69 105.07-69.17 7.8-17.9 9.4-38.79 7.6-59.69a294 294 0 0 0 39.19-33.09c68.38-68 115.47-190.86 102.37-247.95M298.66 213.67a42.7 42.7 0 1 1 60.38 0 42.65 42.65 0 0 1-60.38 0"/>
-            <path d="M109.64 352a45.06 45.06 0 0 0-26.35 12.84C65.67 382.52 64 448 64 448s65.52-1.67 83.15-19.31A44.73 44.73 0 0 0 160 402.32"/>
-          </svg>
-          <span data-i18n="hero_badge">Pilot Launching — Meki, Rift Valley</span>
-        </div>
+
         <h1 id="hero-heading">
           <span class="hero-line-1"        data-i18n="hero_h1a">Empowering</span>
           <span class="hero-line-gradient" data-i18n="hero_h1b">Ethiopia's Farmers</span>
@@ -106,7 +102,7 @@
   <!-- ══════════ STATS ══════════ -->
   <section id="problem" aria-labelledby="problem-heading">
     <div class="container">
-      <div class="section-label" data-reveal data-i18n="problem_label">The Problem</div>
+
       <h2 id="problem-heading" data-reveal data-i18n="problem_h2">Ethiopian farmers lose most of their earnings before reaching the market</h2>
       <p class="section-sub" data-reveal data-i18n="problem_sub">Informal traders control pricing, access, and distribution — leaving smallholder farmers with no leverage and no alternatives.</p>
       <div class="stats-grid">
@@ -158,9 +154,7 @@
   <!-- ══════════ HOW IT WORKS ══════════ -->
   <section id="solution" aria-labelledby="solution-heading">
     <div class="container">
-      <div class="section-label" data-reveal data-i18n="solution_label">How It Works</div>
-      <h2 id="solution-heading" data-reveal data-i18n="solution_h2">Three steps. Zero middlemen.</h2>
-      <p class="section-sub" data-reveal data-i18n="solution_sub">OmishGo is built around the core loop that actually matters — getting a farmer's product in front of a buyer, fast.</p>
+      <h2 id="solution-heading" data-reveal data-i18n="solution_h2">Post a listing. Find it. Deal done.</h2>
       <div class="steps-grid">
         <article class="step-card" data-reveal data-delay="0">
           <div class="step-num">01</div>
@@ -214,9 +208,8 @@
   <section id="demo" aria-labelledby="demo-heading">
     <div class="demo-bg" aria-hidden="true"></div>
     <div class="container demo-inner">
-      <div class="section-label light" data-reveal data-i18n="demo_label">See It Live</div>
-      <h2 id="demo-heading" data-reveal data-i18n="demo_h2">A real listing placed in under 20 seconds</h2>
-      <p class="section-sub light" data-reveal data-i18n="demo_sub">Watch how a farmer in Meki posts a tomato listing and a buyer messages them — end to end, no training required.</p>
+      <h2 id="demo-heading" data-reveal data-i18n="demo_h2">Listing to message — under 20 seconds</h2>
+      <p class="section-sub light" data-reveal data-i18n="demo_sub">A farmer posts produce. A buyer finds it and messages directly. No agent, no phone call.</p>
       <div class="video-wrapper" data-reveal>
         <div class="video-player" id="video-player">
           <picture>
@@ -228,7 +221,6 @@
             <svg viewBox="0 0 24 24" fill="currentColor" width="36" height="36" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
           </button>
           <!-- D: time-outline SVG icon is used in caption; text is set by JS when video is not yet ready -->
-          <div class="video-caption" id="video-caption" data-i18n="demo_caption">Demo coming soon — uploading to YouTube shortly</div>
           <div id="yt-frame-container"></div>
         </div>
       </div>
@@ -238,9 +230,8 @@
   <!-- ══════════ SCREENSHOTS — CINEMATIC 3D CAROUSEL ══════════ -->
   <section id="screenshots" aria-labelledby="screenshots-heading">
     <div class="container screens-header">
-      <div class="section-label" data-reveal data-i18n="screens_label">Built for the Ethiopian Market</div>
-      <h2 id="screenshots-heading" data-reveal data-i18n="screens_h2">Every screen speaks your language</h2>
-      <p class="section-sub" data-reveal data-i18n="screens_sub">9 real app screens. PIN-based login. Works offline. Three languages out of the box.</p>
+      <h2 id="screenshots-heading" data-reveal data-i18n="screens_h2">The app, in three languages</h2>
+      <p class="section-sub" data-reveal data-i18n="screens_sub">9 real screens from the current build. PIN login. Works offline.</p>
       <div class="screen-tabs" data-reveal role="tablist" aria-label="Filter app screens by role">
         <button class="screen-tab active" data-filter="all"     role="tab" aria-selected="true"  data-i18n="tab_all">All Screens</button>
         <button class="screen-tab"        data-filter="onboard" role="tab" aria-selected="false" data-i18n="tab_onboard">Onboarding</button>
@@ -399,7 +390,6 @@
     <div class="container">
       <div class="pilot-inner" data-reveal>
         <div class="pilot-badge-row">
-          <!-- D: calendar-outline icon -->
           <span class="pilot-badge">
             <svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" width="14" height="14" aria-hidden="true">
               <rect width="416" height="384" x="48" y="80" rx="48"/>
@@ -411,17 +401,8 @@
               <path stroke-linecap="round" d="M128 48v32M384 48v32"/>
               <path d="M464 160H48"/>
             </svg>
-            Meki Pilot — Q3 2026
+            Q3 2026
           </span>
-          <!-- D: location-outline icon -->
-          <span class="pilot-badge">
-            <svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" width="14" height="14" aria-hidden="true">
-              <path d="M256 48c-79.5 0-144 61.39-144 137 0 87 96 224.87 131.25 272.49a15.77 15.77 0 0 0 25.5 0C304 409.89 400 272.07 400 185c0-75.61-64.5-137-144-137"/>
-              <circle cx="256" cy="192" r="48"/>
-            </svg>
-            Rift Valley, Ethiopia
-          </span>
-          <!-- D: people-outline icon -->
           <span class="pilot-badge">
             <svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="32" width="14" height="14" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M402 168c-2.93 40.67-33.1 72-66 72s-63.12-31.32-66-72c-3-42.31 26.37-72 66-72s69 30.46 66 72"/>
@@ -429,10 +410,10 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M200 185.94c-2.34 32.48-26.72 58.06-53 58.06s-50.7-25.57-53-58.06C91.61 152.15 115.34 128 147 128s55.39 24.77 53 57.94"/>
               <path stroke-linecap="round" stroke-miterlimit="10" d="M206 306c-18.05-8.27-37.93-11.45-59-11.45-52 0-102.1 25.85-114.65 76.2-1.65 6.66 2.53 13.25 9.37 13.25H154"/>
             </svg>
-            Farmers' Union Partner
+            Farmers' Union admin
           </span>
         </div>
-        <h2 id="pilot-heading" data-i18n="pilot_h2">A structured pilot, not a prototype</h2>
+        <h2 id="pilot-heading" data-i18n="pilot_h2">Closed pilot — Meki, Q3 2026</h2>
         <p data-i18n="pilot_p">OmishGo is running a closed pilot in the Meki area with the local Farmers' Union acting as platform administrators — approving every user, ensuring quality, and building trust on the ground before we scale.</p>
       </div>
       <div class="funders-row" data-reveal data-delay="200">
@@ -486,7 +467,7 @@
             A2: Formspree action — FLAG: action is currently a placeholder. See launch-report.md.
             Replace YOUR_FORM_ID with a real Formspree form ID before sharing this page with anyone.
           -->
-          <form id="waitlist-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" novalidate>
+          <form id="waitlist-form" action="https://formspree.io/f/maqrzgdg" method="POST" novalidate>
             <div class="form-group">
               <label for="wl-name"  data-i18n="form_name">Full Name</label>
               <input type="text" id="wl-name"  name="name"  required autocomplete="name" placeholder="Abebe Girma" />
@@ -528,17 +509,17 @@
           t.me/omishgo · tiktok.com/@omishgo · hello@omishgo.et
         -->
         <div class="social-links" aria-label="Social media links">
-          <a href="https://t.me/omishgo" target="_blank" rel="noopener" class="social-btn" id="social-telegram" aria-label="Telegram">
+          <a href="https://t.me/omishgo_official" target="_blank" rel="noopener" class="social-btn" id="social-telegram" aria-label="Telegram">
             <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true"><path d="M22.265 2.428L.943 10.872c-1.255.503-1.248 1.203-.228 1.515l5.43 1.694L19.185 5.63c.629-.381 1.203-.176.731.242L8.386 15.933l-.42 5.765c.616 0 .886-.28 1.224-.605l2.937-2.853 6.104 4.479c1.124.62 1.933.3 2.214-1.042l4.008-18.879c.407-1.636-.624-2.376-1.988-1.37z"/></svg>
             Telegram Channel
           </a>
-          <a href="https://tiktok.com/@omishgo" target="_blank" rel="noopener" class="social-btn" id="social-tiktok" aria-label="TikTok">
+          <a href="https://tiktok.com/@omishgo_official" target="_blank" rel="noopener" class="social-btn" id="social-tiktok" aria-label="TikTok">
             <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.81a8.22 8.22 0 004.8 1.53V6.88a4.85 4.85 0 01-1.03-.19z"/></svg>
             TikTok Page
           </a>
-          <a href="mailto:hello@omishgo.et" class="social-btn" id="social-email" aria-label="Email">
+          <a href="mailto:bilisumaere@gmail.com" class="social-btn" id="social-email" aria-label="Email">
             <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-            hello@omishgo.et
+            bilisumaere@gmail.com
           </a>
         </div>
       </div>
