@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /* ══════════════════════════════════════════════════════════════
    1. TRANSLATIONS
@@ -20,8 +20,8 @@ const translations = {
     hero_badge: "Meki, Ethiopia · Open Pilot",
     hero_h1a: "Empowering",
     hero_h1b: "Ethiopia's Farmers",
-    hero_amharic: "ያለ ደላላ ቀጥታ ከሻጭ ወደ ገዢ",
-    hero_oromo: "Gabatee irraa bitaa-gurgurtaa karaa salphaa",
+    hero_amharic: "ያለ ደላላ — ቀጥታ ከአርሶ አደር ወደ ገዢ",
+    hero_oromo: "Qonnaan bulaa irraa gara bitataatti — karaa salphaa",
     hero_sub:
       "The mobile marketplace that cuts out middlemen , farmers post listings, buyers discover them instantly, deals happen in real time.",
     hero_cta1: "Download APK",
@@ -128,8 +128,8 @@ const translations = {
     hero_badge: "መቂ፣ ኢትዮጵያ · ክፍት የሙከራ ትግበራ",
     hero_h1a: "የኢትዮጵያ አርሶ አደሮችን",
     hero_h1b: "አቅም ማጎልበት",
-    hero_amharic: "ያለ ደላላ ቀጥታ ከሻጭ ወደ ገዢ",
-    hero_oromo: "Gabatee irraa bitaa-gurgurtaa karaa salphaa",
+    hero_amharic: "ያለ ደላላ — ቀጥታ ከአርሶ አደር ወደ ገዢ",
+    hero_oromo: "Qonnaan bulaa irraa gara bitataatti — karaa salphaa",
     hero_sub:
       "ደላሎችን በማስቀረት አርሶ አደሮች ምርታቸውን በቀጥታ የሚሸጡበት፣ ገዢዎች በፍጥነት የሚያገኙበት እና ግብይት በቅጽበት የሚፈጸምበት ዲጂታል የገበያ ትስስር።",
     hero_cta1: "APK ያውርዱ",
@@ -219,7 +219,7 @@ const translations = {
   },
   or: {
     nav_problem: "Rakkoo",
-    nav_solution: "Akkaataa Itti Hojjetu",
+    nav_solution: "Akkaataa Itti Hojjatu",
     nav_demo: "Agarsiisa",
     nav_screens: "Appii",
     nav_contact: "Nu Quunnamaa",
@@ -227,24 +227,24 @@ const translations = {
     hero_badge: "Maqii, Itoophiyaa · Yaalii Banaa",
     hero_h1a: "Qonnaan Bultoota Itoophiyaaf",
     hero_h1b: "Humna Uumuu",
-    hero_amharic: "ያለ ደላላ ቀጥታ ከሻጭ ወደ ገዢ",
-    hero_oromo: "Gabatee irraa bitaa-gurgurtaa karaa salphaa",
+    hero_amharic: "ያለ ደላላ — ቀጥታ ከአርሶ አደር ወደ ገዢ",
+    hero_oromo: "Qonnaan bulaa irraa gara bitataatti — karaa salphaa",
     hero_sub:
       "Gabaa moobaayilaa daldaltoota giddu-galeessaa hambisu , qonnaan bultoonni oomisha isaanii maxxansu, bitattoonni hatattamaan argatu, gabaan kallattiin raawwatama.",
     hero_cta1: "APK Buufadhu",
-    hero_cta2: "Tarree Eegdota Yaaliitti Makami",
+    hero_cta2: "Tarree Eeggataa Yaaliitti Makami",
     hero_trust:
       "Waldaa Qonnaan Bultootaatiin Kan Mirkanaa'e • Yaalii Maqii 2026",
     problem_label: "Rakkoo",
     problem_h2:
       "Qonnaan bultoonni Itoophiyaa oomishni isaanii gabaa gahuun dura irra caalaa bu'aa isaanii ni dhabu",
     problem_sub:
-      "Daldaltoonni al-idilee gatii fi raabsa to'atu , kunis qonnaan bultoota xixinnoo filannoo dhabsiisuudhaan miidhamaaf saaxila.",
-    stat1_label: "gatii oomishaa daldaltoota giddu-galeessatiif bada",
+      "Daldaltoonni al-idilee gatii fi raabsa to'atu , kunis qonnaan bultoota filannoo dhabsiisuudhaan miidhamaaf saaxila.",
+    stat1_label: "gatii oomishaa daldaltoota giddu-galeessatiin fudhatama",
     stat2_label: "gatii gabaa dhumaa irraa qonnaan bulaa qaqqaba",
     /* B2: Oromo version of the text claim */
     stat3_claim:
-      "Gabaa dijitaalaa kallattii jalqabaa Itoophiyaa kan qonnaan bultoota xixinnootiif ijaarame",
+      "Gabaa dijitaalaa kallattii jalqabaa Itoophiyaa kan qonnaan bultoota ijaarame",
     solution_label: "Akkaataa Itti Hojjetu",
     solution_h2: "Oomisha maxxansi. Argadhu. Waliigaltee xumuuri.",
     solution_sub:
@@ -278,13 +278,13 @@ const translations = {
     screen_s3: "Galtee Qonnaa Balbala Keetti",
     screen_s4: "Adeemsa Dhiyeessaa Hordofi",
     screen_s5: "Daashboordii Qonnaan Bulaa",
-    screen_s6: "Profaayilii Oomishtaa Mirkanaa'e",
+    screen_s6: "Profaayilii Oomishaa Mirkanaa'e",
     screen_s7: "Ergaa Kallattii Appii Keessatti",
     screen_s8: "Daashboordii Bitataa",
     screen_s9: "Ajajoota Koo , Adeemsa Ajajaa",
     pilot_h2: "Yaalii cufame , Maqii, Q3 2026",
     pilot_p:
-      "OmishGoon naannoo Maqiitti piilootii cufaa Waldaa Qonnaan Bultootaa naannichaa kan akka bulchitoota waltajjichaatti tajaajilan waliin ta'uun geggeessaa jira , waldaan tokkoon tokkoon fayyadamaa mirkaneessa, qulqullina to'ata, akkasumas osoo hin babal'isin dura lafarratti amantaa ijaaraa jira.",
+      "OmishGoon naannoo Maqiitti yaalii cufaa Waldaa Qonnaan Bultootaa naannichaa kan akka bulchitoota waltajjichaatti tajaajilan waliin ta'uun geggeessaa jira , waldaan tokkoon tokkoon fayyadamaa mirkaneessa, qulqullina to'ata, akkasumas osoo hin babal'isin dura lafarratti amantaa ijaaraa jira.",
     funders_label: "Qaamolee Maallaqa Dhiyeessanii fi Aksilareetarootaaf",
     dl_label: "OmishGo Argadhu",
     dl_h2: "Qonna Itoophiyaa gara fuulduraatti makamaa",
@@ -308,13 +308,13 @@ const translations = {
     footer_tagline:
       "Gabaa kallattii qonnaan-bulaa irraa bitataatti Itoophiyaa. Daldalaan giddu-galeessaa hin jiru. Gatii fooya'aa. Bu'aa dhugaa.",
     footer_product: "Oomisha",
-    footer_how: "Akkaataa Itti Hojjetu",
+    footer_how: "Akkaataa Itti Hojjatu",
     footer_screens: "Fuulota Appii",
     footer_demo: "Agarsiisa Viidiyoo",
     footer_download: "APK Buufadhu",
-    footer_pilot: "Piilootii",
-    footer_about: "Waa'ee Piilootichaa",
-    footer_join: "Tarree Eegdotaatti Makami",
+    footer_pilot: "Yaalii",
+    footer_about: "Waa'ee Yaalichaa",
+    footer_join: "Tarree Eaggataatti Makami",
     footer_contact_link: "Nu Quunnamaa",
     footer_lang_title: "Language / ቋንቋ / Afaan",
     footer_copy: "© 2026 OmishGo. Itoophiyaa keessatti ijaarame 🇪🇹",
@@ -326,72 +326,82 @@ const translations = {
 /* ══════════════════════════════════════════════════════════════
    2. LANGUAGE ENGINE
    ══════════════════════════════════════════════════════════════ */
-let currentLang = localStorage.getItem('omishgo_lang') || 'en';
+let currentLang = localStorage.getItem("omishgo_lang") || "en";
 
 function applyLanguage(lang) {
   if (!translations[lang]) return;
   currentLang = lang;
-  localStorage.setItem('omishgo_lang', lang);
+  localStorage.setItem("omishgo_lang", lang);
   const d = translations[lang];
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const k = el.getAttribute('data-i18n');
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const k = el.getAttribute("data-i18n");
     if (d[k] !== undefined) el.textContent = d[k];
   });
-  document.querySelectorAll('.lang-btn, .lang-footer-btn').forEach(btn => {
-    const isActive = btn.getAttribute('data-lang') === lang;
-    btn.classList.toggle('active', isActive);
-    btn.setAttribute('aria-pressed', String(isActive));
+  document.querySelectorAll(".lang-btn, .lang-footer-btn").forEach((btn) => {
+    const isActive = btn.getAttribute("data-lang") === lang;
+    btn.classList.toggle("active", isActive);
+    btn.setAttribute("aria-pressed", String(isActive));
   });
-  document.documentElement.lang = lang === 'am' ? 'am' : lang === 'or' ? 'om' : 'en';
+  document.documentElement.lang =
+    lang === "am" ? "am" : lang === "or" ? "om" : "en";
   // Update carousel captions
-  document.querySelectorAll('.c-slide').forEach(slide => {
-    const key = slide.getAttribute('data-label-key');
-    const cap = slide.querySelector('.c-caption');
+  document.querySelectorAll(".c-slide").forEach((slide) => {
+    const key = slide.getAttribute("data-label-key");
+    const cap = slide.querySelector(".c-caption");
     if (cap && key && d[key]) cap.textContent = d[key];
   });
   // B2: update text-claim stat card
-  const claimEl = document.querySelector('.stat-claim');
+  const claimEl = document.querySelector(".stat-claim");
   if (claimEl && d.stat3_claim) claimEl.textContent = d.stat3_claim;
 }
-document.querySelectorAll('.lang-btn, .lang-footer-btn').forEach(btn =>
-  btn.addEventListener('click', () => applyLanguage(btn.getAttribute('data-lang')))
-);
+document
+  .querySelectorAll(".lang-btn, .lang-footer-btn")
+  .forEach((btn) =>
+    btn.addEventListener("click", () =>
+      applyLanguage(btn.getAttribute("data-lang")),
+    ),
+  );
 applyLanguage(currentLang);
 
 /* ══════════════════════════════════════════════════════════════
    3. NAV SCROLL
    ══════════════════════════════════════════════════════════════ */
-const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => {
-  navbar.classList.toggle('scrolled', window.scrollY > 20);
-}, { passive: true });
+const navbar = document.getElementById("navbar");
+window.addEventListener(
+  "scroll",
+  () => {
+    navbar.classList.toggle("scrolled", window.scrollY > 20);
+  },
+  { passive: true },
+);
 
 /* ══════════════════════════════════════════════════════════════
    4. HAMBURGER
    ══════════════════════════════════════════════════════════════ */
-const hamburger = document.getElementById('hamburger');
-const navLinks  = document.getElementById('nav-links');
+const hamburger = document.getElementById("hamburger");
+const navLinks = document.getElementById("nav-links");
 if (hamburger && navLinks) {
   function toggleMobileMenu(forceClose) {
-    const isCurrentlyOpen = hamburger.classList.contains('open');
-    const shouldOpen = forceClose === undefined ? !isCurrentlyOpen : !forceClose;
-    hamburger.setAttribute('aria-expanded', String(shouldOpen));
-    hamburger.classList.toggle('open', shouldOpen);
-    navLinks.classList.toggle('open', shouldOpen);
-    document.body.style.overflow = shouldOpen ? 'hidden' : '';
+    const isCurrentlyOpen = hamburger.classList.contains("open");
+    const shouldOpen =
+      forceClose === undefined ? !isCurrentlyOpen : !forceClose;
+    hamburger.setAttribute("aria-expanded", String(shouldOpen));
+    hamburger.classList.toggle("open", shouldOpen);
+    navLinks.classList.toggle("open", shouldOpen);
+    document.body.style.overflow = shouldOpen ? "hidden" : "";
   }
 
-  hamburger.addEventListener('click', (e) => {
+  hamburger.addEventListener("click", (e) => {
     e.stopPropagation();
     toggleMobileMenu();
   });
 
-  navLinks.querySelectorAll('a').forEach(a => {
-    a.addEventListener('click', () => toggleMobileMenu(true));
+  navLinks.querySelectorAll("a").forEach((a) => {
+    a.addEventListener("click", () => toggleMobileMenu(true));
   });
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && hamburger.classList.contains('open')) {
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && hamburger.classList.contains("open")) {
       toggleMobileMenu(true);
     }
   });
@@ -400,46 +410,59 @@ if (hamburger && navLinks) {
 /* ══════════════════════════════════════════════════════════════
    5. REVEAL
    ══════════════════════════════════════════════════════════════ */
-const revealObs = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('revealed'); revealObs.unobserve(e.target); } });
-}, { threshold: 0.1, rootMargin: '0px 0px -36px 0px' });
-document.querySelectorAll('[data-reveal]').forEach(el => revealObs.observe(el));
+const revealObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        e.target.classList.add("revealed");
+        revealObs.unobserve(e.target);
+      }
+    });
+  },
+  { threshold: 0.1, rootMargin: "0px 0px -36px 0px" },
+);
+document
+  .querySelectorAll("[data-reveal]")
+  .forEach((el) => revealObs.observe(el));
 
 /* ══════════════════════════════════════════════════════════════
    6. COUNTER ANIMATION (only for stat cards with data-count)
    ══════════════════════════════════════════════════════════════ */
 function animateCounter(el) {
-  const target = parseInt(el.getAttribute('data-count'), 10);
+  const target = parseInt(el.getAttribute("data-count"), 10);
   if (target === 0) return;
   const dur = 1800;
   const start = performance.now();
-  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  const easeOut = (t) => 1 - Math.pow(1 - t, 3);
   (function tick(now) {
     const p = Math.min((now - start) / dur, 1);
     el.textContent = Math.floor(easeOut(p) * target);
     if (p < 1) requestAnimationFrame(tick);
   })(start);
 }
-const statsGrid = document.querySelector('.stats-grid');
+const statsGrid = document.querySelector(".stats-grid");
 if (statsGrid) {
-  new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting) {
-      statsGrid.querySelectorAll('.stat-number').forEach(animateCounter);
-    }
-  }, { threshold: 0.4 }).observe(statsGrid);
+  new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting) {
+        statsGrid.querySelectorAll(".stat-number").forEach(animateCounter);
+      }
+    },
+    { threshold: 0.4 },
+  ).observe(statsGrid);
 }
 
 /* ══════════════════════════════════════════════════════════════
    7. PARTICLES
    ══════════════════════════════════════════════════════════════ */
 (function spawnParticles() {
-  const c = document.getElementById('particles-container');
+  const c = document.getElementById("particles-container");
   if (!c) return;
   for (let i = 0; i < 28; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
+    const p = document.createElement("div");
+    p.className = "particle";
     const s = Math.random() * 3 + 1;
-    p.style.cssText = `left:${Math.random()*100}%;bottom:${Math.random()*15}%;width:${s}px;height:${s}px;background:${Math.random()>.5?'#f5c518':'#4dbc8a'};animation-duration:${9+Math.random()*14}s;animation-delay:${Math.random()*10}s`;
+    p.style.cssText = `left:${Math.random() * 100}%;bottom:${Math.random() * 15}%;width:${s}px;height:${s}px;background:${Math.random() > 0.5 ? "#f5c518" : "#4dbc8a"};animation-duration:${9 + Math.random() * 14}s;animation-delay:${Math.random() * 10}s`;
     c.appendChild(p);
   }
 })();
@@ -449,38 +472,38 @@ if (statsGrid) {
    Replace YOUTUBE_ID value once the demo is uploaded.
    ══════════════════════════════════════════════════════════════ */
 const YOUTUBE_ID = "en4wYb-TkdM";
-const playBtn     = document.getElementById('play-btn');
-const videoPlayer = document.getElementById('video-player');
-const ytContainer = document.getElementById('yt-frame-container');
+const playBtn = document.getElementById("play-btn");
+const videoPlayer = document.getElementById("video-player");
+const ytContainer = document.getElementById("yt-frame-container");
 if (playBtn) {
-  playBtn.addEventListener('click', () => {
-    if (YOUTUBE_ID === 'YOUR_YOUTUBE_VIDEO_ID') {
+  playBtn.addEventListener("click", () => {
+    if (YOUTUBE_ID === "YOUR_YOUTUBE_VIDEO_ID") {
       /* D: time-outline SVG used for "uploading soon" state */
-      const cap = document.getElementById('video-caption');
+      const cap = document.getElementById("video-caption");
       if (cap) {
         cap.innerHTML =
           '<svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" width="14" height="14" aria-hidden="true" style="margin-right:5px;vertical-align:middle">' +
-            '<path d="M256 64C150 64 64 150 64 256s86 192 192 192 192-86 192-192S362 64 256 64Z"/>' +
-            '<path d="M256 128v144h96" stroke-linecap="round" stroke-linejoin="round"/>' +
-          '</svg>' +
-          'Video uploading soon , join our Telegram for updates!';
-        cap.style.background = 'rgba(245,197,24,.92)';
-        cap.style.color = '#111';
+          '<path d="M256 64C150 64 64 150 64 256s86 192 192 192 192-86 192-192S362 64 256 64Z"/>' +
+          '<path d="M256 128v144h96" stroke-linecap="round" stroke-linejoin="round"/>' +
+          "</svg>" +
+          "Video uploading soon , join our Telegram for updates!";
+        cap.style.background = "rgba(245,197,24,.92)";
+        cap.style.color = "#111";
       }
       return;
     }
-    const f = document.createElement('iframe');
+    const f = document.createElement("iframe");
     f.src = `https://www.youtube.com/embed/${YOUTUBE_ID}?autoplay=1&rel=0&modestbranding=1`;
-    f.allow = 'autoplay; encrypted-media; picture-in-picture';
+    f.allow = "autoplay; encrypted-media; picture-in-picture";
     f.allowFullscreen = true;
-    f.title = 'OmishGo demo video';
-    ytContainer.innerHTML = '';
+    f.title = "OmishGo demo video";
+    ytContainer.innerHTML = "";
     ytContainer.appendChild(f);
-    playBtn.style.display = 'none';
-    const poster = document.getElementById('video-poster');
-    if (poster) poster.style.display = 'none';
-    const cap = document.getElementById('video-caption');
-    if (cap) cap.style.display = 'none';
+    playBtn.style.display = "none";
+    const poster = document.getElementById("video-poster");
+    if (poster) poster.style.display = "none";
+    const cap = document.getElementById("video-caption");
+    if (cap) cap.style.display = "none";
   });
 }
 
@@ -488,55 +511,59 @@ if (playBtn) {
    9. CINEMATIC 3D SCREENSHOT CAROUSEL
    ══════════════════════════════════════════════════════════════ */
 (function initCarousel() {
-  const track   = document.getElementById('carousel-track');
-  const stage   = document.getElementById('carousel-stage');
-  const prevBtn = document.getElementById('carousel-prev');
-  const nextBtn = document.getElementById('carousel-next');
-  const dotsEl  = document.getElementById('carousel-dots');
-  const tabBtns = document.querySelectorAll('.screen-tab');
+  const track = document.getElementById("carousel-track");
+  const stage = document.getElementById("carousel-stage");
+  const prevBtn = document.getElementById("carousel-prev");
+  const nextBtn = document.getElementById("carousel-next");
+  const dotsEl = document.getElementById("carousel-dots");
+  const tabBtns = document.querySelectorAll(".screen-tab");
   if (!track || !stage) return;
 
-  let allSlides = Array.from(track.querySelectorAll('.c-slide'));
-  let visible   = [...allSlides];
-  let current   = 0;
+  let allSlides = Array.from(track.querySelectorAll(".c-slide"));
+  let visible = [...allSlides];
+  let current = 0;
   let isDragging = false;
   let dragStartX = 0;
   let dragDeltaX = 0;
-  let autoTimer  = null;
+  let autoTimer = null;
 
   function buildDots() {
-    dotsEl.innerHTML = '';
+    dotsEl.innerHTML = "";
     visible.forEach((_, i) => {
-      const d = document.createElement('button');
-      d.className = 'dot' + (i === current ? ' active' : '');
-      d.setAttribute('role', 'tab');
-      d.setAttribute('aria-label', `Screenshot ${i + 1}`);
-      d.addEventListener('click', () => goTo(i));
+      const d = document.createElement("button");
+      d.className = "dot" + (i === current ? " active" : "");
+      d.setAttribute("role", "tab");
+      d.setAttribute("aria-label", `Screenshot ${i + 1}`);
+      d.addEventListener("click", () => goTo(i));
       dotsEl.appendChild(d);
     });
   }
 
   function applyStates() {
-    const classes = ['is-active','is-left','is-right','is-far','is-hidden'];
+    const classes = ["is-active", "is-left", "is-right", "is-far", "is-hidden"];
     visible.forEach((slide, i) => {
       slide.classList.remove(...classes);
       const diff = i - current;
-      if      (diff === 0)             slide.classList.add('is-active');
-      else if (diff === -1)            slide.classList.add('is-left');
-      else if (diff === 1)             slide.classList.add('is-right');
-      else if (Math.abs(diff) <= 3)   slide.classList.add('is-far');
-      else                             slide.classList.add('is-hidden');
+      if (diff === 0) slide.classList.add("is-active");
+      else if (diff === -1) slide.classList.add("is-left");
+      else if (diff === 1) slide.classList.add("is-right");
+      else if (Math.abs(diff) <= 3) slide.classList.add("is-far");
+      else slide.classList.add("is-hidden");
     });
-    dotsEl.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+    dotsEl
+      .querySelectorAll(".dot")
+      .forEach((d, i) => d.classList.toggle("active", i === current));
     const active = visible[current];
     if (!active) return;
-    const stageRect  = stage.getBoundingClientRect();
+    const stageRect = stage.getBoundingClientRect();
     const activeRect = active.getBoundingClientRect();
-    const center     = stageRect.left + stageRect.width / 2;
+    const center = stageRect.left + stageRect.width / 2;
     const cardCenter = activeRect.left + activeRect.width / 2;
-    const currentOffset = parseFloat(track.style.transform?.match(/-?[\d.]+/)?.[0] || 0);
+    const currentOffset = parseFloat(
+      track.style.transform?.match(/-?[\d.]+/)?.[0] || 0,
+    );
     const newOffset = currentOffset - (cardCenter - center);
-    track.style.transition = 'transform .55s cubic-bezier(.25,.46,.45,.94)';
+    track.style.transition = "transform .55s cubic-bezier(.25,.46,.45,.94)";
     track.style.transform = `translateX(${newOffset}px)`;
   }
 
@@ -547,70 +574,90 @@ if (playBtn) {
   }
 
   function applyFilter(group) {
-    allSlides.forEach(slide => {
-      const g = slide.getAttribute('data-group');
-      slide.style.display = (group === 'all' || g === group) ? '' : 'none';
+    allSlides.forEach((slide) => {
+      const g = slide.getAttribute("data-group");
+      slide.style.display = group === "all" || g === group ? "" : "none";
     });
-    visible = allSlides.filter(s => s.style.display !== 'none');
+    visible = allSlides.filter((s) => s.style.display !== "none");
     current = 0;
-    track.style.transition = 'none';
-    track.style.transform = 'translateX(0)';
+    track.style.transition = "none";
+    track.style.transform = "translateX(0)";
     buildDots();
     requestAnimationFrame(() => requestAnimationFrame(() => applyStates()));
   }
 
-  tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      tabBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
-      btn.classList.add('active');
-      btn.setAttribute('aria-selected','true');
-      applyFilter(btn.getAttribute('data-filter'));
+  tabBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      tabBtns.forEach((b) => {
+        b.classList.remove("active");
+        b.setAttribute("aria-selected", "false");
+      });
+      btn.classList.add("active");
+      btn.setAttribute("aria-selected", "true");
+      applyFilter(btn.getAttribute("data-filter"));
     });
   });
 
-  prevBtn.addEventListener('click', () => goTo(current - 1));
-  nextBtn.addEventListener('click', () => goTo(current + 1));
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft')  goTo(current - 1);
-    if (e.key === 'ArrowRight') goTo(current + 1);
+  prevBtn.addEventListener("click", () => goTo(current - 1));
+  nextBtn.addEventListener("click", () => goTo(current + 1));
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") goTo(current - 1);
+    if (e.key === "ArrowRight") goTo(current + 1);
   });
 
-  stage.addEventListener('mousedown', e => {
+  stage.addEventListener("mousedown", (e) => {
     isDragging = true;
     dragStartX = e.clientX;
-    track.style.transition = 'none';
+    track.style.transition = "none";
   });
-  window.addEventListener('mousemove', e => {
+  window.addEventListener("mousemove", (e) => {
     if (!isDragging) return;
     dragDeltaX = e.clientX - dragStartX;
     const base = parseFloat(track.style.transform?.match(/-?[\d.]+/)?.[0] || 0);
     track.style.transform = `translateX(${base + dragDeltaX}px)`;
   });
-  window.addEventListener('mouseup', () => {
+  window.addEventListener("mouseup", () => {
     if (!isDragging) return;
     isDragging = false;
-    if      (dragDeltaX < -50) goTo(current + 1);
-    else if (dragDeltaX >  50) goTo(current - 1);
-    else                        applyStates();
+    if (dragDeltaX < -50) goTo(current + 1);
+    else if (dragDeltaX > 50) goTo(current - 1);
+    else applyStates();
     dragDeltaX = 0;
   });
 
   let touchX = 0;
-  stage.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; track.style.transition = 'none'; }, { passive: true });
-  stage.addEventListener('touchmove',  e => {
-    const delta = e.touches[0].clientX - touchX;
-    const base  = parseFloat(track.style.transform?.match(/-?[\d.]+/)?.[0] || 0);
-    track.style.transform = `translateX(${base + delta * 0.4}px)`;
-  }, { passive: true });
-  stage.addEventListener('touchend', e => {
-    const diff = touchX - e.changedTouches[0].clientX;
-    if      (diff >  40) goTo(current + 1);
-    else if (diff < -40) goTo(current - 1);
-    else                  applyStates();
-  }, { passive: true });
+  stage.addEventListener(
+    "touchstart",
+    (e) => {
+      touchX = e.touches[0].clientX;
+      track.style.transition = "none";
+    },
+    { passive: true },
+  );
+  stage.addEventListener(
+    "touchmove",
+    (e) => {
+      const delta = e.touches[0].clientX - touchX;
+      const base = parseFloat(
+        track.style.transform?.match(/-?[\d.]+/)?.[0] || 0,
+      );
+      track.style.transform = `translateX(${base + delta * 0.4}px)`;
+    },
+    { passive: true },
+  );
+  stage.addEventListener(
+    "touchend",
+    (e) => {
+      const diff = touchX - e.changedTouches[0].clientX;
+      if (diff > 40) goTo(current + 1);
+      else if (diff < -40) goTo(current - 1);
+      else applyStates();
+    },
+    { passive: true },
+  );
 
-  allSlides.forEach(slide => {
-    slide.addEventListener('click', () => {
+  allSlides.forEach((slide) => {
+    slide.addEventListener("click", () => {
       const visIdx = visible.indexOf(slide);
       if (visIdx !== -1 && visIdx !== current) goTo(visIdx);
     });
@@ -618,60 +665,71 @@ if (playBtn) {
 
   function resetAuto() {
     clearInterval(autoTimer);
-    autoTimer = setInterval(() => goTo(current + 1 < visible.length ? current + 1 : 0), 4500);
+    autoTimer = setInterval(
+      () => goTo(current + 1 < visible.length ? current + 1 : 0),
+      4500,
+    );
   }
 
   const stageW = stage.offsetWidth;
   if (track.children.length) {
-    track.style.paddingLeft  = `${stageW / 2 - 110}px`;
+    track.style.paddingLeft = `${stageW / 2 - 110}px`;
     track.style.paddingRight = `${stageW / 2 - 110}px`;
   }
 
-  applyFilter('all');
+  applyFilter("all");
   buildDots();
   applyStates();
   resetAuto();
 
-  stage.addEventListener('mouseenter', () => clearInterval(autoTimer));
-  stage.addEventListener('mouseleave', resetAuto);
+  stage.addEventListener("mouseenter", () => clearInterval(autoTimer));
+  stage.addEventListener("mouseleave", resetAuto);
 })();
 
 /* ══════════════════════════════════════════════════════════════
    10. WAITLIST FORM
    ══════════════════════════════════════════════════════════════ */
-const form       = document.getElementById('waitlist-form');
-const submitBtn  = document.getElementById('form-submit-btn');
-const successMsg = document.getElementById('form-success');
+const form = document.getElementById("waitlist-form");
+const submitBtn = document.getElementById("form-submit-btn");
+const successMsg = document.getElementById("form-success");
 if (form) {
-  form.addEventListener('submit', async e => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (!form.checkValidity()) { form.reportValidity(); return; }
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
     const d = translations[currentLang];
     submitBtn.disabled = true;
     /* D: time-outline SVG used in button sending state */
     submitBtn.innerHTML =
       '<svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" width="16" height="16" aria-hidden="true" style="margin-right:6px">' +
-        '<path d="M256 64C150 64 64 150 64 256s86 192 192 192 192-86 192-192S362 64 256 64Z"/>' +
-        '<path d="M256 128v144h96" stroke-linecap="round" stroke-linejoin="round"/>' +
-      '</svg>Sending…';
+      '<path d="M256 64C150 64 64 150 64 256s86 192 192 192 192-86 192-192S362 64 256 64Z"/>' +
+      '<path d="M256 128v144h96" stroke-linecap="round" stroke-linejoin="round"/>' +
+      "</svg>Sending…";
     try {
-      const res = await fetch(form.action, { method:'POST', body:new FormData(form), headers:{ Accept:'application/json' } });
+      const res = await fetch(form.action, {
+        method: "POST",
+        body: new FormData(form),
+        headers: { Accept: "application/json" },
+      });
       if (res.ok) {
-        form.style.display = 'none';
+        form.style.display = "none";
         /* D: checkmark-circle-outline SVG replaces 🎉 emoji in success message */
         successMsg.innerHTML =
           '<svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="32" width="20" height="20" aria-hidden="true" style="margin-right:8px;flex-shrink:0">' +
-            '<path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192Z" stroke-miterlimit="10"/>' +
-            '<path d="M352 176 217.6 336 160 272" stroke-linecap="round" stroke-linejoin="round"/>' +
-          '</svg>' +
+          '<path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192Z" stroke-miterlimit="10"/>' +
+          '<path d="M352 176 217.6 336 160 272" stroke-linecap="round" stroke-linejoin="round"/>' +
+          "</svg>" +
           (d.form_success || "You're on the list! We'll be in touch soon.");
-        successMsg.style.display = 'flex';
-        successMsg.style.alignItems = 'center';
+        successMsg.style.display = "flex";
+        successMsg.style.alignItems = "center";
       } else throw new Error();
     } catch {
       submitBtn.disabled = false;
-      submitBtn.textContent = translations[currentLang].form_submit || 'Join Waitlist →';
-      alert('Submission failed , please email hello@omishgo.et');
+      submitBtn.textContent =
+        translations[currentLang].form_submit || "Join Waitlist →";
+      alert("Submission failed , please email hello@omishgo.et");
     }
   });
 }
@@ -680,15 +738,21 @@ if (form) {
    11. ACTIVE NAV SECTION HIGHLIGHT
    ══════════════════════════════════════════════════════════════ */
 (function trackSections() {
-  const sections = document.querySelectorAll('section[id],footer[id]');
-  const links    = document.querySelectorAll('.nav-links a');
-  sections.forEach(s => {
-    new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          links.forEach(a => { a.style.color = a.getAttribute('href') === `#${e.target.id}` ? '#fff' : ''; });
-        }
-      });
-    }, { threshold: 0.4 }).observe(s);
+  const sections = document.querySelectorAll("section[id],footer[id]");
+  const links = document.querySelectorAll(".nav-links a");
+  sections.forEach((s) => {
+    new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            links.forEach((a) => {
+              a.style.color =
+                a.getAttribute("href") === `#${e.target.id}` ? "#fff" : "";
+            });
+          }
+        });
+      },
+      { threshold: 0.4 },
+    ).observe(s);
   });
 })();
