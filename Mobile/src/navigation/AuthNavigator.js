@@ -3,6 +3,7 @@ import LoginScreen from "../screens/auth/LoginScreen";
 import RegisterScreen from "../screens/auth/RegisterScreen";
 import LanguagePickerScreen from "../screens/onboarding/LanguagePickerScreen";
 import OnboardingCarousel from "../screens/onboarding/OnboardingCarousel";
+import HelpScreen from "../screens/shared/HelpScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +20,7 @@ const AuthNavigator = ({ route }) => {
       <Stack.Screen name="Onboarding" component={OnboardingCarousel} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="Help" component={HelpScreen} />
     </Stack.Navigator>
   );
 };

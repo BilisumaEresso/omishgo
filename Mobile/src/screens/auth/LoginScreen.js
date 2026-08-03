@@ -366,6 +366,18 @@ const LoginScreen = ({ navigation }) => {
                 })}
               </AppText>
             </TouchableOpacity>
+
+            {/* FAQ Link */}
+            <View style={styles.footerRow}>
+              <Pressable
+                onPress={() => navigation.navigate("Help")}
+                hitSlop={10}
+              >
+                <AppText style={[styles.footerLink, { color: primary }]}>
+                  {t("auth.viewFaq", { defaultValue: "View FAQ" })}
+                </AppText>
+              </Pressable>
+            </View>
           </View>
         </Animated.View>
       </KeyboardAvoidingView>

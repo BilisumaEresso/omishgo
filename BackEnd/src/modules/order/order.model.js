@@ -22,6 +22,11 @@ const orderSchema = new mongoose.Schema(
       required: [true, "Crop type is required"],
       trim: true,
     },
+    variety: {
+      type: String,
+      default: null,
+      trim: true,
+    },
     quantity: {
       type: Number,
       required: [true, "Quantity is required"],

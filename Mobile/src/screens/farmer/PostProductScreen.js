@@ -290,7 +290,7 @@ export default function PostProductScreen({ navigation, route }) {
       CROP_VARIETIES[key].forEach((v) => {
         const vLocalized = t(`varieties.${v}`, { defaultValue: v });
         acc.push({
-          value: `variety::${v}`,
+          value: `variety::${key}::${v}`,
           label: vLocalized,
           isIndented: true,
         });
@@ -308,8 +308,10 @@ export default function PostProductScreen({ navigation, route }) {
       return true;
     }
     if (optValue.startsWith("variety::")) {
-      const selectedVariety = optValue.replace("variety::", "");
-      setCropType(expandedCrop);
+      const parts = optValue.split("::");
+      const selectedCrop = parts[1];
+      const selectedVariety = parts[2];
+      setCropType(selectedCrop);
       setVariety(selectedVariety);
       setExpandedCrop(null);
       return true;
@@ -721,7 +723,12 @@ export default function PostProductScreen({ navigation, route }) {
             options={cropOptions}
             onSelect={handleCropSelect}
             visible={showCropPicker}
-            onOpen={() => setShowCropPicker(true)}
+            onOpen={() => {
+              if (cropType && CROP_VARIETIES[cropType]) {
+                setExpandedCrop(cropType);
+              }
+              setShowCropPicker(true);
+            }}
             onClose={() => setShowCropPicker(false)}
             icon="leaf-outline"
             theme={theme}

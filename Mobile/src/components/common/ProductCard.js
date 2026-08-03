@@ -32,7 +32,7 @@ export const ProductCard = ({
   const rawUnit = product.unit || "q";
   const localizedUnit = getLocalizedUnitName(rawUnit, currentLang, t);
   const rawCrop = product.cropType || product.name || t("common.defaultHarvestCrop", { defaultValue: "Harvest Crop" });
-  const localizedCrop = getLocalizedCropDisplayName(rawCrop, product.variety, currentLang, t);
+  const localizedCrop = getLocalizedCropName(rawCrop, currentLang, t);
 
   const localizedWereda = getLocalizedWeredaName(loc.wereda, currentLang);
   const localizedZone = getLocalizedZoneName(loc.zone, currentLang);
@@ -79,11 +79,21 @@ export const ProductCard = ({
               </AppText>
               <AppText style={styles.refText}>#{shortId}</AppText>
             </View>
-            <View style={styles.verifiedRow}>
-              <Ionicons name="checkmark-circle" size={14} color={primary} />
-              <AppText style={[styles.verifiedText, { color: primary }]}>
-                {t("buyerProfile.statusVerified", { defaultValue: "Verified Producer" })}
-              </AppText>
+            <View style={styles.subMetaRow}>
+              {product.variety ? (
+                <View style={[styles.varietyBadge, { backgroundColor: primary + "15" }]}>
+                  <Ionicons name="pricetag" size={10} color={primary} />
+                  <AppText style={[styles.varietyBadgeText, { color: primary }]}>
+                    {t(`varieties.${product.variety}`, { defaultValue: product.variety })}
+                  </AppText>
+                </View>
+              ) : null}
+              <View style={styles.verifiedRow}>
+                <Ionicons name="checkmark-circle" size={13} color={primary} />
+                <AppText style={[styles.verifiedText, { color: primary }]}>
+                  {t("buyerProfile.statusVerified", { defaultValue: "Verified Producer" })}
+                </AppText>
+              </View>
             </View>
           </View>
         </View>
@@ -258,5 +268,24 @@ const styles = StyleSheet.create({
     paddingVertical: 1.5,
     borderRadius: 6,
     overflow: "hidden",
+  },
+  subMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 3,
+    flexWrap: "wrap",
+  },
+  varietyBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  varietyBadgeText: {
+    fontSize: 11,
+    fontWeight: "700",
   },
 });

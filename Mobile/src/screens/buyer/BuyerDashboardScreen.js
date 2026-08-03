@@ -62,6 +62,7 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
         return {
           _id: p._id,
           cropType: p.cropType || p.category || "Red Onion",
+          variety: p.variety || null,
           quantity: p.quantity ?? 0,
           unit: p.unit || "q",
           price: p.price,

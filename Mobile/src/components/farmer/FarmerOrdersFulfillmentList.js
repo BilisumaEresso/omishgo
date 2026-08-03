@@ -41,7 +41,7 @@ export default function FarmerOrdersFulfillmentList({
             const isLast = idx === Math.min(orders.length, 4) - 1;
             const statusConfig = getOrderStatusConfig(o.status, currentLang);
             const rawCrop = o.cropType || t("common.defaultHarvestCrop", { defaultValue: "Harvest Crop" });
-            const cropName = getLocalizedCropDisplayName(rawCrop, o.variety || o.productId?.variety, currentLang, t);
+            const cropName = getLocalizedCropName(rawCrop, currentLang, t);
             const unitLabel = getLocalizedUnitName(o.unit || "q", currentLang);
             const amount = o.totalPrice ? `${formatNumber(o.totalPrice)} ETB` : t("farmerProducts.priceUnavailable", { defaultValue: "Pending Quote" });
 
@@ -54,9 +54,19 @@ export default function FarmerOrdersFulfillmentList({
               >
                 <View style={styles.orderMain}>
                   <View style={styles.topMeta}>
-                    <AppText style={styles.cropTitle}>
-                      {cropName} <AppText style={styles.volume}>({o.quantity || 1} {unitLabel})</AppText>
-                    </AppText>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexWrap: "wrap", flex: 1 }}>
+                      <AppText style={styles.cropTitle}>
+                        {cropName} <AppText style={styles.volume}>({o.quantity || 1} {unitLabel})</AppText>
+                      </AppText>
+                      {(o.variety || o.productId?.variety) && (
+                        <View style={styles.varietyBadge}>
+                          <Ionicons name="pricetag" size={10} color="#15803D" />
+                          <AppText style={styles.varietyBadgeText}>
+                            {t(`varieties.${o.variety || o.productId?.variety}`, { defaultValue: o.variety || o.productId?.variety })}
+                          </AppText>
+                        </View>
+                      )}
+                    </View>
                     <View style={[styles.statusBadge, { backgroundColor: statusConfig.bg }]}>
                       <AppText style={[styles.statusBadgeText, { color: statusConfig.color }]}>
                         {statusConfig.displayLabel}
@@ -196,6 +206,20 @@ const styles = StyleSheet.create({
   },
   chatBtnText: {
     fontSize: 12,
+    fontWeight: "700",
+    color: "#15803D",
+  },
+  varietyBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    backgroundColor: "#DCFCE7",
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  varietyBadgeText: {
+    fontSize: 11,
     fontWeight: "700",
     color: "#15803D",
   },

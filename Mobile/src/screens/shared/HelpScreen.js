@@ -11,10 +11,12 @@ import {
 import AppText from "../../components/common/AppText";
 import DashboardLayout from "../../components/layout/DashBoardLayout";
 import { useTheme } from "../../hooks/useTheme";
+import { useAuthStore } from "../../store/auth.store.js";
 
 export default function HelpScreen({ navigation }) {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [expandedIndex, setExpandedIndex] = useState(null);
 
   const primary = theme?.colors?.primary || "#1565C0";
@@ -32,6 +34,9 @@ export default function HelpScreen({ navigation }) {
     { question: t("helpScreen.faq6Question"), answer: t("helpScreen.faq6Answer") },
     { question: t("helpScreen.faq7Question"), answer: t("helpScreen.faq7Answer") },
     { question: t("helpScreen.faq8Question"), answer: t("helpScreen.faq8Answer") },
+    { question: t("helpScreen.faq9Question"), answer: t("helpScreen.faq9Answer") },
+    { question: t("helpScreen.faq10Question"), answer: t("helpScreen.faq10Answer") },
+    { question: t("helpScreen.faq11Question"), answer: t("helpScreen.faq11Answer") },
   ];
 
   const toggleFaq = (index) => {
@@ -45,6 +50,16 @@ export default function HelpScreen({ navigation }) {
       showBack
       onBackPress={() => navigation.goBack()}
     >
+      {/* About OmishGo */}
+      <AppText style={[styles.sectionLabel, { color: textSecondary }]}>
+        {t("helpScreen.aboutTitle", { defaultValue: "About OmishGo" })}
+      </AppText>
+      <View style={[styles.aboutContainer, { backgroundColor: surface }]}>
+        <AppText style={[styles.aboutText, { color: textSecondary }]}>
+          {t("helpScreen.aboutText")}
+        </AppText>
+      </View>
+
       {/* Quick Contact Cards */}
       <AppText style={[styles.sectionLabel, { color: textSecondary }]}>
         {t("helpScreen.quickContact")}
@@ -66,21 +81,23 @@ export default function HelpScreen({ navigation }) {
           </AppText>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.contactCard, { backgroundColor: primaryContainer }]}
-          onPress={() => navigation.navigate("Chat", { userId: "admin", userName: t("helpScreen.supportAdmin", { defaultValue: "OmishGo Support Admin" }), phoneNumber: "0938730818" })}
-          activeOpacity={0.8}
-        >
-          <View style={[styles.contactIconBg, { backgroundColor: primary }]}>
-            <Ionicons name="chatbubble-ellipses" size={22} color="#FFFFFF" />
-          </View>
-          <AppText style={[styles.contactCardTitle, { color: primary }]}>
-            {t("helpScreen.sendMessage")}
-          </AppText>
-          <AppText style={[styles.contactCardSub, { color: textSecondary }]}>
-            {t("help.directAdmin", { defaultValue: "Direct message to admin" })}
-          </AppText>
-        </TouchableOpacity>
+        {isAuthenticated && (
+          <TouchableOpacity
+            style={[styles.contactCard, { backgroundColor: primaryContainer }]}
+            onPress={() => navigation.navigate("Chat", { userId: "admin", userName: t("helpScreen.supportAdmin", { defaultValue: "OmishGo Support Admin" }), phoneNumber: "0938730818" })}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.contactIconBg, { backgroundColor: primary }]}>
+              <Ionicons name="chatbubble-ellipses" size={22} color="#FFFFFF" />
+            </View>
+            <AppText style={[styles.contactCardTitle, { color: primary }]}>
+              {t("helpScreen.sendMessage")}
+            </AppText>
+            <AppText style={[styles.contactCardSub, { color: textSecondary }]}>
+              {t("help.directAdmin", { defaultValue: "Direct message to admin" })}
+            </AppText>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* FAQ Section */}
@@ -214,6 +231,17 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 20,
     marginTop: 10,
+  },
+  aboutContainer: {
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    padding: 16,
+    marginBottom: 24,
+  },
+  aboutText: {
+    fontSize: 13,
+    lineHeight: 20,
   },
   versionContainer: {
     alignItems: "center",

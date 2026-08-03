@@ -52,6 +52,7 @@ export default function BuyerOrdersScreen({ navigation, onSwitchTab }) {
       const normalized = raw.map((o) => ({
         id: o._id,
         cropType: o.cropType || o.productId?.cropType || t("buyerOrders.defaultProduce", { defaultValue: "Agricultural Produce" }),
+        variety: o.variety || o.productId?.variety || null,
         quantity: o.quantity || 1,
         unit: o.unit || "q",
         totalPrice: o.totalPrice || (o.priceAtOrder || 0) * (o.quantity || 1),
@@ -229,9 +230,19 @@ export default function BuyerOrdersScreen({ navigation, onSwitchTab }) {
                     );
                   })()}
                   <View style={{ flex: 1 }}>
-                    <AppText style={[styles.cropTitle, { color: textPrimary }]}>
-                      {getLocalizedCropDisplayName(item.cropType, item._raw?.variety || item._raw?.productId?.variety, currentLang, t)}
-                    </AppText>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                      <AppText style={[styles.cropTitle, { color: textPrimary }]}>
+                        {getLocalizedCropName(item.cropType, currentLang, t)}
+                      </AppText>
+                      {(item.variety || item._raw?.variety || item._raw?.productId?.variety) && (
+                        <View style={[styles.varietyBadge, { backgroundColor: primaryColor + "15" }]}>
+                          <Ionicons name="pricetag" size={10} color={primaryColor} />
+                          <AppText style={[styles.varietyBadgeText, { color: primaryColor }]}>
+                            {t(`varieties.${item.variety || item._raw?.variety || item._raw?.productId?.variety}`, { defaultValue: item.variety || item._raw?.variety || item._raw?.productId?.variety })}
+                          </AppText>
+                        </View>
+                      )}
+                    </View>
                     <AppText style={styles.volumeText}>
                       {t("orders.quantityLabel", { defaultValue: "Quantity:" })} <AppText style={styles.boldText}>{item.quantity} {getLocalizedUnitName(item.unit, currentLang, t)}</AppText>
                     </AppText>
@@ -477,5 +488,17 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 13,
     fontWeight: "800",
+  },
+  varietyBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  varietyBadgeText: {
+    fontSize: 11,
+    fontWeight: "700",
   },
 });

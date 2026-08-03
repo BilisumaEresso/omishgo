@@ -1,6 +1,7 @@
 // Mobile/src/screens/farmer/FarmerProductsScreen.js
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -77,6 +78,7 @@ export default function FarmerProductsScreen({ navigation }) {
               p.cropType ||
               p.category ||
               t("common.defaultHarvestCrop", { defaultValue: "Harvest Crop" }),
+            variety: p.variety || null,
             quantity: p.quantity || 0,
             unit: p.unit || "q",
             price: p.price || 0,
@@ -108,9 +110,11 @@ export default function FarmerProductsScreen({ navigation }) {
     [user?._id, user?.id, t],
   );
 
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchProducts();
+    }, [fetchProducts])
+  );
 
   const handleRefresh = () => {
     fetchProducts(true);
@@ -192,7 +196,7 @@ export default function FarmerProductsScreen({ navigation }) {
     const stockTotalVal =
       (Number(item.quantity) || 0) * (Number(item.price) || 0);
 
-    const localizedCrop = getLocalizedCropDisplayName(item.cropType, item._raw?.variety, currentLang, t);
+    const cropBaseName = getLocalizedCropName(item.cropType, currentLang, t);
     const localizedUnit = getLocalizedUnitName(item.unit, currentLang, t);
 
     let localizedLocation = t("common.unknownLocation", {
@@ -216,6 +220,7 @@ export default function FarmerProductsScreen({ navigation }) {
         ? item._raw.photos[0]
         : null;
     const photoUrl = rawPhotoUrl || getCropFallbackImage(item.cropType);
+    const itemVariety = item.variety || item._raw?.variety;
 
     return (
       <TouchableOpacity
@@ -238,19 +243,29 @@ export default function FarmerProductsScreen({ navigation }) {
                 <Ionicons name="leaf" size={18} color="#15803D" />
               </View>
             )}
-            <View>
+            <View style={{ flex: 1 }}>
               <View style={styles.titleRefRow}>
-                <AppText style={[styles.cropName, { color: textPrimary }]}>
-                  {localizedCrop}
+                <AppText style={[styles.cropName, { color: textPrimary }]} numberOfLines={1}>
+                  {cropBaseName}
                 </AppText>
                 <AppText style={styles.refText}>#{item.shortId}</AppText>
               </View>
-              <AppText style={styles.dateText}>
-                {t("farmerProducts.postedLabel", {
-                  date: item.postedDate,
-                  defaultValue: "Posted {{date}}",
-                })}
-              </AppText>
+              <View style={styles.subMetaRow}>
+                {itemVariety ? (
+                  <View style={styles.varietyBadge}>
+                    <Ionicons name="pricetag" size={10} color="#15803D" />
+                    <AppText style={styles.varietyBadgeText}>
+                      {t(`varieties.${itemVariety}`, { defaultValue: itemVariety })}
+                    </AppText>
+                  </View>
+                ) : null}
+                <AppText style={styles.dateText}>
+                  {t("farmerProducts.postedLabel", {
+                    date: item.postedDate,
+                    defaultValue: "Posted {{date}}",
+                  })}
+                </AppText>
+              </View>
             </View>
           </View>
 
@@ -669,5 +684,26 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 13.5,
     fontWeight: "800",
+  },
+  subMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 3,
+    flexWrap: "wrap",
+  },
+  varietyBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    backgroundColor: "#DCFCE7",
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  varietyBadgeText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#15803D",
   },
 });

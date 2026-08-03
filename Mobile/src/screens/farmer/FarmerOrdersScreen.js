@@ -51,6 +51,7 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
       const normalized = raw.map((o) => ({
         id: o._id,
         cropType: o.cropType || o.productId?.cropType || t("farmerOrders.defaultCropType", { defaultValue: "Harvest Crop" }),
+        variety: o.variety || o.productId?.variety || null,
         quantity: o.quantity || 0,
         unit: o.unit || "q",
         price: o.totalPrice || (o.priceAtOrder || 0) * (o.quantity || 1),
@@ -142,9 +143,19 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
             );
           })()}
           <View style={{ flex: 1 }}>
-            <AppText style={[styles.cropTitle, { color: textPrimary }]}>
-              {getLocalizedCropDisplayName(item.cropType, item._raw?.variety || item._raw?.productId?.variety, currentLang, t)}
-            </AppText>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+              <AppText style={[styles.cropTitle, { color: textPrimary }]}>
+                {getLocalizedCropName(item.cropType, currentLang, t)}
+              </AppText>
+              {(item.variety || item._raw?.variety || item._raw?.productId?.variety) && (
+                <View style={styles.varietyBadge}>
+                  <Ionicons name="pricetag" size={10} color="#15803D" />
+                  <AppText style={styles.varietyBadgeText}>
+                    {t(`varieties.${item.variety || item._raw?.variety || item._raw?.productId?.variety}`, { defaultValue: item.variety || item._raw?.variety || item._raw?.productId?.variety })}
+                  </AppText>
+                </View>
+              )}
+            </View>
             <AppText style={styles.volumeText}>
               {t("orders.quantityLabel", { defaultValue: "Quantity:" })} <AppText style={styles.boldText}>{item.quantity} {getLocalizedUnitName(item.unit, currentLang, t)}</AppText>
             </AppText>
@@ -461,5 +472,19 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
     color: "#64748B",
     textAlign: "center",
+  },
+  varietyBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    backgroundColor: "#DCFCE7",
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  varietyBadgeText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#15803D",
   },
 });

@@ -180,8 +180,16 @@ export default function OrderDetailScreen({ route, navigation }) {
         </View>
         <View style={styles.infoRow}>
           <AppText style={styles.infoLabel}>{t("orderDetail.cropType", { defaultValue: "Crop Type" })}</AppText>
-          <AppText style={styles.infoVal}>{getLocalizedCropDisplayName(cropType, order.variety || order.productId?.variety, currentLang, t)}</AppText>
+          <AppText style={styles.infoVal}>{getLocalizedCropName(cropType, currentLang, t)}</AppText>
         </View>
+        {(order.variety || order.productId?.variety) && (
+          <View style={styles.infoRow}>
+            <AppText style={styles.infoLabel}>{t("postProduct.varietyLabel", { defaultValue: "Variety / Cultivar" })}</AppText>
+            <AppText style={styles.infoVal}>
+              {t(`varieties.${order.variety || order.productId?.variety}`, { defaultValue: order.variety || order.productId?.variety })}
+            </AppText>
+          </View>
+        )}
         <View style={styles.infoRow}>
           <AppText style={styles.infoLabel}>{t("orderDetail.quantity", { defaultValue: "Order Volume" })}</AppText>
           <AppText style={styles.infoVal}>{quantity} {getLocalizedUnitName(unit, currentLang, t)}</AppText>

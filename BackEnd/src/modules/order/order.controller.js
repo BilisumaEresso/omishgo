@@ -99,6 +99,7 @@ export const createOrder = asyncHandler(async (req, res) => {
       farmerId: product.farmerId._id,
       productId: product._id,
       cropType: product.cropType,
+      variety: product.variety || null,
       quantity,
       unit: product.unit,
       pricePerUnit: product.price,

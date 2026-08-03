@@ -183,6 +183,12 @@ export const REFERENCE_PRICES = {
 export const CROP_VARIETIES = {
   "Tomato": ["Gelila", "Marglobe", "Chali"],
   "Red Onion": ["Bombay Red", "Adama Red"],
+  "Teff": ["Quncho", "Magna", "Tsedey"],
+  "White Maize": ["BH-660", "BH-540", "Melkassa"],
+  "Wheat": ["Kakaba", "Danda'a", "Ogolcho"],
+  "Barley": ["HB-1307", "HB-1404", "HB-1963"],
+  "Potato": ["Gudene", "Jalene", "Belete"],
+  "Coffee": ["Yirgacheffe", "Sidama", "Harar", "Guji"],
 };
 
 /**

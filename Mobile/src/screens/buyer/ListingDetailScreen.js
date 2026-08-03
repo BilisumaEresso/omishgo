@@ -20,7 +20,7 @@ import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
 import { useSavedStore } from "../../store/saved.store";
 import { formatNumber } from "../../utils/formatNumber";
-import { getCropFallbackImage, getLocalizedCropDisplayName } from "../../constants/crops";
+import { getCropFallbackImage, getLocalizedCropName, getLocalizedCropDisplayName } from "../../constants/crops";
 
 export default function ListingDetailScreen({ route, navigation }) {
   const { t, i18n } = useTranslation();
@@ -136,7 +136,7 @@ export default function ListingDetailScreen({ route, navigation }) {
       setBuyQty("");
       Alert.alert(
         t("listingDetail.orderSentTitle", { defaultValue: "Order Sent to Farmer! 🎉" }),
-        t("listingDetail.orderSentMsg", { qty, unit, cropType: product.cropType, defaultValue: "Your wholesale purchase request for {{qty}} {{unit}} of {{cropType}} has been submitted." }),
+        t("listingDetail.orderSentMsg", { qty, unit, cropType: getLocalizedCropDisplayName(product.cropType, product.variety, currentLang, t), defaultValue: "Your wholesale purchase request for {{qty}} {{unit}} of {{cropType}} has been submitted." }),
         [
           {
             text: t("listingDetail.viewOrdersBtn", { defaultValue: "View Orders" }),
@@ -199,9 +199,17 @@ export default function ListingDetailScreen({ route, navigation }) {
           <View style={{ flex: 1 }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <AppText style={[styles.cropTitle, { color: textPrimary }]}>
-                {getLocalizedCropDisplayName(product.cropType, product.variety, currentLang, t)}
+                {getLocalizedCropName(product.cropType, currentLang, t)}
               </AppText>
               <AppText style={styles.refText}>#{shortId}</AppText>
+              {product.variety ? (
+                <View style={[styles.varietyBadge, { backgroundColor: primaryColor + "15" }]}>
+                  <Ionicons name="pricetag" size={11} color={primaryColor} />
+                  <AppText style={[styles.varietyBadgeText, { color: primaryColor }]}>
+                    {t(`varieties.${product.variety}`, { defaultValue: product.variety })}
+                  </AppText>
+                </View>
+              ) : null}
             </View>
             <AppText style={styles.cropCategory}>
               {t("listingDetail.freshProduce", { defaultValue: "Fresh Wholesale Agricultural Produce" })}
@@ -272,8 +280,16 @@ export default function ListingDetailScreen({ route, navigation }) {
 
           <View style={styles.specRow}>
             <AppText style={styles.specKey}>{t("listingDetail.cropType", { defaultValue: "Crop Type" })}</AppText>
-            <AppText style={styles.specVal}>{getLocalizedCropDisplayName(product.cropType, product.variety, currentLang, t)}</AppText>
+            <AppText style={styles.specVal}>{getLocalizedCropName(product.cropType, currentLang, t)}</AppText>
           </View>
+          {product.variety ? (
+            <View style={styles.specRow}>
+              <AppText style={styles.specKey}>{t("postProduct.varietyLabel", { defaultValue: "Variety / Cultivar" })}</AppText>
+              <AppText style={styles.specVal}>
+                {t(`varieties.${product.variety}`, { defaultValue: product.variety })}
+              </AppText>
+            </View>
+          ) : null}
           <View style={styles.specRow}>
             <AppText style={styles.specKey}>{t("listingDetail.availableStock", { defaultValue: "Available Stock" })}</AppText>
             <AppText style={styles.specVal}>
@@ -371,7 +387,7 @@ export default function ListingDetailScreen({ route, navigation }) {
           <View style={[styles.modalCard, { backgroundColor: surfaceColor }]}>
             <AppText style={styles.modalTitle}>{t("listingDetail.placeWholesaleOrder", { defaultValue: "Place Wholesale Order" })}</AppText>
             <AppText style={styles.modalSub}>
-              {t("listingDetail.enterRequestedVolume", { cropType: product.cropType, max: product.quantity, unit, defaultValue: `Enter requested volume for ${product.cropType} (Max ${product.quantity} ${unit}):` })}
+              {t("listingDetail.enterRequestedVolume", { cropType: getLocalizedCropDisplayName(product.cropType, product.variety, currentLang, t), max: product.quantity, unit, defaultValue: `Enter requested volume for ${getLocalizedCropDisplayName(product.cropType, product.variety, currentLang, t)} (Max ${product.quantity} ${unit}):` })}
             </AppText>
 
             <TextInput
@@ -781,5 +797,17 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "700",
     marginLeft: 4,
+  },
+  varietyBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  varietyBadgeText: {
+    fontSize: 11.5,
+    fontWeight: "700",
   },
 });
