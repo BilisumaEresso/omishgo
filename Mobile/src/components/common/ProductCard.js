@@ -167,6 +167,11 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     padding: 16,
     marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
   },
   cardHeader: {
     flexDirection: "row",
@@ -211,7 +216,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   bookmarkBtn: {
-    padding: 2,
+    padding: 4,
   },
   pricingRow: {
     flexDirection: "row",
@@ -234,7 +239,7 @@ const styles = StyleSheet.create({
   },
   stockBadge: {
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 6,
     borderRadius: 10,
   },
   stockText: {
@@ -265,9 +270,8 @@ const styles = StyleSheet.create({
     color: "#64748B",
     backgroundColor: "#F1F5F9",
     paddingHorizontal: 6,
-    paddingVertical: 1.5,
+    paddingVertical: 2,
     borderRadius: 6,
-    overflow: "hidden",
   },
   subMetaRow: {
     flexDirection: "row",

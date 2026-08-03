@@ -1,6 +1,7 @@
-import { useTranslation } from "react-i18next";
+// Mobile/src/components/buyer/PriceTrendWidget.js
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Animated,
   Easing,
@@ -9,97 +10,124 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import AppText from "../common/AppText";
-import { useTheme } from "../../hooks/useTheme";
-import { formatNumber } from "../../utils/formatNumber";
 import { getLocalizedCropName } from "../../constants/crops";
+import { cleanCityName, getLocalizedMarket } from "../../constants/markets";
 import { getLocalizedUnitName } from "../../constants/units";
+import { useTheme } from "../../hooks/useTheme";
+import { DAYS_SHORT } from "../../utils/ethiopianDate";
+import { formatNumber } from "../../utils/formatNumber";
+import AppText from "../common/AppText";
 
 const COMMODITY_TRENDS = [
   {
     id: "onion",
     crop: "Red Onion",
+    variety: "Bombay Red",
     price: 4500,
     unit: "q",
     change: "+5.8%",
     isPositive: true,
-    market: "Adama Market Hub",
-    insight: "Onion prices are up +5.8% this week due to high demand in central regional markets.",
+    recommendation: "rising", // 'buy_now' | 'rising' | 'stable'
+    marketId: "adama_grain",
+    city: "Adama",
+    insight: "Wholesale onion prices are up +5.8% in Adama due to high demand in central markets.",
+    low7d: 3800,
+    high7d: 4600,
     data: [
-      { label: "Mon", value: 3800 },
-      { label: "Tue", value: 4100 },
-      { label: "Wed", value: 4000 },
-      { label: "Thu", value: 4300 },
-      { label: "Today", value: 4500 },
+      { dayIdx: 1, value: 3800 },
+      { dayIdx: 2, value: 4100 },
+      { dayIdx: 3, value: 4000 },
+      { dayIdx: 4, value: 4300 },
+      { dayIdx: 5, value: 4500, isToday: true },
     ],
   },
   {
     id: "teff",
-    crop: "White Teff",
+    crop: "Teff",
+    variety: "Quncho",
     price: 5200,
     unit: "q",
     change: "+3.2%",
     isPositive: true,
-    market: "Debre Zeit Grain Hub",
-    insight: "Teff prices remain steady with good grain supply from East Shewa.",
+    recommendation: "stable",
+    marketId: "bishoftu_market",
+    city: "Bishoftu",
+    insight: "Teff prices remain steady with good grain supply from East Shewa depots.",
+    low7d: 4900,
+    high7d: 5350,
     data: [
-      { label: "Mon", value: 4900 },
-      { label: "Tue", value: 5000 },
-      { label: "Wed", value: 5100 },
-      { label: "Thu", value: 5150 },
-      { label: "Today", value: 5200 },
+      { dayIdx: 1, value: 4900 },
+      { dayIdx: 2, value: 5000 },
+      { dayIdx: 3, value: 5100 },
+      { dayIdx: 4, value: 5150 },
+      { dayIdx: 5, value: 5200, isToday: true },
     ],
   },
   {
     id: "tomato",
-    crop: "Fresh Tomato",
+    crop: "Tomato",
+    variety: "Gelila",
     price: 3800,
     unit: "q",
     change: "-2.4%",
     isPositive: false,
-    market: "Ziway Terminal",
-    insight: "Recent harvest arrivals in Ziway have slightly lowered tomato prices.",
+    recommendation: "buy_now",
+    marketId: "meki_produce",
+    city: "Meki",
+    insight: "Fresh harvest arrivals in Meki have lowered tomato rates. Great time for bulk buying!",
+    low7d: 3500,
+    high7d: 4200,
     data: [
-      { label: "Mon", value: 4200 },
-      { label: "Tue", value: 4000 },
-      { label: "Wed", value: 3900 },
-      { label: "Thu", value: 3850 },
-      { label: "Today", value: 3800 },
+      { dayIdx: 1, value: 4200 },
+      { dayIdx: 2, value: 4000 },
+      { dayIdx: 3, value: 3900 },
+      { dayIdx: 4, value: 3850 },
+      { dayIdx: 5, value: 3800, isToday: true },
     ],
   },
   {
     id: "garlic",
     crop: "Garlic",
+    variety: null,
     price: 12000,
     unit: "q",
     change: "+8.5%",
     isPositive: true,
-    market: "Bishoftu Market",
-    insight: "Strong demand from food processors is driving garlic prices higher.",
+    recommendation: "rising",
+    marketId: "bishoftu_market",
+    city: "Bishoftu",
+    insight: "Strong demand from wholesale processors is driving garlic rates up in Bishoftu.",
+    low7d: 10500,
+    high7d: 12400,
     data: [
-      { label: "Mon", value: 10500 },
-      { label: "Tue", value: 11000 },
-      { label: "Wed", value: 11400 },
-      { label: "Thu", value: 11800 },
-      { label: "Today", value: 12000 },
+      { dayIdx: 1, value: 10500 },
+      { dayIdx: 2, value: 11000 },
+      { dayIdx: 3, value: 11400 },
+      { dayIdx: 4, value: 11800 },
+      { dayIdx: 5, value: 12000, isToday: true },
     ],
   },
 ];
 
 export default function PriceTrendWidget({ onPressAnalytics }) {
   const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
+  const code = currentLang.startsWith("am") ? "am" : currentLang.startsWith("om") ? "om" : "en";
   const { theme } = useTheme();
+
   const [selectedCropId, setSelectedCropId] = useState("onion");
+  const [selectedPointIdx, setSelectedPointIdx] = useState(4); // Default to Today
 
   const activeCommodity = useMemo(
     () => COMMODITY_TRENDS.find((c) => c.id === selectedCropId) || COMMODITY_TRENDS[0],
-    [selectedCropId]
+    [selectedCropId],
   );
 
   const primaryColor = theme?.colors?.primary || "#1565C0";
   const surfaceColor = theme?.colors?.surface || "#FFFFFF";
   const textColor = theme?.colors?.textPrimary || "#0F172A";
   const textMuted = theme?.colors?.textSecondary || "#64748B";
+  const border = theme?.colors?.border || "#E2E8F0";
   const successColor = "#10B981";
   const dangerColor = "#EF4444";
 
@@ -111,11 +139,18 @@ export default function PriceTrendWidget({ onPressAnalytics }) {
     return max > 0 ? max : 1;
   }, [activeCommodity]);
 
+  const marketInfo = getLocalizedMarket(
+    activeCommodity.marketId || activeCommodity.city,
+    currentLang,
+  );
+  const localizedCrop = getLocalizedCropName(activeCommodity.crop, currentLang, t);
+  const localizedUnit = getLocalizedUnitName(activeCommodity.unit, currentLang, t);
+
   useEffect(() => {
     priceAnim.setValue(activeCommodity.price * 0.75);
     Animated.timing(priceAnim, {
       toValue: activeCommodity.price,
-      duration: 500,
+      duration: 450,
       useNativeDriver: false,
       easing: Easing.out(Easing.cubic),
     }).start();
@@ -129,40 +164,55 @@ export default function PriceTrendWidget({ onPressAnalytics }) {
     };
   }, [selectedCropId, activeCommodity, priceAnim]);
 
+  const getSignalBadge = (rec) => {
+    if (rec === "buy_now") {
+      return {
+        label: t("analytics.buyNowSignal", { defaultValue: "🟢 Good Time to Buy" }),
+        bg: "#DCFCE7",
+        color: "#15803D",
+      };
+    }
+    if (rec === "rising") {
+      return {
+        label: t("analytics.risingSignal", { defaultValue: "🔴 Price Rising" }),
+        bg: "#FEF2F2",
+        color: "#DC2626",
+      };
+    }
+    return {
+      label: t("analytics.stableSignal", { defaultValue: "🔵 Stable Market" }),
+      bg: "#EFF6FF",
+      color: "#1D4ED8",
+    };
+  };
+
+  const signal = getSignalBadge(activeCommodity.recommendation);
+
   return (
     <View style={styles.outerContainer}>
-      <View style={[styles.card, { backgroundColor: surfaceColor }]}>
+      <View style={[styles.card, { backgroundColor: surfaceColor, borderColor: border }]}>
         {/* Header */}
         <View style={styles.header}>
           <View>
             <AppText style={[styles.title, { color: textColor }]}>
-              {t("buyerDashboard.priceTrends", { defaultValue: "Price Trends" })}
+              {t("buyerDashboard.priceTrends", { defaultValue: "Wholesale Price Trends" })}
             </AppText>
-            <AppText style={[styles.subtitle, { color: textMuted }]}>{activeCommodity.market}</AppText>
+
+            <View style={styles.cityMarketRow}>
+              <View style={styles.cityPill}>
+                <Ionicons name="location" size={11} color={primaryColor} />
+                <AppText style={styles.cityPillText}>{marketInfo.city}</AppText>
+              </View>
+              <AppText style={[styles.subtitle, { color: textMuted }]}>
+                {marketInfo.name}
+              </AppText>
+            </View>
           </View>
 
-          <View
-            style={[
-              styles.changeBadge,
-              {
-                backgroundColor: activeCommodity.isPositive
-                  ? "rgba(16, 185, 129, 0.1)"
-                  : "rgba(239, 68, 68, 0.1)",
-              },
-            ]}
-          >
-            <Ionicons
-              name={activeCommodity.isPositive ? "trending-up" : "trending-down"}
-              size={14}
-              color={activeCommodity.isPositive ? successColor : dangerColor}
-            />
-            <AppText
-              style={[
-                styles.changeText,
-                { color: activeCommodity.isPositive ? successColor : dangerColor },
-              ]}
-            >
-              {activeCommodity.change} (7d)
+          {/* Actionable Signal Badge */}
+          <View style={[styles.signalBadge, { backgroundColor: signal.bg }]}>
+            <AppText style={[styles.signalText, { color: signal.color }]}>
+              {signal.label}
             </AppText>
           </View>
         </View>
@@ -181,45 +231,110 @@ export default function PriceTrendWidget({ onPressAnalytics }) {
                 key={item.id}
                 style={[
                   styles.cropPill,
-                  isSelected && { backgroundColor: primaryColor, borderColor: primaryColor },
+                  isSelected
+                    ? { backgroundColor: primaryColor, borderColor: primaryColor }
+                    : { backgroundColor: surfaceColor, borderColor: border },
                 ]}
-                onPress={() => setSelectedCropId(item.id)}
+                onPress={() => {
+                  setSelectedCropId(item.id);
+                  setSelectedPointIdx(4);
+                }}
                 activeOpacity={0.8}
               >
                 <AppText
                   style={[
                     styles.cropPillText,
-                    isSelected && styles.selectedCropPillText,
+                    isSelected ? styles.selectedCropPillText : { color: textMuted },
                   ]}
                 >
-                  {getLocalizedCropName(item.crop, i18n.language || "en", t)}
+                  {getLocalizedCropName(item.crop, currentLang, t)}
                 </AppText>
               </TouchableOpacity>
             );
           })}
         </ScrollView>
 
-        {/* Price Display */}
+        {/* Current Rate & Change Badge */}
         <View style={styles.priceRow}>
-          <AppText style={styles.priceNumber}>ETB {displayPrice}</AppText>
-          <AppText style={styles.unitText}>/ {getLocalizedUnitName(activeCommodity.unit, i18n.language || "en", t)}</AppText>
+          <View style={styles.priceLeft}>
+            <AppText style={[styles.priceNumber, { color: textColor }]}>
+              ETB {displayPrice}
+            </AppText>
+            <AppText style={styles.unitText}>/ {localizedUnit}</AppText>
+          </View>
+
+          <View
+            style={[
+              styles.changePill,
+              {
+                backgroundColor: activeCommodity.isPositive
+                  ? "#DCFCE7"
+                  : "#FEF2F2",
+              },
+            ]}
+          >
+            <Ionicons
+              name={activeCommodity.isPositive ? "trending-up" : "trending-down"}
+              size={13}
+              color={activeCommodity.isPositive ? "#15803D" : dangerColor}
+            />
+            <AppText
+              style={[
+                styles.changeText,
+                { color: activeCommodity.isPositive ? "#15803D" : dangerColor },
+              ]}
+            >
+              {activeCommodity.change} (7d)
+            </AppText>
+          </View>
         </View>
 
-        {/* Simple Bar Chart */}
+        {/* 7-Day Range Track */}
+        <View style={styles.rangeRow}>
+          <AppText style={styles.rangeText}>
+            {t("analytics.rangeMin", { defaultValue: "7d Low" })}: ETB {formatNumber(activeCommodity.low7d)}
+          </AppText>
+          <AppText style={styles.rangeText}>
+            {t("analytics.rangeMax", { defaultValue: "7d High" })}: ETB {formatNumber(activeCommodity.high7d)}
+          </AppText>
+        </View>
+
+        {/* Localized 5-Day Bar Chart */}
         <View style={styles.chartContainer}>
-          {activeCommodity.data.map((point) => {
-            const heightPercent = Math.min(100, Math.max(20, (point.value / maxValue) * 100));
-            const isToday = point.label === "Today";
+          {activeCommodity.data.map((point, idx) => {
+            const heightPercent = Math.min(100, Math.max(22, (point.value / maxValue) * 100));
+            const isSelectedPoint = idx === selectedPointIdx;
+            const dayLabel = point.isToday
+              ? code === "am"
+                ? "ዛሬ"
+                : code === "om"
+                ? "Har'a"
+                : "Today"
+              : DAYS_SHORT[code]?.[point.dayIdx] || "Day";
 
             return (
-              <View key={point.label} style={styles.barCol}>
+              <TouchableOpacity
+                key={idx}
+                style={styles.barCol}
+                onPress={() => setSelectedPointIdx(idx)}
+                activeOpacity={0.85}
+              >
+                {/* Active Tooltip Callout */}
+                {isSelectedPoint && (
+                  <View style={styles.barTooltipPill}>
+                    <AppText style={styles.barTooltipText}>
+                      ETB {formatNumber(point.value)}
+                    </AppText>
+                  </View>
+                )}
+
                 <View style={styles.barTrack}>
                   <View
                     style={[
                       styles.barFill,
                       {
                         height: `${heightPercent}%`,
-                        backgroundColor: isToday ? primaryColor : primaryColor + "40",
+                        backgroundColor: isSelectedPoint ? primaryColor : primaryColor + "35",
                       },
                     ]}
                   />
@@ -227,17 +342,17 @@ export default function PriceTrendWidget({ onPressAnalytics }) {
                 <AppText
                   style={[
                     styles.axisLabel,
-                    isToday && { color: primaryColor, fontWeight: "700" },
+                    isSelectedPoint && { color: primaryColor, fontWeight: "800" },
                   ]}
                 >
-                  {point.label === "Today" ? t("priceTrends.today", { defaultValue: "Today" }) : point.label}
+                  {dayLabel}
                 </AppText>
-              </View>
+              </TouchableOpacity>
             );
           })}
         </View>
 
-        {/* Simple Insight & Analytics Footer */}
+        {/* Insight Advisory Banner */}
         <View style={styles.footer}>
           <AppText style={styles.insightText} numberOfLines={2}>
             💡 {activeCommodity.insight}
@@ -250,9 +365,10 @@ export default function PriceTrendWidget({ onPressAnalytics }) {
               activeOpacity={0.8}
             >
               <AppText style={[styles.analyticsBtnText, { color: primaryColor }]}>
-                {t("buyerDashboard.viewFullAnalysis", { defaultValue: "View Full Market Analysis" })}
+                {t("buyerDashboard.fullMarketAnalysis", {
+                  defaultValue: "Full Market Analytics →",
+                })}
               </AppText>
-              <Ionicons name="arrow-forward" size={14} color={primaryColor} />
             </TouchableOpacity>
           )}
         </View>
@@ -263,59 +379,70 @@ export default function PriceTrendWidget({ onPressAnalytics }) {
 
 const styles = StyleSheet.create({
   outerContainer: {
-    width: "100%",
-    marginBottom: 20,
+    marginBottom: 16,
   },
   card: {
-    borderRadius: 20,
-    padding: 18,
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    padding: 16,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 14,
+    alignItems: "flex-start",
+    marginBottom: 12,
   },
   title: {
-    fontSize: 17,
-    fontWeight: "700",
+    fontSize: 16,
+    fontWeight: "800",
   },
-  subtitle: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  changeBadge: {
+  cityMarketRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
-    gap: 4,
+    gap: 6,
+    marginTop: 3,
   },
-  changeText: {
-    fontSize: 12,
-    fontWeight: "700",
+  cityPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    backgroundColor: "#F1F5F9",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  cityPillText: {
+    fontSize: 11,
+    fontWeight: "800",
+    color: "#0F172A",
+  },
+  subtitle: {
+    fontSize: 11.5,
+  },
+  signalBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+  signalText: {
+    fontSize: 11,
+    fontWeight: "800",
   },
   cropScroll: {
-    marginBottom: 14,
+    marginBottom: 12,
   },
   cropContent: {
     gap: 8,
   },
   cropPill: {
     paddingHorizontal: 14,
-    paddingVertical: 7,
+    paddingVertical: 6,
     borderRadius: 18,
-    backgroundColor: "#F8FAFC",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
   },
   cropPillText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "600",
-    color: "#475569",
   },
   selectedCropPillText: {
     color: "#FFFFFF",
@@ -323,72 +450,107 @@ const styles = StyleSheet.create({
   },
   priceRow: {
     flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 6,
+  },
+  priceLeft: {
+    flexDirection: "row",
     alignItems: "baseline",
-    marginBottom: 14,
+    gap: 4,
   },
   priceNumber: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: "800",
-    color: "#0F172A",
-    letterSpacing: -0.5,
   },
   unitText: {
-    fontSize: 13,
+    fontSize: 12,
+    color: "#64748B",
+    fontWeight: "600",
+  },
+  changePill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+  changeText: {
+    fontSize: 11.5,
+    fontWeight: "800",
+  },
+  rangeRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 14,
+  },
+  rangeText: {
+    fontSize: 11,
     color: "#64748B",
     fontWeight: "500",
-    marginLeft: 4,
   },
   chartContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "flex-end",
-    height: 90,
+    height: 120,
     marginBottom: 14,
+    backgroundColor: "#F8FAFC",
+    paddingVertical: 10,
+    borderRadius: 14,
   },
   barCol: {
-    flex: 1,
     alignItems: "center",
-    height: "100%",
-    justifyContent: "flex-end",
+    width: 44,
+  },
+  barTooltipPill: {
+    position: "absolute",
+    top: -18,
+    backgroundColor: "#0F172A",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    zIndex: 10,
+  },
+  barTooltipText: {
+    color: "#FFFFFF",
+    fontSize: 9.5,
+    fontWeight: "800",
   },
   barTrack: {
-    width: 20,
     height: 70,
-    backgroundColor: "#F1F5F9",
-    borderRadius: 10,
+    width: 14,
+    backgroundColor: "#E2E8F0",
+    borderRadius: 8,
     justifyContent: "flex-end",
     overflow: "hidden",
   },
   barFill: {
     width: "100%",
-    borderRadius: 10,
+    borderRadius: 8,
   },
   axisLabel: {
-    marginTop: 6,
     fontSize: 11,
     color: "#64748B",
-    fontWeight: "500",
+    marginTop: 6,
   },
   footer: {
+    gap: 8,
+    paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: "#F1F5F9",
-    paddingTop: 12,
-    gap: 10,
   },
   insightText: {
     fontSize: 12,
-    color: "#334155",
+    color: "#475569",
     lineHeight: 17,
   },
   analyticsBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 4,
-    paddingVertical: 2,
+    alignSelf: "flex-start",
   },
   analyticsBtnText: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: "700",
   },
 });

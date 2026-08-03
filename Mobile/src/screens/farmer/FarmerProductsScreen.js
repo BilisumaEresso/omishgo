@@ -34,6 +34,7 @@ import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 import { formatNumber } from "../../utils/formatNumber";
+import { formatLocalizedDate } from "../../utils/ethiopianDate";
 
 export default function FarmerProductsScreen({ navigation }) {
   const { t, i18n } = useTranslation();
@@ -90,9 +91,10 @@ export default function FarmerProductsScreen({ navigation }) {
               : t("common.unknownLocation", { defaultValue: "Ethiopia" }),
             shortId,
             postedDate: p.createdAt
-              ? new Date(p.createdAt).toLocaleDateString("en-GB", {
-                  day: "numeric",
-                  month: "short",
+              ? formatLocalizedDate(p.createdAt, currentLang, {
+                  includeDayOfWeek: true,
+                  includeYear: false,
+                  relative: true,
                 })
               : t("common.recently", { defaultValue: "Recently" }),
             _raw: p,
@@ -406,8 +408,9 @@ export default function FarmerProductsScreen({ navigation }) {
   ];
 
   return (
-    <DashboardLayout
-      title={t("farmerProducts.title", { defaultValue: "My Crop Stock" })}
+    <>
+      <DashboardLayout
+        title={t("farmerProducts.title", { defaultValue: "My Crop Stock" })}
       subtitle={t("farmerProducts.subtitle", {
         defaultValue: "Manage harvest inventory & wholesale listings",
       })}
@@ -487,14 +490,15 @@ export default function FarmerProductsScreen({ navigation }) {
       )}
 
       <View style={{ height: 80 }} />
-
-      <FloatingActionButton
-        icon="add"
-        onPress={() => navigation?.navigate("PostProduct")}
-        bottom={24}
-        right={24}
-      />
     </DashboardLayout>
+
+    <FloatingActionButton
+      icon="add"
+      onPress={() => navigation?.navigate("PostProduct")}
+      bottom={24}
+      right={24}
+    />
+    </>
   );
 }
 
@@ -523,11 +527,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1,
     borderColor: "#E2E8F0",
-    shadowColor: "#0F172A",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 4,
   },
   cardHeaderRow: {
     flexDirection: "row",
@@ -536,9 +540,11 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   cropTitleWrap: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
+    marginRight: 8,
   },
   cropThumbImage: {
     width: 48,
@@ -557,6 +563,7 @@ const styles = StyleSheet.create({
   cropName: {
     fontSize: 16,
     fontWeight: "800",
+    flexShrink: 1,
   },
   titleRefRow: {
     flexDirection: "row",
@@ -569,9 +576,8 @@ const styles = StyleSheet.create({
     color: "#64748B",
     backgroundColor: "#F1F5F9",
     paddingHorizontal: 6,
-    paddingVertical: 1.5,
+    paddingVertical: 2,
     borderRadius: 6,
-    overflow: "hidden",
   },
   dateText: {
     fontSize: 11,

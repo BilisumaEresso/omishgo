@@ -1,79 +1,121 @@
-import { useTranslation } from "react-i18next";
+// Mobile/src/components/buyer/BuyerCategorySpendingList.js
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import AppText from "../common/AppText";
+import { getLocalizedCropName } from "../../constants/crops";
+import { useTheme } from "../../hooks/useTheme";
 import { formatNumber } from "../../utils/formatNumber";
+import AppText from "../common/AppText";
 
 export default function BuyerCategorySpendingList({
-  categories = [
-    {
-      id: "c1",
-      category: "Vegetables & Produce",
-      icon: "leaf",
-      bgColor: "#E0F2FE",
-      iconColor: "#0284C7",
-      amount: 5440,
-      date: "10 Jan 2026",
-      method: "Mobile Money",
-    },
-    {
-      id: "c2",
-      category: "Teff & Grains",
-      icon: "nutrition",
-      bgColor: "#EDE9FE",
-      iconColor: "#7C3AED",
-      amount: 54417.8,
-      date: "11 Jan 2026",
-      method: "Bank Card",
-    },
-    {
-      id: "c3",
-      category: "Pulses & Oilseeds",
-      icon: "cube",
-      bgColor: "#FEF3C7",
-      iconColor: "#D97706",
-      amount: 5400,
-      date: "12 Jan 2026",
-      method: "CBE Birr",
-    },
-  ],
+  categories = [],
   currency = "ETB",
   onCategoryPress,
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
+  const { theme } = useTheme();
+
+  const surfaceColor = theme?.colors?.surface || "#FFFFFF";
+  const textPrimary = theme?.colors?.textPrimary || "#0F172A";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
+  const border = theme?.colors?.border || "#E2E8F0";
+
+  // Fallback localized category items using crops/shared constants
+  const defaultCategories = [
+    {
+      id: "c1",
+      category: t("analytics.catVegetables", { defaultValue: "Vegetables & Roots" }),
+      icon: "leaf",
+      bgColor: "#E0F2FE",
+      iconColor: "#0284C7",
+      amount: 18500,
+      date: t("buyerDashboard.thisMonth", { defaultValue: "This Month" }),
+      method: t("buyerDashboard.mobileMoney", { defaultValue: "Mobile Money" }),
+    },
+    {
+      id: "c2",
+      category: t("analytics.catCereals", { defaultValue: "Cereals & Grains" }),
+      icon: "nutrition",
+      bgColor: "#EDE9FE",
+      iconColor: "#7C3AED",
+      amount: 14200,
+      date: t("buyerDashboard.thisMonth", { defaultValue: "This Month" }),
+      method: t("buyerDashboard.bankTransfer", { defaultValue: "Bank Transfer" }),
+    },
+    {
+      id: "c3",
+      category: t("analytics.catCashCrops", { defaultValue: "Cash Crops & Pulses" }),
+      icon: "cube",
+      bgColor: "#FEF3C7",
+      iconColor: "#D97706",
+      amount: 8100,
+      date: t("buyerDashboard.thisMonth", { defaultValue: "This Month" }),
+      method: t("buyerDashboard.cbeBirr", { defaultValue: "CBE Birr" }),
+    },
+  ];
+
+  const displayList = categories.length > 0 ? categories : defaultCategories;
+
   return (
     <View style={styles.container}>
-      <AppText style={styles.sectionTitle}>
-        {t("buyerDashboard.procurementCategories", { defaultValue: "Procurement Categories" })}
+      <AppText style={[styles.sectionTitle, { color: textPrimary }]}>
+        {t("buyerDashboard.procurementCategories", {
+          defaultValue: "Procurement Categories",
+        })}
       </AppText>
 
       <View style={styles.list}>
-        {categories.map((item) => (
-          <TouchableOpacity
-            key={item.id}
-            style={styles.itemCard}
-            onPress={() => onCategoryPress?.(item)}
-            activeOpacity={0.88}
-          >
-            <View style={styles.leftRow}>
-              <View style={[styles.iconWrap, { backgroundColor: item.bgColor }]}>
-                <Ionicons name={item.icon} size={22} color={item.iconColor} />
+        {displayList.map((item) => {
+          const localizedCategory = item.cropType
+            ? getLocalizedCropName(item.cropType, currentLang, t)
+            : item.category;
+
+          return (
+            <TouchableOpacity
+              key={item.id || item.category}
+              style={[
+                styles.itemCard,
+                { backgroundColor: surfaceColor, borderColor: border },
+              ]}
+              onPress={() => onCategoryPress?.(item)}
+              activeOpacity={0.85}
+            >
+              <View style={styles.leftRow}>
+                <View
+                  style={[
+                    styles.iconWrap,
+                    { backgroundColor: item.bgColor || "#E0F2FE" },
+                  ]}
+                >
+                  <Ionicons
+                    name={item.icon || "leaf"}
+                    size={20}
+                    color={item.iconColor || "#0284C7"}
+                  />
+                </View>
+
+                <View style={styles.info}>
+                  <AppText style={[styles.categoryTitle, { color: textPrimary }]}>
+                    {localizedCategory}
+                  </AppText>
+                  <AppText style={[styles.dateText, { color: textSecondary }]}>
+                    {item.date}
+                  </AppText>
+                </View>
               </View>
 
-              <View style={styles.info}>
-                <AppText style={styles.categoryTitle}>{item.category}</AppText>
-                <AppText style={styles.dateText}>{item.date}</AppText>
+              <View style={styles.rightRow}>
+                <AppText style={[styles.amountText, { color: textPrimary }]}>
+                  {currency} {formatNumber(item.amount)}
+                </AppText>
+                <AppText style={[styles.methodText, { color: textSecondary }]}>
+                  {item.method}
+                </AppText>
               </View>
-            </View>
-
-            <View style={styles.rightRow}>
-              <AppText style={styles.amountText}>
-                {currency} {formatNumber(item.amount)}
-              </AppText>
-              <AppText style={styles.methodText}>{item.method}</AppText>
-            </View>
-          </TouchableOpacity>
-        ))}
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </View>
   );
@@ -82,21 +124,20 @@ export default function BuyerCategorySpendingList({
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    marginBottom: 24,
+    marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#0F172A",
+    fontSize: 16,
+    fontWeight: "800",
     marginBottom: 12,
   },
   list: {
-    gap: 12,
+    gap: 10,
   },
   itemCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 14,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -104,41 +145,36 @@ const styles = StyleSheet.create({
   leftRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
+    gap: 12,
+    flex: 1,
   },
   iconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
   },
   info: {
-    justifyContent: "center",
+    flex: 1,
   },
   categoryTitle: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "700",
-    color: "#0F172A",
   },
   dateText: {
-    fontSize: 12,
-    color: "#64748B",
+    fontSize: 11.5,
     marginTop: 2,
   },
   rightRow: {
     alignItems: "flex-end",
   },
   amountText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "800",
-    color: "#0F172A",
-    lineHeight: 20,
-    paddingBottom: 2,
   },
   methodText: {
-    fontSize: 12,
-    color: "#94A3B8",
+    fontSize: 11,
     marginTop: 2,
   },
 });

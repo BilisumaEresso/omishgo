@@ -140,9 +140,9 @@ export const DEFAULT_DESCRIPTIONS_LOCALIZED = {
     Papaya: "ጣፋጭ ባቱ/ሜኪ ፓፓያ። ለስላሳ ቆዳ፣ በጥንቃቄ የተያዘ።",
   },
   om: {
-    Teff: "Xaafii Magna (Adii), haaraa sassaabame. Guutummaatti gara'amee, qulqullaa'ee fi maaddii tokko malee qotame.",
+    Teff: "Xaafii Manya (Adii), haaraa sassaabame. Guutummaatti gara'amee, qulqullaa'ee fi maaddii tokko malee qotame.",
     "Red Onion": "Qasaricha Bombee Diimaa, dheerinni giddugaleessaa hanga guddaatti. Gogee fi jabaatadha.",
-    Tomato: "Xaafii Diimaa Caaccuu Laftii Qorichaa, guutummaatti gabbatee fi cimaadha. Har'a ganama sassaabame.",
+    Tomato: "Timaatima Caaccuu Laftii Qorichaa, guutummaatti gabbatee fi cimaadha. Har'a ganama sassaabame.",
     Garlic: "Qasaricha Adii gogaa. Urgaa fi mi'aa cimaa qaba. Yeroo dheeraa akka turuuf sirriitti to'atame.",
     "White Maize": "Boqqoolloo adii, qulqullina ol aanaa. Akka gaaritti gogee fi qulqullaa'e.",
     Wheat: "Qamadii galii guddaa, xaa'oo kana. Gogaa, qulqulluu fi tolfamee kuufame.",
@@ -180,15 +180,45 @@ export const REFERENCE_PRICES = {
   Papaya: { kg: 25, quintal: 2500 },
 };
 
+// Mobile/src/constants/crops.js
+
 export const CROP_VARIETIES = {
-  "Tomato": ["Gelila", "Marglobe", "Chali"],
-  "Red Onion": ["Bombay Red", "Adama Red"],
-  "Teff": ["Quncho", "Magna", "Tsedey"],
-  "White Maize": ["BH-660", "BH-540", "Melkassa"],
-  "Wheat": ["Kakaba", "Danda'a", "Ogolcho"],
-  "Barley": ["HB-1307", "HB-1404", "HB-1963"],
-  "Potato": ["Gudene", "Jalene", "Belete"],
-  "Coffee": ["Yirgacheffe", "Sidama", "Harar", "Guji"],
+  // --- Existing Cereals & Expanded Varieties ---
+  Teff: ["Quncho", "Magna", "Tsedey", "Kora", "Boset"],
+  "White Maize": ["BH-660", "BH-540", "Melkassa", "BH-661", "Limu"],
+  Wheat: ["Kakaba", "Danda'a", "Ogolcho", "Kingbird", "Huluka"],
+  Barley: ["HB-1307", "HB-1404", "HB-1963", "Sabini", "EH-1493"],
+  Sorghum: ["Melkam", "Degalit", "Dekeba", "Teshale", "Girana"],
+  Millet: ["Tadesse", "Bareda", "Gudetu", "Wama", "Tesema"],
+
+  // --- Vegetables & Bulb Crops ---
+  Tomato: ["Gelila", "Marglobe", "Chali", "Bishola", "Sirinka"],
+  "Red Onion": ["Bombay Red", "Adama Red", "Nazareth Red", "Nafis"],
+  Garlic: ["Bishoftu Netch", "Kuriftu", "Tseday", "Local White"],
+  "Green Pepper": ["Mareko Fana", "Melka Shote", "Melka Awaze", "Bishoftu"],
+  Cabbage: ["Copenhagen Market", "Drumhead", "Gloria", "Local Gomen"],
+  Potato: ["Gudene", "Jalene", "Belete", "Dega", "Bubu"],
+  Carrot: ["Nantes", "Kuroda", "Chantenay"],
+  Beetroot: ["Detroit Dark Red", "Crimson Globe"],
+
+  // --- Pulses, Legumes & Oilseeds ---
+  Lentil: ["Ada'a", "Alemaya", "Derash", "Asano"],
+  Lentils: ["Ada'a", "Alemaya", "Derash", "Asano"], // Plural alias in CROP_TYPES
+  Chickpea: ["Arerti", "Habru", "Natoli", "Ejere", "Dubie"],
+  "Haricot Bean": ["Awash 1", "Awash Melka", "Nasir", "Batu", "Red Wolaita"],
+  Beans: ["Tumsa", "Dosha", "Gebelcho", "Gora", "Degaga"], // Faba / Broad Beans
+  Peas: ["Bilalo", "Burkitu", "Lemu", "Tegegne"], // Field Peas
+  Sesame: ["Walin", "Humera-1", "Mehado-80", "Teda"],
+  Sunflower: ["Osorio", "Zebra", "Russian Giant", "Local Black"],
+
+  // --- Cash Crops (Coffee) ---
+  Coffee: ["Yirgacheffe", "Sidama", "Harar", "Guji", "Jimma", "Limu", "Nekemte"],
+
+  // --- Fruits ---
+  Papaya: ["Solo", "Honey Gold", "Maradol", "Local Rift Valley"],
+  Avocado: ["Hass", "Fuerte", "Ettinger", "Pinkerton"],
+  Banana: ["Giant Cavendish", "Dwarf Cavendish", "Williams", "Poyo"],
+  Mango: ["Tommy Atkins", "Apple Mango", "Keitt", "Kent"],
 };
 
 /**

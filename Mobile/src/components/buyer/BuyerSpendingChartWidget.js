@@ -1,72 +1,102 @@
-import { useTranslation } from "react-i18next";
+// Mobile/src/components/buyer/BuyerSpendingChartWidget.js
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import AppText from "../common/AppText";
+import { useTheme } from "../../hooks/useTheme";
+import { GREGORIAN_MONTHS_SHORT } from "../../utils/ethiopianDate";
 import { formatNumber } from "../../utils/formatNumber";
+import AppText from "../common/AppText";
 
 export default function BuyerSpendingChartWidget({
   monthlyData = [
-    { month: "Jan", amount: 8500 },
-    { month: "Feb", amount: 14200 },
-    { month: "Mar", amount: 20000 },
-    { month: "Apr", amount: 16800 },
+    { month: "Jan", monthIdx: 0, amount: 8500 },
+    { month: "Feb", monthIdx: 1, amount: 14200 },
+    { month: "Mar", monthIdx: 2, amount: 20000 },
+    { month: "Apr", monthIdx: 3, amount: 16800 },
   ],
   currency = "ETB",
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
+  const { theme } = useTheme();
+
   const [selectedIdx, setSelectedIdx] = useState(2); // Default to Mar
 
-  const maxVal = Math.max(...monthlyData.map((d) => d.amount), 50000);
+  const primaryColor = theme?.colors?.primary || "#1565C0";
+  const surfaceColor = theme?.colors?.surface || "#FFFFFF";
+  const textPrimary = theme?.colors?.textPrimary || "#0F172A";
+  const textSecondary = theme?.colors?.textSecondary || "#64748B";
+  const border = theme?.colors?.border || "#E2E8F0";
+
+  const totalSpent = monthlyData.reduce((sum, item) => sum + item.amount, 0);
+  const avgMonthly = Math.round(totalSpent / (monthlyData.length || 1));
+  const maxVal = Math.max(...monthlyData.map((d) => d.amount), 25000);
   const chartHeight = 120;
 
+  // Category breakdown allocation simulation
+  const categoriesSplit = [
+    { label: t("analytics.catVegetables", { defaultValue: "Vegetables & Roots" }), percent: 45, color: "#0284C7" },
+    { label: t("analytics.catCereals", { defaultValue: "Cereals & Grains" }), percent: 35, color: "#7C3AED" },
+    { label: t("analytics.catCashCrops", { defaultValue: "Cash Crops & Pulses" }), percent: 20, color: "#D97706" },
+  ];
+
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: surfaceColor, borderColor: border }]}>
+      {/* 1. Header */}
       <View style={styles.header}>
-        <AppText style={styles.title}>
-          {t("buyerDashboard.mySpending", { defaultValue: "My Spending" })}
-        </AppText>
-        <AppText style={styles.timeframe}>
-          {t("buyerDashboard.last4Months", { defaultValue: "Last 4 Months" })}
-        </AppText>
+        <View>
+          <AppText style={[styles.title, { color: textPrimary }]}>
+            {t("buyerDashboard.mySpending", { defaultValue: "My Procurement Spending" })}
+          </AppText>
+          <AppText style={[styles.subtitle, { color: textSecondary }]}>
+            {t("buyerDashboard.last4Months", { defaultValue: "Last 4 Months Breakdown" })}
+          </AppText>
+        </View>
+        <View style={styles.avgBadge}>
+          <Ionicons name="wallet-outline" size={13} color={primaryColor} />
+          <AppText style={[styles.avgBadgeText, { color: primaryColor }]}>
+            Avg: {currency} {formatNumber(avgMonthly)}/mo
+          </AppText>
+        </View>
       </View>
 
-      <View style={styles.chartContainer}>
-        {/* Y-Axis Guidelines */}
+      {/* 2. Interactive Bar Chart */}
+      <View style={styles.chartArea}>
+        {/* Y-Axis Guideline Markers */}
         <View style={styles.yAxisLines}>
-          <View style={styles.gridLineRow}>
-            <AppText style={styles.yAxisLabel}>50k</AppText>
+          <View style={styles.gridRow}>
+            <AppText style={styles.yAxisText}>{formatNumber(Math.round(maxVal / 1000))}k</AppText>
             <View style={styles.dashedLine} />
           </View>
-          <View style={styles.gridLineRow}>
-            <AppText style={styles.yAxisLabel}>20k</AppText>
+          <View style={styles.gridRow}>
+            <AppText style={styles.yAxisText}>{formatNumber(Math.round(maxVal / 2000))}k</AppText>
             <View style={styles.dashedLine} />
           </View>
-          <View style={styles.gridLineRow}>
-            <AppText style={styles.yAxisLabel}>10k</AppText>
-            <View style={styles.dashedLine} />
-          </View>
-          <View style={styles.gridLineRow}>
-            <AppText style={styles.yAxisLabel}>0</AppText>
+          <View style={styles.gridRow}>
+            <AppText style={styles.yAxisText}>0</AppText>
             <View style={styles.solidLine} />
           </View>
         </View>
 
-        {/* Data Bars & Nodes */}
-        <View style={styles.barsContainer}>
+        {/* Bars */}
+        <View style={styles.barsRow}>
           {monthlyData.map((item, idx) => {
             const isSelected = idx === selectedIdx;
-            const heightPercent = Math.min(100, Math.max(15, (item.amount / maxVal) * 100));
+            const heightPercent = Math.min(100, Math.max(18, (item.amount / maxVal) * 100));
+            const monthLabel =
+              GREGORIAN_MONTHS_SHORT[currentLang]?.[item.monthIdx ?? idx] || item.month;
 
             return (
               <TouchableOpacity
-                key={item.month}
-                style={styles.col}
+                key={item.month + idx}
+                style={styles.barCol}
                 onPress={() => setSelectedIdx(idx)}
-                activeOpacity={0.8}
+                activeOpacity={0.85}
               >
-                {/* Active Tooltip callout */}
+                {/* Selected Amount Callout Tooltip */}
                 {isSelected && (
-                  <View style={styles.tooltipCallout}>
+                  <View style={styles.tooltipPill}>
                     <AppText style={styles.tooltipText}>
                       {currency} {formatNumber(item.amount)}
                     </AppText>
@@ -74,43 +104,69 @@ export default function BuyerSpendingChartWidget({
                   </View>
                 )}
 
-                {/* Vertical Highlight Pill */}
-                <View
-                  style={[
-                    styles.barTrack,
-                    { height: chartHeight },
-                    isSelected && styles.selectedTrack,
-                  ]}
-                >
+                {/* Vertical Bar Container */}
+                <View style={[styles.barContainer, { height: chartHeight }]}>
                   <View
                     style={[
                       styles.barFill,
-                      { height: `${heightPercent}%` },
-                      isSelected ? styles.selectedBarFill : styles.normalBarFill,
-                    ]}
-                  />
-                  {/* Node Dot */}
-                  <View
-                    style={[
-                      styles.nodeDot,
-                      { bottom: `${heightPercent}%` },
-                      isSelected && styles.selectedNodeDot,
+                      {
+                        height: `${heightPercent}%`,
+                        backgroundColor: isSelected ? primaryColor : primaryColor + "35",
+                      },
                     ]}
                   />
                 </View>
 
-                {/* X-Axis Label */}
+                {/* Month Label */}
                 <AppText
                   style={[
-                    styles.xAxisLabel,
-                    isSelected && styles.selectedXAxisLabel,
+                    styles.monthText,
+                    { color: isSelected ? primaryColor : textSecondary, fontWeight: isSelected ? "800" : "500" },
                   ]}
                 >
-                  {item.month}
+                  {monthLabel}
                 </AppText>
               </TouchableOpacity>
             );
           })}
+        </View>
+      </View>
+
+      {/* 3. Category Procurement Allocation Bar */}
+      <View style={[styles.splitSection, { borderTopColor: border }]}>
+        <View style={styles.splitHeader}>
+          <AppText style={[styles.splitTitle, { color: textPrimary }]}>
+            {t("buyerDashboard.spendingAllocation", { defaultValue: "Category Allocation" })}
+          </AppText>
+          <AppText style={[styles.splitTotal, { color: textSecondary }]}>
+            {currency} {formatNumber(monthlyData[selectedIdx]?.amount || totalSpent)}
+          </AppText>
+        </View>
+
+        {/* Multi-color Split Bar */}
+        <View style={styles.multiColorTrack}>
+          {categoriesSplit.map((cat, idx) => (
+            <View
+              key={idx}
+              style={{
+                width: `${cat.percent}%`,
+                height: "100%",
+                backgroundColor: cat.color,
+              }}
+            />
+          ))}
+        </View>
+
+        {/* Legend Row */}
+        <View style={styles.legendRow}>
+          {categoriesSplit.map((cat, idx) => (
+            <View key={idx} style={styles.legendItem}>
+              <View style={[styles.dot, { backgroundColor: cat.color }]} />
+              <AppText style={styles.legendText}>
+                {cat.label} ({cat.percent}%)
+              </AppText>
+            </View>
+          ))}
         </View>
       </View>
     </View>
@@ -119,50 +175,59 @@ export default function BuyerSpendingChartWidget({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    padding: 20,
-    marginBottom: 20,
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 16,
+    marginBottom: 16,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
+    alignItems: "flex-start",
+    marginBottom: 14,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: "800",
+  },
+  subtitle: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  avgBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "#EFF6FF",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+  avgBadgeText: {
+    fontSize: 11,
     fontWeight: "700",
-    color: "#0F172A",
   },
-  timeframe: {
-    fontSize: 13,
-    color: "#64748B",
-    fontWeight: "500",
-  },
-  chartContainer: {
-    height: 180,
+  chartArea: {
     position: "relative",
-    justifyContent: "flex-end",
+    marginBottom: 14,
   },
   yAxisLines: {
     position: "absolute",
     left: 0,
     right: 0,
-    top: 10,
-    bottom: 30,
+    top: 24,
+    bottom: 24,
     justifyContent: "space-between",
   },
-  gridLineRow: {
+  gridRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
   },
-  yAxisLabel: {
-    width: 30,
-    fontSize: 11,
+  yAxisText: {
+    fontSize: 10,
     color: "#94A3B8",
-    textAlign: "right",
+    width: 24,
   },
   dashedLine: {
     flex: 1,
@@ -174,98 +239,105 @@ const styles = StyleSheet.create({
   solidLine: {
     flex: 1,
     height: 1,
-    backgroundColor: "#CBD5E1",
+    backgroundColor: "#E2E8F0",
   },
-  barsContainer: {
+  barsRow: {
     flexDirection: "row",
-    paddingLeft: 40,
-    paddingRight: 10,
     justifyContent: "space-around",
     alignItems: "flex-end",
-    height: 150,
+    paddingLeft: 30,
+    height: 155,
   },
-  col: {
+  barCol: {
     alignItems: "center",
-    position: "relative",
-    flex: 1,
+    width: 48,
   },
-  tooltipCallout: {
+  tooltipPill: {
     position: "absolute",
-    top: -34,
-    backgroundColor: "#1E1B4B",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
-    zIndex: 10,
+    top: -24,
+    backgroundColor: "#0F172A",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
     alignItems: "center",
+    zIndex: 10,
   },
   tooltipText: {
     color: "#FFFFFF",
-    fontSize: 11,
-    fontWeight: "700",
+    fontSize: 10.5,
+    fontWeight: "800",
   },
   tooltipArrow: {
     width: 0,
     height: 0,
-    borderLeftWidth: 5,
-    borderRightWidth: 5,
-    borderTopWidth: 5,
+    borderLeftWidth: 4,
+    borderRightWidth: 4,
+    borderTopWidth: 4,
     borderStyle: "solid",
+    backgroundColor: "transparent",
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
-    borderTopColor: "#1E1B4B",
-    bottom: -5,
-    position: "absolute",
+    borderTopColor: "#0F172A",
+    alignSelf: "center",
   },
-  barTrack: {
-    width: 44,
-    borderRadius: 14,
+  barContainer: {
+    width: 22,
+    backgroundColor: "#F1F5F9",
+    borderRadius: 12,
     justifyContent: "flex-end",
     overflow: "hidden",
-    position: "relative",
-  },
-  selectedTrack: {
-    backgroundColor: "rgba(244, 63, 94, 0.12)", // Pink highlight matching Image 2
   },
   barFill: {
     width: "100%",
-    borderRadius: 14,
+    borderRadius: 12,
   },
-  normalBarFill: {
-    backgroundColor: "rgba(56, 189, 248, 0.25)",
-  },
-  selectedBarFill: {
-    backgroundColor: "rgba(56, 189, 248, 0.6)",
-  },
-  nodeDot: {
-    position: "absolute",
-    left: "50%",
-    marginLeft: -6,
-    marginBottom: -6,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 3,
-    borderColor: "#38BDF8",
-    zIndex: 5,
-  },
-  selectedNodeDot: {
-    borderColor: "#1E1B4B",
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    marginLeft: -7,
-    marginBottom: -7,
-  },
-  xAxisLabel: {
-    marginTop: 8,
+  monthText: {
     fontSize: 12,
+    marginTop: 6,
+  },
+  splitSection: {
+    paddingTop: 12,
+    borderTopWidth: 1,
+  },
+  splitHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  splitTitle: {
+    fontSize: 12.5,
+    fontWeight: "700",
+  },
+  splitTotal: {
+    fontSize: 12.5,
+    fontWeight: "700",
+  },
+  multiColorTrack: {
+    height: 8,
+    borderRadius: 4,
+    overflow: "hidden",
+    flexDirection: "row",
+    marginBottom: 8,
+  },
+  legendRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+  },
+  legendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+  dot: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+  },
+  legendText: {
+    fontSize: 11,
     color: "#64748B",
     fontWeight: "500",
-  },
-  selectedXAxisLabel: {
-    color: "#0F172A",
-    fontWeight: "700",
   },
 });

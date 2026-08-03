@@ -43,11 +43,16 @@
     "farmersCount": "Qonnaan Bultoota {{count}}",
     "verified": "Mirkanaa'eera",
     "getDirectQuotes": "Qonnaan bultoota naannoo irraa kallattiin gatii jumlaa argadhu.",
-    "mySpending": "Baasii Koo",
-    "last4Months": "Ji'oota 4n Darban",
+    "mySpending": "Baasii Bittaa Koo",
+    "last4Months": "Caccaba Ji'oota 4n Darban",
     "procurementCategories": "Ramaddii Bittaa",
-    "priceTrends": "Haala Gatii",
+    "spendingAllocation": "Qoodamsa Baasii",
+    "mobileMoney": "Kaffaltii Moobayilaa",
+    "bankTransfer": "Dabarsa Baankii",
+    "cbeBirr": "CBE Birr",
+    "priceTrends": "Haala Gatii Jumlaa",
     "viewFullAnalysis": "Xiinxala Gabaa Guutuu Ilaali",
+    "fullMarketAnalysis": "Xiinxala Gabaa Guutuu →",
     "specialityDefault": "Xaafii fi shunkurtii irratti xiyyeeffata",
     "viewFarmStock": "Maasii fi Kuusaa Ilaali",
     "recentActivityTitle": "Sochiiwwan Dhiyeenyaa"
@@ -233,6 +238,6 @@
     "confirmSendOrder": "Mirkaneessi fi Ergi"
   },
   "sourcing": {
-    "notesPlaceholder": "Fkn: Qonnaan bulaa tokko irraa yoo xiqqaate kuntaala 10..."
+    "notesPlaceholder": "Fkn: Qonnaan bulaa tokko irraa yoo xiqqaate kunt 10..."
   }
 }

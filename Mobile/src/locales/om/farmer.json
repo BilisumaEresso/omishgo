@@ -39,7 +39,7 @@
     "listHarvest": "Oomisha Maxxansi",
     "cropStockMgmt": "To'annoo Kuusaa Oomishaa",
     "totalActiveVolume": "Hanga Oomishaa Gabaarra Jiruu",
-    "quintalsAbbr": "kuntaala (ku)",
+    "quintalsAbbr": "kunt (ku)",
     "estimatedValue": "Tilmaama Gatii Kuusaa Waligalaa",
     "liveOnMarket": "Gabaarra Kan Jiru",
     "activeHarvestCrops": "Oomishaalee Ammaa",
@@ -138,6 +138,9 @@
   },
   "farmerAnalytics": {
     "title": "Haala Gabaa fi Gurgurtaa",
+    "nationalAnalyticsTitle": "Ragaa Gabaa Biyyoolessaa",
+    "heroHeader": "Gatii Jumlaa fi Fedhii Itoophiyaa",
+    "heroSub": "Odeeffannoo gatii gabaa jumlaa yeroo dhugaa giddala daldala naannoo Itoophiyaa.",
     "thisWeek": "Torbee Kana",
     "totalProducts": "Oomishaalee",
     "totalRevenue": "Galii",
@@ -154,13 +157,13 @@
     "cropWheat": "Qamadii",
     "storePerformance": "Raawwii Gurgurtaa Kee",
     "sellHarvest": "Oomisha Gurguri",
-    "buyerDemandByLoc": "Fedhii Bitataa Bakkaan",
+    "buyerDemandByLoc": "Fedhii Bitataa Giddu-gala Naannootiin",
     "postOnionListing": "Oomisha Shunkurtii Maxxansi →",
     "postCoffeeListing": "Oomisha Bunaa Maxxansi →",
     "advisoryOnionTitle": "Adaamaatti Gatiin Shunkurtii Dabaleera",
-    "advisoryOnionBody": "Shawaa Bahaatti gatiin jumlaa shunkurtii +5.8% (4,500 Birrii/kuntaala) dabaleera. Gatii gaarii argachuuf amma maxxansi.",
-    "advisoryCoffeeTitle": "Harargeetti Fedhiin Bunaa Ol aanaadha",
-    "advisoryCoffeeBody": "Harargeetti bitattoonni 185 buna barbaadaa jiru. Ajaja saffisaa argachuuf oomisha kee maxxansi."
+    "advisoryOnionBody": "Shawaa Bahaatti gatiin jumlaa shunkurtii +5.8% (4,500 Birrii/kunt) dabaleera. Gatii gaarii argachuuf amma maxxansi.",
+    "advisoryCoffeeTitle": "Jimmaatti Fedhiin Bunaa Ol aanaadha",
+    "advisoryCoffeeBody": "Jimmaatti bitattoonni 185 buna barbaadaa jiru. Ajaja saffisaa argachuuf oomisha kee maxxansi."
   },
   "priceTrends": {
     "today": "Har'a"

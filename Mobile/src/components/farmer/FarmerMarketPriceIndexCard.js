@@ -20,7 +20,7 @@ export default function FarmerMarketPriceIndexCard({
 
   const defaultTrends = [
     { crop: "Red Onion", region: "Addis Ababa", price: "4,500 ETB/q", demandChange: "+15%", isUp: true },
-    { crop: "White Teff", region: "Regional Hub", price: "5,200 ETB/q", demandChange: "+8%", isUp: true },
+    { crop: "Teff", region: "Regional Hub", price: "5,200 ETB/q", demandChange: "+8%", isUp: true },
     { crop: "Tomato", region: "Adama", price: "3,800 ETB/q", demandChange: "-2%", isUp: false },
   ];
 

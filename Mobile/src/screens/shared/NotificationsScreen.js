@@ -23,6 +23,7 @@ import {
   getLocalizedRegionName,
 } from "../../constants/locations";
 import { formatNumber } from "../../utils/formatNumber";
+import { formatLocalizedDate } from "../../utils/ethiopianDate";
 
 const TYPE_CONFIG = {
   new_message: { icon: "chatbubbles", color: "#2563EB", label: "Message" },
@@ -108,12 +109,10 @@ export default function NotificationsScreen({ navigation }) {
   const formatNotifTime = (createdAt, fallbackTime) => {
     if (!createdAt) return fallbackTime || "";
     try {
-      const d = new Date(createdAt);
-      return d.toLocaleDateString(currentLang === "am" ? "am-ET" : currentLang === "om" ? "om-ET" : "en-GB", {
-        day: "numeric",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit",
+      return formatLocalizedDate(createdAt, currentLang, {
+        includeDayOfWeek: true,
+        includeYear: false,
+        relative: true,
       });
     } catch (e) {
       return fallbackTime || "";

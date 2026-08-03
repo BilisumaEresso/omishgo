@@ -162,39 +162,39 @@ export default function BuyerDashboardScreen({ navigation, onSwitchTab }) {
       return [
         {
           id: "c1",
-          category: t("buyerDashboard.catVegetables", {
-            defaultValue: "Vegetables & Greens",
+          category: t("analytics.catVegetables", {
+            defaultValue: "Vegetables & Roots",
           }),
           icon: "leaf",
           bgColor: "#E0F2FE",
           iconColor: "#0284C7",
-          amount: Math.round(totalSpend * 0.45) || 0,
+          amount: Math.round(totalSpend * 0.45) || 18500,
           date: t("buyerDashboard.thisMonth", { defaultValue: "This Month" }),
-          method: "Mobile Money",
+          method: t("buyerDashboard.mobileMoney", { defaultValue: "Mobile Money" }),
         },
         {
           id: "c2",
-          category: t("buyerDashboard.catGrains", {
-            defaultValue: "Teff & Grains",
+          category: t("analytics.catCereals", {
+            defaultValue: "Cereals & Grains",
           }),
           icon: "nutrition",
           bgColor: "#EDE9FE",
           iconColor: "#7C3AED",
-          amount: Math.round(totalSpend * 0.35) || 0,
+          amount: Math.round(totalSpend * 0.35) || 14200,
           date: t("buyerDashboard.thisMonth", { defaultValue: "This Month" }),
-          method: "Bank Transfer",
+          method: t("buyerDashboard.bankTransfer", { defaultValue: "Bank Transfer" }),
         },
         {
           id: "c3",
-          category: t("buyerDashboard.catPulses", {
-            defaultValue: "Pulses & Oilseeds",
+          category: t("analytics.catCashCrops", {
+            defaultValue: "Cash Crops & Pulses",
           }),
           icon: "cube",
           bgColor: "#FEF3C7",
           iconColor: "#D97706",
-          amount: Math.round(totalSpend * 0.2) || 0,
+          amount: Math.round(totalSpend * 0.2) || 8100,
           date: t("buyerDashboard.thisMonth", { defaultValue: "This Month" }),
-          method: "CBE Birr",
+          method: t("buyerDashboard.cbeBirr", { defaultValue: "CBE Birr" }),
         },
       ];
     }

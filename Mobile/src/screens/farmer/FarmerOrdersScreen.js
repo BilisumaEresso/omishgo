@@ -24,10 +24,11 @@ import { useTheme } from "../../hooks/useTheme";
 import { getOrderStatusConfig } from "../../constants/statuses";
 import { getLocalizedCropName, getLocalizedCropDisplayName, getCropFallbackImage } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
-import { formatNumber } from "../../utils/formatNumber";
+import { formatLocalizedDate } from "../../utils/ethiopianDate";
 
 export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
   const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
   const { theme } = useTheme();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -60,10 +61,9 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
         buyerPhone: o.buyerId?.phone || null,
         buyerId: o.buyerId?._id || o.buyerId,
         status: o.status || "pending",
-        date: new Date(o.createdAt).toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
+        date: formatLocalizedDate(o.createdAt, currentLang, {
+          includeDayOfWeek: true,
+          includeYear: true,
         }),
         _raw: o,
       }));
@@ -101,8 +101,6 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
     if (activeFilter === "all") return orders;
     return orders.filter((o) => o.status === activeFilter);
   }, [orders, activeFilter]);
-
-  const currentLang = i18n.language || "en";
 
   const renderStatusBadge = (statusKey) => {
     const config = getOrderStatusConfig(statusKey, currentLang);

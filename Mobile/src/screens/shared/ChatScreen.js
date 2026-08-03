@@ -23,6 +23,7 @@ import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
 
 import { getLocalizedCropDisplayName } from "../../constants/crops";
+import { formatLocalizedDate } from "../../utils/ethiopianDate";
 
 const POLL_INTERVAL_MS = 5000;
 
@@ -155,7 +156,8 @@ const MessageBubble = ({ message, isMe, showAvatar, avatarLetter, theme, onAccep
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 export default function ChatScreen({ route, navigation }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const currentUser = useAuthStore((state) => state.user);
@@ -320,9 +322,13 @@ export default function ChatScreen({ route, navigation }) {
 
     for (let i = messages.length - 1; i >= 0; i--) {
       const msg = messages[i];
-      const msgDateStr = new Date(msg.createdAt).toDateString();
+      const formattedGroupDate = formatLocalizedDate(msg.createdAt, currentLang, {
+        includeDayOfWeek: true,
+        includeYear: false,
+        relative: true,
+      });
 
-      if (currentDateGroup !== null && currentDateGroup !== msgDateStr) {
+      if (currentDateGroup !== null && currentDateGroup !== formattedGroupDate) {
         reversed.push({
           type: "date",
           date: currentDateGroup,
@@ -330,7 +336,7 @@ export default function ChatScreen({ route, navigation }) {
         });
       }
 
-      currentDateGroup = msgDateStr;
+      currentDateGroup = formattedGroupDate;
       reversed.push({ type: "message", ...msg, id: msg._id });
     }
 

@@ -2,6 +2,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "@react-navigation/native";
 import {
   ActivityIndicator,
   Image,
@@ -21,9 +22,9 @@ import { getOrderStatusConfig } from "../../constants/statuses";
 import { getLocalizedCropName, getLocalizedCropDisplayName, getCropFallbackImage } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
 
-import { useTheme } from "../../hooks/useTheme";
 import { API_ENDPOINTS } from "../../constants/api";
 import { formatNumber } from "../../utils/formatNumber";
+import { formatLocalizedDate } from "../../utils/ethiopianDate";
 
 export default function BuyerOrdersScreen({ navigation, onSwitchTab }) {
   const { t, i18n } = useTranslation();
@@ -60,10 +61,9 @@ export default function BuyerOrdersScreen({ navigation, onSwitchTab }) {
         farmerPhone: o.farmerId?.phone || null,
         farmerId: o.farmerId?._id || o.farmerId,
         status: o.status || "pending",
-        orderedDate: new Date(o.createdAt || Date.now()).toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
+        orderedDate: formatLocalizedDate(o.createdAt || Date.now(), currentLang, {
+          includeDayOfWeek: true,
+          includeYear: true,
         }),
         _raw: o,
       }));

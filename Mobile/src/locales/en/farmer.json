@@ -138,6 +138,9 @@
   },
   "farmerAnalytics": {
     "title": "Market Insights & Sales",
+    "nationalAnalyticsTitle": "National Market Intelligence",
+    "heroHeader": "Ethiopian Wholesale Rates & Demand",
+    "heroSub": "Real-time wholesale market index across regional trade terminals in Ethiopia.",
     "thisWeek": "This Week",
     "totalProducts": "Products",
     "totalRevenue": "Revenue",
@@ -154,13 +157,13 @@
     "cropWheat": "Wheat",
     "storePerformance": "Your Store Performance",
     "sellHarvest": "Sell Harvest",
-    "buyerDemandByLoc": "Buyer Demand by Location",
+    "buyerDemandByLoc": "Buyer Demand by Regional Hubs",
     "postOnionListing": "Post Onion Listing →",
     "postCoffeeListing": "Post Coffee Listing →",
     "advisoryOnionTitle": "Onion Price Rise in Adama",
     "advisoryOnionBody": "Wholesale onion prices are up +5.8% (ETB 4,500 / quintal) in East Shewa. Post your harvest today to secure good prices.",
-    "advisoryCoffeeTitle": "High Demand for Coffee in Harar",
-    "advisoryCoffeeBody": "185 buyers are searching for Coffee Beans in Harar. List your stock to get instant buyer orders."
+    "advisoryCoffeeTitle": "High Demand for Coffee in Jimma",
+    "advisoryCoffeeBody": "185 buyers are searching for Coffee Beans in Jimma. List your stock to get instant buyer orders."
   },
   "priceTrends": {
     "today": "Today"

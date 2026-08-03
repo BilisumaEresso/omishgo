@@ -5,6 +5,7 @@ import { useTheme } from "../../hooks/useTheme";
 import AppText from "../common/AppText";
 import { getLocalizedCropName, CROP_TYPES, getCropFallbackImage } from "../../constants/crops";
 import { getLocalizedUnitName, UNITS } from "../../constants/units";
+import { formatLocalizedDate } from "../../utils/ethiopianDate";
 
 export default function RecentActivityList({ activities = [], onActivityPress }) {
   const { t, i18n } = useTranslation();
@@ -44,11 +45,10 @@ export default function RecentActivityList({ activities = [], onActivityPress })
     try {
       const d = new Date(timeStr);
       if (isNaN(d.getTime())) return localizeText(timeStr);
-      return d.toLocaleDateString(currentLang === "am" ? "am-ET" : currentLang === "om" ? "om-ET" : "en-GB", {
-        day: "numeric",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit",
+      return formatLocalizedDate(timeStr, currentLang, {
+        includeDayOfWeek: true,
+        includeYear: false,
+        relative: true,
       });
     } catch (e) {
       return localizeText(timeStr);

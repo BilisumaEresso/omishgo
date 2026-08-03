@@ -138,6 +138,9 @@
   },
   "farmerAnalytics": {
     "title": "የገበያ ሁኔታ እና ሽያጭ",
+    "nationalAnalyticsTitle": "ሀገራዊ የገበያ መረጃ",
+    "heroHeader": "የኢትዮጵያ የጅምላ ዋጋዎች እና ፍላጎት",
+    "heroSub": "በኢትዮጵያ በክልል ንግድ ማዕከላት የጅምላ ገበያ መረጃ።",
     "thisWeek": "በዚህ ሳምንት",
     "totalProducts": "ምርቶች",
     "totalRevenue": "ገቢ",
@@ -154,13 +157,13 @@
     "cropWheat": "ስንዴ",
     "storePerformance": "የሽያጭ ክንውንዎ",
     "sellHarvest": "ምርት ይሽጡ",
-    "buyerDemandByLoc": "የገዢ ፍላጎት በቦታ",
+    "buyerDemandByLoc": "የገዢ ፍላጎት በክልል ማዕከላት",
     "postOnionListing": "የሽንኩርት ምርት ያቅርቡ →",
     "postCoffeeListing": "የቡና ምርት ያቅርቡ →",
     "advisoryOnionTitle": "በአዳማ የሽንኩርት ዋጋ ጨምሯል",
     "advisoryOnionBody": "በምስራቅ ሸዋ የጅምላ ሽንኩርት ዋጋ +5.8% (4,500 ብር/ኩንታል) ጨምሯል። ጥሩ ዋጋ ለማግኘት ምርትዎን አሁን ያቅርቡ።",
-    "advisoryCoffeeTitle": "በሐረር ከፍተኛ የቡና ፍላጎት አለ",
-    "advisoryCoffeeBody": "በሐረር 185 ገዢዎች ቡና እየፈለጉ ነው። ፈጣን ትዕዛዝ ለማግኘት ምርትዎን ያቅርቡ።"
+    "advisoryCoffeeTitle": "በጅማ ከፍተኛ የቡና ፍላጎት አለ",
+    "advisoryCoffeeBody": "በጅማ 185 ገዢዎች ቡና እየፈለጉ ነው። ፈጣን ትዕዛዝ ለማግኘት ምርትዎን ያቅርቡ።"
   },
   "priceTrends": {
     "today": "ዛሬ"

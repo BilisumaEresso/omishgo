@@ -3,19 +3,21 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, View } from "react-native";
 import AppText from "../../common/AppText";
 import { getLocalizedUnitName } from "../../../constants/units";
+import { getLocalizedMarket, cleanCityName } from "../../../constants/markets";
 
 export default function RegionalPriceComparison({
   hubs = [
-    { city: "Addis Ababa (Mercato Hub)", region: "Capital", price: "4,850", rawPrice: 4850, unit: "q", supply: "normal", distance: "Capital Center" },
-    { city: "Adama Central Hub", region: "Oromia", price: "4,600", rawPrice: 4600, unit: "q", supply: "high", distance: "95 km" },
-    { city: "Hawassa Market Hub", region: "Sidama", price: "4,400", rawPrice: 4400, unit: "q", supply: "high", distance: "275 km" },
-    { city: "Bahir Dar Grain Hub", region: "Amhara", price: "4,700", rawPrice: 4700, unit: "q", supply: "normal", distance: "560 km" },
-    { city: "Mekelle Terminal Hub", region: "Tigray", price: "4,950", rawPrice: 4950, unit: "q", supply: "scarcity", distance: "780 km" },
+    { city: "Addis Ababa", marketId: "addis_merkato", region: "Capital", price: "4,850", rawPrice: 4850, unit: "q", supply: "normal", distance: "Capital Center" },
+    { city: "Adama", marketId: "adama_grain", region: "Oromia", price: "4,600", rawPrice: 4600, unit: "q", supply: "high", distance: "95 km" },
+    { city: "Hawassa", marketId: "hawassa_hub", region: "Sidama", price: "4,400", rawPrice: 4400, unit: "q", supply: "high", distance: "275 km" },
+    { city: "Bahir Dar", marketId: "bahir_dar_market", region: "Amhara", price: "4,700", rawPrice: 4700, unit: "q", supply: "normal", distance: "560 km" },
+    { city: "Meki", marketId: "meki_produce", region: "Oromia", price: "4,100", rawPrice: 4100, unit: "q", supply: "high", distance: "90 km" },
   ],
   primaryColor = "#15803D",
   isFarmer = true,
 }) {
   const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || "en";
   // Find highest price hub & lowest price hub
   const maxPriceObj = hubs.reduce((max, h) => (h.rawPrice > max.rawPrice ? h : max), hubs[0]);
   const minPriceObj = hubs.reduce((min, h) => (h.rawPrice < min.rawPrice ? h : min), hubs[0]);
@@ -50,12 +52,15 @@ export default function RegionalPriceComparison({
           const badge = getSupplyBadge(hub.supply);
           const isHighest = hub.city === maxPriceObj.city;
           const isLowest = hub.city === minPriceObj.city;
+          const marketInfo = getLocalizedMarket(hub.marketId || hub.city, currentLang);
+          const displayCity = marketInfo.city || cleanCityName(hub.city);
 
           return (
-            <View key={hub.city} style={[styles.hubRow, idx < hubs.length - 1 && styles.borderBottom]}>
+            <View key={hub.city + idx} style={[styles.hubRow, idx < hubs.length - 1 && styles.borderBottom]}>
               <View style={styles.leftGroup}>
                 <View style={styles.nameTagRow}>
-                  <AppText style={styles.cityName}>{hub.city}</AppText>
+                  <AppText style={styles.cityName}>{displayCity}</AppText>
+                  <AppText style={styles.marketHubSub}>{marketInfo.name}</AppText>
 
                   {isHighest && isFarmer && (
                     <View style={styles.recommendTag}>
@@ -213,5 +218,10 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: "#64748B",
     fontWeight: "600",
+  },
+  marketHubSub: {
+    fontSize: 11.5,
+    color: "#64748B",
+    fontWeight: "500",
   },
 });

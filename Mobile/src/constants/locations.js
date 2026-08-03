@@ -1446,3 +1446,121 @@ export const getLocalizedWeredaName = (wereda, lang = "en") => {
   if (code === "en") return wereda;
   return WEREDA_TRANSLATIONS[code]?.[wereda] || wereda;
 };
+
+export const MARKET_PLACES = [
+  {
+    id: "addis_merkato",
+    name: "Addis Ababa (Merkato)",
+    city: "Addis Ababa",
+    region: "Addis Ababa",
+    zone: "Addis Ababa",
+    type: "Central Wholesale Hub",
+    primaryCrop: "Teff",
+    translations: {
+      am: "አዲስ አበባ (መርካቶ)",
+      om: "Finfinnee (Malkaatoo)",
+    },
+  },
+  {
+    id: "adama_grain",
+    name: "Adama Grain Exchange",
+    city: "Adama Town",
+    region: "Oromia",
+    zone: "East Shewa",
+    type: "Regional Grain & Vegetable Market",
+    primaryCrop: "Red Onion",
+    translations: {
+      am: "አዳማ የእህል ገበያ",
+      om: "Gabaa Midhaan Adaamaa",
+    },
+  },
+  {
+    id: "meki_produce",
+    name: "Meki Vegetable Terminal",
+    city: "Meki Town",
+    region: "Oromia",
+    zone: "East Shewa",
+    type: "Irrigation Produce Hub",
+    primaryCrop: "Tomato",
+    translations: {
+      am: "መልካ የአትክልት ገበያ",
+      om: "Malkaa Kuduraa Makkii",
+    },
+  },
+  {
+    id: "bishoftu_market",
+    name: "Bishoftu Wholesale Market",
+    city: "Bishoftu Town",
+    region: "Oromia",
+    zone: "East Shewa",
+    type: "Central Pulse & Grain Depot",
+    primaryCrop: "Garlic",
+    translations: {
+      am: "ቢሾፍቱ የጅምላ ገበያ",
+      om: "Gabaa Jumlaa Bishooftuu",
+    },
+  },
+  {
+    id: "jimma_coffee",
+    name: "Jimma Coffee & Commodity Hub",
+    city: "Jimma Town",
+    region: "Oromia",
+    zone: "Jimma",
+    type: "Cash Crop Exchange",
+    primaryCrop: "Coffee",
+    translations: {
+      am: "ጅማ የቡና እና ምርት ማዕከል",
+      om: "Giddu-gala Bunaa fi Oomisha Jimmaa",
+    },
+  },
+  {
+    id: "shashemene_interchange",
+    name: "Shashemene Produce Terminal",
+    city: "Shashemene Town",
+    region: "Oromia",
+    zone: "West Arsi",
+    type: "Southern Trade Depot",
+    primaryCrop: "Potato",
+    translations: {
+      am: "ሻሸመኔ የንግድ ማዕከል",
+      om: "Giddu-gala Daldala Shaashamannee",
+    },
+  },
+  {
+    id: "asella_terminal",
+    name: "Asella Wheat Terminal",
+    city: "Asella Town",
+    region: "Oromia",
+    zone: "Arsi",
+    type: "Grain Terminal",
+    primaryCrop: "Wheat",
+    translations: {
+      am: "አሰላ የስንዴ ገበያ",
+      om: "Gabaa Qamadii Asellaa",
+    },
+  },
+  {
+    id: "hawassa_hub",
+    name: "Hawassa Regional Market",
+    city: "Hawassa",
+    region: "Sidama",
+    zone: "Sidama",
+    type: "Southern Regional Hub",
+    primaryCrop: "Maize",
+    translations: {
+      am: "ሐዋሳ የክልል ገበያ",
+      om: "Gabaa Naannoo Hawaasaa",
+    },
+  },
+];
+
+export const getLocalizedMarketName = (marketId, lang = "en") => {
+  if (!marketId) return "";
+  const code = normalizeLang(lang);
+  const m = MARKET_PLACES.find(
+    (mp) => mp.id === marketId || mp.name === marketId || mp.city === marketId,
+  );
+  if (!m) return marketId;
+  if (code === "en") return m.name;
+  return m.translations?.[code] || m.name;
+};

@@ -21,6 +21,7 @@ import OrderProgressMap from "../../components/orders/OrderProgressMap";
 import { getCropFallbackImage, getLocalizedCropName, getLocalizedCropDisplayName } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
 import { formatNumber } from "../../utils/formatNumber";
+import { formatLocalizedDate } from "../../utils/ethiopianDate";
 
 const STATUS_CONFIG = {
   pending:   { bg: "#FEF3C7", text: "#B45309", icon: "time-outline",            labelKey: "buyerOrders.statusPending" },
@@ -75,10 +76,9 @@ export default function OrderDetailScreen({ route, navigation }) {
   const orderIdDisplay = `#ORD-${shortId}`;
 
   const date = order.createdAt
-    ? new Date(order.createdAt).toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
+    ? formatLocalizedDate(order.createdAt, currentLang, {
+        includeDayOfWeek: true,
+        includeYear: true,
       })
     : t("common.recently", { defaultValue: "Recently" });
 
