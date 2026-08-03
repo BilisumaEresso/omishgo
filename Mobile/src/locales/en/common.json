@@ -29,5 +29,8 @@
     "unknownPhone": "Phone Not Provided",
     "defaultHarvestCrop": "Harvest Crop",
     "unitQuintal": "quintal"
+  },
+  "splash": {
+    "subtitle": "Simple, Profitable, Trusted"
   }
 }

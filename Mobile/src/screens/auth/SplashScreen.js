@@ -50,6 +50,8 @@ export default function SplashScreen() {
   const primary = colors.primary || PALETTE.emerald;
   const accent = colors.accent || PALETTE.jade;
   const background = colors.background || PALETTE.mist;
+  const textPrimary = colors.textPrimary || PALETTE.deep;
+  const textSecondary = colors.textSecondary || PALETTE.inkSoft;
 
   // ---- Entrance values --------------------------------------------------
   const bgOpacity = useRef(new Animated.Value(0)).current;
@@ -325,7 +327,7 @@ export default function SplashScreen() {
                 { scale: Animated.multiply(logoScale, logoPulse) },
                 { rotate: logoRotateDeg },
               ],
-              shadowColor: PALETTE.deep,
+              shadowColor: colors.shadow || PALETTE.deep,
             },
           ]}
         >
@@ -350,7 +352,7 @@ export default function SplashScreen() {
                 key={`${ch}-${i}`}
                 style={{ opacity: a, transform: [{ translateY }] }}
               >
-                <AppText style={[styles.brand, { color: PALETTE.deep }]}>
+                <AppText style={[styles.brand, { color: textPrimary }]}>
                   {ch}
                 </AppText>
               </Animated.View>
@@ -373,7 +375,7 @@ export default function SplashScreen() {
             transform: [{ translateY: taglineY }],
           }}
         >
-          <AppText style={styles.tagline}>{t("splash.subtitle")}</AppText>
+          <AppText style={[styles.tagline, { color: textSecondary }]}>{t("splash.subtitle")}</AppText>
         </Animated.View>
       </View>
 
@@ -464,7 +466,6 @@ const styles = StyleSheet.create({
   },
   tagline: {
     fontSize: 14.5,
-    color: PALETTE.inkSoft,
     marginTop: 14,
     textAlign: "center",
     maxWidth: 280,

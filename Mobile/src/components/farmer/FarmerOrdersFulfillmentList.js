@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import AppText from "../common/AppText";
 import { getOrderStatusConfig } from "../../constants/statuses";
-import { getLocalizedCropName } from "../../constants/crops";
+import { getLocalizedCropName, getLocalizedCropDisplayName } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
 import { formatNumber } from "../../utils/formatNumber";
 
@@ -40,7 +40,8 @@ export default function FarmerOrdersFulfillmentList({
           {orders.slice(0, 4).map((o, idx) => {
             const isLast = idx === Math.min(orders.length, 4) - 1;
             const statusConfig = getOrderStatusConfig(o.status, currentLang);
-            const cropName = getLocalizedCropName(o.cropType || t("common.defaultHarvestCrop", { defaultValue: "Harvest Crop" }), currentLang);
+            const rawCrop = o.cropType || t("common.defaultHarvestCrop", { defaultValue: "Harvest Crop" });
+            const cropName = getLocalizedCropDisplayName(rawCrop, o.variety || o.productId?.variety, currentLang, t);
             const unitLabel = getLocalizedUnitName(o.unit || "q", currentLang);
             const amount = o.totalPrice ? `${formatNumber(o.totalPrice)} ETB` : t("farmerProducts.priceUnavailable", { defaultValue: "Pending Quote" });
 

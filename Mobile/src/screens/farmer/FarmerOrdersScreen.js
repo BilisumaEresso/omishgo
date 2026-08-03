@@ -143,7 +143,7 @@ export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
           })()}
           <View style={{ flex: 1 }}>
             <AppText style={[styles.cropTitle, { color: textPrimary }]}>
-              {getLocalizedCropName(item.cropType, currentLang, t)}
+              {getLocalizedCropDisplayName(item.cropType, item._raw?.variety || item._raw?.productId?.variety, currentLang, t)}
             </AppText>
             <AppText style={styles.volumeText}>
               {t("orders.quantityLabel", { defaultValue: "Quantity:" })} <AppText style={styles.boldText}>{item.quantity} {getLocalizedUnitName(item.unit, currentLang, t)}</AppText>
