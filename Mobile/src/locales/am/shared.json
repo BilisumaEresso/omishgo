@@ -166,7 +166,24 @@
     "preferencesAndSettings": "ምርጫዎች",
     "marketPriceIndexSub": "ሃገራዊ የጅምላ ዋጋዎች",
     "producerSupport": "እርዳታ እና ድጋፍ",
-    "callSupportSub": "ለድጋፍ ይደውሉ (0938730818)"
+    "callSupportSub": "ለድጋፍ ይደውሉ (0938730818)",
+    "appSettingsTitle": "የመተግበሪያ ቅንብሮች እና ግላዊነት",
+    "appSettingsSub": "ማሳወቂያዎች፣ ፒን፣ ቋንቋ እና የህዝብ መገለጫ አስተዳድር",
+    "publicProfileQRTitle": "የእኔ የህዝብ መገለጫ እና QR ኮድ",
+    "publicProfileQRSub": "የጅምላ ገዢዎች እና አጋሮች መገለጫዎን እንዲያረጋግጡ የQR ኮድ ሊንክዎን ያጋሩ።",
+    "copyLink": "ሊንክ ቅዳ",
+    "shareBtn": "መገለጫ አጋራ",
+    "linkCopiedTitle": "ሊንክ ተቀድቷል!",
+    "linkCopiedMsg": "የህዝብ መገለጫ ሊንክዎ ወደ ክሊፕቦርድ ተቀድቷል።"
+  },
+  "review": {
+    "ratingSummary": "{{rating}} ★ ({{count}} ግምገማዎች)",
+    "noReviewsYet": "ምንም ግምገማ አልተሰጠም",
+    "farmerFeedbackTitle": "የገዢዎች ግምገማ እና ደረጃ ({{count}})",
+    "noReviewsFarmerSub": "ገዢዎች ያደረሱትን ትዕዛዝ ተቀብለው ሲገመግሙ ደረጃቸው እዚህ ይታያል።",
+    "anonymousBuyer": "የጅምላ ገዥ",
+    "customerReviewsTitle": "የገዢዎች ግምገማ እና ደረጃ ({{count}})",
+    "noReviewsYetSub": "ለዚህ አምራች የተረከቡ ትዕዛዞች የገዢ ግምገማ እና አስተያየት እዚህ ይታያሉ።"
   },
   "notificationsScreen": {
     "title": "ማሳወቂያዎች",

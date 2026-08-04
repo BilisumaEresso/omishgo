@@ -341,6 +341,24 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
           })}
         </AppText>
 
+        {/* Full App Settings Navigation */}
+        <TouchableOpacity
+          style={styles.settingItem}
+          onPress={() => navigation?.navigate("Settings")}
+          activeOpacity={0.8}
+        >
+          <View style={styles.settingLeft}>
+            <View style={[styles.iconWrap, { backgroundColor: "rgba(37, 99, 235, 0.1)" }]}>
+              <Ionicons name="settings-outline" size={20} color="#2563EB" />
+            </View>
+            <View>
+              <AppText style={styles.settingTitle}>{t("profile.appSettingsTitle", { defaultValue: "App Settings & Privacy" })}</AppText>
+              <AppText style={styles.settingSub}>{t("profile.appSettingsSub", { defaultValue: "Manage notifications, PIN, language & public profile" })}</AppText>
+            </View>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color="#64748B" />
+        </TouchableOpacity>
+
         {/* Language Selector */}
         <TouchableOpacity
           style={styles.settingItem}

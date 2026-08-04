@@ -125,7 +125,11 @@ export default function FarmerProfileScreen({ route, navigation }) {
             <>
               <Ionicons name="star" size={14} color="#F59E0B" />
               <AppText style={styles.ratingText}>
-                {`${(farmer.averageRating || 0).toFixed(1)} ★ (${farmer.ratingCount} ${farmer.ratingCount === 1 ? "review" : "reviews"})`}
+                {t("review.ratingSummary", {
+                  rating: (farmer.averageRating || 0).toFixed(1),
+                  count: farmer.ratingCount,
+                  defaultValue: `${(farmer.averageRating || 0).toFixed(1)} ★ (${farmer.ratingCount} ${farmer.ratingCount === 1 ? "review" : "reviews"})`,
+                })}
               </AppText>
             </>
           ) : (

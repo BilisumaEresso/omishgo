@@ -166,11 +166,28 @@
     "preferencesAndSettings": "Filannoowwan",
     "marketPriceIndexSub": "Gatii jumlaa biyyoolessaa",
     "producerSupport": "Gargaarsa",
-    "callSupportSub": "Bilbili (0938730818)"
+    "callSupportSub": "Bilbili (0938730818)",
+    "appSettingsTitle": "Sajoo fi Dhooksaa Appii",
+    "appSettingsSub": "Beeksisa, PIN, afaan fi profaayilii alaa bulchi",
+    "publicProfileQRTitle": "Puroofaayilii Alaa fi Koodii QR Koo",
+    "publicProfileQRSub": "Bitattoonni jumlaa fi hiriyoonni profaayilii kee akka mirkaneessaniif koodii QR kee qoodi.",
+    "copyLink": "Liinkii Waraabi",
+    "shareBtn": "Puroofaayilii Qoodi",
+    "linkCopiedTitle": "Liinkiin Waraabameera!",
+    "linkCopiedMsg": "Liinkiin profaayilii kee waraabameera."
+  },
+  "review": {
+    "ratingSummary": "{{rating}} ★ (gamaaggama {{count}})",
+    "noReviewsYet": "Gamaaggamni haaraan hin jiru",
+    "farmerFeedbackTitle": "Gamaaggama fi Sadarkaa Bitattotaa ({{count}})",
+    "noReviewsFarmerSub": "Bitattoonni ajaja isaan ga'e yeroo gamaaggaman sadarkaan isaanii asirratti mul'ata.",
+    "anonymousBuyer": "Bitataa Jumlaa",
+    "customerReviewsTitle": "Gamaaggama fi Sadarkaa Bitattotaa ({{count}})",
+    "noReviewsYetSub": "Ajajawwan oomishtuu kanaaf ga'an gamaaggama bitattootaa asirratti agarsiisu."
   },
   "notificationsScreen": {
     "title": "Beeksisa",
-    "markAllRead": "Hunda dubbifame jedhi",
+    "markAllRead": "Hundi dubbifame jedhi",
     "empty": "Beeksisni hin jiru",
     "emptySub": "Odeeffannoon haaraan hin jiru.",
     "unreadCount": "Haaraa {{count}}"

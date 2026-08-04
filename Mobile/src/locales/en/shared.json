@@ -166,7 +166,24 @@
     "preferencesAndSettings": "Preferences",
     "marketPriceIndexSub": "National wholesale rates",
     "producerSupport": "Support & Help",
-    "callSupportSub": "Call support (0938730818)"
+    "callSupportSub": "Call support (0938730818)",
+    "appSettingsTitle": "App Settings & Privacy",
+    "appSettingsSub": "Manage notifications, PIN, language & public profile",
+    "publicProfileQRTitle": "My Public Profile & QR Code",
+    "publicProfileQRSub": "Scan or share your QR code link so wholesale buyers & partners can verify your profile.",
+    "copyLink": "Copy Link",
+    "shareBtn": "Share Profile",
+    "linkCopiedTitle": "Link Copied!",
+    "linkCopiedMsg": "Your public profile link has been copied to your clipboard."
+  },
+  "review": {
+    "ratingSummary": "{{rating}} ★ ({{count}} reviews)",
+    "noReviewsYet": "No reviews yet",
+    "farmerFeedbackTitle": "Buyer Reviews & Ratings ({{count}})",
+    "noReviewsFarmerSub": "Once buyers receive and review your delivered orders, their ratings will appear here.",
+    "anonymousBuyer": "Wholesale Buyer",
+    "customerReviewsTitle": "Buyer Reviews & Ratings ({{count}})",
+    "noReviewsYetSub": "Delivered harvest orders for this producer will show buyer ratings and feedback here."
   },
   "notificationsScreen": {
     "title": "Notifications",
