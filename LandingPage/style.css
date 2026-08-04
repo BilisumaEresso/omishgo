@@ -717,6 +717,31 @@ footer{background:var(--green-900);color:rgba(255,255,255,.72)}
   font-weight: 500;
 }
 
+.profile-download-btn {
+  max-width: 320px;
+  margin-top: 8px;
+  padding: 16px 32px;
+  font-size: 16px;
+  border-radius: var(--r-full);
+  box-shadow: 0 8px 24px rgba(26,99,73,.35);
+  animation: pulse-soft 2.5s infinite;
+}
+
+.profile-download-btn svg {
+  margin-right: 8px;
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 8px 24px rgba(26,99,73,.35);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 12px 32px rgba(26,99,73,.5);
+  }
+}
+
 .profile-not-found {
   text-align: center;
   padding: 48px 24px;

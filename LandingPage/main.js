@@ -930,7 +930,12 @@ async function fetchAndRenderPublicProfile(customId) {
 
           <div class="profile-footer-cta">
             <p class="profile-trust-note">Verified OmishGo Direct Marketplace Profile • ID: ${escapeHtml(user.customId)}</p>
-            <a href="https://github.com/BilisumaEresso/omishgo/releases/download/v1.0.0-pilot/application-cc25adc4-057a-4fcc-81a7-e7143b75e4df.apk" class="btn btn-primary" download>Get the OmishGo App</a>
+            <a href="https://github.com/BilisumaEresso/omishgo/releases/download/v1.0.0-pilot/application-cc25adc4-057a-4fcc-81a7-e7143b75e4df.apk" class="btn btn-primary btn-lg btn-full profile-download-btn" download>
+              <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
+                <path d="M12 16l-5-5 1.41-1.41L11 13.17V4h2v9.17l2.59-2.58L17 11l-5 5zM5 20h14v-2H5v2z"/>
+              </svg>
+              Get the OmishGo App
+            </a>
           </div>
         </div>
       </div>
