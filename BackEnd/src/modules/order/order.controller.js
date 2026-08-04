@@ -185,6 +185,7 @@ export const getOrderById = asyncHandler(async (req, res) => {
   const orderObj = order.toObject();
   orderObj.hasReviewed = !!review;
   orderObj.isReviewed = !!review;
+  orderObj.review = review;
 
   return sendResponse(res, {
     statusCode: 200,

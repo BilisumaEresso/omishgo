@@ -157,6 +157,24 @@ export default function OrderDetailScreen({ route, navigation }) {
     navigation.navigate("Chat", { userId: partnerId, userName: partnerName });
   };
 
+  const handleViewPartnerProfile = () => {
+    if (role === "farmer") {
+      const buyerId = order.buyerId?._id || order.buyerId;
+      if (buyerId) {
+        navigation.navigate("BuyerProfile", { buyerId });
+      } else {
+        Alert.alert(t("profile.unavailable", { defaultValue: "Profile Unavailable" }), t("profile.buyerProfileUnavailable", { defaultValue: "Buyer profile information is unavailable." }));
+      }
+    } else {
+      const fId = order.farmerId?._id || order.farmerId;
+      if (fId) {
+        navigation.navigate("FarmerProfile", { farmerId: fId });
+      } else {
+        Alert.alert(t("profile.unavailable", { defaultValue: "Profile Unavailable" }), t("profile.producerProfileUnavailable", { defaultValue: "Producer profile information is unavailable." }));
+      }
+    }
+  };
+
   const handleUpdateStatus = async (newStatus) => {
     if (newStatus === "cancelled") {
       Alert.alert(t("orderDetail.cancelOrderTitle", { defaultValue: "Cancel Order" }), t("orderDetail.cancelOrderConfirm", { defaultValue: "Are you sure you want to cancel this order?" }), [
@@ -192,6 +210,9 @@ export default function OrderDetailScreen({ route, navigation }) {
   const alreadyReviewed = hasReviewed || !!(order.hasReviewed || order.isReviewed);
   const showReviewPrompt = isBuyer && isDelivered && !alreadyReviewed;
   const showReviewCompleted = isBuyer && isDelivered && alreadyReviewed;
+
+  const activeRating = userRating || order.review?.rating;
+  const activeComment = comment || order.review?.comment;
 
   return (
     <DashboardLayout
@@ -272,7 +293,11 @@ export default function OrderDetailScreen({ route, navigation }) {
             ? t("orderDetail.buyerContact", { defaultValue: "Buyer Contact" })
             : t("orderDetail.producerContact", { defaultValue: "Producer Contact" })}
         </AppText>
-        <View style={styles.partnerRow}>
+        <TouchableOpacity
+          style={styles.partnerRow}
+          onPress={handleViewPartnerProfile}
+          activeOpacity={0.75}
+        >
           <View style={[styles.partnerAvatar, { backgroundColor: primaryColor, overflow: "hidden" }]}>
             {partnerAvatarUrl ? (
               <Image
@@ -297,7 +322,8 @@ export default function OrderDetailScreen({ route, navigation }) {
               </AppText>
             </View>
           </View>
-        </View>
+          <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
+        </TouchableOpacity>
         <View style={styles.contactActions}>
           <TouchableOpacity
             style={[styles.contactBtn, { borderColor: primaryColor }]}
@@ -354,16 +380,37 @@ export default function OrderDetailScreen({ route, navigation }) {
           <View style={styles.reviewCardHeader}>
             <Ionicons name="checkmark-circle" size={20} color="#10B981" />
             <AppText style={[styles.reviewCardTitle, { color: "#047857" }]}>
-              {userRating
-                ? t("review.userRatedStars", { stars: userRating, defaultValue: `You rated this order ${userRating} stars` })
-                : t("review.alreadyReviewedTitle", { defaultValue: "Already Reviewed" })}
+              {activeRating
+                ? t("review.userRatedStars", { stars: activeRating, defaultValue: `Your Review (${activeRating} Stars)` })
+                : t("review.alreadyReviewedTitle", { defaultValue: "Your Submitted Review" })}
             </AppText>
           </View>
-          <AppText style={[styles.reviewCardSub, { color: "#065F46" }]}>
-            {t("review.alreadyReviewedSub", {
-              defaultValue: "Thank you! Your feedback helps other wholesale buyers on OmishGo.",
-            })}
-          </AppText>
+          {activeRating ? (
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginVertical: 6 }}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Ionicons
+                  key={star}
+                  name={star <= activeRating ? "star" : "star-outline"}
+                  size={18}
+                  color={star <= activeRating ? "#F59E0B" : "#CBD5E1"}
+                />
+              ))}
+              <AppText style={{ fontSize: 13, fontWeight: "700", color: "#047857", marginLeft: 4 }}>
+                {activeRating} / 5
+              </AppText>
+            </View>
+          ) : null}
+          {activeComment ? (
+            <AppText style={[styles.reviewCardSub, { color: "#065F46", fontStyle: "italic", marginTop: 4 }]}>
+              "{activeComment}"
+            </AppText>
+          ) : (
+            <AppText style={[styles.reviewCardSub, { color: "#065F46", marginTop: 4 }]}>
+              {t("review.alreadyReviewedSub", {
+                defaultValue: "Thank you! Your feedback helps other wholesale buyers on OmishGo.",
+              })}
+            </AppText>
+          )}
         </View>
       )}
 
