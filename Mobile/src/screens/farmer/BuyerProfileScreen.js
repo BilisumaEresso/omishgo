@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, TouchableOpacity, View, ScrollView } from "react-native";
+import { ActivityIndicator, Image, StyleSheet, TouchableOpacity, View, ScrollView } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import AppText from "../../components/common/AppText";
@@ -73,7 +73,15 @@ export default function BuyerProfileScreen({ route, navigation }) {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={[styles.profileHeader, { backgroundColor: surface }]}>
           <View style={styles.avatarContainer}>
-            <Ionicons name="person-circle" size={80} color={primary} />
+            {buyer?.avatarUrl ? (
+              <Image
+                source={{ uri: buyer.avatarUrl }}
+                style={{ width: 80, height: 80, borderRadius: 40 }}
+                resizeMode="cover"
+              />
+            ) : (
+              <Ionicons name="person-circle" size={80} color={primary} />
+            )}
           </View>
           <AppText variant="headingMd" style={{ color: textPrimary, textAlign: "center" }}>
             {buyer.name}

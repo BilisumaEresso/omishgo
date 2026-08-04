@@ -1,13 +1,14 @@
-// Mobile/src/screens/buyer/BuyerProfileScreen.js
 import Ionicons from "@expo/vector-icons/Ionicons";
+import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../../components/common/AppText";
 import DashboardLayout from "../../components/layout/DashBoardLayout";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useTheme } from "../../hooks/useTheme";
+import uploadService from "../../services/upload.service";
 import { useAuthStore } from "../../store/auth.store";
 import { formatNumber } from "../../utils/formatNumber";
 
@@ -19,13 +20,14 @@ const LANGUAGES = [
 
 export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
   const { theme } = useTheme();
-  const { user, logout, setLanguage } = useAuthStore();
+  const { user, logout, setLanguage, updateUser } = useAuthStore();
   const { t, i18n } = useTranslation();
 
   const [savedCount, setSavedCount] = useState(0);
   const [ordersCount, setOrdersCount] = useState(0);
   const [totalSpent, setTotalSpent] = useState(0);
   const [languageOpen, setLanguageOpen] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   const primaryColor = theme?.colors?.primary || "#1565C0";
   const surfaceColor = theme?.colors?.surface || "#FFFFFF";
@@ -58,6 +60,130 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
 
     fetchUserData();
   }, []);
+
+  const launchAvatarPicker = async (source) => {
+    const permission =
+      source === "camera"
+        ? await ImagePicker.requestCameraPermissionsAsync()
+        : await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert(
+        t("profile.permissionRequiredTitle", { defaultValue: "Permission Required" }),
+        t("profile.permissionRequiredMsg", {
+          defaultValue: "Camera/Gallery access is required to update profile photo.",
+        }),
+      );
+      return;
+    }
+
+    const pickerOptions = {
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    };
+
+    const result =
+      source === "camera"
+        ? await ImagePicker.launchCameraAsync(pickerOptions)
+        : await ImagePicker.launchImageLibraryAsync(pickerOptions);
+
+    if (result.canceled || !result.assets?.length) return;
+
+    const asset = result.assets[0];
+    setUploadingAvatar(true);
+    try {
+      const res = await uploadService.uploadAvatar(asset);
+      if (res.success && res.avatarUrl) {
+        if (updateUser) await updateUser({ avatarUrl: res.avatarUrl });
+      } else {
+        Alert.alert(
+          t("profile.uploadErrorTitle", { defaultValue: "Upload Error" }),
+          res.message || t("profile.uploadErrorMsg", { defaultValue: "Failed to upload profile photo." }),
+        );
+      }
+    } catch (err) {
+      Alert.alert(
+        t("profile.uploadErrorTitle", { defaultValue: "Upload Error" }),
+        err.message || t("profile.uploadErrorMsg", { defaultValue: "Failed to upload profile photo." }),
+      );
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    setUploadingAvatar(true);
+    try {
+      const res = await uploadService.removeAvatar();
+      if (res.success) {
+        if (updateUser) await updateUser({ avatarUrl: null });
+      } else {
+        Alert.alert(
+          t("profile.removeErrorTitle", { defaultValue: "Remove Error" }),
+          res.message || t("profile.removeErrorMsg", { defaultValue: "Failed to remove profile photo." }),
+        );
+      }
+    } catch (err) {
+      Alert.alert(
+        t("profile.removeErrorTitle", { defaultValue: "Remove Error" }),
+        err.message || t("profile.removeErrorMsg", { defaultValue: "Failed to remove profile photo." }),
+      );
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleAvatarPress = () => {
+    if (uploadingAvatar) return;
+    if (user?.avatarUrl) {
+      Alert.alert(
+        t("profile.avatarOptionTitle", { defaultValue: "Profile Photo" }),
+        t("profile.avatarOptionMsg", { defaultValue: "Choose an option to manage your profile photo:" }),
+        [
+          {
+            text: t("profile.takePhoto", { defaultValue: "Take Photo" }),
+            onPress: () => launchAvatarPicker("camera"),
+          },
+          {
+            text: t("profile.chooseGallery", { defaultValue: "Choose from Gallery" }),
+            onPress: () => launchAvatarPicker("gallery"),
+          },
+          {
+            text: t("profile.removePhoto", { defaultValue: "Remove Photo" }),
+            style: "destructive",
+            onPress: handleRemoveAvatar,
+          },
+          {
+            text: t("common.cancel", { defaultValue: "Cancel" }),
+            style: "cancel",
+          },
+        ],
+        { cancelable: true },
+      );
+    } else {
+      Alert.alert(
+        t("profile.addAvatarTitle", { defaultValue: "Add Profile Photo" }),
+        t("profile.chooseSource", { defaultValue: "Choose photo source:" }),
+        [
+          {
+            text: t("profile.takePhoto", { defaultValue: "Take Photo" }),
+            onPress: () => launchAvatarPicker("camera"),
+          },
+          {
+            text: t("profile.chooseGallery", { defaultValue: "Choose from Gallery" }),
+            onPress: () => launchAvatarPicker("gallery"),
+          },
+          {
+            text: t("common.cancel", { defaultValue: "Cancel" }),
+            style: "cancel",
+          },
+        ],
+        { cancelable: true },
+      );
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -98,9 +224,32 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
       <View
         style={[styles.profileHeaderCard, { backgroundColor: surfaceColor }]}
       >
-        <View style={[styles.avatar, { backgroundColor: primaryColor }]}>
-          <Ionicons name="person" size={36} color="#FFFFFF" />
-        </View>
+        <TouchableOpacity
+          style={[styles.avatar, { backgroundColor: primaryColor }]}
+          onPress={handleAvatarPress}
+          activeOpacity={0.8}
+          disabled={uploadingAvatar}
+        >
+          {user?.avatarUrl ? (
+            <Image
+              source={{ uri: user.avatarUrl }}
+              style={styles.avatarImg}
+              resizeMode="cover"
+            />
+          ) : (
+            <Ionicons name="person" size={36} color="#FFFFFF" />
+          )}
+
+          {uploadingAvatar ? (
+            <View style={styles.avatarOverlay}>
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            </View>
+          ) : (
+            <View style={[styles.cameraBadge, { backgroundColor: primaryColor }]}>
+              <Ionicons name="camera" size={12} color="#FFFFFF" />
+            </View>
+          )}
+        </TouchableOpacity>
 
         <AppText style={[styles.userName, { color: textPrimary }]}>
           {user?.name ||
@@ -340,6 +489,32 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 12,
+    position: "relative",
+    overflow: "visible",
+  },
+  avatarImg: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+  },
+  avatarOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    borderRadius: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cameraBadge: {
+    position: "absolute",
+    bottom: -2,
+    right: -2,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
   },
   userName: {
     fontSize: 20,

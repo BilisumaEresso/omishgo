@@ -3,6 +3,7 @@ import asyncHandler from "../../utils/asyncHandler.js";
 import sendResponse from "../../utils/sendResponse.js";
 import Product from "../product/product.model.js";
 import Order from "./order.model.js";
+import Review from "../review/review.model.js";
 import { createNotification } from "../notification/notification.model.js";
 
 /**
@@ -180,10 +181,15 @@ export const getOrderById = asyncHandler(async (req, res) => {
     throw new ApiError(403, "Not authorized to view this order");
   }
 
+  const review = await Review.findOne({ orderId: order._id });
+  const orderObj = order.toObject();
+  orderObj.hasReviewed = !!review;
+  orderObj.isReviewed = !!review;
+
   return sendResponse(res, {
     statusCode: 200,
     message: "Order retrieved successfully",
-    data: { order },
+    data: { order: orderObj },
   });
 });
 

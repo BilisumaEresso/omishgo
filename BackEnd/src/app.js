@@ -15,6 +15,7 @@ import savedRouter from "./modules/saved/saved.routes.js";
 import sourcingRouter from "./modules/sourcing/sourcing.routes.js";
 import uploadRouter from "./modules/upload/upload.routes.js";
 import userRouter from "./modules/user/user.routes.js";
+import reviewRouter from "./modules/review/review.routes.js";
 
 const app = express();
 
@@ -100,6 +101,7 @@ app.use("/api/v1/saved", savedRouter);
 app.use("/api/v1/sourcing", sourcingRouter);
 app.use("/api/v1/upload", uploadRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/reviews", reviewRouter);
 
 app.use(notFoundMiddleware);
 

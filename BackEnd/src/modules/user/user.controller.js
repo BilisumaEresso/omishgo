@@ -3,6 +3,60 @@ import asyncHandler from "../../utils/asyncHandler.js";
 import sendResponse from "../../utils/sendResponse.js";
 import User from "./user.model.js";
 import Order from "../order/order.model.js";
+import Product from "../product/product.model.js";
+
+/**
+ * @desc    Get public profile by customId (Unauthenticated)
+ * @route   GET /api/v1/users/public/:customId
+ * @access  Public
+ */
+export const getPublicProfileByCustomId = asyncHandler(async (req, res) => {
+  const { customId } = req.params;
+
+  const user = await User.findOne({ customId });
+  if (!user) {
+    throw new ApiError(404, "User profile not found");
+  }
+
+  // Active listings count (farmers only)
+  let activeListingsCount = 0;
+  if (user.role === "farmer") {
+    activeListingsCount = await Product.countDocuments({
+      farmerId: user._id,
+      status: "active",
+    });
+  }
+
+  // Completed orders count
+  const orderQuery =
+    user.role === "farmer"
+      ? { farmerId: user._id, status: "delivered" }
+      : { buyerId: user._id, status: "delivered" };
+  const completedOrdersCount = await Order.countDocuments(orderQuery);
+
+  const profile = {
+    name: user.name,
+    role: user.role,
+    customId: user.customId,
+    avatarUrl: user.avatarUrl || null,
+    isVerified: user.isVerified,
+    location: {
+      region: user.location?.region || "",
+      zone: user.location?.zone || "",
+    },
+    createdAt: user.createdAt,
+    averageRating: user.averageRating || 0,
+    ratingCount: user.ratingCount || 0,
+    activeListingsCount,
+    completedOrdersCount,
+  };
+
+  return sendResponse(res, {
+    statusCode: 200,
+    message: "Public profile retrieved successfully",
+    data: { user: profile },
+  });
+});
 
 /**
  * @desc    Get user/farmer by ID
@@ -53,3 +107,4 @@ export const getMyActivities = asyncHandler(async (req, res) => {
     data: { activities },
   });
 });
+

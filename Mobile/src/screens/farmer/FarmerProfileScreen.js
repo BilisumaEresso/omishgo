@@ -1,8 +1,8 @@
-// Mobile/src/screens/farmer/FarmerProfileScreen.js
 import Ionicons from "@expo/vector-icons/Ionicons";
+import * as ImagePicker from "expo-image-picker";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, Linking, StyleSheet, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Image, Linking, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import AppText from "../../components/common/AppText";
 import DashboardLayout from "../../components/layout/DashBoardLayout";
@@ -10,6 +10,7 @@ import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
 import { useSidebar } from "../../context/SidebarContext";
 import { useTheme } from "../../hooks/useTheme";
+import uploadService from "../../services/upload.service";
 import { useAuthStore } from "../../store/auth.store";
 import { formatNumber } from "../../utils/formatNumber";
 
@@ -21,7 +22,7 @@ const LANGUAGES = [
 
 export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
   const { theme } = useTheme();
-  const { user, logout, setLanguage } = useAuthStore();
+  const { user, logout, setLanguage, updateUser } = useAuthStore();
   const { openSidebar } = useSidebar();
   const { t, i18n } = useTranslation();
 
@@ -29,6 +30,8 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
   const [ordersCount, setOrdersCount] = useState(0);
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [languageOpen, setLanguageOpen] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [reviews, setReviews] = useState([]);
 
   const primaryColor = theme?.colors?.primary || "#15803D";
   const surfaceColor = theme?.colors?.surface || "#FFFFFF";
@@ -54,6 +57,16 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
       const rev = orderList.reduce((sum, o) => sum + (o.totalPrice || 0), 0);
       setTotalRevenue(rev);
     } catch (_) {}
+
+    const customId = user?.customId || user?._id || user?.id;
+    if (customId) {
+      try {
+        const revRes = await api.get(API_ENDPOINTS.reviews.user(customId));
+        if (revRes.data?.success) {
+          setReviews(revRes.data?.data?.reviews || []);
+        }
+      } catch (_) {}
+    }
   };
 
   useEffect(() => {
@@ -65,6 +78,130 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
       fetchFarmerData();
     }, [])
   );
+
+  const launchAvatarPicker = async (source) => {
+    const permission =
+      source === "camera"
+        ? await ImagePicker.requestCameraPermissionsAsync()
+        : await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert(
+        t("profile.permissionRequiredTitle", { defaultValue: "Permission Required" }),
+        t("profile.permissionRequiredMsg", {
+          defaultValue: "Camera/Gallery access is required to update profile photo.",
+        }),
+      );
+      return;
+    }
+
+    const pickerOptions = {
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    };
+
+    const result =
+      source === "camera"
+        ? await ImagePicker.launchCameraAsync(pickerOptions)
+        : await ImagePicker.launchImageLibraryAsync(pickerOptions);
+
+    if (result.canceled || !result.assets?.length) return;
+
+    const asset = result.assets[0];
+    setUploadingAvatar(true);
+    try {
+      const res = await uploadService.uploadAvatar(asset);
+      if (res.success && res.avatarUrl) {
+        if (updateUser) await updateUser({ avatarUrl: res.avatarUrl });
+      } else {
+        Alert.alert(
+          t("profile.uploadErrorTitle", { defaultValue: "Upload Error" }),
+          res.message || t("profile.uploadErrorMsg", { defaultValue: "Failed to upload profile photo." }),
+        );
+      }
+    } catch (err) {
+      Alert.alert(
+        t("profile.uploadErrorTitle", { defaultValue: "Upload Error" }),
+        err.message || t("profile.uploadErrorMsg", { defaultValue: "Failed to upload profile photo." }),
+      );
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    setUploadingAvatar(true);
+    try {
+      const res = await uploadService.removeAvatar();
+      if (res.success) {
+        if (updateUser) await updateUser({ avatarUrl: null });
+      } else {
+        Alert.alert(
+          t("profile.removeErrorTitle", { defaultValue: "Remove Error" }),
+          res.message || t("profile.removeErrorMsg", { defaultValue: "Failed to remove profile photo." }),
+        );
+      }
+    } catch (err) {
+      Alert.alert(
+        t("profile.removeErrorTitle", { defaultValue: "Remove Error" }),
+        err.message || t("profile.removeErrorMsg", { defaultValue: "Failed to remove profile photo." }),
+      );
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleAvatarPress = () => {
+    if (uploadingAvatar) return;
+    if (user?.avatarUrl) {
+      Alert.alert(
+        t("profile.avatarOptionTitle", { defaultValue: "Profile Photo" }),
+        t("profile.avatarOptionMsg", { defaultValue: "Choose an option to manage your profile photo:" }),
+        [
+          {
+            text: t("profile.takePhoto", { defaultValue: "Take Photo" }),
+            onPress: () => launchAvatarPicker("camera"),
+          },
+          {
+            text: t("profile.chooseGallery", { defaultValue: "Choose from Gallery" }),
+            onPress: () => launchAvatarPicker("gallery"),
+          },
+          {
+            text: t("profile.removePhoto", { defaultValue: "Remove Photo" }),
+            style: "destructive",
+            onPress: handleRemoveAvatar,
+          },
+          {
+            text: t("common.cancel", { defaultValue: "Cancel" }),
+            style: "cancel",
+          },
+        ],
+        { cancelable: true },
+      );
+    } else {
+      Alert.alert(
+        t("profile.addAvatarTitle", { defaultValue: "Add Profile Photo" }),
+        t("profile.chooseSource", { defaultValue: "Choose photo source:" }),
+        [
+          {
+            text: t("profile.takePhoto", { defaultValue: "Take Photo" }),
+            onPress: () => launchAvatarPicker("camera"),
+          },
+          {
+            text: t("profile.chooseGallery", { defaultValue: "Choose from Gallery" }),
+            onPress: () => launchAvatarPicker("gallery"),
+          },
+          {
+            text: t("common.cancel", { defaultValue: "Cancel" }),
+            style: "cancel",
+          },
+        ],
+        { cancelable: true },
+      );
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -103,9 +240,32 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
     >
       {/* Profile Header Card */}
       <View style={[styles.profileHeaderCard, { backgroundColor: surfaceColor }]}>
-        <View style={[styles.avatar, { backgroundColor: primaryColor }]}>
-          <Ionicons name="person" size={36} color="#FFFFFF" />
-        </View>
+        <TouchableOpacity
+          style={[styles.avatar, { backgroundColor: primaryColor }]}
+          onPress={handleAvatarPress}
+          activeOpacity={0.8}
+          disabled={uploadingAvatar}
+        >
+          {user?.avatarUrl ? (
+            <Image
+              source={{ uri: user.avatarUrl }}
+              style={styles.avatarImg}
+              resizeMode="cover"
+            />
+          ) : (
+            <Ionicons name="person" size={36} color="#FFFFFF" />
+          )}
+
+          {uploadingAvatar ? (
+            <View style={styles.avatarOverlay}>
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            </View>
+          ) : (
+            <View style={styles.cameraBadge}>
+              <Ionicons name="camera" size={12} color="#FFFFFF" />
+            </View>
+          )}
+        </TouchableOpacity>
 
         <AppText style={[styles.userName, { color: textPrimary }]}>
           {user?.name || t("farmerProfile.fallbackName", { defaultValue: "Verified Farmer Producer" })}
@@ -121,6 +281,24 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
         <AppText style={[styles.phoneText, { color: textSecondary }]}>
           {user?.phone || t("common.unknownPhone", { defaultValue: "Phone Not Provided" })} • {[user?.location?.wereda, user?.location?.zone, user?.location?.region].filter(Boolean).join(", ") || t("common.unknownLocation", { defaultValue: "Location Not Provided" })}
         </AppText>
+
+        <View style={styles.ratingBadge}>
+          {user?.ratingCount > 0 ? (
+            <>
+              <Ionicons name="star" size={14} color="#F59E0B" />
+              <AppText style={styles.ratingText}>
+                {`${(user.averageRating || 0).toFixed(1)} ★ (${user.ratingCount} ${user.ratingCount === 1 ? "review" : "reviews"})`}
+              </AppText>
+            </>
+          ) : (
+            <>
+              <Ionicons name="star-outline" size={14} color="#94A3B8" />
+              <AppText style={[styles.ratingText, { color: "#64748B" }]}>
+                {t("review.noReviewsYet", { defaultValue: "No reviews yet" })}
+              </AppText>
+            </>
+          )}
+        </View>
       </View>
 
       {/* Account KPI Stats */}
@@ -238,6 +416,56 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
         </TouchableOpacity>
       </View>
 
+      {/* Customer Feedback & Reviews Group */}
+      <View style={[styles.settingsGroup, { backgroundColor: surfaceColor }]}>
+        <AppText style={[styles.sectionHeading, { marginBottom: 12 }]}>
+          {t("review.farmerFeedbackTitle", { count: reviews.length, defaultValue: `Buyer Reviews & Ratings (${reviews.length})` })}
+        </AppText>
+
+        {reviews.length === 0 ? (
+          <View style={styles.emptyReviewsBox}>
+            <Ionicons name="chatbox-outline" size={32} color="#94A3B8" />
+            <AppText style={styles.emptyReviewsTitle}>
+              {t("review.noReviewsYet", { defaultValue: "No reviews yet" })}
+            </AppText>
+            <AppText style={styles.emptyReviewsSub}>
+              {t("review.noReviewsFarmerSub", { defaultValue: "Once buyers receive and review your delivered orders, their ratings will appear here." })}
+            </AppText>
+          </View>
+        ) : (
+          <View style={{ gap: 10 }}>
+            {reviews.map((rev) => (
+              <View key={rev._id} style={styles.ownReviewCard}>
+                <View style={styles.ownReviewHeader}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                    {rev.reviewerId?.avatarUrl ? (
+                      <Image source={{ uri: rev.reviewerId.avatarUrl }} style={{ width: 28, height: 28, borderRadius: 14 }} />
+                    ) : (
+                      <Ionicons name="person-circle" size={28} color={primaryColor} />
+                    )}
+                    <View>
+                      <AppText style={styles.ownReviewName}>
+                        {rev.reviewerId?.name || t("review.anonymousBuyer", { defaultValue: "Wholesale Buyer" })}
+                      </AppText>
+                      <AppText style={styles.ownReviewDate}>
+                        {rev.createdAt ? new Date(rev.createdAt).toLocaleDateString() : ""}
+                      </AppText>
+                    </View>
+                  </View>
+                  <View style={styles.ownReviewStarBadge}>
+                    <Ionicons name="star" size={13} color="#F59E0B" />
+                    <AppText style={styles.ownReviewStarText}>{rev.rating} / 5</AppText>
+                  </View>
+                </View>
+                {rev.comment ? (
+                  <AppText style={styles.ownReviewComment}>"{rev.comment}"</AppText>
+                ) : null}
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
+
       {/* Sign Out Button */}
       <TouchableOpacity
         style={styles.logoutBtn}
@@ -274,6 +502,33 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 12,
+    position: "relative",
+    overflow: "visible",
+  },
+  avatarImg: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+  },
+  avatarOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    borderRadius: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cameraBadge: {
+    position: "absolute",
+    bottom: -2,
+    right: -2,
+    backgroundColor: "#15803D",
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
   },
   userName: {
     fontSize: 20,
@@ -393,6 +648,82 @@ const styles = StyleSheet.create({
   logoutBtnText: {
     color: "#DC2626",
     fontSize: 14,
-    fontWeight: "800",
+    fontWeight: "700",
+  },
+  ratingBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: "#FEF3C7",
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  ratingText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#B45309",
+  },
+  emptyReviewsBox: {
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F8FAFC",
+    borderRadius: 16,
+  },
+  emptyReviewsTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginTop: 6,
+  },
+  emptyReviewsSub: {
+    fontSize: 12,
+    color: "#64748B",
+    textAlign: "center",
+    marginTop: 2,
+  },
+  ownReviewCard: {
+    backgroundColor: "#F8FAFC",
+    borderRadius: 14,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  ownReviewHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  ownReviewName: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#0F172A",
+  },
+  ownReviewDate: {
+    fontSize: 11,
+    color: "#64748B",
+  },
+  ownReviewStarBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "#FEF3C7",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  ownReviewStarText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#B45309",
+  },
+  ownReviewComment: {
+    fontSize: 12,
+    color: "#334155",
+    fontStyle: "italic",
+    marginTop: 6,
+    lineHeight: 16,
   },
 });

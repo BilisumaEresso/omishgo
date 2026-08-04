@@ -321,8 +321,16 @@ export default function ListingDetailScreen({ route, navigation }) {
           activeOpacity={0.88}
         >
           <View style={styles.farmerLeft}>
-            <View style={[styles.farmerAvatar, { backgroundColor: primaryColor }]}>
-              <Ionicons name="person" size={24} color="#FFFFFF" />
+            <View style={[styles.farmerAvatar, { backgroundColor: primaryColor, overflow: "hidden" }]}>
+              {farmer?.avatarUrl ? (
+                <Image
+                  source={{ uri: farmer.avatarUrl }}
+                  style={{ width: "100%", height: "100%", borderRadius: 24 }}
+                  resizeMode="cover"
+                />
+              ) : (
+                <Ionicons name="person" size={24} color="#FFFFFF" />
+              )}
             </View>
             <View>
               <AppText style={styles.farmerName}>{farmerName}</AppText>
@@ -331,6 +339,23 @@ export default function ListingDetailScreen({ route, navigation }) {
                 <AppText style={[styles.verifiedLabel, { color: primaryColor }]}>
                   {t("listingDetail.verifiedFarmProducer", { defaultValue: "Verified Farm Producer" })}
                 </AppText>
+              </View>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 3 }}>
+                {farmer?.ratingCount > 0 ? (
+                  <>
+                    <Ionicons name="star" size={12} color="#F59E0B" />
+                    <AppText style={{ fontSize: 11, fontWeight: "700", color: "#B45309" }}>
+                      {`${(farmer.averageRating || 0).toFixed(1)} ★ (${farmer.ratingCount})`}
+                    </AppText>
+                  </>
+                ) : (
+                  <>
+                    <Ionicons name="star-outline" size={12} color="#94A3B8" />
+                    <AppText style={{ fontSize: 11, color: "#64748B" }}>
+                      {t("review.noReviewsYet", { defaultValue: "No reviews yet" })}
+                    </AppText>
+                  </>
+                )}
               </View>
             </View>
           </View>

@@ -76,6 +76,15 @@ export const useAuthStore = create(
       isInitializingAuth: true,
       error: null,
       role: null,
+      updateUser: async (updatedFields) => {
+        const currentUser = get().user;
+        if (!currentUser) return;
+        const updatedUser = { ...currentUser, ...updatedFields };
+        set({ user: updatedUser });
+        try {
+          await storageService.setUser(updatedUser);
+        } catch (_) {}
+      },
       setLanguage: async (language) => {
         const normalized = ["en", "am", "om"].includes(language)
           ? language

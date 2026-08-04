@@ -39,6 +39,7 @@ export const API_ENDPOINTS = {
   },
   upload: {
     image: "/api/v1/upload/image",
+    avatar: "/api/v1/upload/avatar",
   },
   messages: {
     thread: (userId) => `/api/v1/messages/thread/${userId}`,
@@ -76,5 +77,9 @@ export const API_ENDPOINTS = {
     createRequest: "/api/v1/sourcing/request",
     listRequests: "/api/v1/sourcing/requests",
     respond: (id) => `/api/v1/sourcing/requests/${id}/respond`,
+  },
+  reviews: {
+    create: "/api/v1/reviews",
+    user: (customId) => `/api/v1/reviews/user/${customId}`,
   },
 };

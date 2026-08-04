@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Animated,
   FlatList,
+  Image,
   Keyboard,
   Linking,
   Platform,
@@ -96,18 +97,28 @@ const SourcingActionCard = ({ data, isMe, onAccept, onReject, role }) => {
 };
 
 // ─── Message Bubble ───────────────────────────────────────────────────────────
-const MessageBubble = ({ message, isMe, showAvatar, avatarLetter, theme, onAccept, onReject, role }) => {
+const MessageBubble = ({ message, isMe, showAvatar, avatarLetter, avatarUrl, theme, onAccept, onReject, role }) => {
   const primary = theme?.colors?.primary || "#1565C0";
   const surface = theme?.colors?.surface || "#FFFFFF";
   const textPrimary = theme?.colors?.textPrimary || "#0F172A";
   const textSecondary = theme?.colors?.textSecondary || "#64748B";
 
+  const senderAvatar = avatarUrl || message.senderId?.avatarUrl;
+
   return (
     <View style={[styles.bubbleRow, isMe ? styles.rowRight : styles.rowLeft]}>
       {!isMe && (
         showAvatar ? (
-          <View style={[styles.avatarSmall, { backgroundColor: primary }]}>
-            <AppText style={styles.avatarText}>{avatarLetter}</AppText>
+          <View style={[styles.avatarSmall, { backgroundColor: primary, overflow: "hidden" }]}>
+            {senderAvatar ? (
+              <Image
+                source={{ uri: senderAvatar }}
+                style={{ width: 32, height: 32, borderRadius: 16 }}
+                resizeMode="cover"
+              />
+            ) : (
+              <AppText style={styles.avatarText}>{avatarLetter}</AppText>
+            )}
           </View>
         ) : (
           <View style={{ width: 34 }} />

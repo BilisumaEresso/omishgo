@@ -6,8 +6,12 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  KeyboardAvoidingView,
   Linking,
+  Modal,
+  Platform,
   StyleSheet,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -40,6 +44,53 @@ export default function OrderDetailScreen({ route, navigation }) {
 
   const [order, setOrder] = useState(initialOrder);
   const [updating, setUpdating] = useState(false);
+  const [hasReviewed, setHasReviewed] = useState(
+    !!(initialOrder?.hasReviewed || initialOrder?.isReviewed)
+  );
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [userRating, setUserRating] = useState(null);
+
+  const handleSubmitReview = async () => {
+    if (rating < 1 || rating > 5) {
+      Alert.alert(
+        t("review.invalidRatingTitle", { defaultValue: "Rating Required" }),
+        t("review.invalidRatingMsg", { defaultValue: "Please select a rating between 1 and 5 stars." })
+      );
+      return;
+    }
+    setSubmittingReview(true);
+    try {
+      const orderId = order._id || order.id;
+      const res = await api.post(API_ENDPOINTS.reviews.create, {
+        orderId,
+        rating,
+        comment: comment.trim(),
+      });
+      if (res.data?.success) {
+        setHasReviewed(true);
+        setUserRating(rating);
+        setReviewModalVisible(false);
+        Alert.alert(
+          t("review.successTitle", { defaultValue: "Review Submitted" }),
+          t("review.successMsg", { defaultValue: "Thank you for rating your harvest order!" })
+        );
+      }
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err.message ||
+        t("review.errorSubmit", { defaultValue: "Failed to submit review" });
+      Alert.alert(
+        t("review.errorTitle", { defaultValue: "Submission Error" }),
+        msg
+      );
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   const primaryColor = theme?.colors?.primary || "#1565C0";
   const surfaceColor = theme?.colors?.surface || "#FFFFFF";
@@ -134,6 +185,14 @@ export default function OrderDetailScreen({ route, navigation }) {
     }
   };
 
+  const partnerAvatarUrl = role === "farmer" ? order.buyerId?.avatarUrl : order.farmerId?.avatarUrl;
+
+  const isBuyer = role === "buyer";
+  const isDelivered = rawStatus === "delivered";
+  const alreadyReviewed = hasReviewed || !!(order.hasReviewed || order.isReviewed);
+  const showReviewPrompt = isBuyer && isDelivered && !alreadyReviewed;
+  const showReviewCompleted = isBuyer && isDelivered && alreadyReviewed;
+
   return (
     <DashboardLayout
       role={role || "buyer"}
@@ -214,8 +273,16 @@ export default function OrderDetailScreen({ route, navigation }) {
             : t("orderDetail.producerContact", { defaultValue: "Producer Contact" })}
         </AppText>
         <View style={styles.partnerRow}>
-          <View style={[styles.partnerAvatar, { backgroundColor: primaryColor }]}>
-            <Ionicons name="person" size={22} color="#FFFFFF" />
+          <View style={[styles.partnerAvatar, { backgroundColor: primaryColor, overflow: "hidden" }]}>
+            {partnerAvatarUrl ? (
+              <Image
+                source={{ uri: partnerAvatarUrl }}
+                style={{ width: "100%", height: "100%", borderRadius: 22 }}
+                resizeMode="cover"
+              />
+            ) : (
+              <Ionicons name="person" size={22} color="#FFFFFF" />
+            )}
           </View>
           <View style={{ flex: 1 }}>
             <AppText style={styles.partnerName}>
@@ -254,6 +321,147 @@ export default function OrderDetailScreen({ route, navigation }) {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Buyer Rate Order Card */}
+      {showReviewPrompt && (
+        <View style={[styles.reviewCard, { backgroundColor: "#FFFBEB", borderColor: "#F59E0B" }]}>
+          <View style={styles.reviewCardHeader}>
+            <Ionicons name="star" size={20} color="#F59E0B" />
+            <AppText style={[styles.reviewCardTitle, { color: "#B45309" }]}>
+              {t("review.ratePromptTitle", { defaultValue: "Rate & Review This Order" })}
+            </AppText>
+          </View>
+          <AppText style={styles.reviewCardSub}>
+            {t("review.ratePromptSub", {
+              defaultValue: "Share your rating and feedback on the producer's crop quality and delivery service.",
+            })}
+          </AppText>
+          <TouchableOpacity
+            style={[styles.rateBtn, { backgroundColor: primaryColor }]}
+            onPress={() => setReviewModalVisible(true)}
+            activeOpacity={0.85}
+          >
+            <Ionicons name="star-outline" size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+            <AppText style={styles.rateBtnText}>
+              {t("review.rateButton", { defaultValue: "Rate Order" })}
+            </AppText>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {showReviewCompleted && (
+        <View style={[styles.reviewCard, { backgroundColor: "#ECFDF5", borderColor: "#10B981" }]}>
+          <View style={styles.reviewCardHeader}>
+            <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+            <AppText style={[styles.reviewCardTitle, { color: "#047857" }]}>
+              {userRating
+                ? t("review.userRatedStars", { stars: userRating, defaultValue: `You rated this order ${userRating} stars` })
+                : t("review.alreadyReviewedTitle", { defaultValue: "Already Reviewed" })}
+            </AppText>
+          </View>
+          <AppText style={[styles.reviewCardSub, { color: "#065F46" }]}>
+            {t("review.alreadyReviewedSub", {
+              defaultValue: "Thank you! Your feedback helps other wholesale buyers on OmishGo.",
+            })}
+          </AppText>
+        </View>
+      )}
+
+      {/* Review Submission Modal */}
+      <Modal
+        visible={reviewModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setReviewModalVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.modalOverlay}
+        >
+          <View style={[styles.modalCard, { backgroundColor: surfaceColor }]}>
+            <View style={styles.modalHeader}>
+              <AppText style={[styles.modalTitle, { color: textPrimary }]}>
+                {t("review.modalTitle", { defaultValue: "Rate Your Order & Farmer" })}
+              </AppText>
+              <TouchableOpacity onPress={() => setReviewModalVisible(false)}>
+                <Ionicons name="close" size={22} color={textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <AppText style={styles.modalSub}>
+              {t("review.modalSub", {
+                defaultValue: "How satisfied were you with this crop delivery?",
+              })}
+            </AppText>
+
+            {/* Interactive 5-Star Selector */}
+            <View style={styles.starRow}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <TouchableOpacity
+                  key={star}
+                  onPress={() => setRating(star)}
+                  activeOpacity={0.7}
+                  style={styles.starBtn}
+                >
+                  <Ionicons
+                    name={star <= rating ? "star" : "star-outline"}
+                    size={36}
+                    color={star <= rating ? "#F59E0B" : "#CBD5E1"}
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <AppText style={styles.ratingValueText}>
+              {rating} / 5 {rating === 5 ? "★ (Excellent)" : rating === 4 ? "★ (Good)" : rating === 3 ? "★ (Average)" : rating === 2 ? "★ (Below Average)" : "★ (Poor)"}
+            </AppText>
+
+            {/* Optional Comment Input */}
+            <AppText style={styles.inputLabel}>
+              {t("review.commentLabel", { defaultValue: "Write a Comment (Optional)" })}
+            </AppText>
+            <TextInput
+              style={[styles.commentInput, { color: textPrimary, borderColor: "#CBD5E1" }]}
+              placeholder={t("review.commentPlaceholder", {
+                defaultValue: "e.g. Excellent crop quality, fresh teff harvest delivered on time.",
+              })}
+              placeholderTextColor={textSecondary}
+              value={comment}
+              onChangeText={setComment}
+              multiline
+              numberOfLines={4}
+              maxLength={500}
+            />
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={styles.modalCancelBtn}
+                onPress={() => setReviewModalVisible(false)}
+                disabled={submittingReview}
+              >
+                <AppText style={styles.modalCancelText}>
+                  {t("common.cancel", { defaultValue: "Cancel" })}
+                </AppText>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.modalSubmitBtn, { backgroundColor: primaryColor }]}
+                onPress={handleSubmitReview}
+                disabled={submittingReview}
+                activeOpacity={0.85}
+              >
+                {submittingReview ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <AppText style={styles.modalSubmitText}>
+                    {t("review.submitButton", { defaultValue: "Submit Review" })}
+                  </AppText>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
 
       {/* Farmer Action Buttons */}
       {role === "farmer" && rawStatus === "pending" && (
@@ -455,5 +663,127 @@ const styles = StyleSheet.create({
   orderHeroPhoto: {
     width: "100%",
     height: "100%",
+  },
+  reviewCard: {
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    marginBottom: 16,
+  },
+  reviewCardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 6,
+  },
+  reviewCardTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  reviewCardSub: {
+    fontSize: 13,
+    color: "#78350F",
+    lineHeight: 18,
+    marginBottom: 12,
+  },
+  rateBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+  },
+  rateBtnText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(15, 23, 42, 0.6)",
+    justifyContent: "flex-end",
+  },
+  modalCard: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 20,
+    paddingBottom: Platform.OS === "ios" ? 36 : 24,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+  },
+  modalSub: {
+    fontSize: 13,
+    color: "#64748B",
+    marginBottom: 16,
+  },
+  starRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 12,
+    marginVertical: 10,
+  },
+  starBtn: {
+    padding: 4,
+  },
+  ratingValueText: {
+    textAlign: "center",
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#F59E0B",
+    marginBottom: 16,
+  },
+  inputLabel: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginBottom: 6,
+  },
+  commentInput: {
+    borderWidth: 1,
+    borderRadius: 14,
+    padding: 12,
+    fontSize: 14,
+    textAlignVertical: "top",
+    minHeight: 90,
+    marginBottom: 20,
+    backgroundColor: "#F8FAFC",
+  },
+  modalActions: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  modalCancelBtn: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    borderRadius: 14,
+    backgroundColor: "#F1F5F9",
+  },
+  modalCancelText: {
+    color: "#64748B",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  modalSubmitBtn: {
+    flex: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    borderRadius: 14,
+  },
+  modalSubmitText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "700",
   },
 });

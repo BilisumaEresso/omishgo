@@ -58,6 +58,7 @@ export const registerUser = async ({
     id: user._id,
     name: user.name,
     phone: user.phone,
+    email: user.email,
     role: user.role,
     location: user.location,
     preferredLang: user.preferredLang,

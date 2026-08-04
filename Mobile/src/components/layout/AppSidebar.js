@@ -22,6 +22,7 @@ import {
   BackHandler,
   Dimensions,
   Easing,
+  Image,
   PanResponder,
   Platform,
   Pressable,
@@ -504,8 +505,16 @@ const AppSidebar = ({
                 accessibilityLabel={t("appSidebar.viewProfile")}
               >
                 <View style={styles.avatarRing}>
-                  <View style={styles.avatar}>
-                    <Ionicons name="person" size={30} color={primaryColor} />
+                  <View style={[styles.avatar, { overflow: "hidden" }]}>
+                    {user?.avatarUrl ? (
+                      <Image
+                        source={{ uri: user.avatarUrl }}
+                        style={{ width: "100%", height: "100%", borderRadius: 28 }}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <Ionicons name="person" size={30} color={primaryColor} />
+                    )}
                   </View>
                 </View>
 

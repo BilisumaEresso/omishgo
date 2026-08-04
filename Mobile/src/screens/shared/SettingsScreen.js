@@ -165,6 +165,42 @@ const SettingsScreen = ({ navigation }) => {
         <TapRow icon="shield-checkmark-outline" label={t("settingsScreen.privacyPolicy")} onPress={() => handleComingSoon(t("settingsScreen.privacyPolicy"))} isLast />
       </Card>
 
+      {/* PUBLIC PROFILE */}
+      <SectionTitle title={t("settingsScreen.sectionPublicProfile", { defaultValue: "Public Profile" })} />
+      <Card>
+        <View style={[styles.row, { backgroundColor: surface, borderBottomWidth: 1, borderBottomColor: border }]}>
+          <View style={[styles.iconCircle, { backgroundColor: primaryCont }]}>
+            <Ionicons name="globe-outline" size={18} color={primary} />
+          </View>
+          <View style={styles.rowText}>
+            <AppText style={[styles.rowLabel, { color: textPrimary, fontWeight: "700" }]}>
+              {t("settingsScreen.publicProfileExplanationTitle", { defaultValue: "Public Profile Info" })}
+            </AppText>
+            <AppText style={[styles.rowSubtitle, { color: textMuted, lineHeight: 18, marginTop: 4 }]}>
+              {t("settingsScreen.publicProfileExplanation", {
+                defaultValue:
+                  "Your profile (name, verified status, location region/zone, activity — not your phone number) can be viewed publicly via a shareable link, for buyers/farmers to check before dealing with you.",
+              })}
+            </AppText>
+          </View>
+        </View>
+        <TapRow
+          icon="share-social-outline"
+          label={t("settingsScreen.viewSharePublicProfile", { defaultValue: "View & Share My Public Profile" })}
+          subtitle={t("settingsScreen.viewSharePublicProfileSub", { defaultValue: "Shareable public link & QR code (Available in Phase 4)" })}
+          onPress={() =>
+            Alert.alert(
+              t("settingsScreen.publicProfileTitle", { defaultValue: "Public Profile Link" }),
+              t("settingsScreen.publicProfilePhase4Msg", {
+                defaultValue:
+                  "Shareable public profile link and QR code features will be fully active in Phase 4.",
+              }),
+            )
+          }
+          isLast
+        />
+      </Card>
+
       {/* ACCOUNT */}
       <SectionTitle title={t("settingsScreen.sectionAccount")} />
       <Card>

@@ -49,6 +49,18 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false, // Default false — Admin must approve before user can post/message
     },
+    avatarUrl: {
+      type: String,
+      default: null,
+    },
+    averageRating: {
+      type: Number,
+      default: 0,
+    },
+    ratingCount: {
+      type: Number,
+      default: 0,
+    },
     rating:{
       type: Number,
       default: 3.1,

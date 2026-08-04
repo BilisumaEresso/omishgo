@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import {
   Animated,
   Easing,
+  Image,
   Platform,
   Pressable,
   StyleSheet,
@@ -488,10 +489,19 @@ const AppHeader = ({
                       {
                         backgroundColor: "rgba(255,255,255,0.25)",
                         transform: [{ scale: profileScale }],
+                        overflow: "hidden",
                       },
                     ]}
                   >
-                    <Ionicons name="person" size={17} color="#FFFFFF" />
+                    {user?.avatarUrl ? (
+                      <Image
+                        source={{ uri: user.avatarUrl }}
+                        style={{ width: "100%", height: "100%", borderRadius: 18 }}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <Ionicons name="person" size={17} color="#FFFFFF" />
+                    )}
                   </Animated.View>
                 </Animated.View>
               </Pressable>

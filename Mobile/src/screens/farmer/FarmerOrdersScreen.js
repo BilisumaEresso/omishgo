@@ -25,6 +25,7 @@ import { getOrderStatusConfig } from "../../constants/statuses";
 import { getLocalizedCropName, getLocalizedCropDisplayName, getCropFallbackImage } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
 import { formatLocalizedDate } from "../../utils/ethiopianDate";
+import { formatNumber } from "../../utils/formatNumber";
 
 export default function FarmerOrdersScreen({ navigation, onSwitchTab }) {
   const { t, i18n } = useTranslation();
