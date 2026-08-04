@@ -26,31 +26,39 @@ app.use(express.json());
 // CORS_ORIGINS set, fall back to allowing all so local Expo/Vite dev
 // servers on random ports aren't blocked — but this must be set in any
 // deployed environment (see .env.example).
-const allowedOrigins = (process.env.CORS_ORIGINS || "")
+const defaultAllowedOrigins = [
+  "https://omishgo.vercel.app",
+  "http://localhost:3000",
+  "http://localhost:5000",
+  "http://localhost:5173",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:5000",
+  "http://127.0.0.1:5173",
+];
+
+const envOrigins = (process.env.CORS_ORIGINS || "")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
+
+const allowedOrigins = [...defaultAllowedOrigins, ...envOrigins];
 
 app.use(
   cors({
     origin: (origin, callback) => {
       // No Origin header at all (native app requests, curl, Postman) — allow.
       if (!origin) return callback(null, true);
-      if (allowedOrigins.length === 0) {
-        // Nothing configured: permissive in dev, but warn so it's not
-        // mistaken for an intentional production setting.
-        if (process.env.NODE_ENV === "production") {
-          console.warn(
-            "CORS_ORIGINS is not set in production — rejecting browser origin:",
-            origin,
-          );
-          const corsError = new Error("Not allowed by CORS");
-          corsError.statusCode = 403;
-          return callback(corsError);
-        }
+
+      // Allow exact match or any *.vercel.app deployment domain
+      if (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
         return callback(null, true);
       }
-      if (allowedOrigins.includes(origin)) return callback(null, true);
+
+      if (process.env.NODE_ENV !== "production") {
+        return callback(null, true);
+      }
+
+      console.warn("Rejecting browser origin by CORS:", origin);
       const corsError = new Error("Not allowed by CORS");
       corsError.statusCode = 403;
       return callback(corsError);

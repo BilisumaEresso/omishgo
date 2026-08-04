@@ -946,6 +946,7 @@ function handleRoute() {
       profileView.style.display = "block";
       fetchAndRenderPublicProfile(customId);
     }
+    window.scrollTo(0, 0);
   } else {
     if (mainLanding) mainLanding.style.display = "block";
     if (profileView) profileView.style.display = "none";
