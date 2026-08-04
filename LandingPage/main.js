@@ -756,3 +756,202 @@ if (form) {
     ).observe(s);
   });
 })();
+
+/* ══════════════════════════════════════════════════════════════
+   12. PUBLIC PROFILE ROUTER & RENDERER (/users/:customId)
+   ══════════════════════════════════════════════════════════════ */
+const PUBLIC_API_BASE_URL =
+  window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+    ? "http://localhost:5000"
+    : "https://omishgo-4nzk.onrender.com";
+
+function getInitials(name) {
+  if (!name) return "U";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+}
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function updateProfileMetaTags(user) {
+  const isFarmer = user.role === "farmer";
+  const roleTitle = isFarmer ? "Verified Farmer Producer" : "Verified Wholesale Buyer";
+  const pageTitle = `OmishGo — ${user.name}, ${roleTitle}`;
+  const loc = [user.location?.zone, user.location?.region].filter(Boolean).join(", ");
+  const description = `${user.name} is a ${roleTitle}${loc ? ` based in ${loc}` : ""} on OmishGo direct farm-to-buyer marketplace.`;
+
+  document.title = pageTitle;
+
+  let ogTitle = document.querySelector('meta[property="og:title"]');
+  if (ogTitle) {
+    ogTitle.setAttribute("content", pageTitle);
+  }
+
+  let ogDesc = document.querySelector('meta[property="og:description"]');
+  if (ogDesc) {
+    ogDesc.setAttribute("content", description);
+  }
+}
+
+async function fetchAndRenderPublicProfile(customId) {
+  const profileContainer = document.getElementById("public-profile-view");
+  if (!profileContainer) return;
+
+  // State 1: Calm Loading State
+  profileContainer.innerHTML = `
+    <div class="public-profile-container">
+      <div class="profile-card profile-loading">
+        <div class="profile-loading-text">Loading profile details...</div>
+      </div>
+    </div>
+  `;
+
+  try {
+    const res = await fetch(`${PUBLIC_API_BASE_URL}/api/v1/users/public/${encodeURIComponent(customId)}`);
+    const data = await res.json();
+
+    if (!res.ok || !data?.success || !data?.data?.user) {
+      // State 2: Not Found (404)
+      profileContainer.innerHTML = `
+        <div class="public-profile-container">
+          <div class="profile-card profile-not-found">
+            <div class="not-found-icon">🔍</div>
+            <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Profile Not Found</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 15px;">
+              The public profile for ID "<strong>${escapeHtml(customId)}</strong>" does not exist or is unavailable.
+            </p>
+            <a href="/" class="btn btn-primary">Return to OmishGo Home</a>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    const user = data.data.user;
+    updateProfileMetaTags(user);
+
+    const isFarmer = user.role === "farmer";
+    const roleDisplay = isFarmer ? "Farmer Producer" : "Wholesale Buyer";
+    const roleBgClass = isFarmer ? "role-farmer-bg" : "role-buyer-bg";
+
+    const initials = getInitials(user.name);
+    const avatarHtml = user.avatarUrl
+      ? `<img src="${escapeHtml(user.avatarUrl)}" alt="${escapeHtml(user.name)}" class="profile-avatar-img" />`
+      : `<div class="profile-initials-circle ${roleBgClass}">${initials}</div>`;
+
+    // Generic "Verified" badge (NO institution names like Farmers' Union or Meki)
+    const verifiedBadgeHtml = user.isVerified
+      ? `<span class="verified-pill"><svg class="badge-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> Verified</span>`
+      : "";
+
+    const locationStr = [user.location?.zone, user.location?.region].filter(Boolean).join(", ") || "Location Not Provided";
+    const memberSinceStr = user.createdAt
+      ? `Member since ${new Date(user.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })}`
+      : "Member of OmishGo";
+
+    // Honest rating handling
+    const ratingDisplay = user.ratingCount > 0
+      ? `${Number(user.averageRating).toFixed(1)} ★ (${user.ratingCount})`
+      : "No reviews yet";
+
+    // Honest listing/order stats
+    const primaryStatVal = isFarmer ? (user.activeListingsCount || 0) : (user.completedOrdersCount || 0);
+    const primaryStatLbl = isFarmer ? "Active Listings" : "Completed Orders";
+
+    const secondaryStatVal = isFarmer ? (user.completedOrdersCount || 0) : "Verified";
+    const secondaryStatLbl = isFarmer ? "Delivered Orders" : "Account Status";
+
+    // State 3: Success State Rendering
+    profileContainer.innerHTML = `
+      <div class="public-profile-container">
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="profile-avatar-wrap">
+              ${avatarHtml}
+            </div>
+            <div class="profile-identity">
+              <div class="profile-name-row">
+                <h1 class="profile-name">${escapeHtml(user.name)}</h1>
+                ${verifiedBadgeHtml}
+              </div>
+              <div class="profile-role-title">${escapeHtml(roleDisplay)}</div>
+              <div class="profile-meta-row">
+                <span>📍 ${escapeHtml(locationStr)}</span>
+                <span>📅 ${escapeHtml(memberSinceStr)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-stats-grid">
+            <div class="profile-stat-box">
+              <div class="stat-num">${primaryStatVal}</div>
+              <div class="stat-lbl">${primaryStatLbl}</div>
+            </div>
+            <div class="profile-stat-box">
+              <div class="stat-num">${secondaryStatVal}</div>
+              <div class="stat-lbl">${secondaryStatLbl}</div>
+            </div>
+            <div class="profile-stat-box">
+              <div class="stat-rating">${escapeHtml(ratingDisplay)}</div>
+              <div class="stat-lbl">Rating & Reviews</div>
+            </div>
+          </div>
+
+          <div class="profile-footer-cta">
+            <p class="profile-trust-note">Verified OmishGo Direct Marketplace Profile • ID: ${escapeHtml(user.customId)}</p>
+            <a href="https://github.com/BilisumaEresso/omishgo/releases/download/v1.0.0-pilot/application-cc25adc4-057a-4fcc-81a7-e7143b75e4df.apk" class="btn btn-primary" download>Get the OmishGo App</a>
+          </div>
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    console.error("Public profile fetch error:", err);
+    profileContainer.innerHTML = `
+      <div class="public-profile-container">
+        <div class="profile-card profile-not-found">
+          <div class="not-found-icon">⚠️</div>
+          <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Unable to Load Profile</h2>
+          <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 15px;">
+            A network error occurred while loading this public profile. Please check your connection and try again.
+          </p>
+          <a href="/" class="btn btn-primary">Return to OmishGo Home</a>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function handleRoute() {
+  const path = window.location.pathname;
+  const match = path.match(/^\/users\/([A-Za-z0-9_-]+)/);
+
+  const mainLanding = document.getElementById("main-landing-content");
+  const profileView = document.getElementById("public-profile-view");
+
+  if (match && match[1]) {
+    const customId = match[1];
+    if (mainLanding) mainLanding.style.display = "none";
+    if (profileView) {
+      profileView.style.display = "block";
+      fetchAndRenderPublicProfile(customId);
+    }
+  } else {
+    if (mainLanding) mainLanding.style.display = "block";
+    if (profileView) profileView.style.display = "none";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", handleRoute);
+window.addEventListener("popstate", handleRoute);
+handleRoute();

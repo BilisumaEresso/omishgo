@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Alert, Image, Linking, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import AppText from "../../components/common/AppText";
+import PublicProfileShareCard from "../../components/common/PublicProfileShareCard";
 import DashboardLayout from "../../components/layout/DashBoardLayout";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
@@ -329,6 +330,9 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
           <AppText style={styles.statLabel}>{t("profile.totalSales", { defaultValue: "Total Sales" })}</AppText>
         </TouchableOpacity>
       </View>
+
+      {/* Public Profile & QR Code Card */}
+      <PublicProfileShareCard user={user} theme={theme} />
 
       {/* Account Settings List */}
       <View style={[styles.settingsGroup, { backgroundColor: surfaceColor }]}>

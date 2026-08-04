@@ -10,6 +10,15 @@
 export const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_URL || "https://omishgo-4nzk.onrender.com";
 
+// Public Web Domain URL (used for shareable links & QR codes)
+export const PUBLIC_WEB_URL =
+  process.env.EXPO_PUBLIC_WEB_URL || "https://omishgo.et";
+
+export const getPublicProfileUrl = (customId) => {
+  if (!customId) return PUBLIC_WEB_URL;
+  return `${PUBLIC_WEB_URL}/users/${customId}`;
+};
+
 export const API_ENDPOINTS = {
   // Check
   check: "/",

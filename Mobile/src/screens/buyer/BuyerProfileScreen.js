@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Alert, Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "../../components/common/AppText";
+import PublicProfileShareCard from "../../components/common/PublicProfileShareCard";
 import DashboardLayout from "../../components/layout/DashBoardLayout";
 import api from "../../config/api";
 import { API_ENDPOINTS } from "../../constants/api";
@@ -319,6 +320,9 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
           </AppText>
         </View>
       </View>
+
+      {/* Public Profile & QR Code Card */}
+      <PublicProfileShareCard user={user} theme={theme} />
 
       {/* Account Settings List */}
       <View style={[styles.settingsGroup, { backgroundColor: surfaceColor }]}>

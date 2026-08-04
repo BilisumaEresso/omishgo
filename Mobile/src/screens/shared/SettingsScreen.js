@@ -1,9 +1,9 @@
-// Mobile/src/screens/shared/SettingsScreen.js
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
-import { Alert, StyleSheet, Switch, TouchableOpacity, View } from "react-native";
+import { Alert, Modal, StyleSheet, Switch, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import AppText from "../../components/common/AppText";
+import PublicProfileShareCard from "../../components/common/PublicProfileShareCard";
 import DashboardLayout from "../../components/layout/DashBoardLayout";
 import { useTheme } from "../../hooks/useTheme";
 import { useAuthStore } from "../../store/auth.store";
@@ -34,6 +34,7 @@ const SettingsScreen = ({ navigation }) => {
   const [darkMode, setDarkMode] = useState(false);
   const [locationAccess, setLocationAccess] = useState(true);
   const [languageOpen, setLanguageOpen] = useState(false);
+  const [qrModalVisible, setQrModalVisible] = useState(false);
 
   const currentLang = i18n.language || "en";
   const currentLangObj = LANGUAGES.find((l) => l.code === currentLang) || LANGUAGES[0];
@@ -187,16 +188,8 @@ const SettingsScreen = ({ navigation }) => {
         <TapRow
           icon="share-social-outline"
           label={t("settingsScreen.viewSharePublicProfile", { defaultValue: "View & Share My Public Profile" })}
-          subtitle={t("settingsScreen.viewSharePublicProfileSub", { defaultValue: "Shareable public link & QR code (Available in Phase 4)" })}
-          onPress={() =>
-            Alert.alert(
-              t("settingsScreen.publicProfileTitle", { defaultValue: "Public Profile Link" }),
-              t("settingsScreen.publicProfilePhase4Msg", {
-                defaultValue:
-                  "Shareable public profile link and QR code features will be fully active in Phase 4.",
-              }),
-            )
-          }
+          subtitle={t("settingsScreen.viewSharePublicProfileSub", { defaultValue: "Shareable public link & QR code" })}
+          onPress={() => setQrModalVisible(true)}
           isLast
         />
       </Card>
@@ -240,6 +233,29 @@ const SettingsScreen = ({ navigation }) => {
       </AppText>
 
       <View style={{ height: 40 }} />
+
+      {/* Public Profile Share Modal */}
+      <Modal
+        visible={qrModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setQrModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, { backgroundColor: surface }]}>
+            <View style={styles.modalHeader}>
+              <AppText style={[styles.modalTitle, { color: textPrimary }]}>
+                {t("profile.publicProfileModalTitle", { defaultValue: "Public Profile & QR Code" })}
+              </AppText>
+              <TouchableOpacity onPress={() => setQrModalVisible(false)} style={{ padding: 4 }}>
+                <Ionicons name="close" size={24} color={textMuted} />
+              </TouchableOpacity>
+            </View>
+
+            <PublicProfileShareCard user={user} theme={theme} />
+          </View>
+        </View>
+      </Modal>
     </DashboardLayout>
   );
 };
@@ -300,6 +316,27 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 12,
     marginTop: 24,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  modalCard: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 20,
+    paddingBottom: 32,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "800",
   },
 });
 
