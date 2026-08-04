@@ -106,7 +106,7 @@ h2{font-size:clamp(26px,4vw,46px);font-weight:800;line-height:1.14;margin-bottom
    NAV
    ═══════════════════════════════════════════════════════════════ */
 #navbar{position:fixed;top:0;left:0;right:0;z-index:1000;height:var(--nav-h);transition:background .3s,box-shadow .3s,backdrop-filter .3s}
-#navbar.scrolled{background:rgba(6,29,23,.92);backdrop-filter:blur(20px);box-shadow:0 1px 0 var(--border-dark)}
+#navbar.scrolled, body.profile-page #navbar{background:rgba(6,29,23,.92);backdrop-filter:blur(20px);box-shadow:0 1px 0 var(--border-dark)}
 .nav-inner{max-width:var(--max-w);margin:0 auto;padding:0 24px;height:100%;display:flex;align-items:center;gap:36px}
 .nav-logo{display:flex;align-items:center;gap:9px;color:#fff}
 .logo-img{width:36px;height:36px;object-fit:contain;filter:brightness(0) invert(1)}
