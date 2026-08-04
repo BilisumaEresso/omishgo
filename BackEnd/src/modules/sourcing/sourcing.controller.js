@@ -2,7 +2,7 @@
 import SourcingRequest from "./sourcing.model.js";
 import Message from "../messages/message.model.js";
 import User from "../user/user.model.js";
-import Notification from "../notification/notification.model.js";
+import Notification, { createNotification } from "../notification/notification.model.js";
 import asyncHandler from "../../utils/asyncHandler.js";
 import sendResponse from "../../utils/sendResponse.js";
 import ApiError from "../../utils/ApiError.js";
@@ -163,6 +163,23 @@ export const respondToSourcingRequest = asyncHandler(async (req, res) => {
         "sourcingRequestData.status": action === "accepted" ? "accepted" : "rejected",
       },
     }
+  );
+
+  const isAccepted = action === "accepted";
+  const fallbackMessage = isAccepted
+    ? `Your sourcing request for ${request.cropType} was accepted.`
+    : `Your sourcing request for ${request.cropType} was declined.`;
+  const messageKey = isAccepted
+    ? "notifications.sourcingAccepted"
+    : "notifications.sourcingRejected";
+
+  createNotification(
+    request.buyerId,
+    "sourcing_update",
+    fallbackMessage,
+    request._id,
+    messageKey,
+    { cropType: request.cropType }
   );
 
   return sendResponse(res, {

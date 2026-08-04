@@ -144,7 +144,24 @@
     "orderUpdate": "Haalli ajajaa haaromfameera",
     "accountApproved": "Akkaawuntiin kee mirkanaa'eera",
     "accountAlert": "Akeekkachiisa",
-    "systemNotification": "Beeksisa Sirnichaa"
+    "systemNotification": "Beeksisa Sirnichaa",
+    "typeMessage": "Ergaa",
+    "typeOrder": "Ajaja",
+    "typeOrderUpdate": "Haala Ajajaa",
+    "typeAccountVerified": "Akkaawuntii Mirkanaa'e",
+    "typeAccountAlert": "Akeekkachiisa Akkaawuntii",
+    "typeSystem": "Beeksisa Sirnaa",
+    "orderConfirmed": "Ajajni {{cropType}} kee mirkanaa'eera.",
+    "orderInTransit": "Ajajni {{cropType}} kee imala irra jira.",
+    "orderDelivered": "Ajajni {{cropType}} kee si ga'eera.",
+    "orderCancelled": "Ajajni {{cropType}} haqameera.",
+    "newMessageFrom": "Ergaa haaraa {{senderName}} irraa",
+    "accountApprovedMsg": "Akkaawuntiin OmishGo kee bulchaan mirkanaa'eera.",
+    "accountRejectedMsg": "Gaaffiin mirkaneessa akkaawuntii kee hin fudhatamne.",
+    "sourcingAccepted": "Gaaffiin bitta jumlaa {{cropType}} kee fudhatama argateera.",
+    "sourcingRejected": "Gaaffiin bitta jumlaa {{cropType}} kee kufaa ta'eera.",
+    "sourcingRequestReceived": "Gaaffii bitta jumlaa haaraa: {{quantity}} {{unit}} {{cropType}}",
+    "reviewReceived": "Ajaja kee irratti gamaaggama urjii {{rating}} argatteera."
   },
   "errorMessage": {
     "title": "Dogoggoratu Uumame",
@@ -334,6 +351,10 @@
   },
   "chat": {
     "bulkSourcingReq": "Gaaffii Bittaa Jumlaa",
+    "cropLabel": "Midhaan",
+    "quantityLabel": "Hamma",
+    "targetRateLabel": "Gatii Barbaadamu",
+    "destinationLabel": "Bakka Ga'umsaa",
     "declinedOutOfStock": "Kuusaan dhumera / Didameera",
     "matchingHarvest": "Oomishni walfakkaatu maxxanfameera",
     "typeMessage": "Ergaa barreessi...",
@@ -341,7 +362,8 @@
     "acceptedListingLive": "Fudhatameera — Maxxanfameera",
     "acceptAndList": "✓ Fudhadhu fi Maxxansi",
     "decline": "✕ Didi",
-    "openChat": "Haasawa Bani"
+    "openChat": "Haasawa Bani",
+    "defaultTitle": "Waliin Haasaa"
   },
   "help": {
     "directAdmin": "Kallattiin bulchaaf ergaa ergi"

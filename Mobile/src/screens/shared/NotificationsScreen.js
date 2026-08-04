@@ -106,6 +106,21 @@ export default function NotificationsScreen({ navigation }) {
     return result;
   };
 
+  const getNotificationBody = (item) => {
+    if (!item) return "";
+    if (item.messageKey) {
+      const params = { ...(item.messageParams || {}) };
+      if (params.cropType) {
+        params.cropType = getLocalizedCropName(params.cropType, currentLang, t);
+      }
+      return t(item.messageKey, {
+        ...params,
+        defaultValue: item.message || item.body || "",
+      });
+    }
+    return localizeNotificationText(item.message || item.body || "");
+  };
+
   const formatNotifTime = (createdAt, fallbackTime) => {
     if (!createdAt) return fallbackTime || "";
     try {
@@ -142,15 +157,31 @@ export default function NotificationsScreen({ navigation }) {
     if (!item) return;
 
     if (item.type === "new_message") {
-      const partnerId = item.data?.senderId || item.metadata?.senderId;
-      const partnerName = item.data?.senderName || item.metadata?.senderName;
+      const partnerId =
+        item.messageParams?.senderId ||
+        item.data?.senderId ||
+        item.metadata?.senderId ||
+        item.relatedId;
+      const partnerName =
+        item.messageParams?.senderName ||
+        item.data?.senderName ||
+        item.metadata?.senderName;
       if (partnerId) {
         navigation.navigate("Chat", { userId: partnerId, userName: partnerName });
       } else {
         navigation.navigate("Conversations");
       }
-    } else if (item.type === "new_order" || item.type === "order_update") {
-      const orderId = item.data?.orderId || item.metadata?.orderId;
+    } else if (
+      item.type === "new_order" ||
+      item.type === "order_update" ||
+      item.type === "review_received" ||
+      item.type === "sourcing_update"
+    ) {
+      const orderId =
+        item.messageParams?.orderId ||
+        item.data?.orderId ||
+        item.metadata?.orderId ||
+        item.relatedId;
       if (orderId) {
         navigation.navigate("OrderDetail", { order: { _id: orderId } });
       } else {
@@ -184,7 +215,7 @@ export default function NotificationsScreen({ navigation }) {
             {localizeNotificationText(item.title)}
           </AppText>
           <AppText style={[styles.notifBody, { color: textSecondary }]} numberOfLines={2}>
-            {localizeNotificationText(item.message || item.body)}
+            {getNotificationBody(item)}
           </AppText>
           <AppText style={styles.notifTime}>
             {formatNotifTime(item.createdAt, item.time)}
@@ -297,7 +328,7 @@ export default function NotificationsScreen({ navigation }) {
                       </AppText>
 
                       <AppText style={[styles.modalBody, { color: textSecondary }]}>
-                        {localizeNotificationText(selectedNotif.message || selectedNotif.body) || t("notifications.noContent", { defaultValue: "No detailed content provided." })}
+                        {getNotificationBody(selectedNotif) || t("notifications.noContent", { defaultValue: "No detailed content provided." })}
                       </AppText>
 
                       <AppText style={styles.modalTime}>

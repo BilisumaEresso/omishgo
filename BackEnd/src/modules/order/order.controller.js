@@ -263,12 +263,20 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     delivered: `Your order for ${order.cropType} has been delivered.`,
     cancelled: `Order for ${order.cropType} has been cancelled.`,
   };
+  const statusKeys = {
+    confirmed: "notifications.orderConfirmed",
+    in_transit: "notifications.orderInTransit",
+    delivered: "notifications.orderDelivered",
+    cancelled: "notifications.orderCancelled",
+  };
   if (statusMessages[status]) {
     createNotification(
       recipientId,
       "order_update",
       statusMessages[status],
-      order._id
+      order._id,
+      statusKeys[status],
+      { cropType: order.cropType }
     );
   }
 

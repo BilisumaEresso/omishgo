@@ -1,6 +1,6 @@
 // src/screens/shared/OrderDetailScreen.js
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -52,6 +52,21 @@ export default function OrderDetailScreen({ route, navigation }) {
   const [comment, setComment] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
   const [userRating, setUserRating] = useState(null);
+
+  useEffect(() => {
+    const orderId = initialOrder?._id || initialOrder?.id;
+    if (orderId) {
+      api
+        .get(API_ENDPOINTS.orders.detail(orderId))
+        .then((res) => {
+          if (res.data?.data?.order) {
+            setOrder(res.data.data.order);
+            setHasReviewed(!!(res.data.data.order.hasReviewed || res.data.data.order.isReviewed));
+          }
+        })
+        .catch(() => {});
+    }
+  }, [initialOrder]);
 
   const handleSubmitReview = async () => {
     if (rating < 1 || rating > 5) {

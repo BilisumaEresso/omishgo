@@ -55,10 +55,10 @@ const SourcingActionCard = ({ data, isMe, onAccept, onReject, role }) => {
       </View>
 
       <AppText style={styles.actionSpecs}>
-        • Crop: {cropDisplay}{"\n"}
-        • Quantity: {data.quantity} {data.unit || "q"}{"\n"}
-        • Target Rate: ETB {data.targetPrice} / {data.unit || "q"}{"\n"}
-        • Destination: {data.deliveryRegion}
+        • {t("chat.cropLabel", { defaultValue: "Crop" })}: {cropDisplay}{"\n"}
+        • {t("chat.quantityLabel", { defaultValue: "Quantity" })}: {data.quantity} {data.unit || "q"}{"\n"}
+        • {t("chat.targetRateLabel", { defaultValue: "Target Rate" })}: ETB {data.targetPrice} / {data.unit || "q"}{"\n"}
+        • {t("chat.destinationLabel", { defaultValue: "Destination" })}: {data.deliveryRegion}
       </AppText>
 
       {!isMe && role === "farmer" && isPending && (
@@ -414,7 +414,7 @@ export default function ChatScreen({ route, navigation }) {
         }
       />
 
-      <Animated.View style={{ flex: 1, paddingBottom: keyboardHeight }}>
+      <View style={{ flex: 1 }}>
         <View style={{ flex: 1 }}>
           {loading ? (
             <View style={styles.center}>
@@ -493,7 +493,7 @@ export default function ChatScreen({ route, navigation }) {
             </TouchableOpacity>
           </View>
         </View>
-      </Animated.View>
+      </View>
     </View>
   );
 }

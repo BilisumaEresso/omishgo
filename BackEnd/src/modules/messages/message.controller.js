@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import ApiError from "../../utils/ApiError.js";
 import asyncHandler from "../../utils/asyncHandler.js";
 import sendResponse from "../../utils/sendResponse.js";
-import Notification from "../notification/notification.model.js";
+import Notification, { createNotification } from "../notification/notification.model.js";
 import User from "../user/user.model.js";
 import Message from "./message.model.js"; 
 
@@ -128,15 +128,15 @@ export const sendMessage = asyncHandler(async (req, res) => {
   msgObj.receiverId = receiverId.toString();
 
   // Trigger notification for recipient
-  try {
-    await Notification.create({
-      userId: receiverId,
-      type: "new_message",
-      message: "You have a new message",
-      relatedId: message._id.toString(),
-      isRead: false,
-    });
-  } catch (_) {}
+  const senderName = req.user.name || "User";
+  createNotification(
+    receiverId,
+    "new_message",
+    `New message from ${senderName}`,
+    message._id,
+    "notifications.newMessageFrom",
+    { senderName }
+  );
 
   return sendResponse(res, {
     statusCode: 201,

@@ -144,7 +144,24 @@
     "orderUpdate": "Order status updated",
     "accountApproved": "Account verified",
     "accountAlert": "Account alert",
-    "systemNotification": "System notification"
+    "systemNotification": "System notification",
+    "typeMessage": "Message",
+    "typeOrder": "Order",
+    "typeOrderUpdate": "Order Update",
+    "typeAccountVerified": "Account Verified",
+    "typeAccountAlert": "Account Alert",
+    "typeSystem": "System Notification",
+    "orderConfirmed": "Your order for {{cropType}} has been confirmed.",
+    "orderInTransit": "Your order for {{cropType}} is now in transit.",
+    "orderDelivered": "Your order for {{cropType}} has been delivered.",
+    "orderCancelled": "Order for {{cropType}} has been cancelled.",
+    "newMessageFrom": "New message from {{senderName}}",
+    "accountApprovedMsg": "Your OmishGo account has been verified and approved by an admin.",
+    "accountRejectedMsg": "Your OmishGo account verification request was not approved.",
+    "sourcingAccepted": "Your sourcing request for {{cropType}} was accepted.",
+    "sourcingRejected": "Your sourcing request for {{cropType}} was declined.",
+    "sourcingRequestReceived": "New bulk request for {{quantity}} {{unit}} of {{cropType}}",
+    "reviewReceived": "You received a {{rating}}-star review on your order."
   },
   "errorMessage": {
     "title": "An Error Occurred",
@@ -334,6 +351,10 @@
   },
   "chat": {
     "bulkSourcingReq": "Bulk Sourcing Request",
+    "cropLabel": "Crop",
+    "quantityLabel": "Quantity",
+    "targetRateLabel": "Target Rate",
+    "destinationLabel": "Destination",
     "declinedOutOfStock": "Declined / Out of Stock",
     "matchingHarvest": "Matching Harvest Posted",
     "typeMessage": "Type a message...",
@@ -341,7 +362,8 @@
     "acceptedListingLive": "Accepted — Listing Live",
     "acceptAndList": "✓ Accept & List",
     "decline": "✕ Decline",
-    "openChat": "Open Chat"
+    "openChat": "Open Chat",
+    "defaultTitle": "Chat"
   },
   "help": {
     "directAdmin": "Direct message to admin"

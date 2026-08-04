@@ -4,6 +4,7 @@ import sendResponse from "../../utils/sendResponse.js";
 import Order from "../order/order.model.js";
 import User from "../user/user.model.js";
 import Review from "./review.model.js";
+import { createNotification } from "../notification/notification.model.js";
 
 /**
  * @desc    Create a review for a delivered order
@@ -63,6 +64,15 @@ export const createReview = asyncHandler(async (req, res) => {
     reviewee.ratingCount = newCount;
     await reviewee.save();
   }
+
+  createNotification(
+    order.farmerId,
+    "review_received",
+    `You received a ${numericRating}-star review on your order.`,
+    review._id,
+    "notifications.reviewReceived",
+    { rating: numericRating }
+  );
 
   const populatedReview = await Review.findById(review._id).populate(
     "reviewerId",

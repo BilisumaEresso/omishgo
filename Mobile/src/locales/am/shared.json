@@ -144,7 +144,24 @@
     "orderUpdate": "የትዕዛዝዎ ሁኔታ ተዘምኗል",
     "accountApproved": "መለያዎ ጸድቋል",
     "accountAlert": "የመለያ ማሳወቂያ",
-    "systemNotification": "የስርዓት ማሳወቂያ"
+    "systemNotification": "የስርዓት ማሳወቂያ",
+    "typeMessage": "መልእክት",
+    "typeOrder": "ትዕዛዝ",
+    "typeOrderUpdate": "የትዕዛዝ ሁኔታ",
+    "typeAccountVerified": "የተረጋገጠ መለያ",
+    "typeAccountAlert": "የመለያ ማሳወቂያ",
+    "typeSystem": "የስርዓት ማሳወቂያ",
+    "orderConfirmed": "የ{{cropType}} ትዕዛዝዎ ተረጋግጧል።",
+    "orderInTransit": "የ{{cropType}} ትዕዛዝዎ በመጓጓዝ ላይ ይገኛል።",
+    "orderDelivered": "የ{{cropType}} ትዕዛዝዎ ደርሷል።",
+    "orderCancelled": "የ{{cropType}} ትዕዛዝ ተሰርዟል።",
+    "newMessageFrom": "ከ{{senderName}} አዲስ መልእክት",
+    "accountApprovedMsg": "የመለያ ማረጋገጫ ጥያቄዎ በአስተዳዳሪ ጸድቋል።",
+    "accountRejectedMsg": "የመለያ ማረጋገጫ ጥያቄዎ አልተቀበለም።",
+    "sourcingAccepted": "የ{{cropType}} የጅምላ ጥያቄዎ ተቀባይነት አግኝቷል።",
+    "sourcingRejected": "የ{{cropType}} የጅምላ ጥያቄዎ ውድቅ ተደርጓል።",
+    "sourcingRequestReceived": "አዲስ የጅምላ ጥያቄ፦ {{quantity}} {{unit}} {{cropType}}",
+    "reviewReceived": "በትዕዛዝዎ ላይ የ{{rating}} ኮከብ ግምገማ ደርሶዎታል።"
   },
   "errorMessage": {
     "title": "ስህተት አጋጥሟል",
@@ -334,6 +351,10 @@
   },
   "chat": {
     "bulkSourcingReq": "የጅምላ ግዢ ጥያቄ",
+    "cropLabel": "ሰብል",
+    "quantityLabel": "መጠን",
+    "targetRateLabel": "የሚፈለግ ዋጋ",
+    "destinationLabel": "መድረሻ አድራሻ",
     "declinedOutOfStock": "ውድቅ ተደርጓል / አልቋል",
     "matchingHarvest": "ተመሳሳይ ምርት ወጥቷል",
     "typeMessage": "መልዕክት ይጻፉ...",
@@ -341,7 +362,8 @@
     "acceptedListingLive": "ተቀባይነት አግኝቷል — ምርቱ ወጥቷል",
     "acceptAndList": "✓ ተቀበል እና አውጣ",
     "decline": "✕ ውድቅ አድርግ",
-    "openChat": "ውይይት ክፈት"
+    "openChat": "ውይይት ክፈት",
+    "defaultTitle": "ውይይት"
   },
   "help": {
     "directAdmin": "ለአስተዳዳሪ ቀጥታ መልዕክት ላክ"

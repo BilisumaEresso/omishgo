@@ -69,6 +69,15 @@ export const approveUser = asyncHandler(async (req, res) => {
 
   await logAction(req.user._id, "approve_user", user._id, "User");
 
+  createNotification(
+    user._id,
+    "account_approved",
+    "Your OmishGo account has been verified and approved by an admin.",
+    user._id,
+    "notifications.accountApprovedMsg",
+    null
+  );
+
   sendResponse(res, { statusCode: 200, message: "User approved successfully", data: { user } });
 });
 
@@ -91,6 +100,15 @@ export const rejectUser = asyncHandler(async (req, res) => {
   if (!user) throw new ApiError(404, "User not found");
 
   await logAction(req.user._id, "reject_user", user._id, "User");
+
+  createNotification(
+    user._id,
+    "account_rejected",
+    "Your OmishGo account verification request was not approved.",
+    user._id,
+    "notifications.accountRejectedMsg",
+    null
+  );
 
   sendResponse(res, { statusCode: 200, message: "User rejected successfully", data: { user } });
 });
