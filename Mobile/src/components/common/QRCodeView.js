@@ -57,10 +57,10 @@ export default function QRCodeView({
       }}
     >
       {modules.map((row, r) => (
-        <View key={r} style={{ flexDirection: "row", height: cellSize }}>
+        <View key={`qr-row-${r}`} style={{ flexDirection: "row", height: cellSize }}>
           {row.map((cell, c) => (
             <View
-              key={c}
+              key={`qr-cell-${r}-${c}`}
               style={{
                 width: cellSize,
                 height: cellSize,

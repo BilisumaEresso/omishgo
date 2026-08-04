@@ -41,6 +41,15 @@ export default function BuyerProfileScreen({ navigation, onSwitchTab }) {
 
   useEffect(() => {
     const fetchUserData = async () => {
+      if (!user?.customId) {
+        try {
+          const meRes = await api.get(API_ENDPOINTS.auth.me);
+          if (meRes.data?.data?.user) {
+            updateUser(meRes.data.data.user);
+          }
+        } catch (_) {}
+      }
+
       try {
         const savedRes = await api.get(API_ENDPOINTS.saved.list);
         const savedList = savedRes.data?.data?.products || [];

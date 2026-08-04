@@ -14,7 +14,8 @@ export default function PublicProfileShareCard({ user, theme }) {
   const textPrimary = theme?.colors?.textPrimary || "#0F172A";
   const textSecondary = theme?.colors?.textSecondary || "#64748B";
 
-  const customId = user?.customId || "PRO-000000";
+  const rolePrefix = user?.role === "buyer" ? "BYR" : "FMR";
+  const customId = user?.customId || `${rolePrefix}-000000`;
   const profileUrl = getPublicProfileUrl(customId);
   const [copied, setCopied] = useState(false);
 

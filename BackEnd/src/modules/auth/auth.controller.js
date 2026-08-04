@@ -45,6 +45,8 @@ export const getMe = asyncHandler(async (req, res) => {
     name: req.user.name,
     phone: req.user.phone,
     role: req.user.role,
+    customId: req.user.customId,
+    avatarUrl: req.user.avatarUrl || null,
     location: req.user.location,
     preferredLang: req.user.preferredLang,
     isVerified: req.user.isVerified,

@@ -12,7 +12,7 @@ export const API_BASE_URL =
 
 // Public Web Domain URL (used for shareable links & QR codes)
 export const PUBLIC_WEB_URL =
-  process.env.EXPO_PUBLIC_WEB_URL || "https://omishgo.et";
+  process.env.EXPO_PUBLIC_WEB_URL || "https://omishgo.vercel.app";
 
 export const getPublicProfileUrl = (customId) => {
   if (!customId) return PUBLIC_WEB_URL;

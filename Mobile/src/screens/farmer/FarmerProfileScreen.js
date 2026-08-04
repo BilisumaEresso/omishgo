@@ -43,6 +43,15 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
   const currentLangObj = LANGUAGES.find((l) => l.code === currentLang) || LANGUAGES[0];
 
   const fetchFarmerData = async () => {
+    if (!user?.customId) {
+      try {
+        const meRes = await api.get(API_ENDPOINTS.auth.me);
+        if (meRes.data?.data?.user) {
+          updateUser(meRes.data.data.user);
+        }
+      } catch (_) {}
+    }
+
     try {
       const prodRes = await api.get(API_ENDPOINTS.products.list, {
         params: { farmerId: user?._id || user?.id },
@@ -438,8 +447,8 @@ export default function FarmerProfileScreen({ navigation, onSwitchTab }) {
           </View>
         ) : (
           <View style={{ gap: 10 }}>
-            {reviews.map((rev) => (
-              <View key={rev._id} style={styles.ownReviewCard}>
+            {reviews.map((rev, idx) => (
+              <View key={rev._id || rev.id || `farmer-rev-${idx}`} style={styles.ownReviewCard}>
                 <View style={styles.ownReviewHeader}>
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
                     {rev.reviewerId?.avatarUrl ? (

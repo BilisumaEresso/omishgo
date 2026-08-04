@@ -200,8 +200,8 @@ export default function FarmerProfileScreen({ route, navigation }) {
         </View>
       ) : (
         <View style={styles.reviewsList}>
-          {reviews.map((rev) => (
-            <View key={rev._id} style={[styles.reviewItemCard, { backgroundColor: surfaceColor }]}>
+          {reviews.map((rev, idx) => (
+            <View key={rev._id || rev.id || `public-rev-${idx}`} style={[styles.reviewItemCard, { backgroundColor: surfaceColor }]}>
               <View style={styles.reviewItemHeader}>
                 <View style={styles.reviewerInfo}>
                   <View style={styles.reviewerAvatar}>
