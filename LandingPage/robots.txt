@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://omishgo.vercel.app/sitemap.xml

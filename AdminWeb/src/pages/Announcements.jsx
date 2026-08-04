@@ -103,20 +103,20 @@ const Announcements = () => {
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
       <div>
-        <h1 className="text-[32px] font-bold text-[#202224] tracking-[-0.11px]">Announcements</h1>
-        <p className="text-[14px] text-[#202224]/60 mt-1">Broadcast system messages, alerts, and market updates to mobile app users</p>
+        <h1 className="text-[32px] font-bold text-ink tracking-[-0.11px]">Announcements</h1>
+        <p className="text-[14px] text-ink/60 mt-1">Broadcast system messages, alerts, and market updates to mobile app users</p>
       </div>
 
       <div className="bg-white p-8 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)]">
         {error && (
-          <div className="bg-[#FD5454]/10 border border-[#FD5454]/20 text-[#FD5454] p-4 rounded-[10px] mb-6 text-[14px] font-medium flex items-center gap-3">
+          <div className="bg-danger/10 border border-danger/20 text-danger p-4 rounded-[10px] mb-6 text-[14px] font-medium flex items-center gap-3">
             <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
             {error}
           </div>
         )}
         
         {success && (
-          <div className="bg-[#00B69B]/10 border border-[#00B69B]/20 text-[#00B69B] p-4 rounded-[10px] mb-6 text-[14px] font-medium flex items-center gap-3">
+          <div className="bg-success/10 border border-success/20 text-success p-4 rounded-[10px] mb-6 text-[14px] font-medium flex items-center gap-3">
             <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             {success}
           </div>
@@ -125,7 +125,7 @@ const Announcements = () => {
         <form onSubmit={handleSend} className="space-y-8">
           {/* Target Audience Options */}
           <div>
-            <label className="block text-[14px] font-bold text-[#202224] mb-3">Select Target Audience</label>
+            <label className="block text-[14px] font-bold text-ink mb-3">Select Target Audience</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {audienceOptions.map((opt) => {
                 const isSelected = targetRole === opt.id;
@@ -135,12 +135,12 @@ const Announcements = () => {
                     onClick={() => setTargetRole(opt.id)}
                     className={`p-5 rounded-[12px] border-2 cursor-pointer transition-all duration-200 flex flex-col justify-between h-[130px] ${
                       isSelected
-                        ? "border-[#4880FF] bg-[#4880FF]/5 shadow-sm"
-                        : "border-[#E0E0E0] bg-[#F5F6FA] hover:border-gray-300"
+                        ? "border-primary bg-primary/5 shadow-sm"
+                        : "border-border bg-surface-muted hover:border-gray-300"
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <div className={`p-2 rounded-[8px] ${isSelected ? 'bg-[#4880FF] text-white' : 'bg-white text-gray-500'}`}>
+                      <div className={`p-2 rounded-[8px] ${isSelected ? 'bg-primary text-white' : 'bg-white text-gray-500'}`}>
                         {opt.icon}
                       </div>
                       <input 
@@ -149,14 +149,14 @@ const Announcements = () => {
                         value={opt.id} 
                         checked={isSelected} 
                         onChange={() => setTargetRole(opt.id)}
-                        className="w-4 h-4 text-[#4880FF] focus:ring-[#4880FF]/20 cursor-pointer"
+                        className="w-4 h-4 text-primary focus:ring-[#4880FF]/20 cursor-pointer"
                       />
                     </div>
                     <div>
-                      <div className={`text-[15px] font-bold ${isSelected ? 'text-[#4880FF]' : 'text-[#202224]'}`}>
+                      <div className={`text-[15px] font-bold ${isSelected ? 'text-primary' : 'text-ink'}`}>
                         {opt.label}
                       </div>
-                      <div className="text-[12px] text-[#202224]/50">{opt.desc}</div>
+                      <div className="text-[12px] text-ink/50">{opt.desc}</div>
                     </div>
                   </div>
                 );
@@ -165,16 +165,16 @@ const Announcements = () => {
             
             {/* Specific User Autocomplete Field */}
             {targetRole === "specific" && (
-              <div className="mt-6 bg-[#F5F6FA] p-5 rounded-[12px] border border-[#E0E0E0]">
-                <label className="block text-[14px] font-bold text-[#202224] mb-2 flex items-center gap-2">
-                  <svg className="w-4 h-4 text-[#4880FF]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+              <div className="mt-6 bg-surface-muted p-5 rounded-[12px] border border-border">
+                <label className="block text-[14px] font-bold text-ink mb-2 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
                   Target User ID (Short ID or Mongo ID)
                 </label>
                 <input
                   type="text"
                   list="user-datalist"
                   placeholder="Type or select user... (e.g. FMR-83A12C)"
-                  className="w-full bg-white border border-[#D5D5D5] rounded-[10px] h-[44px] px-4 text-[14px] focus:outline-none focus:border-[#4880FF] focus:ring-2 focus:ring-[#4880FF]/20 transition-all font-mono"
+                  className="w-full bg-white border border-border rounded-[10px] h-[44px] px-4 text-[14px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-[#4880FF]/20 transition-all font-mono"
                   value={targetUser}
                   onChange={(e) => setTargetUser(e.target.value)}
                   required={targetRole === "specific"}
@@ -186,7 +186,7 @@ const Announcements = () => {
                     </option>
                   ))}
                 </datalist>
-                <p className="text-[12px] text-[#202224]/50 mt-2">
+                <p className="text-[12px] text-ink/50 mt-2">
                   You can search by typing their Short ID (e.g., FMR-XXXXXX or BYR-XXXXXX) or name.
                 </p>
               </div>
@@ -195,33 +195,33 @@ const Announcements = () => {
 
           {/* Message Area */}
           <div>
-            <label className="block text-[14px] font-bold text-[#202224] mb-2 flex items-center justify-between">
+            <label className="block text-[14px] font-bold text-ink mb-2 flex items-center justify-between">
               <span>Message Content</span>
-              <span className="text-[12px] text-[#202224]/40 font-normal">{message.length} characters</span>
+              <span className="text-[12px] text-ink/40 font-normal">{message.length} characters</span>
             </label>
             <textarea
-              className="w-full bg-[#F5F6FA] border border-[#D5D5D5] rounded-[10px] p-4 text-[14px] text-[#202224] focus:outline-none focus:border-[#4880FF] focus:ring-2 focus:ring-[#4880FF]/20 transition-all resize-none"
+              className="w-full bg-surface-muted border border-border rounded-[10px] p-4 text-[14px] text-ink focus:outline-none focus:border-primary focus:ring-2 focus:ring-[#4880FF]/20 transition-all resize-none"
               rows={6}
               placeholder="Write your message here... (e.g., 'Notice: Market prices for Wheat have been updated for this week.')"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               required
             ></textarea>
-            <p className="text-[12px] text-[#202224]/50 mt-2 flex items-center gap-1.5">
-              <svg className="w-4 h-4 text-[#4880FF]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+            <p className="text-[12px] text-ink/50 mt-2 flex items-center gap-1.5">
+              <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
               This broadcast will be delivered directly to the mobile app in-app notification inbox of the targeted users.
             </p>
           </div>
 
           {/* Submit */}
-          <div className="flex justify-end pt-4 border-t border-[#E0E0E0]/50">
+          <div className="flex justify-end pt-4 border-t border-border/50">
             <button
               type="submit"
               disabled={loading || !message.trim()}
               className={`inline-flex items-center gap-2 px-8 py-3 rounded-[10px] font-bold text-[14px] text-white shadow-sm transition-all ${
                 loading || !message.trim()
                   ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-[#4880FF] hover:bg-[#3d6fd4] cursor-pointer shadow-md shadow-[#4880FF]/20"
+                  : "bg-primary hover:bg-[#3d6fd4] cursor-pointer shadow-md shadow-[#4880FF]/20"
               }`}
             >
               {loading ? (

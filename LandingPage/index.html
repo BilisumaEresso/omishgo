@@ -15,31 +15,32 @@
       property="og:description"
       content="Connecting Ethiopian farmers directly with buyers. No middlemen. Better prices."
     />
-    <meta property="og:image" content="/assets/video_poster.webp" />
+    <meta property="og:image" content="https://omishgo.vercel.app/assets/video_poster.webp" />
     <meta property="og:type" content="website" />
     <!-- C3: og:url — Deployed Vercel URL -->
     <meta property="og:url" content="https://omishgo.vercel.app" />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <!-- Favicons -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <!-- Manifest & Favicons -->
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
     <link
       rel="icon"
       type="image/png"
       sizes="16x16"
-      href="/assets/favicon-16.png"
+      href="assets/favicon-16.png"
     />
     <link
       rel="icon"
       type="image/png"
       sizes="32x32"
-      href="/assets/favicon-32.png"
+      href="assets/favicon-32.png"
     />
     <link
       rel="apple-touch-icon"
       sizes="180x180"
-      href="/assets/favicon-180.png"
+      href="assets/favicon-180.png"
     />
 
     <!-- Fonts -->
@@ -50,7 +51,7 @@
       rel="stylesheet"
     />
 
-    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <!-- ══════════ NAV ══════════ -->
@@ -58,9 +59,11 @@
       <div class="nav-inner">
         <a href="#hero" class="nav-logo" aria-label="OmishGo home">
           <img
-            src="/assets/omishgo_new_general_logo-.png"
+            src="assets/omishgo_new_general_logo-.png"
             class="logo-img"
             alt="OmishGo logo"
+            width="40"
+            height="40"
           />
           <span class="logo-text">OmishGo</span>
         </a>
@@ -194,11 +197,13 @@
           aria-hidden="true"
         >
           <picture>
-            <source srcset="/assets/hero_phones_v2.webp" type="image/webp" />
+            <source srcset="assets/hero_phones_v2.webp" type="image/webp" />
             <img
-              src="/assets/hero_phones_v2.jpg"
+              src="assets/hero_phones_v2.jpg"
               alt="OmishGo — Farmer Dashboard, Onboarding and Buyer Dashboard on three floating phones"
               class="hero-phones-img"
+              width="1200"
+              height="896"
             />
           </picture>
           <div class="phone-glow"></div>
@@ -424,7 +429,7 @@
           </article>
         </div>
         <div class="lang-strip" data-reveal>
-          <span class="lang-pill">🇪🇹 English</span>
+          <span class="lang-pill">English</span>
           <span class="lang-pill">አማርኛ</span>
           <span class="lang-pill">Afaan Oromoo</span>
           <p class="lang-strip-note" data-i18n="lang_note">
@@ -448,12 +453,14 @@
         <div class="video-wrapper" data-reveal>
           <div class="video-player" id="video-player">
             <picture>
-              <source srcset="/assets/video_poster.webp" type="image/webp" />
+              <source srcset="assets/video_poster.webp" type="image/webp" />
               <img
-                src="/assets/video_poster.jpg"
+                src="assets/video_poster.jpg"
                 alt="OmishGo demo video — Ethiopian farmer using smartphone in Rift Valley"
                 class="video-poster"
                 id="video-poster"
+                width="1376"
+                height="768"
               />
             </picture>
             <button
@@ -551,13 +558,10 @@
               <div class="c-phone">
                 <picture
                   ><source
-                    srcset="/assets/Screenshot_20260727-073442_OmishGo.webp"
+                    srcset="assets/Screenshot_20260727-073442_OmishGo.webp"
                     type="image/webp" />
                   <img
-                    src="/assets/Screenshot_20260727-073442_OmishGo.jpg"
-                    alt="OmishGo onboarding: Sell Your Harvest"
-                    loading="lazy"
-                /></picture>
+                    src="assets/Screenshot_20260727-073442_OmishGo.jpg" alt="OmishGo onboarding: Sell Your Harvest" width="480" height="1066" loading="lazy" /></picture>
               </div>
               <div class="c-glow c-glow-green"></div>
             </div>
@@ -579,13 +583,10 @@
               <div class="c-phone">
                 <picture
                   ><source
-                    srcset="/assets/Screenshot_20260727-073449_OmishGo.webp"
+                    srcset="assets/Screenshot_20260727-073449_OmishGo.webp"
                     type="image/webp" />
                   <img
-                    src="/assets/Screenshot_20260727-073449_OmishGo.jpg"
-                    alt="OmishGo onboarding: Browse fresh from farm"
-                    loading="lazy"
-                /></picture>
+                    src="assets/Screenshot_20260727-073449_OmishGo.jpg" alt="OmishGo onboarding: Browse fresh from farm" width="480" height="1066" loading="lazy" /></picture>
               </div>
               <div class="c-glow c-glow-blue"></div>
             </div>
@@ -607,13 +608,10 @@
               <div class="c-phone">
                 <picture
                   ><source
-                    srcset="/assets/Screenshot_20260727-073456_OmishGo.webp"
+                    srcset="assets/Screenshot_20260727-073456_OmishGo.webp"
                     type="image/webp" />
                   <img
-                    src="/assets/Screenshot_20260727-073456_OmishGo.jpg"
-                    alt="OmishGo onboarding: Farm inputs listing"
-                    loading="lazy"
-                /></picture>
+                    src="assets/Screenshot_20260727-073456_OmishGo.jpg" alt="OmishGo onboarding: Farm inputs listing" width="480" height="1066" loading="lazy" /></picture>
               </div>
               <div class="c-glow c-glow-amber"></div>
             </div>
@@ -636,13 +634,10 @@
               <div class="c-phone">
                 <picture
                   ><source
-                    srcset="/assets/Screenshot_20260727-073504_OmishGo.webp"
+                    srcset="assets/Screenshot_20260727-073504_OmishGo.webp"
                     type="image/webp" />
                   <img
-                    src="/assets/Screenshot_20260727-073504_OmishGo.jpg"
-                    alt="OmishGo onboarding: delivery progress"
-                    loading="lazy"
-                /></picture>
+                    src="assets/Screenshot_20260727-073504_OmishGo.jpg" alt="OmishGo onboarding: delivery progress" width="480" height="1066" loading="lazy" /></picture>
               </div>
               <div class="c-glow c-glow-purple"></div>
             </div>
@@ -665,13 +660,10 @@
               <div class="c-phone">
                 <picture
                   ><source
-                    srcset="/assets/Screenshot_20260731-195932_OmishGo.webp"
+                    srcset="assets/Screenshot_20260731-195932_OmishGo.webp"
                     type="image/webp" />
                   <img
-                    src="/assets/Screenshot_20260731-195932_OmishGo.jpg"
-                    alt="OmishGo farmer dashboard"
-                    loading="lazy"
-                /></picture>
+                    src="assets/Screenshot_20260731-195932_OmishGo.jpg" alt="OmishGo farmer dashboard" width="480" height="1066" loading="lazy" /></picture>
               </div>
               <div class="c-glow c-glow-green"></div>
             </div>
@@ -691,13 +683,10 @@
               <div class="c-phone">
                 <picture
                   ><source
-                    srcset="/assets/Screenshot_20260731-195953_OmishGo.webp"
+                    srcset="assets/Screenshot_20260731-195953_OmishGo.webp"
                     type="image/webp" />
                   <img
-                    src="/assets/Screenshot_20260731-195953_OmishGo.jpg"
-                    alt="OmishGo verified producer account profile"
-                    loading="lazy"
-                /></picture>
+                    src="assets/Screenshot_20260731-195953_OmishGo.jpg" alt="OmishGo verified producer account profile" width="480" height="1066" loading="lazy" /></picture>
               </div>
               <div class="c-glow c-glow-green"></div>
             </div>
@@ -719,13 +708,10 @@
               <div class="c-phone c-phone-chat">
                 <picture
                   ><source
-                    srcset="/assets/Screenshot_20260731-200022_OmishGo.webp"
+                    srcset="assets/Screenshot_20260731-200022_OmishGo.webp"
                     type="image/webp" />
                   <img
-                    src="/assets/Screenshot_20260731-200022_OmishGo.jpg"
-                    alt="OmishGo in-app chat between farmer and buyer"
-                    loading="lazy"
-                /></picture>
+                    src="assets/Screenshot_20260731-200022_OmishGo.jpg" alt="OmishGo in-app chat between farmer and buyer" width="480" height="1066" loading="lazy" /></picture>
               </div>
               <div class="c-glow c-glow-green"></div>
             </div>
@@ -748,13 +734,10 @@
               <div class="c-phone">
                 <picture
                   ><source
-                    srcset="/assets/Screenshot_20260731-200050_OmishGo.webp"
+                    srcset="assets/Screenshot_20260731-200050_OmishGo.webp"
                     type="image/webp" />
                   <img
-                    src="/assets/Screenshot_20260731-200050_OmishGo.jpg"
-                    alt="OmishGo buyer dashboard"
-                    loading="lazy"
-                /></picture>
+                    src="assets/Screenshot_20260731-200050_OmishGo.jpg" alt="OmishGo buyer dashboard" width="480" height="1066" loading="lazy" /></picture>
               </div>
               <div class="c-glow c-glow-blue"></div>
             </div>
@@ -775,13 +758,10 @@
               <div class="c-phone">
                 <picture
                   ><source
-                    srcset="/assets/Screenshot_20260731-200103_OmishGo.webp"
+                    srcset="assets/Screenshot_20260731-200103_OmishGo.webp"
                     type="image/webp" />
                   <img
-                    src="/assets/Screenshot_20260731-200103_OmishGo.jpg"
-                    alt="OmishGo buyer orders screen with order progress"
-                    loading="lazy"
-                /></picture>
+                    src="assets/Screenshot_20260731-200103_OmishGo.jpg" alt="OmishGo buyer orders screen with order progress" width="480" height="1066" loading="lazy" /></picture>
               </div>
               <div class="c-glow c-glow-blue"></div>
             </div>
@@ -992,9 +972,10 @@
             A2: Formspree action — FLAG: action is currently a placeholder. See launch-report.md.
             Replace YOUR_FORM_ID with a real Formspree form ID before sharing this page with anyone.
           -->
+            <!-- TODO: set real Formspree ID before launch -->
             <form
               id="waitlist-form"
-              action="https://formspree.io/f/maqrzgdg"
+              action="https://formspree.io/f/YOUR_FORM_ID"
               method="POST"
               novalidate
             >
@@ -1077,9 +1058,11 @@
         <div class="footer-brand">
           <a href="#hero" class="nav-logo footer-logo" aria-label="OmishGo">
             <img
-              src="/assets/omishgo_new_general_logo-.png"
+              src="assets/omishgo_new_general_logo-.png"
               class="logo-img"
               alt="OmishGo logo"
+              width="40"
+              height="40"
             />
             <span class="logo-text">OmishGo</span>
           </a>
@@ -1211,7 +1194,7 @@
       </div>
       <div class="footer-bottom">
         <div class="container footer-bottom-inner">
-          <p data-i18n="footer_copy">© 2026 OmishGo. Built in Ethiopia 🇪🇹</p>
+          <p data-i18n="footer_copy">© 2026 OmishGo. Built in Ethiopia</p>
           <p class="footer-privacy" data-i18n="footer_privacy">
             Your contact info is used only to notify you about the pilot. We do
             not sell or share it.
@@ -1220,6 +1203,6 @@
       </div>
     </footer>
 
-    <script src="/main.js"></script>
+    <script src="main.js"></script>
   </body>
 </html>

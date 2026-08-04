@@ -5,7 +5,6 @@ import {
   BrowserRouter as Router,
   Routes,
 } from "react-router-dom";
-import "./App.css";
 import AdminLayout from "./layout/AdminLayout";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";

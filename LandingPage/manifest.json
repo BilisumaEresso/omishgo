@@ -1,0 +1,21 @@
+{
+  "name": "OmishGo Marketplace",
+  "short_name": "OmishGo",
+  "description": "Ethiopia's Direct Farm-to-Buyer Marketplace",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0B130E",
+  "theme_color": "#2E7D32",
+  "icons": [
+    {
+      "src": "assets/favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

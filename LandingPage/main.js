@@ -114,7 +114,7 @@ const translations = {
     footer_join: "Join Waitlist",
     footer_contact_link: "Contact Us",
     footer_lang_title: "Language / ቋንቋ / Afaan",
-    footer_copy: "© 2026 OmishGo. Built in Ethiopia 🇪🇹",
+    footer_copy: "© 2026 OmishGo. Built in Ethiopia",
     footer_privacy:
       "Your contact info is only used to notify you about the pilot. We don't sell or share it.",
   },
@@ -214,7 +214,7 @@ const translations = {
     footer_join: "የተጠባባቂ ዝርዝሩን ይቀላቀሉ",
     footer_contact_link: "ያግኙን",
     footer_lang_title: "Language / ቋንቋ / Afaan",
-    footer_copy: "© 2026 OmishGo. በኢትዮጵያ ተሰራ 🇪🇹",
+    footer_copy: "© 2026 OmishGo. በኢትዮጵያ ተሰራ",
     footer_privacy: "የመገናኛ መረጃዎ ለሙከራ ትግበራው ማሳወቂያ ብቻ ያገለግላል። ለማንም አሳልፈን አንሰጥም።",
   },
   or: {
@@ -317,7 +317,7 @@ const translations = {
     footer_join: "Tarree Eaggataatti Makami",
     footer_contact_link: "Nu Quunnamaa",
     footer_lang_title: "Language / ቋንቋ / Afaan",
-    footer_copy: "© 2026 OmishGo. Itoophiyaa keessatti ijaarame 🇪🇹",
+    footer_copy: "© 2026 OmishGo. Itoophiyaa keessatti ijaarame",
     footer_privacy:
       "Ragaan quunnamtii kee waa'ee piilootichaa beeksisuuf qofa fayyada. Eenyuufiyyuu dabarsee hin kennamu.",
   },
@@ -471,7 +471,8 @@ if (statsGrid) {
    8. VIDEO PLAYER
    Replace YOUTUBE_ID value once the demo is uploaded.
    ══════════════════════════════════════════════════════════════ */
-const YOUTUBE_ID = "en4wYb-TkdM";
+// TODO: Replace YOUR_YOUTUBE_VIDEO_ID with real YouTube video ID before launch
+const YOUTUBE_ID = "YOUR_YOUTUBE_VIDEO_ID";
 const playBtn = document.getElementById("play-btn");
 const videoPlayer = document.getElementById("video-player");
 const ytContainer = document.getElementById("yt-frame-container");
@@ -713,9 +714,21 @@ if (form) {
         body: new FormData(form),
         headers: { Accept: "application/json" },
       });
+    // Check if Formspree action is still placeholder
+    if (form.action.includes("YOUR_FORM_ID")) {
+      successMsg.innerHTML =
+        '<svg viewBox="0 0 512 512" fill="none" stroke="#FD5454" stroke-width="32" width="20" height="20" aria-hidden="true" style="margin-right:8px;flex-shrink:0">' +
+        '<path d="M85.57 446.25h340.86a24 24 0 0020.73-36.09L276.73 68.61a24 24 0 00-41.46 0L64.84 410.16a24 24 0 0020.73 36.09z" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M256 192v120M256 368h.01" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '</svg>' +
+        '<span style="color:#FD5454">Waitlist submission is currently in preview mode (placeholder ID). Please contact bilisumaere@gmail.com</span>';
+      successMsg.style.display = "flex";
+      successMsg.style.alignItems = "center";
+      return;
+    }
+
       if (res.ok) {
         form.style.display = "none";
-        /* D: checkmark-circle-outline SVG replaces 🎉 emoji in success message */
         successMsg.innerHTML =
           '<svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="32" width="20" height="20" aria-hidden="true" style="margin-right:8px;flex-shrink:0">' +
           '<path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192Z" stroke-miterlimit="10"/>' +
@@ -729,7 +742,14 @@ if (form) {
       submitBtn.disabled = false;
       submitBtn.textContent =
         translations[currentLang].form_submit || "Join Waitlist →";
-      alert("Submission failed , please email hello@omishgo.et");
+      successMsg.innerHTML =
+        '<svg viewBox="0 0 512 512" fill="none" stroke="#FD5454" stroke-width="32" width="20" height="20" aria-hidden="true" style="margin-right:8px;flex-shrink:0">' +
+        '<path d="M85.57 446.25h340.86a24 24 0 0020.73-36.09L276.73 68.61a24 24 0 00-41.46 0L64.84 410.16a24 24 0 0020.73 36.09z" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M256 192v120M256 368h.01" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '</svg>' +
+        '<span style="color:#FD5454">Submission failed. Please try again or email bilisumaere@gmail.com</span>';
+      successMsg.style.display = "flex";
+      successMsg.style.alignItems = "center";
     }
   });
 }
@@ -826,7 +846,7 @@ async function fetchAndRenderPublicProfile(customId) {
       profileContainer.innerHTML = `
         <div class="public-profile-container">
           <div class="profile-card profile-not-found">
-            <div class="not-found-icon">🔍</div>
+            <div class="not-found-icon"><svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="32" width="48" height="48" aria-hidden="true"><path d="M221.09 64a157.09 157.09 0 1 0 157.09 157.09A157.1 157.1 0 0 0 221.09 64Z" stroke-miterlimit="10"/><path d="M338.29 338.29 448 448" stroke-linecap="round" stroke-miterlimit="10"/></svg></div>
             <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Profile Not Found</h2>
             <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 15px;">
               The public profile for ID "<strong>${escapeHtml(customId)}</strong>" does not exist or is unavailable.
@@ -887,8 +907,8 @@ async function fetchAndRenderPublicProfile(customId) {
               </div>
               <div class="profile-role-title">${escapeHtml(roleDisplay)}</div>
               <div class="profile-meta-row">
-                <span>📍 ${escapeHtml(locationStr)}</span>
-                <span>📅 ${escapeHtml(memberSinceStr)}</span>
+                <span><svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="32" width="14" height="14" aria-hidden="true" style="vertical-align:middle;margin-right:4px;"><path d="M256 48c-79.5 0-144 61.5-144 144 0 128 144 272 144 272s144-144 144-272c0-82.5-64.5-144-144-144z"/><circle cx="256" cy="192" r="48"/></svg>${escapeHtml(locationStr)}</span>
+                <span><svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="32" width="14" height="14" aria-hidden="true" style="vertical-align:middle;margin-right:4px;"><rect width="416" height="384" x="48" y="80" rx="48"/><path stroke-linecap="round" d="M128 48v32M384 48v32"/><path d="M464 160H48"/></svg>${escapeHtml(memberSinceStr)}</span>
               </div>
             </div>
           </div>
@@ -920,7 +940,7 @@ async function fetchAndRenderPublicProfile(customId) {
     profileContainer.innerHTML = `
       <div class="public-profile-container">
         <div class="profile-card profile-not-found">
-          <div class="not-found-icon">⚠️</div>
+          <div class="not-found-icon"><svg viewBox="0 0 512 512" fill="none" stroke="#FD5454" stroke-width="32" width="48" height="48" aria-hidden="true"><path d="M85.57 446.25h340.86a24 24 0 0020.73-36.09L276.73 68.61a24 24 0 00-41.46 0L64.84 410.16a24 24 0 0020.73 36.09z" stroke-linecap="round" stroke-linejoin="round"/><path d="M256 192v120M256 368h.01" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Unable to Load Profile</h2>
           <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 15px;">
             A network error occurred while loading this public profile. Please check your connection and try again.

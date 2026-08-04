@@ -351,7 +351,7 @@ const Analytics = () => {
   </style>
 </head>
 <body>
-  <h1>🌾 OmishGo Platform - Full System Audit & Executive Report</h1>
+  <h1>OmishGo Platform - Full System Audit & Executive Report</h1>
   <p><strong>Generated On:</strong> ${new Date().toLocaleString()}</p>
   <p><strong>Prepared By:</strong> System Super Admin</p>
 
@@ -451,7 +451,7 @@ const Analytics = () => {
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#4880FF] border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -494,12 +494,12 @@ const Analytics = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-[32px] font-bold text-[#202224] tracking-[-0.11px]">Dashboard</h1>
+          <h1 className="text-[32px] font-bold text-ink tracking-[-0.11px]">Dashboard</h1>
         </div>
         <div className="flex items-center gap-3">
           <button 
             onClick={startBuildingReport}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#4880FF] text-white rounded-[10px] font-semibold text-[14px] hover:bg-[#3d6fd4] transition-all cursor-pointer shadow-md shadow-[#4880FF]/20"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-[10px] font-semibold text-[14px] hover:bg-[#3d6fd4] transition-all cursor-pointer shadow-md shadow-[#4880FF]/20"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
             Generate Full System Report
@@ -510,8 +510,8 @@ const Analytics = () => {
       {/* TOP CHART: Revenue (Dual Overlapping Smooth Area Graph) */}
       <div className="bg-white p-8 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)]">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-[24px] font-bold text-[#202224]">Revenue</h2>
-          <div className="border border-[#D5D5D5] rounded-[4px] px-3 py-1.5 bg-[#FCFDFD] text-[12px] text-[#2B3034]/60 flex items-center gap-2 cursor-pointer hover:border-[#4880FF] transition-colors">
+          <h2 className="text-[24px] font-bold text-ink">Revenue</h2>
+          <div className="border border-border rounded-[4px] px-3 py-1.5 bg-[#FCFDFD] text-[12px] text-[#2B3034]/60 flex items-center gap-2 cursor-pointer hover:border-primary transition-colors">
             October
             <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
           </div>
@@ -576,11 +576,11 @@ const Analytics = () => {
         <div className="flex justify-center items-center gap-8 mt-6">
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-[#FF8E72] inline-block"></span>
-            <span className="text-[14px] font-semibold text-[#202224]/70">Sales</span>
+            <span className="text-[14px] font-semibold text-ink/70">Sales</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-[#D09BFF] inline-block"></span>
-            <span className="text-[14px] font-semibold text-[#202224]/70">Profit</span>
+            <span className="text-[14px] font-semibold text-ink/70">Profit</span>
           </div>
         </div>
       </div>
@@ -590,7 +590,7 @@ const Analytics = () => {
         
         {/* CARD 1: Customers */}
         <div className="bg-white p-8 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] flex flex-col justify-between h-[360px]">
-          <h2 className="text-[20px] font-bold text-[#202224]">Customers</h2>
+          <h2 className="text-[20px] font-bold text-ink">Customers</h2>
 
           <div className="flex justify-center items-center relative my-2">
             <div className="w-[150px] h-[150px] relative flex items-center justify-center">
@@ -605,20 +605,20 @@ const Analytics = () => {
             </div>
           </div>
 
-          <div className="flex justify-between items-center pt-4 border-t border-[#E0E0E0]/40">
+          <div className="flex justify-between items-center pt-4 border-t border-border/40">
             <div className="text-center flex-1">
-              <div className="text-[24px] font-bold text-[#202224]">{users.length > 0 ? (users.length * 850).toLocaleString() : '34,249'}</div>
+              <div className="text-[24px] font-bold text-ink">{users.length > 0 ? (users.length * 850).toLocaleString() : '34,249'}</div>
               <div className="flex items-center justify-center gap-1.5 mt-1">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#3B82F6]"></span>
-                <span className="text-[12px] font-semibold text-[#202224]/50">New Customers</span>
+                <span className="text-[12px] font-semibold text-ink/50">New Customers</span>
               </div>
             </div>
-            <div className="w-[1px] h-10 bg-[#E0E0E0]"></div>
+            <div className="w-[1px] h-10 bg-border"></div>
             <div className="text-center flex-1">
-              <div className="text-[24px] font-bold text-[#202224]">{farmerCount > 0 ? (farmerCount * 120).toLocaleString() : '1420'}</div>
+              <div className="text-[24px] font-bold text-ink">{farmerCount > 0 ? (farmerCount * 120).toLocaleString() : '1420'}</div>
               <div className="flex items-center justify-center gap-1.5 mt-1">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#93C5FD]"></span>
-                <span className="text-[12px] font-semibold text-[#202224]/50">Repeated</span>
+                <span className="text-[12px] font-semibold text-ink/50">Repeated</span>
               </div>
             </div>
           </div>
@@ -627,18 +627,18 @@ const Analytics = () => {
         {/* CARD 2: Featured Product */}
         <div className="bg-white p-8 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] flex flex-col justify-between h-[360px] relative">
           <div className="flex justify-between items-center">
-            <h2 className="text-[20px] font-bold text-[#202224]">Featured Product</h2>
+            <h2 className="text-[20px] font-bold text-ink">Featured Product</h2>
             
             <div className="flex gap-2">
               <button 
                 onClick={handlePrevProduct}
-                className="w-8 h-8 rounded-full bg-[#F5F6FA] flex items-center justify-center text-[#202224] hover:bg-[#4880FF] hover:text-white transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full bg-surface-muted flex items-center justify-center text-ink hover:bg-primary hover:text-white transition-colors cursor-pointer"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
               </button>
               <button 
                 onClick={handleNextProduct}
-                className="w-8 h-8 rounded-full bg-[#F5F6FA] flex items-center justify-center text-[#202224] hover:bg-[#4880FF] hover:text-white transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full bg-surface-muted flex items-center justify-center text-ink hover:bg-primary hover:text-white transition-colors cursor-pointer"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
               </button>
@@ -646,7 +646,7 @@ const Analytics = () => {
           </div>
 
           <div className="flex flex-col items-center justify-center my-auto">
-            <div className="w-[120px] h-[120px] rounded-[18px] bg-[#F5F6FA] overflow-hidden shadow-sm flex items-center justify-center mb-4">
+            <div className="w-[120px] h-[120px] rounded-[18px] bg-surface-muted overflow-hidden shadow-sm flex items-center justify-center mb-4">
               {currentFeatured && currentFeatured.photos && currentFeatured.photos[0] ? (
                 <img src={currentFeatured.photos[0]} alt={currentFeatured.cropType} className="w-full h-full object-cover" />
               ) : (
@@ -656,10 +656,10 @@ const Analytics = () => {
               )}
             </div>
 
-            <div className="text-[18px] font-bold text-[#202224] text-center">
+            <div className="text-[18px] font-bold text-ink text-center">
               {currentFeatured ? currentFeatured.cropType : "Beats Headphone 2026"}
             </div>
-            <div className="text-[16px] font-bold text-[#4880FF] mt-1">
+            <div className="text-[16px] font-bold text-primary mt-1">
               {currentFeatured ? `ETB ${currentFeatured.price?.toLocaleString()} / ${currentFeatured.unit}` : "$89.00"}
             </div>
           </div>
@@ -667,7 +667,7 @@ const Analytics = () => {
 
         {/* CARD 3: Sales Analytics */}
         <div className="bg-white p-8 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] flex flex-col justify-between h-[360px]">
-          <h2 className="text-[20px] font-bold text-[#202224]">Sales Analytics</h2>
+          <h2 className="text-[20px] font-bold text-ink">Sales Analytics</h2>
 
           <div style={{ width: '100%', height: 230 }}>
             <ResponsiveContainer width="100%" height="100%">
@@ -705,26 +705,26 @@ const Analytics = () => {
       {isBuildingReport && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-[16px] shadow-2xl p-8 max-w-md w-full text-center space-y-6 animate-in fade-in zoom-in-95">
-            <div className="w-16 h-16 rounded-full bg-[#4880FF]/15 text-[#4880FF] flex items-center justify-center mx-auto relative">
+            <div className="w-16 h-16 rounded-full bg-primary/15 text-primary flex items-center justify-center mx-auto relative">
               <svg className="w-8 h-8 animate-spin" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
               </svg>
             </div>
 
             <div>
-              <h3 className="text-[20px] font-bold text-[#202224]">Compiling System Executive Report</h3>
-              <p className="text-[13px] text-[#202224]/60 mt-1">{buildStatusText}</p>
+              <h3 className="text-[20px] font-bold text-ink">Compiling System Executive Report</h3>
+              <p className="text-[13px] text-ink/60 mt-1">{buildStatusText}</p>
             </div>
 
             {/* Progress Bar */}
             <div className="space-y-2">
-              <div className="w-full bg-[#F5F6FA] h-3 rounded-full overflow-hidden border border-[#E0E0E0]">
+              <div className="w-full bg-surface-muted h-3 rounded-full overflow-hidden border border-border">
                 <div 
                   className="bg-gradient-to-r from-[#4880FF] to-[#00B69B] h-full rounded-full transition-all duration-300 ease-out"
                   style={{ width: `${buildProgress}%` }}
                 ></div>
               </div>
-              <div className="text-[12px] font-bold text-[#4880FF] text-right">{buildProgress}%</div>
+              <div className="text-[12px] font-bold text-primary text-right">{buildProgress}%</div>
             </div>
           </div>
         </div>
@@ -736,66 +736,66 @@ const Analytics = () => {
           <div className="bg-white rounded-[14px] shadow-2xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             
             {/* Modal Header */}
-            <div className="p-6 border-b border-[#E0E0E0] flex justify-between items-center bg-[#F5F6FA]">
+            <div className="p-6 border-b border-border flex justify-between items-center bg-surface-muted">
               <div>
-                <h2 className="text-[22px] font-bold text-[#202224]">Full System Executive Report</h2>
-                <p className="text-[13px] text-[#202224]/60 mt-0.5">Comprehensive operational documentation &amp; analytics ready</p>
+                <h2 className="text-[22px] font-bold text-ink">Full System Executive Report</h2>
+                <p className="text-[13px] text-ink/60 mt-0.5">Comprehensive operational documentation &amp; analytics ready</p>
               </div>
               <button 
-                onClick={() => setShowReportModal(false)}
                 className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-gray-400 hover:text-gray-700 transition-colors border border-gray-200 cursor-pointer"
+                onClick={() => setShowReportModal(false)}
               >
-                ✕
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
 
             {/* Modal Body */}
             <div className="p-8 overflow-y-auto flex-1 space-y-6 text-[14px]">
-              <div className="bg-[#00B69B]/10 p-5 rounded-[12px] border border-[#00B69B]/20 flex items-center justify-between">
+              <div className="bg-success/10 p-5 rounded-[12px] border border-success/20 flex items-center justify-between">
                 <div>
-                  <div className="text-[16px] font-bold text-[#00B69B] flex items-center gap-2">
+                  <div className="text-[16px] font-bold text-success flex items-center gap-2">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     System Audit Document Successfully Built
                   </div>
-                  <div className="text-[12px] text-[#202224]/60 mt-1">Export formatted PDF documents, Excel spreadsheets, or Word doc files.</div>
+                  <div className="text-[12px] text-ink/60 mt-1">Export formatted PDF documents, Excel spreadsheets, or Word doc files.</div>
                 </div>
               </div>
 
               {/* Summary KPIs */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div className="bg-[#F5F6FA] p-4 rounded-[10px]">
-                  <div className="text-[22px] font-bold text-[#4880FF]">{users.length}</div>
-                  <div className="text-[12px] text-[#202224]/50 font-semibold uppercase">Total Users</div>
+                <div className="bg-surface-muted p-4 rounded-[10px]">
+                  <div className="text-[22px] font-bold text-primary">{users.length}</div>
+                  <div className="text-[12px] text-ink/50 font-semibold uppercase">Total Users</div>
                 </div>
-                <div className="bg-[#F5F6FA] p-4 rounded-[10px]">
-                  <div className="text-[22px] font-bold text-[#4AD991]">{products.length}</div>
-                  <div className="text-[12px] text-[#202224]/50 font-semibold uppercase">Products</div>
+                <div className="bg-surface-muted p-4 rounded-[10px]">
+                  <div className="text-[22px] font-bold text-success">{products.length}</div>
+                  <div className="text-[12px] text-ink/50 font-semibold uppercase">Products</div>
                 </div>
-                <div className="bg-[#F5F6FA] p-4 rounded-[10px]">
-                  <div className="text-[22px] font-bold text-[#FEC53D]">{orders.length}</div>
-                  <div className="text-[12px] text-[#202224]/50 font-semibold uppercase">Orders</div>
+                <div className="bg-surface-muted p-4 rounded-[10px]">
+                  <div className="text-[22px] font-bold text-warning">{orders.length}</div>
+                  <div className="text-[12px] text-ink/50 font-semibold uppercase">Orders</div>
                 </div>
-                <div className="bg-[#F5F6FA] p-4 rounded-[10px]">
+                <div className="bg-surface-muted p-4 rounded-[10px]">
                   <div className="text-[22px] font-bold text-[#8280FF]">{auditLogs.length}</div>
-                  <div className="text-[12px] text-[#202224]/50 font-semibold uppercase">Audit Logs</div>
+                  <div className="text-[12px] text-ink/50 font-semibold uppercase">Audit Logs</div>
                 </div>
               </div>
 
               {/* Format Selectors Cards */}
               <div>
-                <h3 className="text-[16px] font-bold text-[#202224] mb-4">Select Export Format:</h3>
+                <h3 className="text-[16px] font-bold text-ink mb-4">Select Export Format:</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* PDF Option */}
                   <div 
                     onClick={() => setSelectedFormat('pdf')}
                     className={`p-5 rounded-[12px] border-2 cursor-pointer transition-all flex flex-col justify-between h-[130px] ${
                       selectedFormat === 'pdf'
-                        ? 'border-[#FD5454] bg-red-50/40 shadow-sm'
-                        : 'border-[#E0E0E0] bg-[#F5F6FA] hover:border-gray-300'
+                        ? 'border-danger bg-red-50/40 shadow-sm'
+                        : 'border-border bg-surface-muted hover:border-gray-300'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="p-2 rounded-[8px] bg-[#FD5454] text-white">
+                      <div className="p-2 rounded-[8px] bg-danger text-white">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5-3h7.5M8.25 6H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
                       </div>
                       <input 
@@ -803,12 +803,12 @@ const Analytics = () => {
                         name="exportFormat" 
                         checked={selectedFormat === 'pdf'} 
                         onChange={() => setSelectedFormat('pdf')}
-                        className="w-4 h-4 text-[#FD5454] cursor-pointer"
+                        className="w-4 h-4 text-danger cursor-pointer"
                       />
                     </div>
                     <div>
-                      <div className="text-[15px] font-bold text-[#202224]">Formatted PDF</div>
-                      <div className="text-[12px] text-[#202224]/50">Printable document with styling</div>
+                      <div className="text-[15px] font-bold text-ink">Formatted PDF</div>
+                      <div className="text-[12px] text-ink/50">Printable document with styling</div>
                     </div>
                   </div>
 
@@ -817,12 +817,12 @@ const Analytics = () => {
                     onClick={() => setSelectedFormat('excel')}
                     className={`p-5 rounded-[12px] border-2 cursor-pointer transition-all flex flex-col justify-between h-[130px] ${
                       selectedFormat === 'excel'
-                        ? 'border-[#00B69B] bg-emerald-50/40 shadow-sm'
-                        : 'border-[#E0E0E0] bg-[#F5F6FA] hover:border-gray-300'
+                        ? 'border-success bg-emerald-50/40 shadow-sm'
+                        : 'border-border bg-surface-muted hover:border-gray-300'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="p-2 rounded-[8px] bg-[#00B69B] text-white">
+                      <div className="p-2 rounded-[8px] bg-success text-white">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.375 19.5h17.25m-17.25-3h17.25m-17.25-3h17.25m-17.25-3h17.25M6.75 6h10.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25H6.75a2.25 2.25 0 01-2.25-2.25V8.25A2.25 2.25 0 016.75 6z" /></svg>
                       </div>
                       <input 
@@ -830,12 +830,12 @@ const Analytics = () => {
                         name="exportFormat" 
                         checked={selectedFormat === 'excel'} 
                         onChange={() => setSelectedFormat('excel')}
-                        className="w-4 h-4 text-[#00B69B] cursor-pointer"
+                        className="w-4 h-4 text-success cursor-pointer"
                       />
                     </div>
                     <div>
-                      <div className="text-[15px] font-bold text-[#202224]">Excel (.CSV)</div>
-                      <div className="text-[12px] text-[#202224]/50">Spreadsheet data for MS Excel</div>
+                      <div className="text-[15px] font-bold text-ink">Excel (.CSV)</div>
+                      <div className="text-[12px] text-ink/50">Spreadsheet data for MS Excel</div>
                     </div>
                   </div>
 
@@ -844,12 +844,12 @@ const Analytics = () => {
                     onClick={() => setSelectedFormat('doc')}
                     className={`p-5 rounded-[12px] border-2 cursor-pointer transition-all flex flex-col justify-between h-[130px] ${
                       selectedFormat === 'doc'
-                        ? 'border-[#4880FF] bg-blue-50/40 shadow-sm'
-                        : 'border-[#E0E0E0] bg-[#F5F6FA] hover:border-gray-300'
+                        ? 'border-primary bg-blue-50/40 shadow-sm'
+                        : 'border-border bg-surface-muted hover:border-gray-300'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="p-2 rounded-[8px] bg-[#4880FF] text-white">
+                      <div className="p-2 rounded-[8px] bg-primary text-white">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
                       </div>
                       <input 
@@ -857,12 +857,12 @@ const Analytics = () => {
                         name="exportFormat" 
                         checked={selectedFormat === 'doc'} 
                         onChange={() => setSelectedFormat('doc')}
-                        className="w-4 h-4 text-[#4880FF] cursor-pointer"
+                        className="w-4 h-4 text-primary cursor-pointer"
                       />
                     </div>
                     <div>
-                      <div className="text-[15px] font-bold text-[#202224]">Word (.DOC)</div>
-                      <div className="text-[12px] text-[#202224]/50">Editable doc for MS Word</div>
+                      <div className="text-[15px] font-bold text-ink">Word (.DOC)</div>
+                      <div className="text-[12px] text-ink/50">Editable doc for MS Word</div>
                     </div>
                   </div>
                 </div>
@@ -870,16 +870,16 @@ const Analytics = () => {
             </div>
 
             {/* Modal Footer - Single Generate Button */}
-            <div className="p-6 border-t border-[#E0E0E0] bg-[#F5F6FA] flex justify-end gap-3">
+            <div className="p-6 border-t border-border bg-surface-muted flex justify-end gap-3">
               <button
                 onClick={() => setShowReportModal(false)}
-                className="px-5 py-2.5 bg-white border border-[#D5D5D5] text-[#202224] rounded-[10px] font-semibold text-[14px] hover:bg-gray-50 transition-colors cursor-pointer"
+                className="px-5 py-2.5 bg-white border border-border text-ink rounded-[10px] font-semibold text-[14px] hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleGenerateSelectedFormat}
-                className="inline-flex items-center gap-2 px-8 py-2.5 bg-[#4880FF] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#3d6fd4] transition-all cursor-pointer shadow-md shadow-[#4880FF]/20"
+                className="inline-flex items-center gap-2 px-8 py-2.5 bg-primary text-white rounded-[10px] font-bold text-[14px] hover:bg-[#3d6fd4] transition-all cursor-pointer shadow-md shadow-[#4880FF]/20"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
                 Generate {selectedFormat.toUpperCase()} Report

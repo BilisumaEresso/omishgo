@@ -30,12 +30,12 @@ const AuditLog = () => {
   }, []);
 
   const getActionStyle = (action) => {
-    if (!action) return "bg-[#4880FF] text-white";
+    if (!action) return "bg-primary text-white";
     const act = action.toLowerCase();
-    if (act.includes("approve")) return "bg-[#00B69B] text-white";
-    if (act.includes("reject")) return "bg-[#FD5454] text-white";
+    if (act.includes("approve")) return "bg-success text-white";
+    if (act.includes("reject")) return "bg-danger text-white";
     if (act.includes("broadcast") || act.includes("announce")) return "bg-[#8280FF] text-white";
-    return "bg-[#4880FF] text-white";
+    return "bg-primary text-white";
   };
 
   const formatActionName = (action) => {
@@ -92,14 +92,14 @@ const AuditLog = () => {
       {/* Page Title */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-[32px] font-bold text-[#202224] tracking-[-0.11px]">Audit Log</h1>
-          <p className="text-[14px] text-[#202224]/60 mt-1">Real-time system activity, administrative tracking, and security event logs</p>
+          <h1 className="text-[32px] font-bold text-ink tracking-[-0.11px]">Audit Log</h1>
+          <p className="text-[14px] text-ink/60 mt-1">Real-time system activity, administrative tracking, and security event logs</p>
         </div>
         <button 
           onClick={fetchLogs}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-[#D5D5D5] rounded-[10px] text-[14px] font-semibold text-[#202224] hover:bg-[#F5F6FA] hover:border-[#4880FF] transition-all cursor-pointer shadow-sm"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-border rounded-[10px] text-[14px] font-semibold text-ink hover:bg-surface-muted hover:border-primary transition-all cursor-pointer shadow-sm"
         >
-          <svg className="w-4 h-4 text-[#4880FF]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+          <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
           Refresh Logs
         </button>
       </div>
@@ -109,32 +109,32 @@ const AuditLog = () => {
       {/* KPI Strip */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white p-5 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] flex items-center gap-4">
-          <div className="w-[48px] h-[48px] rounded-[14px] bg-[#4880FF]/15 flex items-center justify-center">
-            <svg className="w-6 h-6 text-[#4880FF]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751A11.959 11.959 0 0112 2.714z" /></svg>
+          <div className="w-[48px] h-[48px] rounded-[14px] bg-primary/15 flex items-center justify-center">
+            <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751A11.959 11.959 0 0112 2.714z" /></svg>
           </div>
           <div>
-            <div className="text-[13px] text-[#202224]/50 font-semibold">Total Audit Logs</div>
-            <div className="text-[22px] font-bold text-[#202224]">{logs.length}</div>
+            <div className="text-[13px] text-ink/50 font-semibold">Total Audit Logs</div>
+            <div className="text-[22px] font-bold text-ink">{logs.length}</div>
           </div>
         </div>
 
         <div className="bg-white p-5 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] flex items-center gap-4">
-          <div className="w-[48px] h-[48px] rounded-[14px] bg-[#00B69B]/15 flex items-center justify-center">
-            <svg className="w-6 h-6 text-[#00B69B]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+          <div className="w-[48px] h-[48px] rounded-[14px] bg-success/15 flex items-center justify-center">
+            <svg className="w-6 h-6 text-success" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
           </div>
           <div>
-            <div className="text-[13px] text-[#202224]/50 font-semibold">Approvals</div>
-            <div className="text-[22px] font-bold text-[#00B69B]">{approveCount}</div>
+            <div className="text-[13px] text-ink/50 font-semibold">Approvals</div>
+            <div className="text-[22px] font-bold text-success">{approveCount}</div>
           </div>
         </div>
 
         <div className="bg-white p-5 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] flex items-center gap-4">
-          <div className="w-[48px] h-[48px] rounded-[14px] bg-[#FD5454]/15 flex items-center justify-center">
-            <svg className="w-6 h-6 text-[#FD5454]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          <div className="w-[48px] h-[48px] rounded-[14px] bg-danger/15 flex items-center justify-center">
+            <svg className="w-6 h-6 text-danger" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           </div>
           <div>
-            <div className="text-[13px] text-[#202224]/50 font-semibold">Rejections</div>
-            <div className="text-[22px] font-bold text-[#FD5454]">{rejectCount}</div>
+            <div className="text-[13px] text-ink/50 font-semibold">Rejections</div>
+            <div className="text-[22px] font-bold text-danger">{rejectCount}</div>
           </div>
         </div>
 
@@ -143,7 +143,7 @@ const AuditLog = () => {
             <svg className="w-6 h-6 text-[#8280FF]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5A4.5 4.5 0 013 11.25V9.75A4.5 4.5 0 017.5 5.25h.75c.704 0 1.402-.03 2.09-.09m0 10.68c1.785.154 3.58.27 5.39.345a.75.75 0 00.77-.746V8.541a.75.75 0 00-.77-.746c-1.81.075-3.605.191-5.39.345" /></svg>
           </div>
           <div>
-            <div className="text-[13px] text-[#202224]/50 font-semibold">Broadcasts</div>
+            <div className="text-[13px] text-ink/50 font-semibold">Broadcasts</div>
             <div className="text-[22px] font-bold text-[#8280FF]">{broadcastCount}</div>
           </div>
         </div>
@@ -153,13 +153,13 @@ const AuditLog = () => {
       <div className="bg-white p-6 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)]">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="relative flex-1">
-            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#202224] opacity-40" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink opacity-40" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input
               type="text"
               placeholder="Search logs by admin, action, target ID, or details..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#F5F6FA] border-[0.6px] border-[#D5D5D5] rounded-[10px] h-[44px] pl-11 pr-4 text-[14px] focus:outline-none focus:border-[#4880FF] focus:ring-2 focus:ring-[#4880FF]/20 transition-all"
+              className="w-full bg-surface-muted border-[0.6px] border-border rounded-[10px] h-[44px] pl-11 pr-4 text-[14px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-[#4880FF]/20 transition-all"
             />
           </div>
 
@@ -167,7 +167,7 @@ const AuditLog = () => {
             <select 
               value={actionFilter} 
               onChange={(e) => setActionFilter(e.target.value)}
-              className="w-full bg-[#F5F6FA] border-[0.6px] border-[#D5D5D5] rounded-[10px] h-[44px] px-4 text-[14px] focus:outline-none focus:border-[#4880FF] focus:ring-2 focus:ring-[#4880FF]/20 transition-all appearance-none cursor-pointer"
+              className="w-full bg-surface-muted border-[0.6px] border-border rounded-[10px] h-[44px] px-4 text-[14px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-[#4880FF]/20 transition-all appearance-none cursor-pointer"
             >
               <option value="all">All Actions</option>
               <option value="approve">Approvals Only</option>
@@ -183,18 +183,18 @@ const AuditLog = () => {
       <div className="bg-white rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] overflow-hidden">
         {loading ? (
           <div className="p-12 flex items-center justify-center">
-            <div className="w-8 h-8 border-4 border-[#4880FF] border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-[#F1F4F9]">
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224] rounded-tl-[14px]">Timestamp</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Admin</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Action</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Target Type</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Target Profile / ID</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224] rounded-tr-[14px]">Details</th>
+              <tr className="bg-surface-soft">
+                <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-tl-[14px]">Timestamp</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">Admin</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">Action</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">Target Type</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">Target Profile / ID</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-tr-[14px]">Details</th>
               </tr>
             </thead>
             <tbody>
@@ -207,10 +207,10 @@ const AuditLog = () => {
                     key={log._id} 
                     className="border-b border-[#979797]/15 last:border-0 hover:bg-[#F9FAFB] transition-colors"
                   >
-                    <td className="py-4 px-5 text-[13px] text-[#202224]/70 whitespace-nowrap">
+                    <td className="py-4 px-5 text-[13px] text-ink/70 whitespace-nowrap">
                       {new Date(log.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </td>
-                    <td className="py-4 px-5 text-[14px] font-semibold text-[#202224]">
+                    <td className="py-4 px-5 text-[14px] font-semibold text-ink">
                       {log.adminId?.name || "System Admin"}
                     </td>
                     <td className="py-4 px-5">
@@ -218,7 +218,7 @@ const AuditLog = () => {
                         {formatActionName(log.action)}
                       </span>
                     </td>
-                    <td className="py-4 px-5 text-[14px] text-[#202224]/80 font-medium capitalize">
+                    <td className="py-4 px-5 text-[14px] text-ink/80 font-medium capitalize">
                       {log.targetType || "System"}
                     </td>
                     {/* Target ID Column - Clicking redirects directly to profile/detail! */}
@@ -226,7 +226,7 @@ const AuditLog = () => {
                       {targetLink ? (
                         <Link 
                           to={targetLink} 
-                          className="inline-flex items-center gap-1.5 text-[13px] font-mono text-[#4880FF] font-semibold hover:underline bg-[#4880FF]/10 px-3 py-1.5 rounded-[8px] transition-colors"
+                          className="inline-flex items-center gap-1.5 text-[13px] font-mono text-primary font-semibold hover:underline bg-primary/10 px-3 py-1.5 rounded-[8px] transition-colors"
                           title="Click to view full user profile or entity details"
                         >
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
@@ -237,7 +237,7 @@ const AuditLog = () => {
                       )}
                     </td>
                     <td 
-                      className="py-4 px-5 text-[14px] text-[#202224]/70 max-w-xs truncate cursor-pointer hover:text-[#4880FF]"
+                      className="py-4 px-5 text-[14px] text-ink/70 max-w-xs truncate cursor-pointer hover:text-primary"
                       onClick={() => setSelectedLog(log)}
                     >
                       {log.details || "—"}
@@ -263,45 +263,45 @@ const AuditLog = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-[14px] shadow-2xl w-full max-w-lg p-8 relative animate-in fade-in zoom-in-95 duration-150">
             <button 
-              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F5F6FA] flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-200 transition-colors"
+              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-surface-muted flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-200 transition-colors"
               onClick={() => setSelectedLog(null)}
             >
-              ✕
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
-            <h2 className="text-[22px] font-bold text-[#202224] mb-6">Audit Log Details</h2>
+            <h2 className="text-[22px] font-bold text-ink mb-6">Audit Log Details</h2>
             
             <div className="space-y-5 text-[14px]">
-              <div className="bg-[#F5F6FA] p-4 rounded-[10px]">
-                <span className="block text-[12px] text-[#202224]/50 font-bold uppercase mb-1">Timestamp</span>
-                <span className="text-[#202224] font-medium">{new Date(selectedLog.createdAt).toLocaleString()}</span>
+              <div className="bg-surface-muted p-4 rounded-[10px]">
+                <span className="block text-[12px] text-ink/50 font-bold uppercase mb-1">Timestamp</span>
+                <span className="text-ink font-medium">{new Date(selectedLog.createdAt).toLocaleString()}</span>
               </div>
               
-              <div className="bg-[#F5F6FA] p-4 rounded-[10px]">
-                <span className="block text-[12px] text-[#202224]/50 font-bold uppercase mb-1">Admin User</span>
-                <span className="text-[#202224] font-bold">{selectedLog.adminId?.name || "System Admin"}</span>
-                {selectedLog.adminId?.phone && <span className="text-[#202224]/60 ml-2">({selectedLog.adminId.phone})</span>}
+              <div className="bg-surface-muted p-4 rounded-[10px]">
+                <span className="block text-[12px] text-ink/50 font-bold uppercase mb-1">Admin User</span>
+                <span className="text-ink font-bold">{selectedLog.adminId?.name || "System Admin"}</span>
+                {selectedLog.adminId?.phone && <span className="text-ink/60 ml-2">({selectedLog.adminId.phone})</span>}
               </div>
               
               <div className="flex gap-4">
-                <div className="bg-[#F5F6FA] p-4 rounded-[10px] flex-1">
-                  <span className="block text-[12px] text-[#202224]/50 font-bold uppercase mb-1">Action</span>
+                <div className="bg-surface-muted p-4 rounded-[10px] flex-1">
+                  <span className="block text-[12px] text-ink/50 font-bold uppercase mb-1">Action</span>
                   <span className={`inline-block px-3 py-1 rounded-[13.5px] text-[12px] font-bold ${getActionStyle(selectedLog.action)}`}>
                     {formatActionName(selectedLog.action)}
                   </span>
                 </div>
 
-                <div className="bg-[#F5F6FA] p-4 rounded-[10px] flex-1">
-                  <span className="block text-[12px] text-[#202224]/50 font-bold uppercase mb-1">Target Type</span>
-                  <span className="text-[#202224] font-bold capitalize">{selectedLog.targetType}</span>
+                <div className="bg-surface-muted p-4 rounded-[10px] flex-1">
+                  <span className="block text-[12px] text-ink/50 font-bold uppercase mb-1">Target Type</span>
+                  <span className="text-ink font-bold capitalize">{selectedLog.targetType}</span>
                 </div>
               </div>
               
-              <div className="bg-[#F5F6FA] p-4 rounded-[10px]">
-                <span className="block text-[12px] text-[#202224]/50 font-bold uppercase mb-1">Target Profile / ID</span>
+              <div className="bg-surface-muted p-4 rounded-[10px]">
+                <span className="block text-[12px] text-ink/50 font-bold uppercase mb-1">Target Profile / ID</span>
                 {getTargetLink(selectedLog) ? (
                   <Link 
                     to={getTargetLink(selectedLog)}
-                    className="inline-flex items-center gap-1.5 text-[#4880FF] font-mono font-bold hover:underline"
+                    className="inline-flex items-center gap-1.5 text-primary font-mono font-bold hover:underline"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
                     {getTargetIdString(selectedLog.targetId)} (View Profile)
@@ -311,9 +311,9 @@ const AuditLog = () => {
                 )}
               </div>
               
-              <div className="bg-[#F5F6FA] p-4 rounded-[10px]">
-                <span className="block text-[12px] text-[#202224]/50 font-bold uppercase mb-1">Full Log Details</span>
-                <div className="mt-1 text-[#202224] font-medium whitespace-pre-wrap">
+              <div className="bg-surface-muted p-4 rounded-[10px]">
+                <span className="block text-[12px] text-ink/50 font-bold uppercase mb-1">Full Log Details</span>
+                <div className="mt-1 text-ink font-medium whitespace-pre-wrap">
                   {selectedLog.details || "No additional details provided."}
                 </div>
               </div>
@@ -323,14 +323,14 @@ const AuditLog = () => {
               {getTargetLink(selectedLog) && (
                 <Link
                   to={getTargetLink(selectedLog)}
-                  className="px-5 py-2.5 bg-[#4880FF] text-white rounded-[10px] font-semibold text-[14px] hover:bg-[#3d6fd4] transition-colors"
+                  className="px-5 py-2.5 bg-primary text-white rounded-[10px] font-semibold text-[14px] hover:bg-[#3d6fd4] transition-colors"
                 >
                   Go to Target Profile
                 </Link>
               )}
               <button 
                 onClick={() => setSelectedLog(null)}
-                className="px-6 py-2.5 bg-[#F5F6FA] text-[#202224] rounded-[10px] font-semibold text-[14px] hover:bg-gray-200 transition-colors cursor-pointer"
+                className="px-6 py-2.5 bg-surface-muted text-ink rounded-[10px] font-semibold text-[14px] hover:bg-gray-200 transition-colors cursor-pointer"
               >
                 Close
               </button>

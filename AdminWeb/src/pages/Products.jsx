@@ -53,8 +53,8 @@ const Products = () => {
 
   const getStatusStyle = (status) => {
     switch (status) {
-      case "active": return "bg-[#00B69B] text-white";
-      case "sold": return "bg-[#FD5454] text-white";
+      case "active": return "bg-success text-white";
+      case "sold": return "bg-danger text-white";
       case "draft": return "bg-[#979797] text-white";
       default: return "bg-gray-400 text-white";
     }
@@ -71,8 +71,8 @@ const Products = () => {
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
-        <h1 className="text-[32px] font-bold text-[#202224] tracking-[-0.11px]">Products</h1>
-        <div className="text-[14px] text-[#202224]/60">
+        <h1 className="text-[32px] font-bold text-ink tracking-[-0.11px]">Products</h1>
+        <div className="text-[14px] text-ink/60">
           {products.length} product{products.length !== 1 ? "s" : ""} found
         </div>
       </div>
@@ -84,7 +84,7 @@ const Products = () => {
         <div className="flex flex-col lg:flex-row gap-4">
           {/* Search */}
           <div className="relative flex-1">
-            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#202224] opacity-40" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink opacity-40" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>
             <input
@@ -92,13 +92,13 @@ const Products = () => {
               placeholder="Search by crop name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#F5F6FA] border-[0.6px] border-[#D5D5D5] rounded-[10px] h-[44px] pl-11 pr-4 text-[14px] focus:outline-none focus:border-[#4880FF] focus:ring-2 focus:ring-[#4880FF]/20 transition-all"
+              className="w-full bg-surface-muted border-[0.6px] border-border rounded-[10px] h-[44px] pl-11 pr-4 text-[14px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-[#4880FF]/20 transition-all"
             />
           </div>
 
           {/* Region Filter */}
           <div className="relative lg:w-[200px]">
-            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#202224] opacity-40" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink opacity-40" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
             </svg>
             <input
@@ -106,7 +106,7 @@ const Products = () => {
               placeholder="Filter by region..."
               value={regionFilter}
               onChange={(e) => setRegionFilter(e.target.value)}
-              className="w-full bg-[#F5F6FA] border-[0.6px] border-[#D5D5D5] rounded-[10px] h-[44px] pl-11 pr-4 text-[14px] focus:outline-none focus:border-[#4880FF] focus:ring-2 focus:ring-[#4880FF]/20 transition-all"
+              className="w-full bg-surface-muted border-[0.6px] border-border rounded-[10px] h-[44px] pl-11 pr-4 text-[14px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-[#4880FF]/20 transition-all"
             />
           </div>
 
@@ -115,7 +115,7 @@ const Products = () => {
             <select 
               value={statusFilter} 
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full bg-[#F5F6FA] border-[0.6px] border-[#D5D5D5] rounded-[10px] h-[44px] px-4 text-[14px] focus:outline-none focus:border-[#4880FF] focus:ring-2 focus:ring-[#4880FF]/20 transition-all appearance-none cursor-pointer"
+              className="w-full bg-surface-muted border-[0.6px] border-border rounded-[10px] h-[44px] px-4 text-[14px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-[#4880FF]/20 transition-all appearance-none cursor-pointer"
             >
               <option value="all">All Statuses</option>
               <option value="active">Active</option>
@@ -130,7 +130,7 @@ const Products = () => {
             <select 
               value={sortBy} 
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full bg-[#F5F6FA] border-[0.6px] border-[#D5D5D5] rounded-[10px] h-[44px] px-4 text-[14px] focus:outline-none focus:border-[#4880FF] focus:ring-2 focus:ring-[#4880FF]/20 transition-all appearance-none cursor-pointer"
+              className="w-full bg-surface-muted border-[0.6px] border-border rounded-[10px] h-[44px] px-4 text-[14px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-[#4880FF]/20 transition-all appearance-none cursor-pointer"
             >
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
@@ -146,21 +146,21 @@ const Products = () => {
       <div className="bg-white rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] overflow-hidden">
         {loading ? (
           <div className="p-12 flex items-center justify-center">
-            <div className="w-8 h-8 border-4 border-[#4880FF] border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-[#F1F4F9]">
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224] rounded-tl-[14px]">Product</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">ID</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Farmer</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Quantity</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Price</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Region</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Date</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Status</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224] rounded-tr-[14px] text-right">Action</th>
+              <tr className="bg-surface-soft">
+                <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-tl-[14px]">Product</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">ID</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">Farmer</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">Quantity</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">Price</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">Region</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">Date</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">Status</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-tr-[14px] text-right">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -174,7 +174,7 @@ const Products = () => {
                         <PlaceholderImg />
                       )}
                       <div>
-                        <Link to={`/products/${p.customId || p._id}`} className="text-[14px] text-[#202224] font-semibold hover:text-[#4880FF] hover:underline">
+                        <Link to={`/products/${p.customId || p._id}`} className="text-[14px] text-ink font-semibold hover:text-primary hover:underline">
                           {p.cropType}
                         </Link>
                         {p.priceAnomaly === 'high' && (
@@ -193,29 +193,29 @@ const Products = () => {
                     </div>
                   </td>
                   <td className="py-4 px-5">
-                    <Link to={`/products/${p.customId || p._id}`} className="text-[13px] font-mono text-[#4880FF] hover:underline">
+                    <Link to={`/products/${p.customId || p._id}`} className="text-[13px] font-mono text-primary hover:underline">
                       {p.customId || `#${p._id.slice(-6)}`}
                     </Link>
                   </td>
                   <td className="py-4 px-5">
                     {p.farmerId ? (
-                      <Link to={`/users/${p.farmerId.customId || p.farmerId._id}`} className="text-[14px] text-[#202224] hover:text-[#4880FF] hover:underline font-medium">
+                      <Link to={`/users/${p.farmerId.customId || p.farmerId._id}`} className="text-[14px] text-ink hover:text-primary hover:underline font-medium">
                         {p.farmerId.name}
                       </Link>
                     ) : (
                       <span className="text-gray-400">Unknown</span>
                     )}
                   </td>
-                  <td className="py-4 px-5 text-[14px] text-[#202224]/80 whitespace-nowrap">
+                  <td className="py-4 px-5 text-[14px] text-ink/80 whitespace-nowrap">
                     {p.quantity} {p.unit}
                   </td>
-                  <td className="py-4 px-5 text-[14px] text-[#202224] font-semibold whitespace-nowrap">
+                  <td className="py-4 px-5 text-[14px] text-ink font-semibold whitespace-nowrap">
                     ETB {p.price?.toLocaleString()}
                   </td>
-                  <td className="py-4 px-5 text-[14px] text-[#202224]/70 whitespace-nowrap">
+                  <td className="py-4 px-5 text-[14px] text-ink/70 whitespace-nowrap">
                     {p.location?.region || p.farmerId?.location?.region || "—"}
                   </td>
-                  <td className="py-4 px-5 text-[14px] text-[#202224]/70 whitespace-nowrap">
+                  <td className="py-4 px-5 text-[14px] text-ink/70 whitespace-nowrap">
                     {new Date(p.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </td>
                   <td className="py-4 px-5">
@@ -226,7 +226,7 @@ const Products = () => {
                   <td className="py-4 px-5 text-right">
                     <Link 
                       to={`/products/${p.customId || p._id}`} 
-                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#F5F6FA] text-[#4880FF] rounded-[10px] font-semibold text-[13px] hover:bg-[#4880FF] hover:text-white transition-all"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-muted text-primary rounded-[10px] font-semibold text-[13px] hover:bg-primary hover:text-white transition-all"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                       View

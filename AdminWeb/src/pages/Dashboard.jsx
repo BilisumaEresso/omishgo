@@ -43,7 +43,7 @@ const TrendDownIcon = () => (
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[#4880FF] text-white px-3 py-2 rounded-md shadow-lg text-sm font-semibold">
+      <div className="bg-primary text-white px-3 py-2 rounded-md shadow-lg text-sm font-semibold">
         {label}: {payload[0].value.toLocaleString()}
       </div>
     );
@@ -85,11 +85,11 @@ const Dashboard = () => {
 
   const getStatusStyle = (status) => {
     switch (status) {
-      case "pending": return "bg-[#FCBE2D] text-white";
-      case "confirmed": return "bg-[#4880FF] text-white";
+      case "pending": return "bg-warning text-white";
+      case "confirmed": return "bg-primary text-white";
       case "in_transit": return "bg-[#8280FF] text-white";
-      case "delivered": return "bg-[#00B69B] text-white";
-      case "cancelled": return "bg-[#FD5454] text-white";
+      case "delivered": return "bg-success text-white";
+      case "cancelled": return "bg-danger text-white";
       default: return "bg-gray-400 text-white";
     }
   };
@@ -98,7 +98,7 @@ const Dashboard = () => {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-[#4880FF] border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           <span className="text-gray-500 text-sm font-medium">Loading dashboard...</span>
         </div>
       </div>
@@ -124,7 +124,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-[32px] font-bold text-[#202224] tracking-[-0.11px]">Dashboard</h1>
+      <h1 className="text-[32px] font-bold text-ink tracking-[-0.11px]">Dashboard</h1>
 
       {error && <div className="text-red-500 bg-white p-4 rounded-lg shadow">{error}</div>}
 
@@ -135,8 +135,8 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] flex flex-col justify-between min-h-[161px]">
           <div className="flex justify-between items-start">
             <div>
-              <div className="text-[16px] text-[#202224] opacity-70 mb-3">Total User</div>
-              <div className="text-[28px] font-bold text-[#202224] tracking-[1px] leading-[38px]">{users.length.toLocaleString()}</div>
+              <div className="text-[16px] text-ink opacity-70 mb-3">Total User</div>
+              <div className="text-[28px] font-bold text-ink tracking-[1px] leading-[38px]">{users.length.toLocaleString()}</div>
             </div>
             <div className="w-[60px] h-[60px] rounded-[23px] bg-[#8280FF]/20 flex items-center justify-center">
               <UsersIcon />
@@ -144,8 +144,8 @@ const Dashboard = () => {
           </div>
           <div className="flex items-center gap-2 mt-4">
             <TrendUpIcon />
-            <span className="text-[#00B69B] text-[16px] font-semibold">8.5%</span>
-            <span className="text-[16px] text-[#202224] opacity-70">Up from yesterday</span>
+            <span className="text-success text-[16px] font-semibold">8.5%</span>
+            <span className="text-[16px] text-ink opacity-70">Up from yesterday</span>
           </div>
         </div>
 
@@ -153,17 +153,17 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] flex flex-col justify-between min-h-[161px]">
           <div className="flex justify-between items-start">
             <div>
-              <div className="text-[16px] text-[#202224] opacity-70 mb-3">Total Order</div>
-              <div className="text-[28px] font-bold text-[#202224] tracking-[1px] leading-[38px]">{orders.length.toLocaleString()}</div>
+              <div className="text-[16px] text-ink opacity-70 mb-3">Total Order</div>
+              <div className="text-[28px] font-bold text-ink tracking-[1px] leading-[38px]">{orders.length.toLocaleString()}</div>
             </div>
-            <div className="w-[60px] h-[60px] rounded-[23px] bg-[#FEC53D]/20 flex items-center justify-center">
+            <div className="w-[60px] h-[60px] rounded-[23px] bg-warning/20 flex items-center justify-center">
               <OrdersIcon />
             </div>
           </div>
           <div className="flex items-center gap-2 mt-4">
             <TrendUpIcon />
-            <span className="text-[#00B69B] text-[16px] font-semibold">1.3%</span>
-            <span className="text-[16px] text-[#202224] opacity-70">Up from past week</span>
+            <span className="text-success text-[16px] font-semibold">1.3%</span>
+            <span className="text-[16px] text-ink opacity-70">Up from past week</span>
           </div>
         </div>
 
@@ -171,17 +171,17 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] flex flex-col justify-between min-h-[161px]">
           <div className="flex justify-between items-start">
             <div>
-              <div className="text-[16px] text-[#202224] opacity-70 mb-3">Total Sales</div>
-              <div className="text-[28px] font-bold text-[#202224] tracking-[1px] leading-[38px]">ETB {totalSales.toLocaleString()}</div>
+              <div className="text-[16px] text-ink opacity-70 mb-3">Total Sales</div>
+              <div className="text-[28px] font-bold text-ink tracking-[1px] leading-[38px]">ETB {totalSales.toLocaleString()}</div>
             </div>
-            <div className="w-[60px] h-[60px] rounded-[23px] bg-[#4AD991]/20 flex items-center justify-center">
+            <div className="w-[60px] h-[60px] rounded-[23px] bg-success/20 flex items-center justify-center">
               <SalesIcon />
             </div>
           </div>
           <div className="flex items-center gap-2 mt-4">
             <TrendDownIcon />
             <span className="text-[#F93C65] text-[16px] font-semibold">4.3%</span>
-            <span className="text-[16px] text-[#202224] opacity-70">Down from yesterday</span>
+            <span className="text-[16px] text-ink opacity-70">Down from yesterday</span>
           </div>
         </div>
 
@@ -189,8 +189,8 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] flex flex-col justify-between min-h-[161px]">
           <div className="flex justify-between items-start">
             <div>
-              <div className="text-[16px] text-[#202224] opacity-70 mb-3">Total Pending</div>
-              <div className="text-[28px] font-bold text-[#202224] tracking-[1px] leading-[38px]">{pendingOrders.length.toLocaleString()}</div>
+              <div className="text-[16px] text-ink opacity-70 mb-3">Total Pending</div>
+              <div className="text-[28px] font-bold text-ink tracking-[1px] leading-[38px]">{pendingOrders.length.toLocaleString()}</div>
             </div>
             <div className="w-[60px] h-[60px] rounded-[23px] bg-[#FF9066]/20 flex items-center justify-center">
               <PendingIcon />
@@ -198,8 +198,8 @@ const Dashboard = () => {
           </div>
           <div className="flex items-center gap-2 mt-4">
             <TrendUpIcon />
-            <span className="text-[#00B69B] text-[16px] font-semibold">1.8%</span>
-            <span className="text-[16px] text-[#202224] opacity-70">Up from yesterday</span>
+            <span className="text-success text-[16px] font-semibold">1.8%</span>
+            <span className="text-[16px] text-ink opacity-70">Up from yesterday</span>
           </div>
         </div>
       </div>
@@ -207,8 +207,8 @@ const Dashboard = () => {
       {/* Sales Details Chart */}
       <div className="bg-white p-8 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)]">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-[24px] font-bold text-[#202224]">Sales Details</h2>
-          <div className="border border-[#D5D5D5] rounded-[4px] px-3 py-1.5 bg-[#FCFDFD] text-[12px] text-[#2B3034]/60 flex items-center gap-2 cursor-pointer hover:border-[#4880FF] transition-colors">
+          <h2 className="text-[24px] font-bold text-ink">Sales Details</h2>
+          <div className="border border-border rounded-[4px] px-3 py-1.5 bg-[#FCFDFD] text-[12px] text-[#2B3034]/60 flex items-center gap-2 cursor-pointer hover:border-primary transition-colors">
             October
             <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
           </div>
@@ -256,18 +256,18 @@ const Dashboard = () => {
       {/* Products Table */}
       <div className="bg-white p-8 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)]">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-[24px] font-bold text-[#202224]">Products</h2>
-          <Link to="/products" className="text-[14px] text-[#4880FF] font-semibold hover:underline">View All</Link>
+          <h2 className="text-[24px] font-bold text-ink">Products</h2>
+          <Link to="/products" className="text-[14px] text-primary font-semibold hover:underline">View All</Link>
         </div>
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#F1F4F9]">
-              <th className="py-4 px-5 text-[14px] font-bold text-[#202224] rounded-l-[12px]">Product Name</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Location</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Date - Time</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Quantity</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Amount</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-[#202224] rounded-r-[12px]">Status</th>
+            <tr className="bg-surface-soft">
+              <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-l-[12px]">Product Name</th>
+              <th className="py-4 px-5 text-[14px] font-bold text-ink">Location</th>
+              <th className="py-4 px-5 text-[14px] font-bold text-ink">Date - Time</th>
+              <th className="py-4 px-5 text-[14px] font-bold text-ink">Quantity</th>
+              <th className="py-4 px-5 text-[14px] font-bold text-ink">Amount</th>
+              <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-r-[12px]">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -284,26 +284,26 @@ const Dashboard = () => {
                         </div>
                       )}
                     </div>
-                    <Link to={`/products/${p.customId || p._id}`} className="text-[14px] text-[#202224]/80 hover:text-[#4880FF] hover:underline font-semibold">
+                    <Link to={`/products/${p.customId || p._id}`} className="text-[14px] text-ink/80 hover:text-primary hover:underline font-semibold">
                       {p.cropType}
                     </Link>
                   </div>
                 </td>
-                <td className="py-4 px-5 text-[14px] text-[#202224]/80">
+                <td className="py-4 px-5 text-[14px] text-ink/80">
                   {p.farmerId?.location?.region || "N/A"}
                 </td>
-                <td className="py-4 px-5 text-[14px] text-[#202224]/80 font-semibold whitespace-nowrap">
+                <td className="py-4 px-5 text-[14px] text-ink/80 font-semibold whitespace-nowrap">
                   {new Date(p.createdAt).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute:'2-digit' }).replace(',', ' -')}
                 </td>
-                <td className="py-4 px-5 text-[14px] text-[#202224]/80">
+                <td className="py-4 px-5 text-[14px] text-ink/80">
                   {p.quantity} {p.unit}
                 </td>
-                <td className="py-4 px-5 text-[14px] text-[#202224]/80 font-semibold whitespace-nowrap">
+                <td className="py-4 px-5 text-[14px] text-ink/80 font-semibold whitespace-nowrap">
                   ETB {p.price?.toLocaleString() || "0"}
                 </td>
                 <td className="py-4 px-5">
                   <span className={`px-4 py-1.5 rounded-[13.5px] text-[14px] font-semibold inline-block ${
-                    p.status === 'approved' ? 'bg-[#00B69B] text-white' : p.status === 'rejected' ? 'bg-[#FD5454] text-white' : 'bg-[#FCBE2D] text-white'
+                    p.status === 'approved' ? 'bg-success text-white' : p.status === 'rejected' ? 'bg-danger text-white' : 'bg-warning text-white'
                   }`}>
                     {p.status ? p.status.charAt(0).toUpperCase() + p.status.slice(1) : "Pending"}
                   </span>
@@ -320,17 +320,17 @@ const Dashboard = () => {
       {/* Users Table */}
       <div className="bg-white p-8 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)]">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-[24px] font-bold text-[#202224]">Users</h2>
-          <Link to="/users" className="text-[14px] text-[#4880FF] font-semibold hover:underline">View All</Link>
+          <h2 className="text-[24px] font-bold text-ink">Users</h2>
+          <Link to="/users" className="text-[14px] text-primary font-semibold hover:underline">View All</Link>
         </div>
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#F1F4F9]">
-              <th className="py-4 px-5 text-[14px] font-bold text-[#202224] rounded-l-[12px]">User</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Phone</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Role</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Joined</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-[#202224] rounded-r-[12px]">Status</th>
+            <tr className="bg-surface-soft">
+              <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-l-[12px]">User</th>
+              <th className="py-4 px-5 text-[14px] font-bold text-ink">Phone</th>
+              <th className="py-4 px-5 text-[14px] font-bold text-ink">Role</th>
+              <th className="py-4 px-5 text-[14px] font-bold text-ink">Joined</th>
+              <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-r-[12px]">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -342,25 +342,25 @@ const Dashboard = () => {
                       <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(u.name || 'U')}&background=random&bold=true`} alt="Avatar" className="w-full h-full object-cover" />
                     </div>
                     <div className="flex flex-col">
-                      <Link to={`/users/${u.customId || u._id}`} className="text-[14px] text-[#202224]/80 hover:text-[#4880FF] hover:underline font-semibold">
+                      <Link to={`/users/${u.customId || u._id}`} className="text-[14px] text-ink/80 hover:text-primary hover:underline font-semibold">
                         {u.name || "N/A"}
                       </Link>
                       <span className="text-[12px] text-gray-400 font-mono">{u.customId || `#${u._id.slice(-6)}`}</span>
                     </div>
                   </div>
                 </td>
-                <td className="py-4 px-5 text-[14px] text-[#202224]/80 whitespace-nowrap">
+                <td className="py-4 px-5 text-[14px] text-ink/80 whitespace-nowrap">
                   {u.phone || "N/A"}
                 </td>
-                <td className="py-4 px-5 text-[14px] text-[#202224]/80 font-semibold capitalize">
+                <td className="py-4 px-5 text-[14px] text-ink/80 font-semibold capitalize">
                   {u.role}
                 </td>
-                <td className="py-4 px-5 text-[14px] text-[#202224]/80 whitespace-nowrap">
+                <td className="py-4 px-5 text-[14px] text-ink/80 whitespace-nowrap">
                   {new Date(u.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                 </td>
                 <td className="py-4 px-5">
                   <span className={`px-4 py-1.5 rounded-[13.5px] text-[14px] font-semibold inline-block ${
-                    u.isVerified ? "bg-[#00B69B] text-white" : "bg-[#FCBE2D] text-white"
+                    u.isVerified ? "bg-success text-white" : "bg-warning text-white"
                   }`}>
                     {u.isVerified ? "Approved" : "Pending"}
                   </span>

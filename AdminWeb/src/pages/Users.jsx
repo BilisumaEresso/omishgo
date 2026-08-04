@@ -97,8 +97,8 @@ const Users = () => {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-[32px] font-bold text-[#202224] tracking-[-0.11px]">Users</h1>
-          <div className="text-[14px] text-[#202224]/60">{filteredUsers.length} user{filteredUsers.length !== 1 ? "s" : ""} found</div>
+          <h1 className="text-[32px] font-bold text-ink tracking-[-0.11px]">Users</h1>
+          <div className="text-[14px] text-ink/60">{filteredUsers.length} user{filteredUsers.length !== 1 ? "s" : ""} found</div>
         </div>
 
         {/* Bulk Action Buttons */}
@@ -108,7 +108,7 @@ const Users = () => {
             disabled={selectedUsers.size === 0}
             className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-[10px] text-[14px] font-semibold transition-all ${
               selectedUsers.size > 0 
-                ? "bg-[#00B69B] text-white hover:bg-[#00a08a] shadow-sm cursor-pointer" 
+                ? "bg-success text-white hover:bg-[#00a08a] shadow-sm cursor-pointer" 
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
           >
@@ -120,7 +120,7 @@ const Users = () => {
             disabled={selectedUsers.size === 0}
             className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-[10px] text-[14px] font-semibold transition-all ${
               selectedUsers.size > 0 
-                ? "bg-[#FD5454] text-white hover:bg-[#e04848] shadow-sm cursor-pointer" 
+                ? "bg-danger text-white hover:bg-[#e04848] shadow-sm cursor-pointer" 
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
           >
@@ -139,38 +139,38 @@ const Users = () => {
             <svg className="w-6 h-6 text-[#8280FF]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
           </div>
           <div>
-            <div className="text-[13px] text-[#202224]/50 font-semibold">Total Users</div>
-            <div className="text-[22px] font-bold text-[#202224]">{users.length}</div>
+            <div className="text-[13px] text-ink/50 font-semibold">Total Users</div>
+            <div className="text-[22px] font-bold text-ink">{users.length}</div>
           </div>
         </div>
 
         <div className="bg-white p-5 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] flex items-center gap-4">
-          <div className="w-[48px] h-[48px] rounded-[14px] bg-[#4AD991]/15 flex items-center justify-center">
-            <svg className="w-6 h-6 text-[#4AD991]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.5M4.5 21V10.5" /></svg>
+          <div className="w-[48px] h-[48px] rounded-[14px] bg-success/15 flex items-center justify-center">
+            <svg className="w-6 h-6 text-success" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.5M4.5 21V10.5" /></svg>
           </div>
           <div>
-            <div className="text-[13px] text-[#202224]/50 font-semibold">Farmers</div>
-            <div className="text-[22px] font-bold text-[#202224]">{farmersCount}</div>
+            <div className="text-[13px] text-ink/50 font-semibold">Farmers</div>
+            <div className="text-[22px] font-bold text-ink">{farmersCount}</div>
           </div>
         </div>
 
         <div className="bg-white p-5 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] flex items-center gap-4">
-          <div className="w-[48px] h-[48px] rounded-[14px] bg-[#4880FF]/15 flex items-center justify-center">
-            <svg className="w-6 h-6 text-[#4880FF]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>
+          <div className="w-[48px] h-[48px] rounded-[14px] bg-primary/15 flex items-center justify-center">
+            <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>
           </div>
           <div>
-            <div className="text-[13px] text-[#202224]/50 font-semibold">Buyers</div>
-            <div className="text-[22px] font-bold text-[#202224]">{buyersCount}</div>
+            <div className="text-[13px] text-ink/50 font-semibold">Buyers</div>
+            <div className="text-[22px] font-bold text-ink">{buyersCount}</div>
           </div>
         </div>
 
         <div className="bg-white p-5 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] flex items-center gap-4">
-          <div className="w-[48px] h-[48px] rounded-[14px] bg-[#FCBE2D]/15 flex items-center justify-center">
-            <svg className="w-6 h-6 text-[#FCBE2D]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <div className="w-[48px] h-[48px] rounded-[14px] bg-warning/15 flex items-center justify-center">
+            <svg className="w-6 h-6 text-warning" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           </div>
           <div>
-            <div className="text-[13px] text-[#202224]/50 font-semibold">Pending Approval</div>
-            <div className="text-[22px] font-bold text-[#FCBE2D]">{pendingCount}</div>
+            <div className="text-[13px] text-ink/50 font-semibold">Pending Approval</div>
+            <div className="text-[22px] font-bold text-warning">{pendingCount}</div>
           </div>
         </div>
       </div>
@@ -179,13 +179,13 @@ const Users = () => {
       <div className="bg-white p-6 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)]">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="relative flex-1">
-            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#202224] opacity-40" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink opacity-40" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input
               type="text"
               placeholder="Search by name, phone, or User ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#F5F6FA] border-[0.6px] border-[#D5D5D5] rounded-[10px] h-[44px] pl-11 pr-4 text-[14px] focus:outline-none focus:border-[#4880FF] focus:ring-2 focus:ring-[#4880FF]/20 transition-all"
+              className="w-full bg-surface-muted border-[0.6px] border-border rounded-[10px] h-[44px] pl-11 pr-4 text-[14px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-[#4880FF]/20 transition-all"
             />
           </div>
 
@@ -193,7 +193,7 @@ const Users = () => {
             <select 
               value={roleFilter} 
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="w-full bg-[#F5F6FA] border-[0.6px] border-[#D5D5D5] rounded-[10px] h-[44px] px-4 text-[14px] focus:outline-none focus:border-[#4880FF] focus:ring-2 focus:ring-[#4880FF]/20 transition-all appearance-none cursor-pointer"
+              className="w-full bg-surface-muted border-[0.6px] border-border rounded-[10px] h-[44px] px-4 text-[14px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-[#4880FF]/20 transition-all appearance-none cursor-pointer"
             >
               <option value="all">All Roles</option>
               <option value="farmer">Farmers</option>
@@ -206,7 +206,7 @@ const Users = () => {
             <select 
               value={statusFilter} 
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full bg-[#F5F6FA] border-[0.6px] border-[#D5D5D5] rounded-[10px] h-[44px] px-4 text-[14px] focus:outline-none focus:border-[#4880FF] focus:ring-2 focus:ring-[#4880FF]/20 transition-all appearance-none cursor-pointer"
+              className="w-full bg-surface-muted border-[0.6px] border-border rounded-[10px] h-[44px] px-4 text-[14px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-[#4880FF]/20 transition-all appearance-none cursor-pointer"
             >
               <option value="all">All Statuses</option>
               <option value="approved">Approved</option>
@@ -219,7 +219,7 @@ const Users = () => {
             <select 
               value={sortBy} 
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full bg-[#F5F6FA] border-[0.6px] border-[#D5D5D5] rounded-[10px] h-[44px] px-4 text-[14px] focus:outline-none focus:border-[#4880FF] focus:ring-2 focus:ring-[#4880FF]/20 transition-all appearance-none cursor-pointer"
+              className="w-full bg-surface-muted border-[0.6px] border-border rounded-[10px] h-[44px] px-4 text-[14px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-[#4880FF]/20 transition-all appearance-none cursor-pointer"
             >
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
@@ -234,27 +234,27 @@ const Users = () => {
       <div className="bg-white rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] overflow-hidden">
         {loading ? (
           <div className="p-12 flex items-center justify-center">
-            <div className="w-8 h-8 border-4 border-[#4880FF] border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-[#F1F4F9]">
+              <tr className="bg-surface-soft">
                 <th className="py-4 px-5 w-12 text-center rounded-tl-[14px]">
                   <input 
                     type="checkbox" 
                     onChange={handleSelectAll}
                     checked={filteredUsers.length > 0 && selectedUsers.size === filteredUsers.length}
-                    className="w-4 h-4 text-[#4880FF] rounded focus:ring-[#4880FF]/20 cursor-pointer"
+                    className="w-4 h-4 text-primary rounded focus:ring-[#4880FF]/20 cursor-pointer"
                   />
                 </th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">User</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">User ID</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Phone</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Role</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Joined Date</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224]">Status</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-[#202224] rounded-tr-[14px] text-right">Action</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">User</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">User ID</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">Phone</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">Role</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">Joined Date</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink">Status</th>
+                <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-tr-[14px] text-right">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -265,7 +265,7 @@ const Users = () => {
                       type="checkbox"
                       checked={selectedUsers.has(u._id)}
                       onChange={() => handleSelectUser(u._id)}
-                      className="w-4 h-4 text-[#4880FF] rounded focus:ring-[#4880FF]/20 cursor-pointer"
+                      className="w-4 h-4 text-primary rounded focus:ring-[#4880FF]/20 cursor-pointer"
                     />
                   </td>
                   <td className="py-4 px-5">
@@ -273,24 +273,24 @@ const Users = () => {
                       <div className="w-[44px] h-[44px] rounded-full bg-[#D8D8D8] overflow-hidden flex-shrink-0">
                         <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(u.name || 'U')}&background=random&bold=true`} alt="Avatar" className="w-full h-full object-cover" />
                       </div>
-                      <Link to={`/users/${u.customId || u._id}`} className="text-[14px] text-[#202224] font-semibold hover:text-[#4880FF] hover:underline">
+                      <Link to={`/users/${u.customId || u._id}`} className="text-[14px] text-ink font-semibold hover:text-primary hover:underline">
                         {u.name || "N/A"}
                       </Link>
                     </div>
                   </td>
                   <td className="py-4 px-5">
-                    <Link to={`/users/${u.customId || u._id}`} className="text-[13px] font-mono text-[#4880FF] hover:underline">
+                    <Link to={`/users/${u.customId || u._id}`} className="text-[13px] font-mono text-primary hover:underline">
                       {u.customId || `#${u._id.slice(-6)}`}
                     </Link>
                   </td>
-                  <td className="py-4 px-5 text-[14px] text-[#202224]/80 whitespace-nowrap">{u.phone}</td>
-                  <td className="py-4 px-5 text-[14px] text-[#202224]/80 font-semibold capitalize whitespace-nowrap">{u.role}</td>
-                  <td className="py-4 px-5 text-[14px] text-[#202224]/70 whitespace-nowrap">
+                  <td className="py-4 px-5 text-[14px] text-ink/80 whitespace-nowrap">{u.phone}</td>
+                  <td className="py-4 px-5 text-[14px] text-ink/80 font-semibold capitalize whitespace-nowrap">{u.role}</td>
+                  <td className="py-4 px-5 text-[14px] text-ink/70 whitespace-nowrap">
                     {new Date(u.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </td>
                   <td className="py-4 px-5">
                     <span className={`px-4 py-1.5 rounded-[13.5px] text-[13px] font-semibold inline-block ${
-                      u.isVerified ? "bg-[#00B69B] text-white" : "bg-[#FCBE2D] text-white"
+                      u.isVerified ? "bg-success text-white" : "bg-warning text-white"
                     }`}>
                       {u.isVerified ? "Approved" : "Pending"}
                     </span>
@@ -298,7 +298,7 @@ const Users = () => {
                   <td className="py-4 px-5 text-right">
                     <Link 
                       to={`/users/${u.customId || u._id}`}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#F5F6FA] text-[#4880FF] rounded-[10px] font-semibold text-[13px] hover:bg-[#4880FF] hover:text-white transition-all"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-muted text-primary rounded-[10px] font-semibold text-[13px] hover:bg-primary hover:text-white transition-all"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
                       Profile
