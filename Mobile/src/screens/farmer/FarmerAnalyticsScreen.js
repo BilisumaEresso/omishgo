@@ -295,21 +295,24 @@ export default function FarmerAnalyticsScreen({ navigation }) {
       const matchCategory =
         selectedCategory === "all" || item.category === selectedCategory;
       const q = searchQuery.toLowerCase().trim();
-      const cropName = (item.crop || "").toLowerCase();
-      const varietyName = (item.variety || "").toLowerCase();
-      const marketName = (item.marketName || item.market || "").toLowerCase();
-      const cityName = cleanCityName(item.city).toLowerCase();
+      
+      const localizedCropName = getLocalizedCropName(item.crop, currentLang, t).toLowerCase();
+      const localizedVarietyName = item.variety ? t(`varieties.${item.variety}`, { defaultValue: item.variety }).toLowerCase() : "";
+      
+      const marketInfo = getLocalizedMarket(item.marketId || item.city, currentLang);
+      const localizedMarketName = (marketInfo.name || "").toLowerCase();
+      const localizedCityName = (marketInfo.city || cleanCityName(item.city)).toLowerCase();
 
       const matchSearch =
         !q ||
-        cropName.includes(q) ||
-        varietyName.includes(q) ||
-        marketName.includes(q) ||
-        cityName.includes(q);
+        localizedCropName.includes(q) ||
+        localizedVarietyName.includes(q) ||
+        localizedMarketName.includes(q) ||
+        localizedCityName.includes(q);
 
       return matchCategory && matchSearch;
     });
-  }, [marketPrices, selectedCategory, searchQuery]);
+  }, [marketPrices, selectedCategory, searchQuery, currentLang, t]);
 
   const handleSellPress = (cropItem) => {
     navigation?.navigate("PostProduct", {
@@ -630,6 +633,10 @@ export default function FarmerAnalyticsScreen({ navigation }) {
                 ? t(`varieties.${loc.topVariety}`, { defaultValue: loc.topVariety })
                 : null;
 
+              const localizedDemandLevel = loc.demandLevel === "high"
+                ? t("analytics.demandHigh", { defaultValue: "HIGH" })
+                : t("analytics.demandMedium", { defaultValue: "MEDIUM" });
+
               return (
                 <View
                   key={loc.city}
@@ -644,7 +651,7 @@ export default function FarmerAnalyticsScreen({ navigation }) {
                     </View>
                     <View style={[styles.demandBadge, { backgroundColor: badgeColor + "18" }]}>
                       <AppText style={[styles.demandText, { color: badgeColor }]}>
-                        {loc.demandLevel.toUpperCase()} {t("analytics.demand", { defaultValue: "DEMAND" })}
+                        {localizedDemandLevel} {t("analytics.demand", { defaultValue: "DEMAND" })}
                       </AppText>
                     </View>
                   </View>

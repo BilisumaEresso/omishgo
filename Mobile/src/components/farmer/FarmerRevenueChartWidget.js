@@ -3,16 +3,23 @@ import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, View } from "react-native";
 import AppText from "../common/AppText";
+import { GREGORIAN_MONTHS_SHORT, ETHIOPIAN_MONTHS_SHORT } from "../../utils/ethiopianDate";
 
 export default function FarmerRevenueChartWidget({ currency = "ETB" }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  
+  const currentLang = i18n.language || "en";
+  const langCode = currentLang.startsWith("am") ? "am" : currentLang.startsWith("om") ? "om" : "en";
+  const isEth = langCode === "am" || langCode === "om";
+  const monthLabels = isEth ? ETHIOPIAN_MONTHS_SHORT[langCode] : GREGORIAN_MONTHS_SHORT[langCode];
+
   const chartData = [
-    { month: "Jan", heightPct: 40, value: "14K" },
-    { month: "Feb", heightPct: 65, value: "28K" },
-    { month: "Mar", heightPct: 50, value: "22K" },
-    { month: "Apr", heightPct: 85, value: "45K" },
-    { month: "May", heightPct: 70, value: "34K" },
-    { month: "Jun", heightPct: 95, value: "52K" },
+    { month: monthLabels[0], heightPct: 40, value: "14K" },
+    { month: monthLabels[1], heightPct: 65, value: "28K" },
+    { month: monthLabels[2], heightPct: 50, value: "22K" },
+    { month: monthLabels[3], heightPct: 85, value: "45K" },
+    { month: monthLabels[4], heightPct: 70, value: "34K" },
+    { month: monthLabels[5], heightPct: 95, value: "52K" },
   ];
 
   return (
@@ -25,7 +32,7 @@ export default function FarmerRevenueChartWidget({ currency = "ETB" }) {
 
         <View style={styles.trendBadge}>
           <Ionicons name="trending-up" size={14} color="#15803D" />
-          <AppText style={styles.trendText}>+24% YoY</AppText>
+          <AppText style={styles.trendText}>{t("farmerDashboard.yoyTrend", { defaultValue: "+24% YoY" })}</AppText>
         </View>
       </View>
 

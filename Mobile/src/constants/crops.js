@@ -43,6 +43,8 @@ export const CROP_IMAGES = {
     "https://images.unsplash.com/photo-1581242335635-ce8631489ac5?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHBhcGF5YXxlbnwwfHwwfHx8MA%3D%3D",
   Default:
     "https://images.unsplash.com/photo-1575218823251-f9d243b6f720?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fGFsbCUyMHZlZ2l0YWJsZXN8ZW58MHx8MHx8fDA%3D",
+  "Red Onion":
+    "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 };
 
 export const getCropFallbackImage = (cropType) => {

@@ -149,6 +149,7 @@ export default function FarmerDashboardScreen({ navigation, onSwitchTab }) {
           unit: o.unit || "q",
           price: o.priceAtOrder || o.price || 0,
           totalPrice: o.totalPrice || (o.priceAtOrder || 0) * (o.quantity || 1),
+          createdAt: o.createdAt,
           date: new Date(o.createdAt).toLocaleDateString("en-GB", {
             day: "numeric",
             month: "short",

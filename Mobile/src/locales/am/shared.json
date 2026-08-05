@@ -284,6 +284,17 @@
   "analytics": {
     "title": "የገበያ ትንታኔ",
     "subtitle": "የጅምላ ዋጋ በኩንታል",
+    "demandHigh": "ከፍተኛ",
+    "demandMedium": "መካከለኛ",
+    "catCereals": "እህልና ጥራጥሬ",
+    "catVegetables": "አትክልትና ስራስር",
+    "catCashCrops": "የጥሬ ገንዘብ ሰብል",
+    "ratesPerQuintalSub": "በኢትዮጵያ ገበያዎች የጅምላ ሸቀጦች ዋጋ በኩንታል (100 ኪ.ግ)",
+    "searchRatesPlaceholder": "ምርት፣ ዝርያ ወይም ከተማ ይፈልጉ...",
+    "noRatesFound": "ለፍለጋዎ የሚስማማ ዋጋ አልተገኘም",
+    "wholesaleRate": "የጅምላ ዋጋ / ኩንታል",
+    "weeklyRange": "የ7-ቀናት የዋጋ ክልል",
+    "locationDemandSub": "በዋና ዋና የኢትዮጵያ የንግድ ማዕከላት ውስጥ የጅምላ ግዢ እንቅስቃሴ እና በጣም የሚፈለጉ ሰብሎች",
     "nationalCommodityIndex": "ሃገራዊ የዋጋ ማውጫ",
     "bestHubToSell": "ለመሸጥ የተሻለ ገበያ",
     "regionalHubs": "የክልል ገበያዎች",
@@ -381,5 +392,14 @@
     "gambela": "ጋምቤላ",
     "harari": "ሐረሪ",
     "direDawa": "ድሬዳዋ"
+  },
+  "tabs": {
+    "orders": "ትዕዛዝ",
+    "products": "ምርት",
+    "home": "ዋና ገጽ",
+    "analytics": "ዳታ",
+    "profile": "ፕሮፋይል",
+    "marketplace": "ገበያ",
+    "saved": "የተቀመጠ"
   }
 }

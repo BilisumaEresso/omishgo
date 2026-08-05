@@ -9,6 +9,7 @@ import {
   getLocalizedZoneName,
   getLocalizedRegionName,
 } from "../../constants/locations";
+import { getLocalizedMarket } from "../../constants/markets";
 
 export default function FarmerMarketPriceIndexCard({
   trends = [],
@@ -19,9 +20,9 @@ export default function FarmerMarketPriceIndexCard({
   const currentLang = i18n.language || "en";
 
   const defaultTrends = [
-    { crop: "Red Onion", region: "Addis Ababa", price: "4,500 ETB/q", demandChange: "+15%", isUp: true },
-    { crop: "Teff", region: "Regional Hub", price: "5,200 ETB/q", demandChange: "+8%", isUp: true },
-    { crop: "Tomato", region: "Adama", price: "3,800 ETB/q", demandChange: "-2%", isUp: false },
+    { crop: "Red Onion", region: "addis_merkato", price: "4,500 ETB/q", demandChange: "+15%", isUp: true },
+    { crop: "Teff", region: "adama_grain", price: "5,200 ETB/q", demandChange: "+8%", isUp: true },
+    { crop: "Tomato", region: "meki_produce", price: "3,800 ETB/q", demandChange: "-2%", isUp: false },
   ];
 
   const list = trends.length > 0 ? trends : defaultTrends;
@@ -49,10 +50,13 @@ export default function FarmerMarketPriceIndexCard({
           const isLast = idx === list.length - 1;
           const isUp = item.isUp ?? !item.demandChange?.includes("-");
           const cropName = getLocalizedCropName(item.crop, currentLang, t);
+          const marketInfo = getLocalizedMarket(item.region, currentLang);
           const localizedRegion =
+            (marketInfo?.region ? marketInfo.name : null) ||
             getLocalizedWeredaName(item.region, currentLang) ||
             getLocalizedZoneName(item.region, currentLang) ||
             getLocalizedRegionName(item.region, currentLang) ||
+            marketInfo?.name ||
             item.region;
 
           return (

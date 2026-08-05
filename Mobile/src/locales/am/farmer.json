@@ -97,6 +97,7 @@
     "statusDelivered": "የደረሰ",
     "statusCancelled": "የተሰረዘ",
     "unitKg": "ኪ.ግ",
+    "buyer": "ገዢ",
     "unknownBuyer": "የጅምላ ገዢ",
     "errorLoadOrders": "ትዕዛዞችን ማምጣት አልተቻለም። ወደ ታች በመሳብ እንደገና ይሞክሩ።",
     "retry": "እንደገና ሞክር",

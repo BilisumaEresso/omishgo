@@ -2,6 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as NavigationBar from "expo-navigation-bar";
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Animated,
   Easing,
@@ -62,6 +63,7 @@ function useTabAnimations(tabs, activeTab) {
 }
 
 export default function BottomTabBar({ role, activeTab, onTabPress }) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const { user, role: authRole } = useAuthStore();
   const insets = useSafeAreaInsets();
@@ -168,7 +170,7 @@ export default function BottomTabBar({ role, activeTab, onTabPress }) {
               },
             ]}
           >
-            {tab.label}
+            {t(`tabs.${tab.key}`, { defaultValue: tab.label })}
           </Animated.Text>
         </Animated.View>
       </Pressable>

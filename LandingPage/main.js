@@ -117,6 +117,27 @@ const translations = {
     footer_copy: "© 2026 OmishGo. Built in Ethiopia",
     footer_privacy:
       "Your contact info is only used to notify you about the pilot. We don't sell or share it.",
+    public_loading: "Loading profile details...",
+    public_not_found: "Profile Not Found",
+    public_not_found_desc: "This public profile does not exist or is unavailable.",
+    public_return_home: "Return to OmishGo Home",
+    public_farmer_role: "Verified Farmer Producer",
+    public_buyer_role: "Verified Wholesale Buyer",
+    public_verified: "Verified",
+    public_location_not_provided: "Location Not Provided",
+    public_member_since: "Member since",
+    public_member_generic: "Member of OmishGo",
+    public_no_reviews: "No reviews yet",
+    public_stat_active_listings: "Active Listings",
+    public_stat_completed_orders: "Completed Orders",
+    public_stat_delivered_orders: "Delivered Orders",
+    public_stat_active_orders: "Active Orders",
+    public_stat_rating_reviews: "Rating & Reviews",
+    public_stat_joined_year: "Joined",
+    public_trust_note: "Verified OmishGo Direct Marketplace Profile",
+    public_get_app_btn: "Get the OmishGo App",
+    public_error_title: "Unable to Load Profile",
+    public_error_desc: "A network error occurred while loading this public profile. Please check your connection and try again."
   },
   am: {
     nav_problem: "ችግሩ",
@@ -216,6 +237,27 @@ const translations = {
     footer_lang_title: "Language / ቋንቋ / Afaan",
     footer_copy: "© 2026 OmishGo. በኢትዮጵያ ተሰራ",
     footer_privacy: "የመገናኛ መረጃዎ ለሙከራ ትግበራው ማሳወቂያ ብቻ ያገለግላል። ለማንም አሳልፈን አንሰጥም።",
+    public_loading: "ፕሮፋይል በማምጣት ላይ...",
+    public_not_found: "ፕሮፋይል አልተገኘም",
+    public_not_found_desc: "ይህ የህዝብ ፕሮፋይል የለም ወይም አይገኝም።",
+    public_return_home: "ወደ OmishGo ዋና ገጽ ይመለሱ",
+    public_farmer_role: "የተረጋገጠ አምራች አርሶ አደር",
+    public_buyer_role: "የተረጋገጠ የጅምላ ገዢ",
+    public_verified: "የተረጋገጠ",
+    public_location_not_provided: "አድራሻ አልተሰጠም",
+    public_member_since: "አባል የሆነው ከ",
+    public_member_generic: "የOmishGo አባል",
+    public_no_reviews: "ምንም ግምገማ የለም",
+    public_stat_active_listings: "ያሉ ምርቶች",
+    public_stat_completed_orders: "የተጠናቀቁ ትዕዛዞች",
+    public_stat_delivered_orders: "የደረሱ ትዕዛዞች",
+    public_stat_active_orders: "የነቁ ትዕዛዞች",
+    public_stat_rating_reviews: "ደረጃ እና ግምገማ",
+    public_stat_joined_year: "አባል የሆነበት",
+    public_trust_note: "የተረጋገጠ የOmishGo ቀጥታ ገበያ ፕሮፋይል",
+    public_get_app_btn: "የOmishGo መተግበሪያ ያውርዱ",
+    public_error_title: "ፕሮፋይል ማምጣት አልተቻለም",
+    public_error_desc: "ይህን ፕሮፋይል ሲያመጣ የኔትወርክ ስህተት አጋጥሟል። እባክዎ ግንኙነትዎን ያረጋግጡና እንደገና ይሞክሩ።"
   },
   or: {
     nav_problem: "Rakkoo",
@@ -320,6 +362,27 @@ const translations = {
     footer_copy: "© 2026 OmishGo. Itoophiyaa keessatti ijaarame",
     footer_privacy:
       "Ragaan quunnamtii kee waa'ee piilootichaa beeksisuuf qofa fayyada. Eenyuufiyyuu dabarsee hin kennamu.",
+    public_loading: "Profaayilii fidaa jira...",
+    public_not_found: "Profaayiliin Hin Argamne",
+    public_not_found_desc: "Profaayiliin kun hin jiru ykn hin argamu.",
+    public_return_home: "Gara Fuula OmishGo'tti Deebi'i",
+    public_farmer_role: "Qonnaan Bulaa Mirkanaa'e",
+    public_buyer_role: "Bitataa Jumlaa Mirkanaa'e",
+    public_verified: "Mirkanaa'e",
+    public_location_not_provided: "Iddoon Hin Kennamne",
+    public_member_since: "Miseensa erga",
+    public_member_generic: "Miseensa OmishGo",
+    public_no_reviews: "Ilaalchi hin kennamne",
+    public_stat_active_listings: "Oomishaalee Maxxanfaman",
+    public_stat_completed_orders: "Ajajoota Xumuraman",
+    public_stat_delivered_orders: "Ajajoota Qaqqaban",
+    public_stat_active_orders: "Ajajoota Hojjetaa Jiran",
+    public_stat_rating_reviews: "Sadarkaa fi Ilaalcha",
+    public_stat_joined_year: "Bara seene",
+    public_trust_note: "Profaayilii Gabaa Kallattii OmishGo Mirkanaa'e",
+    public_get_app_btn: "Appii OmishGo Buufadhu",
+    public_error_title: "Profaayilii Fiduun Hin Danda'amne",
+    public_error_desc: "Profaayilii kana fiduuf dogoggorri neetworkii uumameera. Maaloo neetworkii keessan mirkaneessaa deebitanii yaalaa."
   },
 };
 
@@ -832,10 +895,11 @@ async function fetchAndRenderPublicProfile(customId) {
   profileContainer.innerHTML = `
     <div class="public-profile-container">
       <div class="profile-card profile-loading">
-        <div class="profile-loading-text">Loading profile details...</div>
+        <div class="profile-loading-text" data-i18n="public_loading">Loading profile details...</div>
       </div>
     </div>
   `;
+  applyLanguage(currentLang);
 
   try {
     const res = await fetch(`${PUBLIC_API_BASE_URL}/api/v1/users/public/${encodeURIComponent(customId)}`);
@@ -847,14 +911,15 @@ async function fetchAndRenderPublicProfile(customId) {
         <div class="public-profile-container">
           <div class="profile-card profile-not-found">
             <div class="not-found-icon"><svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="32" width="48" height="48" aria-hidden="true"><path d="M221.09 64a157.09 157.09 0 1 0 157.09 157.09A157.1 157.1 0 0 0 221.09 64Z" stroke-miterlimit="10"/><path d="M338.29 338.29 448 448" stroke-linecap="round" stroke-miterlimit="10"/></svg></div>
-            <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Profile Not Found</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 15px;">
-              The public profile for ID "<strong>${escapeHtml(customId)}</strong>" does not exist or is unavailable.
+            <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;" data-i18n="public_not_found">Profile Not Found</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 15px;" data-i18n="public_not_found_desc">
+              This public profile does not exist or is unavailable.
             </p>
-            <a href="/" class="btn btn-primary">Return to OmishGo Home</a>
+            <a href="/" class="btn btn-primary" data-i18n="public_return_home">Return to OmishGo Home</a>
           </div>
         </div>
       `;
+      applyLanguage(currentLang);
       return;
     }
 
@@ -862,7 +927,7 @@ async function fetchAndRenderPublicProfile(customId) {
     updateProfileMetaTags(user);
 
     const isFarmer = user.role === "farmer";
-    const roleDisplay = isFarmer ? "Farmer Producer" : "Wholesale Buyer";
+    const roleI18n = isFarmer ? "public_farmer_role" : "public_buyer_role";
     const roleBgClass = isFarmer ? "role-farmer-bg" : "role-buyer-bg";
 
     const initials = getInitials(user.name);
@@ -872,25 +937,30 @@ async function fetchAndRenderPublicProfile(customId) {
 
     // Generic "Verified" badge (NO institution names like Farmers' Union or Meki)
     const verifiedBadgeHtml = user.isVerified
-      ? `<span class="verified-pill"><svg class="badge-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> Verified</span>`
+      ? `<span class="verified-pill"><svg class="badge-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> <span data-i18n="public_verified">Verified</span></span>`
       : "";
 
-    const locationStr = [user.location?.zone, user.location?.region].filter(Boolean).join(", ") || "Location Not Provided";
-    const memberSinceStr = user.createdAt
-      ? `Member since ${new Date(user.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })}`
-      : "Member of OmishGo";
+    const locationStr = [user.location?.zone, user.location?.region].filter(Boolean).join(", ");
+    const locationHtml = locationStr 
+      ? `<span><svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="32" width="14" height="14" aria-hidden="true" style="vertical-align:middle;margin-right:4px;"><path d="M256 48c-79.5 0-144 61.5-144 144 0 128 144 272 144 272s144-144 144-272c0-82.5-64.5-144-144-144z"/><circle cx="256" cy="192" r="48"/></svg>${escapeHtml(locationStr)}</span>`
+      : `<span><svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="32" width="14" height="14" aria-hidden="true" style="vertical-align:middle;margin-right:4px;"><path d="M256 48c-79.5 0-144 61.5-144 144 0 128 144 272 144 272s144-144 144-272c0-82.5-64.5-144-144-144z"/><circle cx="256" cy="192" r="48"/></svg><span data-i18n="public_location_not_provided">Location Not Provided</span></span>`;
+    
+    const joinedYear = user.createdAt ? new Date(user.createdAt).getFullYear() : "2026";
+    const memberHtml = `<span><svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="32" width="14" height="14" aria-hidden="true" style="vertical-align:middle;margin-right:4px;"><rect width="416" height="384" x="48" y="80" rx="48"/><path stroke-linecap="round" d="M128 48v32M384 48v32"/><path d="M464 160H48"/></svg><span data-i18n="public_member_since">Member since</span> ${joinedYear}</span>`;
 
-    // Honest rating handling
-    const ratingDisplay = user.ratingCount > 0
-      ? `${Number(user.averageRating).toFixed(1)} ★ (${user.ratingCount})`
-      : "No reviews yet";
+    // 4 Stats logic
+    const stat1Val = isFarmer ? (user.activeListingsCount || 0) : (user.completedOrdersCount || 0); 
+    const stat1LblI18n = isFarmer ? "public_stat_active_listings" : "public_stat_active_orders";
+    
+    const stat2Val = isFarmer ? (user.completedOrdersCount || 0) : (user.completedOrdersCount || 0);
+    const stat2LblI18n = isFarmer ? "public_stat_delivered_orders" : "public_stat_completed_orders";
 
-    // Honest listing/order stats
-    const primaryStatVal = isFarmer ? (user.activeListingsCount || 0) : (user.completedOrdersCount || 0);
-    const primaryStatLbl = isFarmer ? "Active Listings" : "Completed Orders";
-
-    const secondaryStatVal = isFarmer ? (user.completedOrdersCount || 0) : "Verified";
-    const secondaryStatLbl = isFarmer ? "Delivered Orders" : "Account Status";
+    let ratingValHtml = "";
+    if (user.ratingCount > 0) {
+      ratingValHtml = `<span class="stat-rating">${Number(user.averageRating).toFixed(1)} ★</span>`;
+    } else {
+      ratingValHtml = `<span class="stat-rating" data-i18n="public_no_reviews" style="font-size:14px; font-weight:600;">No reviews yet</span>`;
+    }
 
     // State 3: Success State Rendering
     profileContainer.innerHTML = `
@@ -905,55 +975,61 @@ async function fetchAndRenderPublicProfile(customId) {
                 <h1 class="profile-name">${escapeHtml(user.name)}</h1>
                 ${verifiedBadgeHtml}
               </div>
-              <div class="profile-role-title">${escapeHtml(roleDisplay)}</div>
+              <div class="profile-role-title" data-i18n="${roleI18n}">Verified User</div>
               <div class="profile-meta-row">
-                <span><svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="32" width="14" height="14" aria-hidden="true" style="vertical-align:middle;margin-right:4px;"><path d="M256 48c-79.5 0-144 61.5-144 144 0 128 144 272 144 272s144-144 144-272c0-82.5-64.5-144-144-144z"/><circle cx="256" cy="192" r="48"/></svg>${escapeHtml(locationStr)}</span>
-                <span><svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="32" width="14" height="14" aria-hidden="true" style="vertical-align:middle;margin-right:4px;"><rect width="416" height="384" x="48" y="80" rx="48"/><path stroke-linecap="round" d="M128 48v32M384 48v32"/><path d="M464 160H48"/></svg>${escapeHtml(memberSinceStr)}</span>
+                ${locationHtml}
+                ${memberHtml}
               </div>
             </div>
           </div>
 
           <div class="profile-stats-grid">
             <div class="profile-stat-box">
-              <div class="stat-num">${primaryStatVal}</div>
-              <div class="stat-lbl">${primaryStatLbl}</div>
+              <div class="stat-num">${stat1Val}</div>
+              <div class="stat-lbl" data-i18n="${stat1LblI18n}">Active Listings</div>
             </div>
             <div class="profile-stat-box">
-              <div class="stat-num">${secondaryStatVal}</div>
-              <div class="stat-lbl">${secondaryStatLbl}</div>
+              <div class="stat-num">${stat2Val}</div>
+              <div class="stat-lbl" data-i18n="${stat2LblI18n}">Delivered Orders</div>
             </div>
             <div class="profile-stat-box">
-              <div class="stat-rating">${escapeHtml(ratingDisplay)}</div>
-              <div class="stat-lbl">Rating & Reviews</div>
+              <div class="stat-num">${ratingValHtml}</div>
+              <div class="stat-lbl" data-i18n="public_stat_rating_reviews">Rating & Reviews</div>
+            </div>
+            <div class="profile-stat-box">
+              <div class="stat-num" style="color:var(--text-primary)">${joinedYear}</div>
+              <div class="stat-lbl" data-i18n="public_stat_joined_year">Joined</div>
             </div>
           </div>
 
           <div class="profile-footer-cta">
-            <p class="profile-trust-note">Verified OmishGo Direct Marketplace Profile • ID: ${escapeHtml(user.customId)}</p>
+            <p class="profile-trust-note"><span data-i18n="public_trust_note">Verified OmishGo Direct Marketplace Profile</span> • ID: ${escapeHtml(user.customId)}</p>
             <a href="https://github.com/BilisumaEresso/omishgo/releases/download/v1.0.0-pilot/application-cc25adc4-057a-4fcc-81a7-e7143b75e4df.apk" class="btn btn-primary btn-lg btn-full profile-download-btn" download>
               <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true">
                 <path d="M12 16l-5-5 1.41-1.41L11 13.17V4h2v9.17l2.59-2.58L17 11l-5 5zM5 20h14v-2H5v2z"/>
               </svg>
-              Get the OmishGo App
+              <span data-i18n="public_get_app_btn">Get the OmishGo App</span>
             </a>
           </div>
         </div>
       </div>
     `;
+    applyLanguage(currentLang);
   } catch (err) {
     console.error("Public profile fetch error:", err);
     profileContainer.innerHTML = `
       <div class="public-profile-container">
         <div class="profile-card profile-not-found">
           <div class="not-found-icon"><svg viewBox="0 0 512 512" fill="none" stroke="#FD5454" stroke-width="32" width="48" height="48" aria-hidden="true"><path d="M85.57 446.25h340.86a24 24 0 0020.73-36.09L276.73 68.61a24 24 0 00-41.46 0L64.84 410.16a24 24 0 0020.73 36.09z" stroke-linecap="round" stroke-linejoin="round"/><path d="M256 192v120M256 368h.01" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Unable to Load Profile</h2>
-          <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 15px;">
+          <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;" data-i18n="public_error_title">Unable to Load Profile</h2>
+          <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 15px;" data-i18n="public_error_desc">
             A network error occurred while loading this public profile. Please check your connection and try again.
           </p>
-          <a href="/" class="btn btn-primary">Return to OmishGo Home</a>
+          <a href="/" class="btn btn-primary" data-i18n="public_return_home">Return to OmishGo Home</a>
         </div>
       </div>
     `;
+    applyLanguage(currentLang);
   }
 }
 

@@ -7,6 +7,7 @@ import { getOrderStatusConfig } from "../../constants/statuses";
 import { getLocalizedCropName, getLocalizedCropDisplayName } from "../../constants/crops";
 import { getLocalizedUnitName } from "../../constants/units";
 import { formatNumber } from "../../utils/formatNumber";
+import { formatLocalizedDate } from "../../utils/ethiopianDate";
 
 export default function FarmerOrdersFulfillmentList({
   orders = [],
@@ -44,6 +45,13 @@ export default function FarmerOrdersFulfillmentList({
             const cropName = getLocalizedCropName(rawCrop, currentLang, t);
             const unitLabel = getLocalizedUnitName(o.unit || "q", currentLang);
             const amount = o.totalPrice ? `${formatNumber(o.totalPrice)} ETB` : t("farmerProducts.priceUnavailable", { defaultValue: "Pending Quote" });
+            
+            const formattedDate = o.createdAt
+              ? formatLocalizedDate(o.createdAt, currentLang, {
+                  month: "short",
+                  day: "numeric",
+                })
+              : (o.date || t("listingDetail.timeToday", { defaultValue: "Today" }));
 
             return (
               <TouchableOpacity
@@ -75,7 +83,7 @@ export default function FarmerOrdersFulfillmentList({
                   </View>
 
                   <AppText style={styles.buyerText}>
-                    {t("buyerOrders.unknownFarmer", { defaultValue: "Buyer" })}: <AppText style={styles.buyerName}>{o.buyerName || t("farmerOrders.unknownBuyer", { defaultValue: "Wholesale Buyer" })}</AppText> • {o.date || t("listingDetail.timeToday", { defaultValue: "Today" })}
+                    {t("farmerOrders.buyer", { defaultValue: "Buyer" })}: <AppText style={styles.buyerName}>{o.buyerName || t("farmerOrders.unknownBuyer", { defaultValue: "Wholesale Buyer" })}</AppText> • {formattedDate}
                   </AppText>
 
                   <View style={styles.bottomMeta}>

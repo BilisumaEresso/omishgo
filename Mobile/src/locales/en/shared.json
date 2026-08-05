@@ -284,6 +284,17 @@
   "analytics": {
     "title": "Market Analytics",
     "subtitle": "Wholesale rates per quintal",
+    "demandHigh": "HIGH",
+    "demandMedium": "MEDIUM",
+    "catCereals": "Cereals & Grains",
+    "catVegetables": "Vegetables & Roots",
+    "catCashCrops": "Cash Crops",
+    "ratesPerQuintalSub": "Wholesale commodity prices per quintal (100 kg) across Ethiopian markets",
+    "searchRatesPlaceholder": "Search crop, variety, or city...",
+    "noRatesFound": "No rates match your search",
+    "wholesaleRate": "Wholesale Rate / Quintal",
+    "weeklyRange": "7-Day Range",
+    "locationDemandSub": "Wholesale purchasing activity and top wanted crops in key Ethiopian commercial centers",
     "nationalCommodityIndex": "National Index",
     "bestHubToSell": "Best Hub to Sell",
     "regionalHubs": "Regional Hubs",
@@ -381,5 +392,14 @@
     "gambela": "Gambela",
     "harari": "Harari",
     "direDawa": "Dire Dawa"
+  },
+  "tabs": {
+    "orders": "Orders",
+    "products": "Crops",
+    "home": "Home",
+    "analytics": "Data",
+    "profile": "Profile",
+    "marketplace": "Market",
+    "saved": "Saved"
   }
 }

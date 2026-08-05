@@ -282,9 +282,20 @@
     "dayToday": "Har'a"
   },
   "analytics": {
-    "title": "Xiinxala Gabaa",
-    "subtitle": "Gatii jumlaa kunt",
-    "nationalCommodityIndex": "Gatii Biyyoolessaa",
+    "title": "Daataa Gabaa",
+    "subtitle": "Gatii jumlaa kuntaalaan",
+    "demandHigh": "OL'AANAA",
+    "demandMedium": "GIDDUGALEESSA",
+    "catCereals": "Midhaanii fi Boloqqee",
+    "catVegetables": "Kuduraa fi Hundee",
+    "catCashCrops": "Midhaan Gabaa",
+    "ratesPerQuintalSub": "Gatii jumlaa oomishaa kuntaalaan (kg 100) gabaa Itiyoophiyaa keessatti",
+    "searchRatesPlaceholder": "Midhaan, gosa ykn magaalaa barbaadi...",
+    "noRatesFound": "Gatiin barbaaddan hin argamne",
+    "wholesaleRate": "Gatii Jumlaa / Kuntaalaa",
+    "weeklyRange": "Gatii Guyyaa 7",
+    "locationDemandSub": "Sochiin bittaa jumlaa fi oomishni baay'ee barbaadamu",
+    "nationalCommodityIndex": "Haala Oomishaa Biyyaalessaa",
     "bestHubToSell": "Bakka Gurgurtaaf Gaarii",
     "regionalHubs": "Gabaa Naannoo",
     "keyHubs": "Gabaa Gurguddoo 5",
@@ -381,5 +392,14 @@
     "gambela": "Gambeellaa",
     "harari": "Hararii",
     "direDawa": "Dirre Dawaa"
+  },
+  "tabs": {
+    "orders": "Ajaja",
+    "products": "Oomisha",
+    "home": "Seensa",
+    "analytics": "Daataa",
+    "profile": "Profaayilii",
+    "marketplace": "Gabaa",
+    "saved": "Kuusaa"
   }
 }

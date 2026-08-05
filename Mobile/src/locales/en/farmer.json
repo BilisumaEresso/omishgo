@@ -97,6 +97,7 @@
     "statusDelivered": "Delivered",
     "statusCancelled": "Cancelled",
     "unitKg": "kg",
+    "buyer": "Buyer",
     "unknownBuyer": "Wholesale Buyer",
     "errorLoadOrders": "Could not load orders. Pull down to retry.",
     "retry": "Retry",
