@@ -45,6 +45,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/auth/login" element={<Navigate to="/login" replace />} />
         
         {/* Protected Admin Routes wrapped in AdminLayout */}
         <Route
@@ -147,6 +148,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
