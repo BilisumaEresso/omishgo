@@ -190,6 +190,7 @@
   },
   "productCard": {
     "view": "እይ",
-    "priceFormat": "{{price}} / {{unit}}"
+    "priceFormat": "{{price}} / {{unit}}",
+    "inStockText": "{{qty}} {{unit}} አለ"
   }
 }

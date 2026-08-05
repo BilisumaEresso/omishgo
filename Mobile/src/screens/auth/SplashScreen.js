@@ -7,6 +7,7 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   Animated,
   Easing,
@@ -368,14 +369,22 @@ export default function SplashScreen() {
           ]}
         />
 
-        {/* Tagline */}
+        {/* Tagline / Slogans */}
         <Animated.View
           style={{
             opacity: taglineOpacity,
             transform: [{ translateY: taglineY }],
+            width: "100%",
           }}
         >
-          <AppText style={[styles.tagline, { color: textSecondary }]}>{t("splash.subtitle")}</AppText>
+          <View style={styles.sloganRow}>
+            {t("splash.subtitle").split(/[,፣•]/).map((s) => s.trim()).filter(Boolean).map((word, idx) => (
+              <View key={idx} style={[styles.sloganPill, { backgroundColor: PALETTE.card }]}>
+                <Ionicons name="checkmark-circle" size={14} color={PALETTE.jade} />
+                <AppText style={[styles.sloganText, { color: PALETTE.deep }]}>{word}</AppText>
+              </View>
+            ))}
+          </View>
         </Animated.View>
       </View>
 
@@ -464,13 +473,31 @@ const styles = StyleSheet.create({
     marginTop: 14,
     borderRadius: 1,
   },
-  tagline: {
-    fontSize: 14.5,
-    marginTop: 14,
-    textAlign: "center",
-    maxWidth: 280,
-    lineHeight: 22,
-    letterSpacing: 0.2,
+  sloganRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 10,
+    marginTop: 20,
+    paddingHorizontal: 20,
+  },
+  sloganPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  sloganText: {
+    fontSize: 13,
+    fontWeight: "700",
+    letterSpacing: 0.3,
   },
   loading: {
     position: "absolute",

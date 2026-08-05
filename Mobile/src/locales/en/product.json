@@ -190,6 +190,7 @@
   },
   "productCard": {
     "view": "View",
-    "priceFormat": "{{price}} / {{unit}}"
+    "priceFormat": "{{price}} / {{unit}}",
+    "inStockText": "{{qty}} {{unit}} in stock"
   }
 }
