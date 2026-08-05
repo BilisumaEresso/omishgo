@@ -106,6 +106,14 @@ describe("Notification Localization & Triggers", () => {
     expect(notif.type).toBe("new_message");
     expect(notif.messageKey).toBe("notifications.newMessageFrom");
     expect(notif.messageParams).toEqual({ senderName: "Test Buyer", senderId: buyerId.toString() });
+
+    // Test legacy Message ID resolution in getThread
+    const createdMsgId = res.body.data.message._id;
+    const threadRes = await request(app)
+      .get(`/api/v1/messages/thread/${createdMsgId}`)
+      .set("Authorization", `Bearer ${farmerToken}`);
+    expect(threadRes.status).toBe(200);
+    expect(threadRes.body.data.messages.length).toBeGreaterThan(0);
   });
 
   test("3. Admin approve/reject user triggers account_approved / account_rejected notification", async () => {

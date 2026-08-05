@@ -31,6 +31,18 @@ export const getThread = asyncHandler(async (req, res) => {
       });
     }
     other = adminUser._id.toString();
+  } else if (mongoose.Types.ObjectId.isValid(other)) {
+    // Fallback: If `other` is a Message ID (from legacy notifications), resolve to participant's User ID
+    const isUser = await User.exists({ _id: other });
+    if (!isUser) {
+      const msgDoc = await Message.findById(other);
+      if (msgDoc) {
+        other =
+          msgDoc.senderId.toString() === me.toString()
+            ? msgDoc.receiverId.toString()
+            : msgDoc.senderId.toString();
+      }
+    }
   }
 
   // Validate the other user exists
