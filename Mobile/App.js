@@ -8,8 +8,6 @@ import "./src/locales/i18n.js";
 import RootNavigator from "./src/navigation/RootNavigator.js";
 import { getDeviceId } from "./src/utils/deviceId.js";
 
-import { KeyboardProvider } from "react-native-keyboard-controller";
-
 export default function App() {
   useEffect(() => {
     // Initialize and log device ID for testing
@@ -40,14 +38,12 @@ export default function App() {
   }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <KeyboardProvider>
-        <ThemeProvider>
-          <NavigationProvider>
-            <RootNavigator />
-            <StatusBar barStyle="dark-content" />
-          </NavigationProvider>
-        </ThemeProvider>
-      </KeyboardProvider>
+      <ThemeProvider>
+        <NavigationProvider>
+          <RootNavigator />
+          <StatusBar barStyle="dark-content" />
+        </NavigationProvider>
+      </ThemeProvider>
     </GestureHandlerRootView>
   );
 }

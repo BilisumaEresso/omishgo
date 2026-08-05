@@ -16,7 +16,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { KeyboardStickyView } from "react-native-keyboard-controller";
 import AppText from "../../components/common/AppText";
 import AppHeader from "../../components/layout/AppHeader";
 import api from "../../config/api";
@@ -444,58 +443,56 @@ export default function ChatScreen({ route, navigation }) {
           </View>
         )}
 
-        {/* Floating Input Bar pinned above keyboard on iOS & Android */}
-        <KeyboardStickyView offset={{ closed: 0, opened: 0 }}>
-          <View
-            style={[
-              styles.floatingInputWrapper,
-              { paddingBottom: Math.max(insets.bottom, 8) },
-            ]}
-          >
-            <View style={[styles.floatingInputCard, { backgroundColor: surface }]}>
-              {/* Attachment (+) Button */}
-              <TouchableOpacity
-                style={styles.attachBtn}
-                onPress={() => {}}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="add-circle" size={26} color={primary} />
-              </TouchableOpacity>
+        {/* Floating Input Bar */}
+        <Animated.View
+          style={[
+            styles.floatingInputWrapper,
+            { paddingBottom: Animated.add(keyboardHeight, Math.max(insets.bottom, 8)) },
+          ]}
+        >
+          <View style={[styles.floatingInputCard, { backgroundColor: surface }]}>
+            {/* Attachment (+) Button */}
+            <TouchableOpacity
+              style={styles.attachBtn}
+              onPress={() => {}}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="add-circle" size={26} color={primary} />
+            </TouchableOpacity>
 
-              {/* Wide Multiline Input Field */}
-              <TextInput
-                style={[styles.inputField, { color: textPrimary }]}
-                placeholder={t("chat.typeMessage", { defaultValue: "Type a message..." })}
-                placeholderTextColor={textSecondary}
-                value={text}
-                onChangeText={setText}
-                multiline
-                maxLength={1500}
-              />
+            {/* Wide Multiline Input Field */}
+            <TextInput
+              style={[styles.inputField, { color: textPrimary }]}
+              placeholder={t("chat.typeMessage", { defaultValue: "Type a message..." })}
+              placeholderTextColor={textSecondary}
+              value={text}
+              onChangeText={setText}
+              multiline
+              maxLength={1500}
+            />
 
-              {/* Dynamic Send / Mic Action Button */}
-              <TouchableOpacity
-                style={[
-                  styles.sendFab,
-                  { backgroundColor: text.trim() ? primary : primary + "25" },
-                ]}
-                onPress={handleSend}
-                disabled={!text.trim() || sending}
-                activeOpacity={0.8}
-              >
-                {sending ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Ionicons
-                    name={text.trim() ? "send" : "mic"}
-                    size={18}
-                    color={text.trim() ? "#FFFFFF" : primary}
-                  />
-                )}
-              </TouchableOpacity>
-            </View>
+            {/* Dynamic Send / Mic Action Button */}
+            <TouchableOpacity
+              style={[
+                styles.sendFab,
+                { backgroundColor: text.trim() ? primary : primary + "25" },
+              ]}
+              onPress={handleSend}
+              disabled={!text.trim() || sending}
+              activeOpacity={0.8}
+            >
+              {sending ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : (
+                <Ionicons
+                  name={text.trim() ? "send" : "mic"}
+                  size={18}
+                  color={text.trim() ? "#FFFFFF" : primary}
+                />
+              )}
+            </TouchableOpacity>
           </View>
-        </KeyboardStickyView>
+        </Animated.View>
       </View>
     </View>
   );
