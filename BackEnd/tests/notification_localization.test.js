@@ -105,7 +105,7 @@ describe("Notification Localization & Triggers", () => {
     expect(notif).toBeDefined();
     expect(notif.type).toBe("new_message");
     expect(notif.messageKey).toBe("notifications.newMessageFrom");
-    expect(notif.messageParams).toEqual({ senderName: "Test Buyer" });
+    expect(notif.messageParams).toEqual({ senderName: "Test Buyer", senderId: buyerId.toString() });
   });
 
   test("3. Admin approve/reject user triggers account_approved / account_rejected notification", async () => {

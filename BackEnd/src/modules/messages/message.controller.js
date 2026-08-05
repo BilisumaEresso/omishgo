@@ -133,9 +133,9 @@ export const sendMessage = asyncHandler(async (req, res) => {
     receiverId,
     "new_message",
     `New message from ${senderName}`,
-    message._id,
+    req.user._id,
     "notifications.newMessageFrom",
-    { senderName }
+    { senderName, senderId: req.user._id.toString() }
   );
 
   return sendResponse(res, {
