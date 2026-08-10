@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
+import { getUserAvatarUrl, formatLocation } from "../utils/avatar";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -78,10 +79,13 @@ const Users = () => {
   let filteredUsers = users.filter(u => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
+    const locStr = formatLocation(u.location).toLowerCase();
     return (
       (u.name && u.name.toLowerCase().includes(q)) ||
       (u.phone && u.phone.includes(q)) ||
-      (u.customId && u.customId.toLowerCase().includes(q))
+      (u.email && u.email.toLowerCase().includes(q)) ||
+      (u.customId && u.customId.toLowerCase().includes(q)) ||
+      locStr.includes(q)
     );
   });
 
@@ -182,7 +186,7 @@ const Users = () => {
             <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink opacity-40" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input
               type="text"
-              placeholder="Search by name, phone, or User ID..."
+              placeholder="Search by name, phone, email, location, or User ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-surface-muted border-[0.6px] border-border rounded-[10px] h-[44px] pl-11 pr-4 text-[14px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-[#4880FF]/20 transition-all"
@@ -230,93 +234,117 @@ const Users = () => {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] overflow-hidden">
+      {/* Minimal Sleek Table */}
+      <div className="bg-white rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] overflow-hidden w-full">
         {loading ? (
           <div className="p-12 flex items-center justify-center">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-surface-soft">
-                <th className="py-4 px-5 w-12 text-center rounded-tl-[14px]">
-                  <input 
-                    type="checkbox" 
-                    onChange={handleSelectAll}
-                    checked={filteredUsers.length > 0 && selectedUsers.size === filteredUsers.length}
-                    className="w-4 h-4 text-primary rounded focus:ring-[#4880FF]/20 cursor-pointer"
-                  />
-                </th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">User</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">User ID</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Phone</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Role</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Joined Date</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Status</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-tr-[14px] text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((u) => (
-                <tr key={u._id} className="border-b border-[#979797]/15 last:border-0 hover:bg-[#F9FAFB] transition-colors">
-                  <td className="py-4 px-5 text-center">
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[650px] sm:min-w-0">
+              <thead>
+                <tr className="bg-surface-soft text-[13px] text-ink/70">
+                  <th className="py-3.5 px-3 w-10 text-center rounded-tl-[14px]">
                     <input 
-                      type="checkbox"
-                      checked={selectedUsers.has(u._id)}
-                      onChange={() => handleSelectUser(u._id)}
+                      type="checkbox" 
+                      onChange={handleSelectAll}
+                      checked={filteredUsers.length > 0 && selectedUsers.size === filteredUsers.length}
                       className="w-4 h-4 text-primary rounded focus:ring-[#4880FF]/20 cursor-pointer"
                     />
-                  </td>
-                  <td className="py-4 px-5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-[44px] h-[44px] rounded-full bg-[#D8D8D8] overflow-hidden flex-shrink-0">
-                        <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(u.name || 'U')}&background=random&bold=true`} alt="Avatar" className="w-full h-full object-cover" />
+                  </th>
+                  <th className="py-3.5 px-4 font-bold">User Profile</th>
+                  <th className="py-3.5 px-4 font-bold">Contact Info</th>
+                  <th className="py-3.5 px-4 font-bold">Role &amp; Location</th>
+                  <th className="py-3.5 px-4 font-bold rounded-tr-[14px] text-right">Status &amp; Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#979797]/15 text-[14px]">
+                {filteredUsers.map((u) => (
+                  <tr key={u._id} className="hover:bg-[#F9FAFB] transition-colors">
+                    {/* Checkbox */}
+                    <td className="py-3.5 px-3 text-center">
+                      <input 
+                        type="checkbox"
+                        checked={selectedUsers.has(u._id)}
+                        onChange={() => handleSelectUser(u._id)}
+                        className="w-4 h-4 text-primary rounded focus:ring-[#4880FF]/20 cursor-pointer"
+                      />
+                    </td>
+
+                    {/* 1. User Profile */}
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-[40px] h-[40px] rounded-full bg-[#D8D8D8] overflow-hidden flex-shrink-0 border border-border">
+                          <img src={getUserAvatarUrl(u)} alt={u.name || "User Avatar"} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <Link to={`/users/${u.customId || u._id}`} className="text-[14px] text-ink font-bold hover:text-primary hover:underline block truncate">
+                              {u.name || "N/A"}
+                            </Link>
+                            <span className="text-[10px] font-mono text-primary font-bold">{u.customId || `#${u._id.slice(-6)}`}</span>
+                          </div>
+                          {u.preferredLang && (
+                            <span className="text-[10px] text-ink/40 uppercase font-bold block">
+                              {u.preferredLang === 'am' ? 'Amharic' : u.preferredLang === 'om' ? 'Afaan Oromo' : 'English'}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <Link to={`/users/${u.customId || u._id}`} className="text-[14px] text-ink font-semibold hover:text-primary hover:underline">
-                        {u.name || "N/A"}
-                      </Link>
-                    </div>
-                  </td>
-                  <td className="py-4 px-5">
-                    <Link to={`/users/${u.customId || u._id}`} className="text-[13px] font-mono text-primary hover:underline">
-                      {u.customId || `#${u._id.slice(-6)}`}
-                    </Link>
-                  </td>
-                  <td className="py-4 px-5 text-[14px] text-ink/80 whitespace-nowrap">{u.phone}</td>
-                  <td className="py-4 px-5 text-[14px] text-ink/80 font-semibold capitalize whitespace-nowrap">{u.role}</td>
-                  <td className="py-4 px-5 text-[14px] text-ink/70 whitespace-nowrap">
-                    {new Date(u.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                  </td>
-                  <td className="py-4 px-5">
-                    <span className={`px-4 py-1.5 rounded-[13.5px] text-[13px] font-semibold inline-block ${
-                      u.isVerified ? "bg-success text-white" : "bg-warning text-white"
-                    }`}>
-                      {u.isVerified ? "Approved" : "Pending"}
-                    </span>
-                  </td>
-                  <td className="py-4 px-5 text-right">
-                    <Link 
-                      to={`/users/${u.customId || u._id}`}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-muted text-primary rounded-[10px] font-semibold text-[13px] hover:bg-primary hover:text-white transition-all"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
-                      Profile
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-              {filteredUsers.length === 0 && (
-                <tr>
-                  <td colSpan="8" className="py-16 text-center">
-                    <svg className="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    <div className="text-gray-400 text-[16px] font-medium">No users found</div>
-                    <div className="text-gray-300 text-[13px] mt-1">Try adjusting your search or filters</div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                    </td>
+
+                    {/* 2. Contact Info */}
+                    <td className="py-3.5 px-4 whitespace-nowrap">
+                      <div className="text-[13px] font-semibold text-ink">{u.phone}</div>
+                      {u.email && <div className="text-[11px] text-ink/50">{u.email}</div>}
+                    </td>
+
+                    {/* 3. Role & Location */}
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[12px] font-bold capitalize px-2.5 py-0.5 rounded-full bg-surface-muted border border-border text-ink">
+                          {u.role}
+                        </span>
+                        {(u.rating || u.averageRating) > 0 && (
+                          <span className="text-[11px] font-bold text-amber-500">
+                            ★ {u.rating || u.averageRating}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[11px] text-ink/50 block truncate mt-0.5">
+                        {formatLocation(u.location)}
+                      </span>
+                    </td>
+
+                    {/* 4. Status & Action */}
+                    <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                      <div className="flex items-center justify-end gap-2">
+                        <span className={`px-3 py-1 rounded-full text-[11px] font-bold inline-block ${
+                          u.isVerified ? "bg-success text-white" : "bg-warning text-white"
+                        }`}>
+                          {u.isVerified ? "Approved" : "Pending"}
+                        </span>
+                        <Link 
+                          to={`/users/${u.customId || u._id}`}
+                          className="inline-flex items-center px-3 py-1 bg-surface-muted text-primary rounded-[8px] font-bold text-[12px] hover:bg-primary hover:text-white transition-all"
+                        >
+                          Profile
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {filteredUsers.length === 0 && (
+                  <tr>
+                    <td colSpan="5" className="py-12 text-center text-gray-400 text-sm">
+                      No users found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

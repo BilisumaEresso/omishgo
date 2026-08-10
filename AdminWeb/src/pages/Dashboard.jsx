@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import api from "../services/api";
+import { getUserAvatarUrl, formatLocation } from "../utils/avatar";
 
 // SVG Icon Components
 const UsersIcon = () => (
@@ -254,124 +255,143 @@ const Dashboard = () => {
       </div>
 
       {/* Products Table */}
-      <div className="bg-white p-8 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)]">
+      <div className="bg-white p-6 sm:p-8 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] w-full">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-[24px] font-bold text-ink">Products</h2>
+          <h2 className="text-[20px] sm:text-[24px] font-bold text-ink">Products</h2>
           <Link to="/products" className="text-[14px] text-primary font-semibold hover:underline">View All</Link>
         </div>
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-surface-soft">
-              <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-l-[12px]">Product Name</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-ink">Location</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-ink">Date - Time</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-ink">Quantity</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-ink">Amount</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-r-[12px]">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.slice(0, 5).map((p) => (
-              <tr key={p._id} className="border-b border-[#979797]/20 last:border-0 hover:bg-[#F9FAFB] transition-colors">
-                <td className="py-4 px-5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-[44px] h-[44px] rounded-[18px] bg-[#D8D8D8] overflow-hidden flex-shrink-0">
-                      {p.images && p.images[0] ? (
-                        <img src={p.images[0]} alt={p.cropType} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
-                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-                        </div>
-                      )}
-                    </div>
-                    <Link to={`/products/${p.customId || p._id}`} className="text-[14px] text-ink/80 hover:text-primary hover:underline font-semibold">
-                      {p.cropType}
-                    </Link>
-                  </div>
-                </td>
-                <td className="py-4 px-5 text-[14px] text-ink/80">
-                  {p.farmerId?.location?.region || "N/A"}
-                </td>
-                <td className="py-4 px-5 text-[14px] text-ink/80 font-semibold whitespace-nowrap">
-                  {new Date(p.createdAt).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute:'2-digit' }).replace(',', ' -')}
-                </td>
-                <td className="py-4 px-5 text-[14px] text-ink/80">
-                  {p.quantity} {p.unit}
-                </td>
-                <td className="py-4 px-5 text-[14px] text-ink/80 font-semibold whitespace-nowrap">
-                  ETB {p.price?.toLocaleString() || "0"}
-                </td>
-                <td className="py-4 px-5">
-                  <span className={`px-4 py-1.5 rounded-[13.5px] text-[14px] font-semibold inline-block ${
-                    p.status === 'approved' ? 'bg-success text-white' : p.status === 'rejected' ? 'bg-danger text-white' : 'bg-warning text-white'
-                  }`}>
-                    {p.status ? p.status.charAt(0).toUpperCase() + p.status.slice(1) : "Pending"}
-                  </span>
-                </td>
+        <div className="w-full overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[550px] sm:min-w-0">
+            <thead>
+              <tr className="bg-surface-soft text-[13px] text-ink/70">
+                <th className="py-3.5 px-4 font-bold rounded-l-[12px]">Product &amp; Variety</th>
+                <th className="py-3.5 px-4 font-bold">Farmer &amp; Location</th>
+                <th className="py-3.5 px-4 font-bold">Price &amp; Quantity</th>
+                <th className="py-3.5 px-4 font-bold rounded-r-[12px] text-right">Status</th>
               </tr>
-            ))}
-            {products.length === 0 && (
-              <tr><td colSpan="6" className="py-8 text-center text-gray-400">No products found.</td></tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-[#979797]/15 text-[14px]">
+              {products.slice(0, 5).map((p) => (
+                <tr key={p._id} className="hover:bg-[#F9FAFB] transition-colors">
+                  <td className="py-3.5 px-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-[40px] h-[40px] rounded-[12px] bg-[#D8D8D8] overflow-hidden flex-shrink-0 border border-border">
+                        {(p.photos && p.photos[0]) || (p.images && p.images[0]) ? (
+                          <img src={p.photos ? p.photos[0] : p.images[0]} alt={p.cropType} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
+                            <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <Link to={`/products/${p.customId || p._id}`} className="text-[14px] text-ink hover:text-primary hover:underline font-bold truncate">
+                            {p.cropType}
+                          </Link>
+                          {p.variety && (
+                            <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">
+                              {p.variety}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[11px] font-mono text-primary font-bold block">{p.customId || `#${p._id.slice(-6)}`}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <span className="text-[13px] text-ink/80 block font-semibold truncate">
+                      {formatLocation(p.location || p.farmerId?.location)}
+                    </span>
+                    <span className="text-[11px] text-ink/50 block">
+                      {new Date(p.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                    </span>
+                  </td>
+                  <td className="py-3.5 px-4 whitespace-nowrap">
+                    <div className="text-[14px] text-ink font-bold">ETB {p.price?.toLocaleString() || "0"}</div>
+                    <div className="text-[11px] text-ink/50">{p.quantity} {p.unit}</div>
+                  </td>
+                  <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                    <span className={`px-3 py-1 rounded-full text-[11px] font-bold capitalize inline-block ${
+                      p.status === 'approved' || p.status === 'active' ? 'bg-success text-white' : p.status === 'rejected' ? 'bg-danger text-white' : 'bg-warning text-white'
+                    }`}>
+                      {p.status ? p.status.charAt(0).toUpperCase() + p.status.slice(1) : "Pending"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+              {products.length === 0 && (
+                <tr><td colSpan="4" className="py-8 text-center text-gray-400 text-sm">No products found.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Users Table */}
-      <div className="bg-white p-8 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)]">
+      <div className="bg-white p-6 sm:p-8 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] w-full">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-[24px] font-bold text-ink">Users</h2>
+          <h2 className="text-[20px] sm:text-[24px] font-bold text-ink">Users</h2>
           <Link to="/users" className="text-[14px] text-primary font-semibold hover:underline">View All</Link>
         </div>
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-surface-soft">
-              <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-l-[12px]">User</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-ink">Phone</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-ink">Role</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-ink">Joined</th>
-              <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-r-[12px]">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.slice(0, 5).map((u) => (
-              <tr key={u._id} className="border-b border-[#979797]/20 last:border-0 hover:bg-[#F9FAFB] transition-colors">
-                <td className="py-4 px-5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-[44px] h-[44px] rounded-full bg-[#D8D8D8] overflow-hidden flex-shrink-0">
-                      <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(u.name || 'U')}&background=random&bold=true`} alt="Avatar" className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex flex-col">
-                      <Link to={`/users/${u.customId || u._id}`} className="text-[14px] text-ink/80 hover:text-primary hover:underline font-semibold">
-                        {u.name || "N/A"}
-                      </Link>
-                      <span className="text-[12px] text-gray-400 font-mono">{u.customId || `#${u._id.slice(-6)}`}</span>
-                    </div>
-                  </div>
-                </td>
-                <td className="py-4 px-5 text-[14px] text-ink/80 whitespace-nowrap">
-                  {u.phone || "N/A"}
-                </td>
-                <td className="py-4 px-5 text-[14px] text-ink/80 font-semibold capitalize">
-                  {u.role}
-                </td>
-                <td className="py-4 px-5 text-[14px] text-ink/80 whitespace-nowrap">
-                  {new Date(u.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
-                </td>
-                <td className="py-4 px-5">
-                  <span className={`px-4 py-1.5 rounded-[13.5px] text-[14px] font-semibold inline-block ${
-                    u.isVerified ? "bg-success text-white" : "bg-warning text-white"
-                  }`}>
-                    {u.isVerified ? "Approved" : "Pending"}
-                  </span>
-                </td>
+        <div className="w-full overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[550px] sm:min-w-0">
+            <thead>
+              <tr className="bg-surface-soft text-[13px] text-ink/70">
+                <th className="py-3.5 px-4 font-bold rounded-l-[12px]">User</th>
+                <th className="py-3.5 px-4 font-bold">Contact</th>
+                <th className="py-3.5 px-4 font-bold">Role &amp; Location</th>
+                <th className="py-3.5 px-4 font-bold rounded-r-[12px] text-right">Status</th>
               </tr>
-            ))}
-            {users.length === 0 && (
-              <tr><td colSpan="5" className="py-8 text-center text-gray-400">No users found.</td></tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-[#979797]/15 text-[14px]">
+              {users.slice(0, 5).map((u) => (
+                <tr key={u._id} className="hover:bg-[#F9FAFB] transition-colors">
+                  <td className="py-3.5 px-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-[40px] h-[40px] rounded-full bg-[#D8D8D8] overflow-hidden flex-shrink-0 border border-border">
+                        <img src={getUserAvatarUrl(u)} alt={u.name || "Avatar"} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <Link to={`/users/${u.customId || u._id}`} className="text-[14px] text-ink hover:text-primary hover:underline font-bold truncate">
+                            {u.name || "N/A"}
+                          </Link>
+                          {(u.rating || u.averageRating) > 0 && (
+                            <span className="text-[11px] font-bold text-amber-500">★{u.rating || u.averageRating}</span>
+                          )}
+                        </div>
+                        <span className="text-[11px] text-primary font-mono font-bold block">{u.customId || `#${u._id.slice(-6)}`}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-3.5 px-4 whitespace-nowrap">
+                    <div className="text-[13px] font-semibold text-ink">{u.phone || "N/A"}</div>
+                    {u.email && <div className="text-[11px] text-ink/50">{u.email}</div>}
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <span className="text-[12px] font-bold capitalize text-ink block">
+                      {u.role}
+                    </span>
+                    <span className="text-[11px] text-ink/50 block truncate">
+                      {formatLocation(u.location)}
+                    </span>
+                  </td>
+                  <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                    <span className={`px-3 py-1 rounded-full text-[11px] font-bold inline-block ${
+                      u.isVerified ? "bg-success text-white" : "bg-warning text-white"
+                    }`}>
+                      {u.isVerified ? "Approved" : "Pending"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+              {users.length === 0 && (
+                <tr><td colSpan="4" className="py-8 text-center text-gray-400 text-sm">No users found.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

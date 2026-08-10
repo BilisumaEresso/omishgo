@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
+import { getUserAvatarUrl, formatLocation } from "../utils/avatar";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -23,11 +24,18 @@ const Products = () => {
       const res = await api.get(`/admin/products?${params.toString()}`);
       let fetched = res.data?.data?.products || [];
 
-      // Client-side region filter
-      if (regionFilter) {
+      // Client-side search & region filter
+      if (searchQuery || regionFilter) {
         fetched = fetched.filter(p => {
-          const region = p.location?.region || p.farmerId?.location?.region || "";
-          return region.toLowerCase().includes(regionFilter.toLowerCase());
+          const matchQuery = !searchQuery || (
+            (p.cropType && p.cropType.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (p.variety && p.variety.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (p.customId && p.customId.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (p.farmerId?.name && p.farmerId.name.toLowerCase().includes(searchQuery.toLowerCase()))
+          );
+          const regionStr = p.location?.region || p.farmerId?.location?.region || "";
+          const matchRegion = !regionFilter || regionStr.toLowerCase().includes(regionFilter.toLowerCase());
+          return matchQuery && matchRegion;
         });
       }
 
@@ -89,7 +97,7 @@ const Products = () => {
             </svg>
             <input
               type="text"
-              placeholder="Search by crop name..."
+              placeholder="Search by crop, variety, or farmer..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-surface-muted border-[0.6px] border-border rounded-[10px] h-[44px] pl-11 pr-4 text-[14px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-[#4880FF]/20 transition-all"
@@ -142,109 +150,118 @@ const Products = () => {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] overflow-hidden">
+      {/* Minimal Sleek Table */}
+      <div className="bg-white rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] overflow-hidden w-full">
         {loading ? (
           <div className="p-12 flex items-center justify-center">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-surface-soft">
-                <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-tl-[14px]">Product</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">ID</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Farmer</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Quantity</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Price</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Region</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Date</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Status</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-tr-[14px] text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((p) => (
-                <tr key={p._id} className={`border-b border-[#979797]/15 last:border-0 hover:bg-[#F9FAFB] transition-colors ${p.priceAnomaly ? 'bg-orange-50/50' : ''}`}>
-                  <td className="py-4 px-5">
-                    <div className="flex items-center gap-3">
-                      {p.photos && p.photos.length > 0 ? (
-                        <img src={p.photos[0]} alt={p.cropType} className="w-[48px] h-[48px] rounded-[14px] object-cover flex-shrink-0" />
-                      ) : (
-                        <PlaceholderImg />
-                      )}
-                      <div>
-                        <Link to={`/products/${p.customId || p._id}`} className="text-[14px] text-ink font-semibold hover:text-primary hover:underline">
-                          {p.cropType}
-                        </Link>
-                        {p.priceAnomaly === 'high' && (
-                          <div className="flex items-center gap-1 mt-0.5">
-                            <svg className="w-3 h-3 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" /></svg>
-                            <span className="text-[11px] text-red-500 font-semibold">High Price</span>
-                          </div>
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[650px] sm:min-w-0">
+              <thead>
+                <tr className="bg-surface-soft text-[13px] text-ink/70">
+                  <th className="py-3.5 px-4 font-bold rounded-tl-[14px]">Product</th>
+                  <th className="py-3.5 px-4 font-bold">Farmer &amp; Location</th>
+                  <th className="py-3.5 px-4 font-bold">Price &amp; Quantity</th>
+                  <th className="py-3.5 px-4 font-bold">Status</th>
+                  <th className="py-3.5 px-4 font-bold rounded-tr-[14px] text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#979797]/15 text-[14px]">
+                {products.map((p) => (
+                  <tr key={p._id} className={`hover:bg-[#F9FAFB] transition-colors ${p.priceAnomaly ? 'bg-orange-50/50' : ''}`}>
+                    {/* 1. Product & Variety */}
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-3">
+                        {p.photos && p.photos.length > 0 ? (
+                          <img src={p.photos[0]} alt={p.cropType} className="w-[44px] h-[44px] rounded-[12px] object-cover flex-shrink-0 border border-border" />
+                        ) : (
+                          <PlaceholderImg />
                         )}
-                        {p.priceAnomaly === 'low' && (
-                          <div className="flex items-center gap-1 mt-0.5">
-                            <svg className="w-3 h-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" /></svg>
-                            <span className="text-[11px] text-amber-500 font-semibold">Low Price</span>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <Link to={`/products/${p.customId || p._id}`} className="text-[14px] text-ink font-bold hover:text-primary hover:underline">
+                              {p.cropType}
+                            </Link>
+                            {p.variety && (
+                              <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">
+                                {p.variety}
+                              </span>
+                            )}
                           </div>
-                        )}
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[11px] font-mono text-primary font-semibold">{p.customId || `#${p._id.slice(-6)}`}</span>
+                            {p.priceAnomaly === 'high' && (
+                              <span className="text-[10px] text-red-500 font-bold bg-red-50 px-1.5 py-0.5 rounded">High Price</span>
+                            )}
+                            {p.priceAnomaly === 'low' && (
+                              <span className="text-[10px] text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded">Low Price</span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="py-4 px-5">
-                    <Link to={`/products/${p.customId || p._id}`} className="text-[13px] font-mono text-primary hover:underline">
-                      {p.customId || `#${p._id.slice(-6)}`}
-                    </Link>
-                  </td>
-                  <td className="py-4 px-5">
-                    {p.farmerId ? (
-                      <Link to={`/users/${p.farmerId.customId || p.farmerId._id}`} className="text-[14px] text-ink hover:text-primary hover:underline font-medium">
-                        {p.farmerId.name}
+                    </td>
+
+                    {/* 2. Farmer & Location */}
+                    <td className="py-3.5 px-4">
+                      {p.farmerId ? (
+                        <div className="flex items-center gap-2.5">
+                          <img
+                            src={getUserAvatarUrl(p.farmerId, { bg: "4880FF" })}
+                            alt={p.farmerId.name}
+                            className="w-7 h-7 rounded-full object-cover border border-border flex-shrink-0"
+                          />
+                          <div className="min-w-0">
+                            <Link to={`/users/${p.farmerId.customId || p.farmerId._id}`} className="text-[13px] text-ink hover:text-primary hover:underline font-semibold block truncate">
+                              {p.farmerId.name}
+                            </Link>
+                            <span className="text-[11px] text-ink/50 block truncate">
+                              {formatLocation(p.location || p.farmerId?.location)}
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 text-[13px]">Unknown</span>
+                      )}
+                    </td>
+
+                    {/* 3. Price & Quantity */}
+                    <td className="py-3.5 px-4 whitespace-nowrap">
+                      <div className="text-[14px] text-ink font-bold">ETB {p.price?.toLocaleString()}</div>
+                      <div className="text-[11px] text-ink/50">
+                        {p.quantity} {p.unit} · {new Date(p.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                      </div>
+                    </td>
+
+                    {/* 4. Status */}
+                    <td className="py-3.5 px-4 whitespace-nowrap">
+                      <span className={`px-3 py-1 rounded-full text-[12px] font-bold capitalize inline-block ${getStatusStyle(p.status)}`}>
+                        {p.status}
+                      </span>
+                    </td>
+
+                    {/* 5. Action */}
+                    <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                      <Link 
+                        to={`/products/${p.customId || p._id}`} 
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-surface-muted text-primary rounded-[8px] font-bold text-[12px] hover:bg-primary hover:text-white transition-all"
+                      >
+                        View
                       </Link>
-                    ) : (
-                      <span className="text-gray-400">Unknown</span>
-                    )}
-                  </td>
-                  <td className="py-4 px-5 text-[14px] text-ink/80 whitespace-nowrap">
-                    {p.quantity} {p.unit}
-                  </td>
-                  <td className="py-4 px-5 text-[14px] text-ink font-semibold whitespace-nowrap">
-                    ETB {p.price?.toLocaleString()}
-                  </td>
-                  <td className="py-4 px-5 text-[14px] text-ink/70 whitespace-nowrap">
-                    {p.location?.region || p.farmerId?.location?.region || "—"}
-                  </td>
-                  <td className="py-4 px-5 text-[14px] text-ink/70 whitespace-nowrap">
-                    {new Date(p.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                  </td>
-                  <td className="py-4 px-5">
-                    <span className={`px-4 py-1.5 rounded-[13.5px] text-[13px] font-semibold capitalize inline-block ${getStatusStyle(p.status)}`}>
-                      {p.status}
-                    </span>
-                  </td>
-                  <td className="py-4 px-5 text-right">
-                    <Link 
-                      to={`/products/${p.customId || p._id}`} 
-                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-muted text-primary rounded-[10px] font-semibold text-[13px] hover:bg-primary hover:text-white transition-all"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                      View
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-              {products.length === 0 && (
-                <tr>
-                  <td colSpan="9" className="py-16 text-center">
-                    <svg className="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-                    <div className="text-gray-400 text-[16px] font-medium">No products found</div>
-                    <div className="text-gray-300 text-[13px] mt-1">Try adjusting your search or filters</div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                    </td>
+                  </tr>
+                ))}
+                {products.length === 0 && (
+                  <tr>
+                    <td colSpan="5" className="py-12 text-center text-gray-400 text-sm">
+                      No products found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

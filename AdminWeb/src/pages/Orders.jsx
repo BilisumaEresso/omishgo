@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
+import { getUserAvatarUrl } from "../utils/avatar";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -39,6 +40,8 @@ const Orders = () => {
       filtered = filtered.filter(o =>
         (o.customId && o.customId.toLowerCase().includes(q)) ||
         (o.cropType && o.cropType.toLowerCase().includes(q)) ||
+        (o.variety && o.variety.toLowerCase().includes(q)) ||
+        (o.productId?.variety && o.productId.variety.toLowerCase().includes(q)) ||
         (o.buyerId?.name && o.buyerId.name.toLowerCase().includes(q)) ||
         (o.farmerId?.name && o.farmerId.name.toLowerCase().includes(q))
       );
@@ -122,7 +125,7 @@ const Orders = () => {
             <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink opacity-40" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input
               type="text"
-              placeholder="Search by order ID, crop, buyer, or farmer..."
+              placeholder="Search by order ID, crop, variety, buyer, or farmer..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-surface-muted border-[0.6px] border-border rounded-[10px] h-[44px] pl-11 pr-4 text-[14px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-[#4880FF]/20 transition-all"
@@ -153,86 +156,119 @@ const Orders = () => {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] overflow-hidden">
+      {/* Minimal Sleek Table */}
+      <div className="bg-white rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] overflow-hidden w-full">
         {loading ? (
           <div className="p-12 flex items-center justify-center">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-surface-soft">
-                <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-tl-[14px]">Order ID</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Crop</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Buyer</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Farmer</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Qty</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Total</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Date</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Status</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-tr-[14px] text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((o) => (
-                <tr key={o._id} className="border-b border-[#979797]/15 last:border-0 hover:bg-[#F9FAFB] transition-colors">
-                  <td className="py-4 px-5">
-                    <Link to={`/orders/${o.customId || o._id}`} className="text-[13px] font-mono text-primary hover:underline font-semibold">
-                      {o.customId || `#${o._id.slice(-6)}`}
-                    </Link>
-                  </td>
-                  <td className="py-4 px-5 text-[14px] text-ink font-medium">{o.cropType || o.productId?.cropType || "—"}</td>
-                  <td className="py-4 px-5">
-                    {o.buyerId ? (
-                      <div>
-                        <Link to={`/users/${o.buyerId.customId || o.buyerId._id}`} className="text-[14px] text-ink hover:text-primary hover:underline font-medium">
-                          {o.buyerId.name}
-                        </Link>
-                        <div className="text-[12px] text-gray-400">{o.buyerId.phone}</div>
-                      </div>
-                    ) : <span className="text-gray-400">Unknown</span>}
-                  </td>
-                  <td className="py-4 px-5">
-                    {o.farmerId ? (
-                      <div>
-                        <Link to={`/users/${o.farmerId.customId || o.farmerId._id}`} className="text-[14px] text-ink hover:text-primary hover:underline font-medium">
-                          {o.farmerId.name}
-                        </Link>
-                        <div className="text-[12px] text-gray-400">{o.farmerId.phone}</div>
-                      </div>
-                    ) : <span className="text-gray-400">Unknown</span>}
-                  </td>
-                  <td className="py-4 px-5 text-[14px] text-ink/80 whitespace-nowrap">{o.quantity} {o.unit || o.productId?.unit}</td>
-                  <td className="py-4 px-5 text-[14px] text-ink font-semibold whitespace-nowrap">ETB {o.totalPrice?.toLocaleString()}</td>
-                  <td className="py-4 px-5 text-[14px] text-ink/70 whitespace-nowrap">
-                    {new Date(o.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                  </td>
-                  <td className="py-4 px-5">
-                    <span className={`px-4 py-1.5 rounded-[13.5px] text-[13px] font-semibold capitalize inline-block ${getStatusStyle(o.status)}`}>
-                      {o.status?.replace('_', ' ')}
-                    </span>
-                  </td>
-                  <td className="py-4 px-5 text-right">
-                    <Link to={`/orders/${o.customId || o._id}`}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-muted text-primary rounded-[10px] font-semibold text-[13px] hover:bg-primary hover:text-white transition-all">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                      View
-                    </Link>
-                  </td>
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[700px] sm:min-w-0">
+              <thead>
+                <tr className="bg-surface-soft text-[13px] text-ink/70">
+                  <th className="py-3.5 px-4 font-bold rounded-tl-[14px]">Order ID &amp; Date</th>
+                  <th className="py-3.5 px-4 font-bold">Crop &amp; Variety</th>
+                  <th className="py-3.5 px-4 font-bold">Buyer</th>
+                  <th className="py-3.5 px-4 font-bold">Farmer</th>
+                  <th className="py-3.5 px-4 font-bold">Total &amp; Qty</th>
+                  <th className="py-3.5 px-4 font-bold rounded-tr-[14px] text-right">Status &amp; Action</th>
                 </tr>
-              ))}
-              {orders.length === 0 && (
-                <tr>
-                  <td colSpan="9" className="py-16 text-center">
-                    <svg className="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V19.5a2.25 2.25 0 002.25 2.25h.75" /></svg>
-                    <div className="text-gray-400 text-[16px] font-medium">No orders found</div>
-                    <div className="text-gray-300 text-[13px] mt-1">Try adjusting your search or filters</div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-[#979797]/15 text-[14px]">
+                {orders.map((o) => {
+                  const varietyStr = o.variety || o.productId?.variety;
+                  return (
+                    <tr key={o._id} className="hover:bg-[#F9FAFB] transition-colors">
+                      {/* 1. Order ID & Date */}
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <Link to={`/orders/${o.customId || o._id}`} className="text-[13px] font-mono text-primary hover:underline font-bold block">
+                          {o.customId || `#${o._id.slice(-6)}`}
+                        </Link>
+                        <span className="text-[11px] text-ink/50 block">
+                          {new Date(o.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                        </span>
+                      </td>
+
+                      {/* 2. Crop & Variety */}
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[14px] text-ink font-bold">{o.cropType || o.productId?.cropType || "—"}</span>
+                          {varietyStr && (
+                            <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">
+                              {varietyStr}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* 3. Buyer */}
+                      <td className="py-3.5 px-4">
+                        {o.buyerId ? (
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={getUserAvatarUrl(o.buyerId, { bg: "4880FF" })}
+                              alt={o.buyerId.name || "Buyer"}
+                              className="w-7 h-7 rounded-full object-cover border border-border flex-shrink-0"
+                            />
+                            <div className="min-w-0">
+                              <Link to={`/users/${o.buyerId.customId || o.buyerId._id}`} className="text-[13px] text-ink hover:text-primary hover:underline font-semibold block truncate">
+                                {o.buyerId.name}
+                              </Link>
+                            </div>
+                          </div>
+                        ) : <span className="text-gray-400 text-[13px]">Unknown</span>}
+                      </td>
+
+                      {/* 4. Farmer */}
+                      <td className="py-3.5 px-4">
+                        {o.farmerId ? (
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={getUserAvatarUrl(o.farmerId, { bg: "4AD991" })}
+                              alt={o.farmerId.name || "Farmer"}
+                              className="w-7 h-7 rounded-full object-cover border border-border flex-shrink-0"
+                            />
+                            <div className="min-w-0">
+                              <Link to={`/users/${o.farmerId.customId || o.farmerId._id}`} className="text-[13px] text-ink hover:text-primary hover:underline font-semibold block truncate">
+                                {o.farmerId.name}
+                              </Link>
+                            </div>
+                          </div>
+                        ) : <span className="text-gray-400 text-[13px]">Unknown</span>}
+                      </td>
+
+                      {/* 5. Total & Qty */}
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <div className="text-[14px] text-ink font-bold">ETB {o.totalPrice?.toLocaleString()}</div>
+                        <div className="text-[11px] text-ink/50">{o.quantity} {o.unit || o.productId?.unit}</div>
+                      </td>
+
+                      {/* 6. Status & Action */}
+                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-2">
+                          <span className={`px-3 py-1 rounded-full text-[11px] font-bold capitalize inline-block ${getStatusStyle(o.status)}`}>
+                            {o.status?.replace('_', ' ')}
+                          </span>
+                          <Link to={`/orders/${o.customId || o._id}`}
+                            className="inline-flex items-center px-3 py-1 bg-surface-muted text-primary rounded-[8px] font-bold text-[12px] hover:bg-primary hover:text-white transition-all">
+                            View
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {orders.length === 0 && (
+                  <tr>
+                    <td colSpan="6" className="py-12 text-center text-gray-400 text-sm">
+                      No orders found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

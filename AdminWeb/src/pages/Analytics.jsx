@@ -4,6 +4,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
 import api from "../services/api";
+import { getUserAvatarUrl, formatLocation } from "../utils/avatar";
 
 const Analytics = () => {
   const [products, setProducts] = useState([]);
@@ -67,184 +68,196 @@ const Analytics = () => {
     setFeaturedIndex((prev) => (prev - 1 + products.length) % products.length);
   };
 
-  // Start Building Report Process with simulated compiler progress
+  // Step 1: Start building report with dynamic 100% progress simulation
   const startBuildingReport = () => {
     setIsBuildingReport(true);
     setBuildProgress(0);
-    setBuildStatusText("Initializing System Data Aggregator...");
+    setBuildStatusText("Initializing system data compilation...");
 
     const steps = [
-      { pct: 20, text: "Fetching User Directory & Verification Ledger..." },
-      { pct: 45, text: "Compiling Agricultural Product Catalog & Price Alerts..." },
-      { pct: 70, text: "Processing Financial Transactions & Order Analytics..." },
-      { pct: 90, text: "Formatting Audit Logs & Security Trail..." },
-      { pct: 100, text: "System Executive Report Built Successfully!" }
+      { p: 20, text: "Fetching user directory & location records..." },
+      { p: 45, text: "Aggregating crop listings & varieties..." },
+      { p: 70, text: "Compiling order transactions & revenue logs..." },
+      { p: 90, text: "Formatting printable PDF & spreadsheet structures..." },
+      { p: 100, text: "Executive Report successfully generated!" }
     ];
 
-    let currentStep = 0;
+    let stepIdx = 0;
     const interval = setInterval(() => {
-      if (currentStep < steps.length) {
-        setBuildProgress(steps[currentStep].pct);
-        setBuildStatusText(steps[currentStep].text);
-        currentStep++;
+      if (stepIdx < steps.length) {
+        setBuildProgress(steps[stepIdx].p);
+        setBuildStatusText(steps[stepIdx].text);
+        stepIdx++;
       } else {
         clearInterval(interval);
         setTimeout(() => {
           setIsBuildingReport(false);
           setShowReportModal(true);
-        }, 500);
+        }, 400);
       }
-    }, 450);
+    }, 400);
   };
 
-  // 1. Export Clean Formatted PDF (Dedicated Print Window with Page-Breaks & Branded CSS)
+  // 1. Export PDF Document Utility (Opens print window with pre-styled printable HTML template)
   const handleExportPDF = () => {
-    const totalRevenue = orders.reduce((sum, o) => sum + (o.totalPrice || 0), 0);
-    const approvedUsers = users.filter(u => u.isVerified).length;
-
-    const pdfWindow = window.open("", "_blank", "width=900,height=900");
-    if (!pdfWindow) {
-      alert("Please allow popups to open the PDF report window.");
-      return;
-    }
+    const pdfWindow = window.open('', '_blank');
+    const totalSales = orders.reduce((s, o) => s + (o.totalPrice || 0), 0);
 
     const htmlContent = `
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>OmishGo System Executive PDF Report</title>
+  <title>OmishGo System Executive Report</title>
   <style>
-    @page { size: A4; margin: 20mm; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #202224; line-height: 1.5; background: #fff; margin: 0; padding: 20px; }
-    .header { border-bottom: 3px solid #4880FF; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end; }
-    .title { font-size: 26px; font-weight: bold; color: #202224; margin: 0; }
-    .subtitle { font-size: 13px; color: #4880FF; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-    .meta { text-align: right; font-size: 12px; color: #666; }
-    .section-title { font-size: 18px; font-weight: bold; color: #202224; border-bottom: 2px solid #F1F4F9; padding-bottom: 8px; margin-top: 30px; margin-bottom: 15px; }
-    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
-    .kpi-box { background: #F5F6FA; border: 1px solid #E0E0E0; border-radius: 10px; padding: 15px; text-align: center; }
-    .kpi-val { font-size: 22px; font-weight: bold; color: #4880FF; }
-    .kpi-lbl { font-size: 11px; text-transform: uppercase; color: #666; font-weight: 600; margin-top: 5px; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1c2434; padding: 40px; margin: 0; background: #fff; }
+    .header { border-b: 3px solid #4880FF; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 28px; font-weight: 800; color: #4880FF; letter-spacing: -0.5px; }
+    .title { font-size: 18px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+    .meta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; }
+    .meta-card { text-align: center; }
+    .meta-val { font-size: 22px; font-weight: 700; color: #0f172a; }
+    .meta-lbl { font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-top: 4px; }
+    h3 { font-size: 16px; font-weight: 700; color: #1e293b; margin-top: 30px; margin-bottom: 12px; border-left: 4px solid #4880FF; padding-left: 10px; }
     table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 12px; }
-    th { background-color: #F1F4F9; color: #202224; font-weight: bold; text-align: left; padding: 10px; border-bottom: 2px solid #E0E0E0; }
-    td { padding: 9px 10px; border-bottom: 1px solid #E0E0E0; color: #333; }
-    tr:nth-child(even) { background-color: #FAFAFA; }
-    .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
-    .badge-approved { background: #00B69B; color: #fff; }
-    .badge-pending { background: #FCBE2D; color: #fff; }
-    .page-break { page-break-after: always; }
-    .footer { text-align: center; font-size: 11px; color: #999; margin-top: 40px; border-top: 1px solid #E0E0E0; padding-top: 15px; }
+    th { background: #f1f5f9; color: #475569; font-weight: 700; text-align: left; padding: 10px 12px; border-bottom: 2px solid #cbd5e1; }
+    td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+    tr:nth-child(even) { background: #fafafa; }
+    .badge { padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; display: inline-block; }
+    .badge-success { background: #dcfce7; color: #166534; }
+    .footer { font-size: 10px; color: #94a3b8; text-align: center; margin-top: 50px; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+    @media print {
+      body { padding: 20px; }
+      .page-break { page-break-after: always; }
+    }
   </style>
 </head>
 <body>
-  <div className="header">
+  <div class="header">
     <div>
-      <div className="subtitle">OmishGo Agricultural Platform</div>
-      <h1 className="title">System Executive Report</h1>
+      <div class="logo">OMISHGO</div>
+      <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Agri-Marketplace Official System Report</div>
     </div>
-    <div className="meta">
-      <div><strong>Date:</strong> ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</div>
-      <div><strong>Scope:</strong> Full Platform Audit</div>
+    <div style="text-align: right;">
+      <div class="title">Executive Audit</div>
+      <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Generated: ${new Date().toLocaleString()}</div>
     </div>
   </div>
 
-  <div className="section-title">1. Key Performance Indicators</div>
-  <div className="kpi-grid">
-    <div className="kpi-box"><div className="kpi-val">${users.length}</div><div className="kpi-lbl">Total Users</div></div>
-    <div className="kpi-box"><div className="kpi-val">${approvedUsers}</div><div className="kpi-lbl">Approved Users</div></div>
-    <div className="kpi-box"><div className="kpi-val">${products.length}</div><div className="kpi-lbl">Products</div></div>
-    <div className="kpi-box"><div className="kpi-val">ETB ${totalRevenue.toLocaleString()}</div><div className="kpi-lbl">Trade Volume</div></div>
+  <div class="meta-grid">
+    <div class="meta-card">
+      <div class="meta-val">${users.length}</div>
+      <div class="meta-lbl">Total Users</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-val">${products.length}</div>
+      <div class="meta-lbl">Active Products</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-val">${orders.length}</div>
+      <div class="meta-lbl">Total Orders</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-val">ETB ${totalSales.toLocaleString()}</div>
+      <div class="meta-lbl">Marketplace Revenue</div>
+    </div>
   </div>
 
-  <div className="section-title">2. Registered Users Roster</div>
+  <h3>Product Inventory &amp; Varieties (${products.length})</h3>
   <table>
     <thead>
       <tr>
-        <th>User ID</th>
-        <th>Full Name</th>
-        <th>Phone</th>
-        <th>Role</th>
-        <th>Status</th>
-        <th>Joined</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${users.map(u => `
-        <tr>
-          <td><strong>${u.customId || u._id}</strong></td>
-          <td>${u.name || 'N/A'}</td>
-          <td>${u.phone}</td>
-          <td style="text-transform: capitalize;">${u.role}</td>
-          <td><span class="badge ${u.isVerified ? 'badge-approved' : 'badge-pending'}">${u.isVerified ? 'Approved' : 'Pending'}</span></td>
-          <td>${new Date(u.createdAt).toLocaleDateString()}</td>
-        </tr>
-      `).join('')}
-    </tbody>
-  </table>
-
-  <div className="page-break"></div>
-
-  <div className="section-title">3. Active Product Inventory</div>
-  <table>
-    <thead>
-      <tr>
-        <th>Product ID</th>
+        <th>Custom ID</th>
         <th>Crop Type</th>
-        <th>Price per Unit</th>
-        <th>Available Quantity</th>
-        <th>Farmer Name</th>
+        <th>Variety</th>
+        <th>Price (ETB)</th>
+        <th>Quantity</th>
+        <th>Farmer</th>
+        <th>Location</th>
         <th>Status</th>
       </tr>
     </thead>
     <tbody>
-      ${products.map(p => `
+      ${products.slice(0, 15).map(p => `
         <tr>
           <td><strong>${p.customId || p._id}</strong></td>
           <td>${p.cropType}</td>
-          <td>ETB ${p.price?.toLocaleString()} / ${p.unit}</td>
+          <td>${p.variety ? `<strong>${p.variety}</strong>` : '—'}</td>
+          <td>ETB ${p.price?.toLocaleString()}</td>
           <td>${p.quantity} ${p.unit}</td>
-          <td>${p.farmerId?.name || 'N/A'}</td>
-          <td style="text-transform: uppercase;">${p.status}</td>
+          <td>${p.farmerId?.name || 'Unknown'}</td>
+          <td>${formatLocation(p.location || p.farmerId?.location)}</td>
+          <td><span class="badge badge-success">${p.status}</span></td>
         </tr>
       `).join('')}
     </tbody>
   </table>
 
-  <div className="section-title">4. Financial Transactions & Order Ledger</div>
+  <h3>Recent Orders (${orders.length})</h3>
   <table>
     <thead>
       <tr>
         <th>Order ID</th>
-        <th>Crop</th>
+        <th>Crop / Variety</th>
         <th>Quantity</th>
-        <th>Total Amount</th>
+        <th>Total Price</th>
+        <th>Buyer</th>
+        <th>Farmer</th>
         <th>Status</th>
-        <th>Date</th>
       </tr>
     </thead>
     <tbody>
-      ${orders.map(o => `
+      ${orders.slice(0, 15).map(o => `
         <tr>
           <td><strong>${o.customId || o._id}</strong></td>
-          <td>${o.cropType || o.productId?.cropType || 'N/A'}</td>
+          <td>${o.cropType || 'Crop'} ${o.variety || o.productId?.variety ? `(${o.variety || o.productId?.variety})` : ''}</td>
           <td>${o.quantity} ${o.unit || 'kg'}</td>
-          <td><strong>ETB ${o.totalPrice?.toLocaleString()}</strong></td>
-          <td style="text-transform: uppercase;">${o.status}</td>
-          <td>${new Date(o.createdAt).toLocaleDateString()}</td>
+          <td>ETB ${o.totalPrice?.toLocaleString()}</td>
+          <td>${o.buyerId?.name || 'Unknown'}</td>
+          <td>${o.farmerId?.name || 'Unknown'}</td>
+          <td>${o.status}</td>
         </tr>
       `).join('')}
     </tbody>
   </table>
 
-  <div className="section-title">5. System Security & Audit Log Trail</div>
+  <div class="page-break"></div>
+
+  <h3>User Accounts Directory (${users.length})</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Name</th>
+        <th>Phone / Email</th>
+        <th>Role</th>
+        <th>Rating</th>
+        <th>Location</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${users.slice(0, 15).map(u => `
+        <tr>
+          <td><strong>${u.customId || u._id}</strong></td>
+          <td>${u.name || 'N/A'}</td>
+          <td>${u.phone} ${u.email ? `<br/><small>${u.email}</small>` : ''}</td>
+          <td>${u.role}</td>
+          <td>${(u.rating || u.averageRating) > 0 ? `★ ${u.rating || u.averageRating}` : '—'}</td>
+          <td>${formatLocation(u.location)}</td>
+          <td>${u.isVerified ? 'Approved' : 'Pending'}</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>
+
+  <h3>System Audit Logs</h3>
   <table>
     <thead>
       <tr>
         <th>Timestamp</th>
-        <th>Admin User</th>
-        <th>Action Performed</th>
-        <th>Target Type</th>
+        <th>Admin</th>
+        <th>Action</th>
+        <th>Target</th>
         <th>Details</th>
       </tr>
     </thead>
@@ -261,15 +274,13 @@ const Analytics = () => {
     </tbody>
   </table>
 
-  <div className="footer">
+  <div class="footer">
     End of Official System Executive Report — OmishGo Platform Confidential — Page 2
   </div>
 
   <script>
     window.onload = function() {
-      setTimeout(function() {
-        window.print();
-      }, 500);
+      setTimeout(() => { window.print(); }, 500);
     };
   </script>
 </body>
@@ -287,25 +298,25 @@ const Analytics = () => {
 
     // Section 1: Users
     csv += "=== USER DIRECTORY ===\n";
-    csv += "User ID,Name,Phone,Role,Status,Joined Date\n";
+    csv += "User ID,Name,Phone,Email,Role,Rating,Location,Status,Joined Date\n";
     users.forEach(u => {
-      csv += `"${u.customId || u._id}","${u.name || ''}","${u.phone}","${u.role}","${u.isVerified ? 'Approved' : 'Pending'}","${new Date(u.createdAt).toLocaleDateString()}"\n`;
+      csv += `"${u.customId || u._id}","${u.name || ''}","${u.phone}","${u.email || ''}","${u.role}","${u.rating || u.averageRating || ''}","${formatLocation(u.location)}","${u.isVerified ? 'Approved' : 'Pending'}","${new Date(u.createdAt).toLocaleDateString()}"\n`;
     });
     csv += "\n";
 
     // Section 2: Products
     csv += "=== PRODUCT INVENTORY ===\n";
-    csv += "Product ID,Crop Type,Price (ETB),Unit,Quantity,Farmer Name,Status\n";
+    csv += "Product ID,Crop Type,Variety,Price (ETB),Unit,Quantity,Farmer Name,Location,Status\n";
     products.forEach(p => {
-      csv += `"${p.customId || p._id}","${p.cropType}",${p.price},"${p.unit}",${p.quantity},"${p.farmerId?.name || ''}","${p.status}"\n`;
+      csv += `"${p.customId || p._id}","${p.cropType}","${p.variety || ''}",${p.price},"${p.unit}",${p.quantity},"${p.farmerId?.name || ''}","${formatLocation(p.location || p.farmerId?.location)}","${p.status}"\n`;
     });
     csv += "\n";
 
     // Section 3: Orders
     csv += "=== ORDER TRANSACTIONS ===\n";
-    csv += "Order ID,Crop Type,Quantity,Unit,Total Price (ETB),Status,Date\n";
+    csv += "Order ID,Crop Type,Variety,Quantity,Unit,Total Price (ETB),Status,Date\n";
     orders.forEach(o => {
-      csv += `"${o.customId || o._id}","${o.cropType || ''}",${o.quantity},"${o.unit || 'kg'}",${o.totalPrice},"${o.status}","${new Date(o.createdAt).toLocaleDateString()}"\n`;
+      csv += `"${o.customId || o._id}","${o.cropType || ''}","${o.variety || o.productId?.variety || ''}",${o.quantity},"${o.unit || 'kg'}",${o.totalPrice},"${o.status}","${new Date(o.createdAt).toLocaleDateString()}"\n`;
     });
     csv += "\n";
 
@@ -646,7 +657,7 @@ const Analytics = () => {
           </div>
 
           <div className="flex flex-col items-center justify-center my-auto">
-            <div className="w-[120px] h-[120px] rounded-[18px] bg-surface-muted overflow-hidden shadow-sm flex items-center justify-center mb-4">
+            <div className="w-[120px] h-[120px] rounded-[18px] bg-surface-muted overflow-hidden shadow-sm flex items-center justify-center mb-4 border border-border">
               {currentFeatured && currentFeatured.photos && currentFeatured.photos[0] ? (
                 <img src={currentFeatured.photos[0]} alt={currentFeatured.cropType} className="w-full h-full object-cover" />
               ) : (
@@ -656,12 +667,22 @@ const Analytics = () => {
               )}
             </div>
 
-            <div className="text-[18px] font-bold text-ink text-center">
-              {currentFeatured ? currentFeatured.cropType : "Beats Headphone 2026"}
+            <div className="text-[18px] font-bold text-ink text-center flex items-center gap-2 flex-wrap justify-center">
+              <span>{currentFeatured ? currentFeatured.cropType : "Crop Listing"}</span>
+              {currentFeatured?.variety && (
+                <span className="px-2.5 py-0.5 bg-primary/10 text-primary text-xs rounded-full font-bold">
+                  {currentFeatured.variety}
+                </span>
+              )}
             </div>
             <div className="text-[16px] font-bold text-primary mt-1">
-              {currentFeatured ? `ETB ${currentFeatured.price?.toLocaleString()} / ${currentFeatured.unit}` : "$89.00"}
+              {currentFeatured ? `ETB ${currentFeatured.price?.toLocaleString()} / ${currentFeatured.unit}` : "ETB 0"}
             </div>
+            {currentFeatured?.location && (
+              <div className="text-[12px] text-ink/50 mt-1 font-medium">
+                📍 {formatLocation(currentFeatured.location)}
+              </div>
+            )}
           </div>
         </div>
 

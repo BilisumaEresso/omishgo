@@ -40,7 +40,7 @@ export const getUserDetail = asyncHandler(async (req, res) => {
   const products = await Product.find({ farmerId: user._id }).sort("-createdAt");
   const orders = await Order.find({
     $or: [{ buyerId: user._id }, { farmerId: user._id }]
-  }).populate("productId", "cropType price unit customId").sort("-createdAt");
+  }).populate("productId", "cropType variety price unit customId photos location").sort("-createdAt");
 
   sendResponse(res, {
     statusCode: 200,
@@ -126,7 +126,7 @@ export const getAllProducts = asyncHandler(async (req, res) => {
   if (cropType) query.cropType = { $regex: cropType, $options: "i" };
 
   let products = await Product.find(query)
-    .populate("farmerId", "name phone location customId")
+    .populate("farmerId", "name phone email location customId avatarUrl rating averageRating preferredLang")
     .sort("-createdAt");
     
   // Calculate market averages for anomaly detection
@@ -163,13 +163,13 @@ export const getProductDetail = asyncHandler(async (req, res) => {
   const query = isObjectId ? { _id: id } : { customId: id };
 
   const product = await Product.findOne(query)
-    .populate("farmerId", "name phone location role customId");
+    .populate("farmerId", "name phone email location role customId avatarUrl rating averageRating preferredLang");
     
   if (!product) throw new ApiError(404, "Product not found");
 
   // Get recent orders for this product
   const orders = await Order.find({ productId: product._id })
-    .populate("buyerId", "name phone customId")
+    .populate("buyerId", "name phone email customId avatarUrl location")
     .sort("-createdAt")
     .limit(10);
 
@@ -192,9 +192,9 @@ export const getAllOrders = asyncHandler(async (req, res) => {
   if (status) query.status = status;
 
   const orders = await Order.find(query)
-    .populate("buyerId", "name phone customId")
-    .populate("farmerId", "name phone customId")
-    .populate("productId", "cropType price unit photos customId")
+    .populate("buyerId", "name phone email customId avatarUrl location preferredLang")
+    .populate("farmerId", "name phone email customId avatarUrl location preferredLang")
+    .populate("productId", "cropType variety price unit photos customId location")
     .sort("-createdAt");
 
   sendResponse(res, { statusCode: 200, message: "Orders retrieved", data: { orders } });
@@ -211,9 +211,9 @@ export const getOrderDetail = asyncHandler(async (req, res) => {
   const query = isObjectId ? { _id: id } : { customId: id };
 
   const order = await Order.findOne(query)
-    .populate("buyerId", "name phone location customId")
-    .populate("farmerId", "name phone location customId")
-    .populate("productId", "cropType price unit photos description customId");
+    .populate("buyerId", "name phone email location customId avatarUrl preferredLang rating averageRating")
+    .populate("farmerId", "name phone email location customId avatarUrl preferredLang rating averageRating")
+    .populate("productId", "cropType variety price unit photos description customId location");
     
   if (!order) throw new ApiError(404, "Order not found");
 

@@ -180,81 +180,82 @@ const AuditLog = () => {
       </div>
 
       {/* Audit Log Table */}
-      <div className="bg-white rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] overflow-hidden">
+      <div className="bg-white rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)] overflow-hidden max-w-full">
         {loading ? (
           <div className="p-12 flex items-center justify-center">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-surface-soft">
-                <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-tl-[14px]">Timestamp</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Admin</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Action</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Target Type</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink">Target Profile / ID</th>
-                <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-tr-[14px]">Details</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredLogs.map((log) => {
-                const targetIdStr = getTargetIdString(log.targetId);
-                const targetLink = getTargetLink(log);
+          <div className="overflow-x-auto w-full max-w-full">
+            <table className="w-full min-w-[800px] text-left border-collapse">
+              <thead>
+                <tr className="bg-surface-soft">
+                  <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-tl-[14px]">Timestamp</th>
+                  <th className="py-4 px-5 text-[14px] font-bold text-ink">Admin</th>
+                  <th className="py-4 px-5 text-[14px] font-bold text-ink">Action</th>
+                  <th className="py-4 px-5 text-[14px] font-bold text-ink">Target Type</th>
+                  <th className="py-4 px-5 text-[14px] font-bold text-ink">Target Profile / ID</th>
+                  <th className="py-4 px-5 text-[14px] font-bold text-ink rounded-tr-[14px]">Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredLogs.map((log) => {
+                  const targetIdStr = getTargetIdString(log.targetId);
+                  const targetLink = getTargetLink(log);
 
-                return (
-                  <tr 
-                    key={log._id} 
-                    className="border-b border-[#979797]/15 last:border-0 hover:bg-[#F9FAFB] transition-colors"
-                  >
-                    <td className="py-4 px-5 text-[13px] text-ink/70 whitespace-nowrap">
-                      {new Date(log.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                    </td>
-                    <td className="py-4 px-5 text-[14px] font-semibold text-ink">
-                      {log.adminId?.name || "System Admin"}
-                    </td>
-                    <td className="py-4 px-5">
-                      <span className={`px-4 py-1.5 rounded-[13.5px] text-[13px] font-semibold inline-block ${getActionStyle(log.action)}`}>
-                        {formatActionName(log.action)}
-                      </span>
-                    </td>
-                    <td className="py-4 px-5 text-[14px] text-ink/80 font-medium capitalize">
-                      {log.targetType || "System"}
-                    </td>
-                    {/* Target ID Column - Clicking redirects directly to profile/detail! */}
-                    <td className="py-4 px-5">
-                      {targetLink ? (
-                        <Link 
-                          to={targetLink} 
-                          className="inline-flex items-center gap-1.5 text-[13px] font-mono text-primary font-semibold hover:underline bg-primary/10 px-3 py-1.5 rounded-[8px] transition-colors"
-                          title="Click to view full user profile or entity details"
-                        >
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
-                          {targetIdStr}
-                        </Link>
-                      ) : (
-                        <span className="text-[13px] text-gray-400 font-mono">—</span>
-                      )}
-                    </td>
-                    <td 
-                      className="py-4 px-5 text-[14px] text-ink/70 max-w-xs truncate cursor-pointer hover:text-primary"
-                      onClick={() => setSelectedLog(log)}
+                  return (
+                    <tr 
+                      key={log._id} 
+                      className="border-b border-[#979797]/15 last:border-0 hover:bg-[#F9FAFB] transition-colors"
                     >
-                      {log.details || "—"}
+                      <td className="py-4 px-5 text-[13px] text-ink/70 whitespace-nowrap">
+                        {new Date(log.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </td>
+                      <td className="py-4 px-5 text-[14px] font-semibold text-ink">
+                        {log.adminId?.name || "System Admin"}
+                      </td>
+                      <td className="py-4 px-5">
+                        <span className={`px-4 py-1.5 rounded-[13.5px] text-[13px] font-semibold inline-block ${getActionStyle(log.action)}`}>
+                          {formatActionName(log.action)}
+                        </span>
+                      </td>
+                      <td className="py-4 px-5 text-[14px] text-ink/80 font-medium capitalize">
+                        {log.targetType || "System"}
+                      </td>
+                      <td className="py-4 px-5">
+                        {targetLink ? (
+                          <Link 
+                            to={targetLink} 
+                            className="inline-flex items-center gap-1.5 text-[13px] font-mono text-primary font-semibold hover:underline bg-primary/10 px-3 py-1.5 rounded-[8px] transition-colors"
+                            title="Click to view full user profile or entity details"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                            {targetIdStr}
+                          </Link>
+                        ) : (
+                          <span className="text-[13px] text-gray-400 font-mono">—</span>
+                        )}
+                      </td>
+                      <td 
+                        className="py-4 px-5 text-[14px] text-ink/70 max-w-xs truncate cursor-pointer hover:text-primary"
+                        onClick={() => setSelectedLog(log)}
+                      >
+                        {log.details || "—"}
+                      </td>
+                    </tr>
+                  );
+                })}
+                {filteredLogs.length === 0 && (
+                  <tr>
+                    <td colSpan="6" className="py-16 text-center">
+                      <svg className="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V19.5a2.25 2.25 0 002.25 2.25h.75" /></svg>
+                      <div className="text-gray-400 text-[16px] font-medium">No audit logs matching your query</div>
                     </td>
                   </tr>
-                );
-              })}
-              {filteredLogs.length === 0 && (
-                <tr>
-                  <td colSpan="6" className="py-16 text-center">
-                    <svg className="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V19.5a2.25 2.25 0 002.25 2.25h.75" /></svg>
-                    <div className="text-gray-400 text-[16px] font-medium">No audit logs matching your query</div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 

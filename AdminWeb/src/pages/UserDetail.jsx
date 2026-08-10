@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
 import ConfirmModal from "../components/ConfirmModal";
+import { getUserAvatarUrl, formatLocation } from "../utils/avatar";
 
 const UserDetail = () => {
   const { id } = useParams();
@@ -147,7 +148,7 @@ const UserDetail = () => {
             <div className="relative">
               <div className="w-22 h-22 rounded-full bg-primary-light ring-4 ring-primary/20 border-2 border-primary overflow-hidden flex-shrink-0">
                 <img
-                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}&background=4880FF&color=fff&bold=true`}
+                  src={getUserAvatarUrl(user, { bg: "4880FF" })}
                   alt={user.name || "User Avatar"}
                   className="w-full h-full object-cover"
                 />
@@ -164,6 +165,11 @@ const UserDetail = () => {
             <div>
               <div className="flex flex-wrap items-center gap-3">
                 <h2 className="text-2xl font-bold text-ink">{user.name || "N/A"}</h2>
+                {(user.rating || user.averageRating) > 0 && (
+                  <span className="flex items-center gap-1 text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
+                    ★ {user.rating || user.averageRating} ({user.ratingCount || 0})
+                  </span>
+                )}
                 <span
                   className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold capitalize ${
                     user.isVerified
@@ -190,6 +196,15 @@ const UserDetail = () => {
                   <span className="font-medium text-ink">{user.phone || "N/A"}</span>
                 </div>
 
+                {user.email && (
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                    </svg>
+                    <span className="font-medium text-ink">{user.email}</span>
+                  </div>
+                )}
+
                 <div className="flex items-center gap-2 capitalize">
                   <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
@@ -197,13 +212,22 @@ const UserDetail = () => {
                   <span>Role: <strong className="text-ink font-semibold">{user.role}</strong></span>
                 </div>
 
+                {user.preferredLang && (
+                  <div className="flex items-center gap-2 capitalize">
+                    <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m0 2.25c0 5.308-2.617 9.87-6.37 12.836m6.37-12.836A48.474 48.474 0 0115 5.621m-3 12.836c2.093-1.652 3.844-3.722 5.097-6.086m-5.097 6.086L18 21" />
+                    </svg>
+                    <span>Language: <strong className="text-ink font-semibold">{user.preferredLang === 'am' ? 'Amharic' : user.preferredLang === 'om' ? 'Afaan Oromo' : 'English'}</strong></span>
+                  </div>
+                )}
+
                 {user.location && (
                   <div className="flex items-center gap-2">
                     <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                     </svg>
-                    <span className="font-medium text-ink">{user.location.region} / {user.location.zone}</span>
+                    <span className="font-medium text-ink">{formatLocation(user.location)}</span>
                   </div>
                 )}
               </div>
@@ -275,6 +299,7 @@ const UserDetail = () => {
                   <tr className="bg-surface-soft text-ink border-b border-border">
                     <th className="py-3.5 px-5 text-sm font-bold rounded-l-xl">Product ID</th>
                     <th className="py-3.5 px-5 text-sm font-bold">Crop Type</th>
+                    <th className="py-3.5 px-5 text-sm font-bold">Variety</th>
                     <th className="py-3.5 px-5 text-sm font-bold">Quantity</th>
                     <th className="py-3.5 px-5 text-sm font-bold">Price</th>
                     <th className="py-3.5 px-5 text-sm font-bold rounded-r-xl">Status</th>
@@ -289,6 +314,15 @@ const UserDetail = () => {
                         </Link>
                       </td>
                       <td className="py-4 px-5 text-sm text-ink font-semibold">{p.cropType}</td>
+                      <td className="py-4 px-5 text-sm text-ink/70">
+                        {p.variety ? (
+                          <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary">
+                            {p.variety}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
+                      </td>
                       <td className="py-4 px-5 text-sm text-ink-muted whitespace-nowrap">{p.quantity} {p.unit}</td>
                       <td className="py-4 px-5 text-sm text-ink font-bold whitespace-nowrap">ETB {p.price?.toLocaleString()}</td>
                       <td className="py-4 px-5">
@@ -338,6 +372,7 @@ const UserDetail = () => {
                   <tr className="bg-surface-soft text-ink border-b border-border">
                     <th className="py-3.5 px-5 text-sm font-bold rounded-l-xl">Order ID</th>
                     <th className="py-3.5 px-5 text-sm font-bold">Crop</th>
+                    <th className="py-3.5 px-5 text-sm font-bold">Variety</th>
                     <th className="py-3.5 px-5 text-sm font-bold">Type</th>
                     <th className="py-3.5 px-5 text-sm font-bold">Total Price</th>
                     <th className="py-3.5 px-5 text-sm font-bold rounded-r-xl">Status</th>
@@ -352,6 +387,15 @@ const UserDetail = () => {
                         </Link>
                       </td>
                       <td className="py-4 px-5 text-sm text-ink font-semibold">{o.cropType || o.productId?.cropType || "—"}</td>
+                      <td className="py-4 px-5 text-sm text-ink/70">
+                        {o.variety || o.productId?.variety ? (
+                          <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary">
+                            {o.variety || o.productId?.variety}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
+                      </td>
                       <td className="py-4 px-5 text-sm font-medium capitalize">
                         {isFarmer ? (
                           <span className="text-success font-semibold">Sale</span>

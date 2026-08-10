@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
+import { getUserAvatarUrl, formatLocation } from "../utils/avatar";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -71,6 +72,7 @@ const ProductDetail = () => {
   if (!product) return <div className="text-gray-400 text-center py-20">Product not found</div>;
 
   const photos = product.photos && product.photos.length > 0 ? product.photos : [];
+  const farmer = product.farmerId;
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
@@ -176,8 +178,15 @@ const ProductDetail = () => {
           <div className="bg-white p-8 rounded-[14px] shadow-[6px_6px_54px_rgba(0,0,0,0.05)]">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h2 className="text-[24px] font-bold text-ink mb-1">{product.cropType}</h2>
-                <span className="text-[14px] text-ink/50 uppercase tracking-wider font-semibold">{product.category || "General"}</span>
+                <div className="flex items-center gap-3 flex-wrap mb-1">
+                  <h2 className="text-[24px] font-bold text-ink">{product.cropType}</h2>
+                  {product.variety && (
+                    <span className="px-3 py-1 bg-primary/10 text-primary font-bold text-xs rounded-full border border-primary/20">
+                      Variety: {product.variety}
+                    </span>
+                  )}
+                </div>
+                <span className="text-[14px] text-ink/50 uppercase tracking-wider font-semibold">{product.category || "Produce Catalog"}</span>
               </div>
               <div className="text-right">
                 <div className="text-[28px] font-bold text-primary">ETB {product.price?.toLocaleString()}</div>
@@ -203,9 +212,11 @@ const ProductDetail = () => {
               <div className="bg-surface-muted p-4 rounded-[10px]">
                 <div className="flex items-center gap-2 mb-2">
                   <svg className="w-4 h-4 text-success" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
-                  <span className="text-[12px] text-ink/50 font-semibold uppercase">Region</span>
+                  <span className="text-[12px] text-ink/50 font-semibold uppercase">Location</span>
                 </div>
-                <div className="text-[14px] font-bold text-ink">{product.location?.region || product.farmerId?.location?.region || "N/A"}</div>
+                <div className="text-[13px] font-bold text-ink truncate" title={formatLocation(product.location || farmer?.location)}>
+                  {formatLocation(product.location || farmer?.location)}
+                </div>
               </div>
               <div className="bg-surface-muted p-4 rounded-[10px]">
                 <div className="flex items-center gap-2 mb-2">
@@ -237,27 +248,47 @@ const ProductDetail = () => {
               Farmer Information
             </h3>
             <div className="flex items-start gap-5">
-              <div className="w-[60px] h-[60px] rounded-full bg-[#8280FF]/15 overflow-hidden flex-shrink-0">
-                <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(product.farmerId?.name || 'F')}&background=8280FF&color=fff&bold=true`} alt="Farmer" className="w-full h-full object-cover" />
+              <div className="w-[64px] h-[64px] rounded-full bg-[#8280FF]/15 border-2 border-primary/20 overflow-hidden flex-shrink-0">
+                <img src={getUserAvatarUrl(farmer, { bg: "8280FF" })} alt={farmer?.name || "Farmer"} className="w-full h-full object-cover" />
               </div>
               <div className="flex-1">
-                <Link to={`/users/${product.farmerId?.customId || product.farmerId?._id}`} className="text-[18px] font-bold text-ink hover:text-primary hover:underline">
-                  {product.farmerId?.name || "Unknown Farmer"}
-                </Link>
-                <div className="text-[13px] font-mono text-primary mb-3">{product.farmerId?.customId || ""}</div>
-                <div className="flex flex-wrap gap-4 text-[14px] text-ink/60">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <Link to={`/users/${farmer?.customId || farmer?._id}`} className="text-[18px] font-bold text-ink hover:text-primary hover:underline">
+                    {farmer?.name || "Unknown Farmer"}
+                  </Link>
+                  {(farmer?.rating || farmer?.averageRating) > 0 && (
+                    <span className="flex items-center gap-1 text-[13px] font-bold text-amber-500 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+                      ★ {farmer.rating || farmer.averageRating}
+                    </span>
+                  )}
+                </div>
+                <div className="text-[13px] font-mono text-primary mb-3">{farmer?.customId || ""}</div>
+                
+                <div className="flex flex-wrap gap-y-2 gap-x-6 text-[14px] text-ink/60">
                   <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>
-                    {product.farmerId?.phone || "N/A"}
+                    <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>
+                    {farmer?.phone || "N/A"}
                   </div>
+                  {farmer?.email && (
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+                      {farmer.email}
+                    </div>
+                  )}
                   <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
-                    {product.farmerId?.location?.region || "Unknown"} / {product.farmerId?.location?.zone || "Unknown"}
+                    <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+                    {formatLocation(farmer?.location)}
                   </div>
+                  {farmer?.preferredLang && (
+                    <div className="flex items-center gap-2 capitalize">
+                      <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m0 2.25c0 5.308-2.617 9.87-6.37 12.836m6.37-12.836A48.474 48.474 0 0115 5.621m-3 12.836c2.093-1.652 3.844-3.722 5.097-6.086m-5.097 6.086L18 21" /></svg>
+                      Language: {farmer.preferredLang === 'am' ? 'Amharic' : farmer.preferredLang === 'om' ? 'Afaan Oromo' : 'English'}
+                    </div>
+                  )}
                 </div>
               </div>
               <Link
-                to={`/users/${product.farmerId?.customId || product.farmerId?._id}`}
+                to={`/users/${farmer?.customId || farmer?._id}`}
                 className="px-4 py-2 bg-surface-muted text-primary rounded-[10px] font-semibold text-[13px] hover:bg-primary hover:text-white transition-all flex-shrink-0"
               >
                 View Profile
@@ -298,9 +329,16 @@ const ProductDetail = () => {
                   </td>
                   <td className="py-4 px-5">
                     {o.buyerId ? (
-                      <Link to={`/users/${o.buyerId.customId || o.buyerId._id}`} className="text-[14px] text-ink hover:text-primary hover:underline font-medium">
-                        {o.buyerId.name || "Unknown"}
-                      </Link>
+                      <div className="flex items-center gap-2.5">
+                        <img
+                          src={getUserAvatarUrl(o.buyerId, { bg: "4880FF" })}
+                          alt={o.buyerId.name || "Buyer"}
+                          className="w-7 h-7 rounded-full object-cover border border-border flex-shrink-0"
+                        />
+                        <Link to={`/users/${o.buyerId.customId || o.buyerId._id}`} className="text-[14px] text-ink hover:text-primary hover:underline font-medium">
+                          {o.buyerId.name || "Unknown"}
+                        </Link>
+                      </div>
                     ) : (
                       <span className="text-gray-400">Unknown</span>
                     )}

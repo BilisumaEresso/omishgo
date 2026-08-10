@@ -105,13 +105,33 @@ const AdminLayout = ({ children }) => {
     },
   ];
 
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
   return (
-    <div className="flex min-h-screen bg-surface-muted font-sans text-ink">
-      {/* Sidebar - fixed, never scrolls */}
-      <aside className="w-[240px] bg-white border-r border-border flex flex-col fixed top-0 left-0 bottom-0 z-30">
-        <div className="text-2xl font-bold py-6 text-center flex-shrink-0">
-          <span className="text-ink">Omish</span>
-          <span className="text-primary">Go</span>
+    <div className="flex min-h-screen max-w-full overflow-x-hidden bg-surface-muted font-sans text-ink">
+      {/* Mobile Backdrop */}
+      {mobileSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-xs"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - fixed on desktop, overlay drawer on mobile */}
+      <aside className={`w-[240px] bg-white border-r border-border flex flex-col fixed top-0 left-0 bottom-0 z-50 transition-transform duration-300 ${
+        mobileSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      }`}>
+        <div className="text-2xl font-bold py-6 text-center flex-shrink-0 flex items-center justify-between px-6 lg:justify-center">
+          <div>
+            <span className="text-ink">Omish</span>
+            <span className="text-primary">Go</span>
+          </div>
+          <button 
+            onClick={() => setMobileSidebarOpen(false)}
+            className="lg:hidden text-ink/60 hover:text-ink"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
         </div>
         
         <nav className="flex-1 overflow-y-auto px-4">
@@ -122,6 +142,7 @@ const AdminLayout = ({ children }) => {
                 <li key={item.name}>
                   <Link
                     to={item.path}
+                    onClick={() => setMobileSidebarOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-[10px] cursor-pointer transition-all duration-200 text-[14px] font-semibold tracking-[0.3px] ${
                       isActive
                         ? "bg-primary text-white shadow-md"
@@ -148,11 +169,19 @@ const AdminLayout = ({ children }) => {
         </div>
       </aside>
 
-      {/* Main Content Area - offset by sidebar width */}
-      <div className="flex-1 flex flex-col ml-[240px]">
+      {/* Main Content Area - offset by sidebar width on desktop */}
+      <div className="flex-1 flex flex-col lg:ml-[240px] min-w-0 max-w-full overflow-x-hidden">
         {/* Top Bar */}
-        <header className="h-[70px] bg-white flex items-center justify-between px-8 sticky top-0 z-20 border-b border-border">
-          <div className="flex items-center relative">
+        <header className="h-[70px] bg-white flex items-center justify-between px-4 sm:px-8 sticky top-0 z-20 border-b border-border">
+          <div className="flex items-center gap-3">
+            {/* Hamburger Button on Mobile */}
+            <button 
+              onClick={() => setMobileSidebarOpen(true)}
+              className="lg:hidden p-2 rounded-lg bg-surface-muted text-ink/70 hover:text-ink cursor-pointer"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+            </button>
+
             {/* Search Input */}
             <div className="relative">
               <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink opacity-50" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -164,11 +193,11 @@ const AdminLayout = ({ children }) => {
                 onKeyDown={handleKeyDown}
                 onBlur={() => setTimeout(() => setShowResults(false), 250)}
                 onFocus={() => searchResults.length > 0 && setShowResults(true)}
-                className="bg-surface-muted border-[0.6px] border-border rounded-[19px] h-[38px] pl-10 pr-4 text-[14px] w-[340px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                className="bg-surface-muted border-[0.6px] border-border rounded-[19px] h-[38px] pl-10 pr-4 text-[13px] sm:text-[14px] w-[180px] sm:w-[320px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
               />
               {/* Search Results Dropdown */}
               {showResults && searchResults.length > 0 && (
-                <div className="absolute top-full left-0 mt-2 w-[400px] bg-white rounded-xl shadow-2xl border border-border overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute top-full left-0 mt-2 w-[300px] sm:w-[400px] bg-white rounded-xl shadow-2xl border border-border overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   {searchResults.map((r, i) => (
                     <div
                       key={i}
@@ -203,14 +232,14 @@ const AdminLayout = ({ children }) => {
                 </div>
               )}
               {showResults && searchResults.length === 0 && searchQuery.length >= 2 && (
-                <div className="absolute top-full left-0 mt-2 w-[400px] bg-white rounded-xl shadow-xl border border-border p-6 text-center text-ink-muted text-sm z-50">
+                <div className="absolute top-full left-0 mt-2 w-[300px] sm:w-[400px] bg-white rounded-xl shadow-xl border border-border p-6 text-center text-ink-muted text-sm z-50">
                   No matching users, products, or orders found
                 </div>
               )}
             </div>
           </div>
           
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3 sm:gap-6">
             {/* Notification */}
             <button className="relative p-2 text-ink-muted hover:text-primary transition-colors cursor-pointer">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
@@ -220,21 +249,20 @@ const AdminLayout = ({ children }) => {
             </button>
 
             {/* Profile */}
-            <div className="flex items-center gap-3 cursor-pointer pl-6 border-l border-border">
-              <div className="w-10 h-10 rounded-full bg-surface-muted overflow-hidden border border-border">
+            <div className="flex items-center gap-3 cursor-pointer sm:pl-6 sm:border-l sm:border-border">
+              <div className="w-10 h-10 rounded-full bg-surface-muted overflow-hidden border border-border flex-shrink-0">
                 <img src="https://ui-avatars.com/api/?name=Admin&background=F5F6FA&color=4880FF&bold=true" alt="Admin" className="w-full h-full object-cover" />
               </div>
               <div className="hidden sm:block">
                 <div className="text-[14px] font-bold text-ink leading-tight">Admin</div>
                 <div className="text-[12px] font-semibold text-ink-muted">Super Admin</div>
               </div>
-              <svg className="w-4 h-4 text-ink-muted ml-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
             </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-8">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 min-w-0 max-w-full overflow-x-hidden">
           {children}
         </main>
       </div>
