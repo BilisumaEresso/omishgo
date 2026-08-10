@@ -915,7 +915,7 @@ async function fetchAndRenderPublicProfile(customId) {
             <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 15px;" data-i18n="public_not_found_desc">
               This public profile does not exist or is unavailable.
             </p>
-            <a href="index.html" class="btn btn-primary" data-i18n="public_return_home">Return to OmishGo Home</a>
+            <a href="/" class="btn btn-primary" data-i18n="public_return_home">Return to OmishGo Home</a>
           </div>
         </div>
       `;
@@ -1025,7 +1025,7 @@ async function fetchAndRenderPublicProfile(customId) {
           <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 15px;" data-i18n="public_error_desc">
             A network error occurred while loading this public profile. Please check your connection and try again.
           </p>
-          <a href="index.html" class="btn btn-primary" data-i18n="public_return_home">Return to OmishGo Home</a>
+          <a href="/" class="btn btn-primary" data-i18n="public_return_home">Return to OmishGo Home</a>
         </div>
       </div>
     `;
@@ -1035,7 +1035,7 @@ async function fetchAndRenderPublicProfile(customId) {
 
 function handleRoute() {
   const path = window.location.pathname;
-  const match = path.match(/^\/users\/([A-Za-z0-9_-]+)/);
+  const match = path.match(/^\/users?\/([A-Za-z0-9_-]+)/i);
 
   const mainLanding = document.getElementById("main-landing-content");
   const profileView = document.getElementById("public-profile-view");
@@ -1055,6 +1055,15 @@ function handleRoute() {
     document.body.classList.remove("profile-page");
   }
 }
+
+document.addEventListener("click", (e) => {
+  const link = e.target.closest('a[href^="#"]');
+  if (link && document.body.classList.contains("profile-page")) {
+    e.preventDefault();
+    const hash = link.getAttribute("href");
+    window.location.href = "/" + (hash === "#hero" ? "" : hash);
+  }
+});
 
 document.addEventListener("DOMContentLoaded", handleRoute);
 window.addEventListener("popstate", handleRoute);
