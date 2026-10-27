@@ -10,7 +10,9 @@
    ══════════════════════════════════════════════════════════════ */
 const translations = {
   en: {
-    nav_problem: "Problem",
+    announcement_text: "Built for Ethiopian agriculture / Designed around local markets",
+    announcement_link: "See how it works ↗",
+    nav_problem: "Why OmishGo",
     nav_solution: "How It Works",
     nav_demo: "Intro",
     nav_screens: "App",
@@ -140,6 +142,8 @@ const translations = {
     public_error_desc: "A network error occurred while loading this public profile. Please check your connection and try again."
   },
   am: {
+    announcement_text: "ለኢትዮጵያ ግብርና የተዘጋጀ / ከአገር ውስጥ ገበያዎች ጋር የተጣጣመ",
+    announcement_link: "እንዴት እንደሚሰራ ይመልከቱ ↗",
     nav_problem: "ችግሩ",
     nav_solution: "አሠራር",
     nav_demo: "መግቢያ ቪዲዮ",
@@ -260,6 +264,8 @@ const translations = {
     public_error_desc: "ይህን ፕሮፋይል ሲያመጣ የኔትወርክ ስህተት አጋጥሟል። እባክዎ ግንኙነትዎን ያረጋግጡና እንደገና ይሞክሩ።"
   },
   or: {
+    announcement_text: "Qonna Itoophiyaatiif kan qophaa'e / Gabaa naannoo irratti hundaa'e",
+    announcement_link: "Akkamitti akka hojjetu ilaalaa ↗",
     nav_problem: "Rakkoo",
     nav_solution: "Akkaataa Itti Hojjatu",
     nav_demo: "Viidiyoo Jalqabaa",
@@ -392,6 +398,7 @@ const translations = {
 let currentLang = localStorage.getItem("omishgo_lang") || "en";
 
 function applyLanguage(lang) {
+  if (lang === "om") lang = "or";
   if (!translations[lang]) return;
   currentLang = lang;
   localStorage.setItem("omishgo_lang", lang);
@@ -400,6 +407,13 @@ function applyLanguage(lang) {
     const k = el.getAttribute("data-i18n");
     if (d[k] !== undefined) el.textContent = d[k];
   });
+
+  // Sync dropdown selector
+  const langSelect = document.getElementById("languageSelect");
+  if (langSelect && langSelect.value !== lang) {
+    langSelect.value = lang;
+  }
+
   document.querySelectorAll(".lang-btn, .lang-footer-btn").forEach((btn) => {
     const isActive = btn.getAttribute("data-lang") === lang;
     btn.classList.toggle("active", isActive);
@@ -407,16 +421,21 @@ function applyLanguage(lang) {
   });
   document.documentElement.lang =
     lang === "am" ? "am" : lang === "or" ? "om" : "en";
-  // Update carousel captions
-  document.querySelectorAll(".c-slide").forEach((slide) => {
-    const key = slide.getAttribute("data-label-key");
-    const cap = slide.querySelector(".c-caption");
-    if (cap && key && d[key]) cap.textContent = d[key];
-  });
+  // Update carousel captions and telemetry
+  if (typeof window.coverflowRender === "function") window.coverflowRender();
   // B2: update text-claim stat card
   const claimEl = document.querySelector(".stat-claim");
   if (claimEl && d.stat3_claim) claimEl.textContent = d.stat3_claim;
 }
+
+// Bind dropdown change
+const langSelect = document.getElementById("languageSelect");
+if (langSelect) {
+  langSelect.addEventListener("change", (e) => {
+    applyLanguage(e.target.value);
+  });
+}
+
 document
   .querySelectorAll(".lang-btn, .lang-footer-btn")
   .forEach((btn) =>
@@ -463,6 +482,16 @@ if (hamburger && navLinks) {
     a.addEventListener("click", () => toggleMobileMenu(true));
   });
 
+  document.addEventListener("click", (e) => {
+    if (
+      hamburger.classList.contains("open") &&
+      !navLinks.contains(e.target) &&
+      !hamburger.contains(e.target)
+    ) {
+      toggleMobileMenu(true);
+    }
+  });
+
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && hamburger.classList.contains("open")) {
       toggleMobileMenu(true);
@@ -503,17 +532,188 @@ function animateCounter(el) {
     if (p < 1) requestAnimationFrame(tick);
   })(start);
 }
-const statsGrid = document.querySelector(".stats-grid");
+const statsGrid = document.querySelector(".insight-grid, .stats-grid");
 if (statsGrid) {
   new IntersectionObserver(
     (entries) => {
       if (entries[0].isIntersecting) {
-        statsGrid.querySelectorAll(".stat-number").forEach(animateCounter);
+        statsGrid.querySelectorAll(".stat-number[data-count], .insight-stat-number[data-count]").forEach(animateCounter);
       }
     },
     { threshold: 0.4 },
   ).observe(statsGrid);
 }
+
+
+/* ══════════════════════════════════════════════════════════════
+   6b. INTERACTIVE STEP FLOW & EXPERIENCE TABS
+   ══════════════════════════════════════════════════════════════ */
+const stepData = [
+  {
+    title: "Put your produce on the map.",
+    text: "A clear listing helps the right buyers discover what is available. Snap a photo, set a price in Birr, and describe the harvest.",
+    callout: "Listing ready",
+    sub: "Available to verified buyers"
+  },
+  {
+    title: "Let buyers find the right quantity.",
+    text: "Buyers can choose the amount they need, from a few kuntaala to the available stock, and message you directly in the app.",
+    callout: "Order received",
+    sub: "Quantity and details are clear"
+  },
+  {
+    title: "Keep everyone in the loop.",
+    text: "The order status helps the farmer, buyer, and delivery team stay coordinated throughout the entire journey.",
+    callout: "Delivery coordinated",
+    sub: "Updates as order progresses"
+  },
+  {
+    title: "Close the loop with confidence.",
+    text: "Confirm receipt, complete payment according to the agreed process, and share verified feedback.",
+    callout: "Delivery confirmed",
+    sub: "Ready for review and payment"
+  }
+];
+
+function initSteps() {
+  const stepItems = document.querySelectorAll(".step-item");
+  if (!stepItems.length) return;
+
+  function setStep(index) {
+    stepItems.forEach((item, i) => item.classList.toggle("active", i === index));
+    const d = stepData[index];
+    if (!d) return;
+
+    const countEl = document.getElementById("stepCount");
+    const titleEl = document.getElementById("previewTitle");
+    const textEl = document.getElementById("previewText");
+    const calloutB = document.querySelector("#previewCallout b");
+    const calloutS = document.querySelector("#previewCallout small");
+    const progEl = document.getElementById("previewProgress");
+    const basket = document.querySelector(".produce-basket");
+
+    if (countEl) countEl.textContent = index + 1;
+    if (titleEl) titleEl.textContent = d.title;
+    if (textEl) textEl.textContent = d.text;
+    if (calloutB) calloutB.textContent = d.callout;
+    if (calloutS) calloutS.textContent = d.sub;
+    if (progEl) progEl.style.width = `${(index + 1) * 25}%`;
+    if (basket) {
+      basket.style.transform = index === 1
+        ? "translateX(18px) scale(.95)"
+        : index === 2
+        ? "translate(35px,-4px) scale(.88)"
+        : index === 3
+        ? "translate(0,-4px) scale(.92)"
+        : "translate(0,0) scale(1)";
+    }
+  }
+
+  stepItems.forEach((item, i) => {
+    item.addEventListener("click", () => setStep(i));
+  });
+}
+initSteps();
+
+const roleData = {
+  farmer: {
+    label: "01 — FARMER EXPERIENCE",
+    title: "Your produce.<br>Your progress.",
+    description: "A simple dashboard to post available harvests, track incoming orders, and follow your revenue transparently.",
+    features: [
+      "Add produce in familiar local units (Kuntaala)",
+      "View live order status and delivery updates",
+      "Direct messaging with verified wholesale buyers"
+    ],
+    pillTopTitle: "ETB 270,000 Revenue",
+    pillTopSub: "Active Harvest Sales",
+    pillBottomTitle: "Demand: Onion +15%",
+    pillBottomSub: "Direct Wholesale Pricing",
+    screenshot: "assets/Screenshot_20260731-195932_OmishGo.webp"
+  },
+  buyer: {
+    label: "02 — BUYER EXPERIENCE",
+    title: "Find produce.<br>Order with clarity.",
+    description: "Discover available crops, choose the quantity you need, and follow your order through delivery.",
+    features: [
+      "Browse verified smallholder product listings",
+      "Order by kuntaala or available stock",
+      "Track delivery progress and confirm receipt"
+    ],
+    pillTopTitle: "ETB 45,900 Saved",
+    pillTopSub: "Middleman Markups Eliminated",
+    pillBottomTitle: "12 Verified Farmers",
+    pillBottomSub: "Direct Smallholder Sourcing",
+    screenshot: "assets/Screenshot_20260731-200050_OmishGo.webp"
+  },
+  union: {
+    label: "03 — UNION EXPERIENCE",
+    title: "One view of the<br>whole operation.",
+    description: "A clearer operational view for authorized staff to verify participants, coordinate orders, and review activity.",
+    features: [
+      "Register and verify local participants",
+      "Monitor orders and transport coordination",
+      "Review operational activity and pilot results"
+    ],
+    pillTopTitle: "Ayano Kurfa · Verified",
+    pillTopSub: "Meki Town, East Shewa",
+    pillBottomTitle: "100% Verified Accounts",
+    pillBottomSub: "Union Admin Oversight",
+    screenshot: "assets/Screenshot_20260731-195953_OmishGo.webp"
+  }
+};
+
+function initRoleTabs() {
+  const tabs = document.querySelectorAll(".experience-tab");
+  if (!tabs.length) return;
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => {
+        const active = t === tab;
+        t.classList.toggle("active", active);
+        t.setAttribute("aria-selected", String(active));
+      });
+
+      const role = tab.getAttribute("data-role");
+      const d = roleData[role];
+      if (!d) return;
+
+      const lbl = document.getElementById("roleLabel");
+      const ttl = document.getElementById("roleTitle");
+      const desc = document.getElementById("roleDescription");
+      const feat = document.getElementById("roleFeatures");
+      const shot = document.getElementById("dashboardScreenshot");
+      
+      const pillTopTitle = document.getElementById("expPillTopTitle");
+      const pillTopSub = document.getElementById("expPillTopSub");
+      const pillBottomTitle = document.getElementById("expPillBottomTitle");
+      const pillBottomSub = document.getElementById("expPillBottomSub");
+
+      if (lbl) lbl.textContent = d.label;
+      if (ttl) ttl.innerHTML = d.title;
+      if (desc) desc.textContent = d.description;
+      if (feat) feat.innerHTML = d.features.map(f => `<li><span>✓</span> ${f}</li>`).join("");
+      
+      if (pillTopTitle && d.pillTopTitle) pillTopTitle.textContent = d.pillTopTitle;
+      if (pillTopSub && d.pillTopSub) pillTopSub.textContent = d.pillTopSub;
+      if (pillBottomTitle && d.pillBottomTitle) pillBottomTitle.textContent = d.pillBottomTitle;
+      if (pillBottomSub && d.pillBottomSub) pillBottomSub.textContent = d.pillBottomSub;
+      
+      if (shot && d.screenshot) {
+        shot.style.opacity = "0.4";
+        setTimeout(() => {
+          shot.src = d.screenshot;
+          shot.style.opacity = "1";
+        }, 150);
+      }
+    });
+  });
+}
+initRoleTabs();
+
+const yearEl = document.getElementById("year");
+if (yearEl) yearEl.textContent = new Date().getFullYear();
 
 /* ══════════════════════════════════════════════════════════════
    7. PARTICLES
@@ -531,361 +731,266 @@ if (statsGrid) {
 })();
 
 /* ══════════════════════════════════════════════════════════════
-   8. VIDEO PLAYER
-   Replace YOUTUBE_ID value once the demo is uploaded.
+   9. 3D COVERFLOW CINEMA ENGINE (INFINITE LOOP + AUTOPLAY)
    ══════════════════════════════════════════════════════════════ */
-// TODO: Replace YOUR_YOUTUBE_VIDEO_ID with real YouTube video ID before launch
-const YOUTUBE_ID = "YOUR_YOUTUBE_VIDEO_ID";
-const playBtn = document.getElementById("play-btn");
-const videoPlayer = document.getElementById("video-player");
-const ytContainer = document.getElementById("yt-frame-container");
-if (playBtn) {
-  playBtn.addEventListener("click", () => {
-    if (YOUTUBE_ID === "YOUR_YOUTUBE_VIDEO_ID") {
-      /* D: time-outline SVG used for "uploading soon" state */
-      const cap = document.getElementById("video-caption");
-      if (cap) {
-        cap.innerHTML =
-          '<svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" width="14" height="14" aria-hidden="true" style="margin-right:5px;vertical-align:middle">' +
-          '<path d="M256 64C150 64 64 150 64 256s86 192 192 192 192-86 192-192S362 64 256 64Z"/>' +
-          '<path d="M256 128v144h96" stroke-linecap="round" stroke-linejoin="round"/>' +
-          "</svg>" +
-          "Video uploading soon , join our Telegram for updates!";
-        cap.style.background = "rgba(245,197,24,.92)";
-        cap.style.color = "#111";
-      }
-      return;
-    }
-    const f = document.createElement("iframe");
-    f.src = `https://www.youtube.com/embed/${YOUTUBE_ID}?autoplay=1&rel=0&modestbranding=1`;
-    f.allow = "autoplay; encrypted-media; picture-in-picture";
-    f.allowFullscreen = true;
-    f.title = "OmishGo demo video";
-    ytContainer.innerHTML = "";
-    ytContainer.appendChild(f);
-    playBtn.style.display = "none";
-    const poster = document.getElementById("video-poster");
-    if (poster) poster.style.display = "none";
-    const cap = document.getElementById("video-caption");
-    if (cap) cap.style.display = "none";
-  });
-}
+window.coverflowRender = null;
 
-/* ══════════════════════════════════════════════════════════════
-   9. CINEMATIC 3D SCREENSHOT CAROUSEL
-   ══════════════════════════════════════════════════════════════ */
-(function initCarousel() {
-  const track = document.getElementById("carousel-track");
-  const stage = document.getElementById("carousel-stage");
-  const prevBtn = document.getElementById("carousel-prev");
-  const nextBtn = document.getElementById("carousel-next");
-  const dotsEl = document.getElementById("carousel-dots");
-  const tabBtns = document.querySelectorAll(".screen-tab");
-  if (!track || !stage) return;
+(function initCoverflowCinema() {
+  const viewport = document.getElementById("coverflowViewport");
+  const track = document.getElementById("coverflowTrack");
+  const allCards = Array.from(document.querySelectorAll(".c-card"));
+  const filterTabs = document.querySelectorAll(".dock-tab");
+  const dockIndicator = document.getElementById("dockIndicator");
+  const dotsStrip = document.getElementById("dotsStrip");
+  const btnPrev = document.getElementById("btnPrev");
+  const btnNext = document.getElementById("btnNext");
 
-  let allSlides = Array.from(track.querySelectorAll(".c-slide"));
-  let visible = [...allSlides];
-  let current = 0;
-  let isDragging = false;
-  let dragStartX = 0;
-  let dragDeltaX = 0;
+  const tBadge = document.getElementById("tBadge");
+  const tTitle = document.getElementById("tTitle");
+  const tSub = document.getElementById("tSub");
+  const tCurrent = document.getElementById("tCurrent");
+  const tTotal = document.getElementById("tTotal");
+
+  if (!viewport || !track || !allCards.length) return;
+
+  let visibleCards = [...allCards];
+  let activeIndex = 4; // Start centered on Farmer Dashboard (index 4)
+  const AUTO_INTERVAL = 3800; // 3.8 seconds interval
   let autoTimer = null;
 
-  function buildDots() {
-    dotsEl.innerHTML = "";
-    visible.forEach((_, i) => {
-      const d = document.createElement("button");
-      d.className = "dot" + (i === current ? " active" : "");
-      d.setAttribute("role", "tab");
-      d.setAttribute("aria-label", `Screenshot ${i + 1}`);
-      d.addEventListener("click", () => goTo(i));
-      dotsEl.appendChild(d);
-    });
+  function updateDockIndicator(activeTab) {
+    if (!activeTab || !dockIndicator) return;
+    dockIndicator.style.width = activeTab.offsetWidth + "px";
+    dockIndicator.style.transform = "translateX(" + (activeTab.offsetLeft - 5) + "px)";
   }
 
-  function applyStates() {
-    const classes = ["is-active", "is-left", "is-right", "is-far", "is-hidden"];
-    visible.forEach((slide, i) => {
-      slide.classList.remove(...classes);
-      const diff = i - current;
-      if (diff === 0) slide.classList.add("is-active");
-      else if (diff === -1) slide.classList.add("is-left");
-      else if (diff === 1) slide.classList.add("is-right");
-      else if (Math.abs(diff) <= 3) slide.classList.add("is-far");
-      else slide.classList.add("is-hidden");
+  function render3D() {
+    const total = visibleCards.length;
+    if (total === 0) return;
+    // Circular modular wrapping
+    activeIndex = ((activeIndex % total) + total) % total;
+
+    const isMobile = window.innerWidth <= 768;
+    const spacing = isMobile ? 150 : 210;
+    const zStep = isMobile ? 85 : 120;
+    const rotY = isMobile ? 24 : 30;
+
+    visibleCards.forEach((card, i) => {
+      // Circular shortest distance calculation
+      let offset = i - activeIndex;
+      while (offset > total / 2) offset -= total;
+      while (offset < -total / 2) offset += total;
+      const absOffset = Math.abs(offset);
+
+      card.classList.toggle("is-active", offset === 0);
+
+      if (offset === 0) {
+        card.style.transform = "translateX(0px) translateZ(0px) rotateY(0deg) scale(1)";
+        card.style.opacity = "1";
+        card.style.filter = "brightness(1)";
+        card.style.zIndex = "20";
+        card.style.pointerEvents = "auto";
+      } else if (absOffset <= 4) {
+        const dir = offset > 0 ? 1 : -1;
+        const x = dir * (spacing + (absOffset - 1) * (isMobile ? 85 : 125));
+        const z = -absOffset * zStep;
+        const r = -dir * rotY;
+        const scale = Math.max(0.72, 1 - absOffset * 0.08);
+        const opacity = Math.max(0.3, 1 - absOffset * 0.2);
+        const brightness = Math.max(0.45, 1 - absOffset * 0.16);
+
+        card.style.transform = "translateX(" + x + "px) translateZ(" + z + "px) rotateY(" + r + "deg) scale(" + scale + ")";
+        card.style.opacity = String(opacity);
+        card.style.filter = "brightness(" + brightness + ")";
+        card.style.zIndex = String(20 - absOffset);
+        card.style.pointerEvents = "auto";
+      } else {
+        card.style.opacity = "0";
+        card.style.pointerEvents = "none";
+        card.style.transform = "translateX(" + (offset > 0 ? 700 : -700) + "px) translateZ(-700px)";
+      }
     });
-    dotsEl
-      .querySelectorAll(".dot")
-      .forEach((d, i) => d.classList.toggle("active", i === current));
-    const active = visible[current];
-    if (!active) return;
-    const stageRect = stage.getBoundingClientRect();
-    const activeRect = active.getBoundingClientRect();
-    const center = stageRect.left + stageRect.width / 2;
-    const cardCenter = activeRect.left + activeRect.width / 2;
-    const currentOffset = parseFloat(
-      track.style.transform?.match(/-?[\d.]+/)?.[0] || 0,
-    );
-    const newOffset = currentOffset - (cardCenter - center);
-    track.style.transition = "transform .55s cubic-bezier(.25,.46,.45,.94)";
-    track.style.transform = `translateX(${newOffset}px)`;
+
+    // Update Telemetry
+    const cur = visibleCards[activeIndex];
+    if (cur) {
+      const role = cur.dataset.role;
+      const key = cur.getAttribute("data-label-key");
+      const d = (typeof translations !== "undefined" && translations[currentLang]) ? translations[currentLang] : {};
+      
+      if (tTitle) tTitle.textContent = (key && d[key]) ? d[key] : cur.dataset.title;
+      if (tSub) tSub.textContent = cur.dataset.sub;
+      if (tBadge) {
+        tBadge.textContent = role;
+        tBadge.className = "t-badge " + (role === "Onboarding" ? "badge-onboard" : role === "Farmer" ? "badge-farmer" : "badge-buyer");
+      }
+      if (tCurrent) tCurrent.textContent = String(activeIndex + 1).padStart(2, "0");
+      if (tTotal) tTotal.textContent = String(total).padStart(2, "0");
+    }
+
+    renderDots();
+  }
+
+  window.coverflowRender = render3D;
+
+  function renderDots() {
+    if (!dotsStrip) return;
+    dotsStrip.innerHTML = "";
+    visibleCards.forEach((_, idx) => {
+      const dot = document.createElement("button");
+      dot.className = "c-dot" + (idx === activeIndex ? " active" : "");
+      dot.setAttribute("aria-label", "Screenshot " + (idx + 1));
+      dot.addEventListener("click", () => {
+        goTo(idx);
+      });
+      dotsStrip.appendChild(dot);
+    });
   }
 
   function goTo(index) {
-    current = Math.max(0, Math.min(index, visible.length - 1));
-    applyStates();
+    const total = visibleCards.length;
+    if (total === 0) return;
+    activeIndex = ((index % total) + total) % total;
+    render3D();
     resetAuto();
   }
 
-  function applyFilter(group) {
-    allSlides.forEach((slide) => {
-      const g = slide.getAttribute("data-group");
-      slide.style.display = group === "all" || g === group ? "" : "none";
-    });
-    visible = allSlides.filter((s) => s.style.display !== "none");
-    current = 0;
-    track.style.transition = "none";
-    track.style.transform = "translateX(0)";
-    buildDots();
-    requestAnimationFrame(() => requestAnimationFrame(() => applyStates()));
+  function nextSlide() {
+    goTo(activeIndex + 1);
   }
 
-  tabBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      tabBtns.forEach((b) => {
-        b.classList.remove("active");
-        b.setAttribute("aria-selected", "false");
-      });
-      btn.classList.add("active");
-      btn.setAttribute("aria-selected", "true");
-      applyFilter(btn.getAttribute("data-filter"));
-    });
-  });
+  function prevSlide() {
+    goTo(activeIndex - 1);
+  }
 
-  prevBtn.addEventListener("click", () => goTo(current - 1));
-  nextBtn.addEventListener("click", () => goTo(current + 1));
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowLeft") goTo(current - 1);
-    if (e.key === "ArrowRight") goTo(current + 1);
-  });
+  // Autoplay timer
+  function startAuto() {
+    stopAuto();
+    autoTimer = setInterval(() => {
+      nextSlide();
+    }, AUTO_INTERVAL);
+  }
 
-  stage.addEventListener("mousedown", (e) => {
-    isDragging = true;
-    dragStartX = e.clientX;
-    track.style.transition = "none";
-  });
-  window.addEventListener("mousemove", (e) => {
-    if (!isDragging) return;
-    dragDeltaX = e.clientX - dragStartX;
-    const base = parseFloat(track.style.transform?.match(/-?[\d.]+/)?.[0] || 0);
-    track.style.transform = `translateX(${base + dragDeltaX}px)`;
-  });
-  window.addEventListener("mouseup", () => {
-    if (!isDragging) return;
-    isDragging = false;
-    if (dragDeltaX < -50) goTo(current + 1);
-    else if (dragDeltaX > 50) goTo(current - 1);
-    else applyStates();
-    dragDeltaX = 0;
-  });
-
-  let touchX = 0;
-  stage.addEventListener(
-    "touchstart",
-    (e) => {
-      touchX = e.touches[0].clientX;
-      track.style.transition = "none";
-    },
-    { passive: true },
-  );
-  stage.addEventListener(
-    "touchmove",
-    (e) => {
-      const delta = e.touches[0].clientX - touchX;
-      const base = parseFloat(
-        track.style.transform?.match(/-?[\d.]+/)?.[0] || 0,
-      );
-      track.style.transform = `translateX(${base + delta * 0.4}px)`;
-    },
-    { passive: true },
-  );
-  stage.addEventListener(
-    "touchend",
-    (e) => {
-      const diff = touchX - e.changedTouches[0].clientX;
-      if (diff > 40) goTo(current + 1);
-      else if (diff < -40) goTo(current - 1);
-      else applyStates();
-    },
-    { passive: true },
-  );
-
-  allSlides.forEach((slide) => {
-    slide.addEventListener("click", () => {
-      const visIdx = visible.indexOf(slide);
-      if (visIdx !== -1 && visIdx !== current) goTo(visIdx);
-    });
-  });
+  function stopAuto() {
+    if (autoTimer) {
+      clearInterval(autoTimer);
+      autoTimer = null;
+    }
+  }
 
   function resetAuto() {
-    clearInterval(autoTimer);
-    autoTimer = setInterval(
-      () => goTo(current + 1 < visible.length ? current + 1 : 0),
-      4500,
-    );
+    startAuto();
   }
 
-  const stageW = stage.offsetWidth;
-  if (track.children.length) {
-    track.style.paddingLeft = `${stageW / 2 - 110}px`;
-    track.style.paddingRight = `${stageW / 2 - 110}px`;
+  function applyFilter(filter) {
+    allCards.forEach(c => {
+      const match = filter === "all" || c.dataset.group === filter;
+      c.style.display = match ? "block" : "none";
+    });
+    visibleCards = allCards.filter(c => c.style.display !== "none");
+    activeIndex = Math.floor(visibleCards.length / 2);
+    render3D();
+    resetAuto();
   }
 
-  applyFilter("all");
-  buildDots();
-  applyStates();
-  resetAuto();
+  // Click card to center
+  allCards.forEach(card => {
+    card.addEventListener("click", () => {
+      const idx = visibleCards.indexOf(card);
+      if (idx !== -1 && idx !== activeIndex) {
+        goTo(idx);
+      }
+    });
+  });
 
-  stage.addEventListener("mouseenter", () => clearInterval(autoTimer));
-  stage.addEventListener("mouseleave", resetAuto);
-})();
-
-/* ══════════════════════════════════════════════════════════════
-   10. WAITLIST FORM
-   ══════════════════════════════════════════════════════════════ */
-const form = document.getElementById("waitlist-form");
-const submitBtn = document.getElementById("form-submit-btn");
-const successMsg = document.getElementById("form-success");
-if (form) {
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      return;
-    }
-    const d = translations[currentLang];
-    submitBtn.disabled = true;
-    /* D: time-outline SVG used in button sending state */
-    submitBtn.innerHTML =
-      '<svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" width="16" height="16" aria-hidden="true" style="margin-right:6px">' +
-      '<path d="M256 64C150 64 64 150 64 256s86 192 192 192 192-86 192-192S362 64 256 64Z"/>' +
-      '<path d="M256 128v144h96" stroke-linecap="round" stroke-linejoin="round"/>' +
-      "</svg>Sending…";
-    try {
-      const res = await fetch(form.action, {
-        method: "POST",
-        body: new FormData(form),
-        headers: { Accept: "application/json" },
+  // Filter tabs
+  filterTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      filterTabs.forEach(t => {
+        t.classList.remove("active");
+        t.setAttribute("aria-selected", "false");
       });
-    // Check if Formspree action is still placeholder
-    if (form.action.includes("YOUR_FORM_ID")) {
-      successMsg.innerHTML =
-        '<svg viewBox="0 0 512 512" fill="none" stroke="#FD5454" stroke-width="32" width="20" height="20" aria-hidden="true" style="margin-right:8px;flex-shrink:0">' +
-        '<path d="M85.57 446.25h340.86a24 24 0 0020.73-36.09L276.73 68.61a24 24 0 00-41.46 0L64.84 410.16a24 24 0 0020.73 36.09z" stroke-linecap="round" stroke-linejoin="round"/>' +
-        '<path d="M256 192v120M256 368h.01" stroke-linecap="round" stroke-linejoin="round"/>' +
-        '</svg>' +
-        '<span style="color:#FD5454">Waitlist submission is currently in preview mode (placeholder ID). Please contact bilisumaere@gmail.com</span>';
-      successMsg.style.display = "flex";
-      successMsg.style.alignItems = "center";
-      return;
-    }
+      tab.classList.add("active");
+      tab.setAttribute("aria-selected", "true");
+      updateDockIndicator(tab);
+      applyFilter(tab.dataset.filter);
+    });
+  });
 
-      if (res.ok) {
-        form.style.display = "none";
-        successMsg.innerHTML =
-          '<svg viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="32" width="20" height="20" aria-hidden="true" style="margin-right:8px;flex-shrink:0">' +
-          '<path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192Z" stroke-miterlimit="10"/>' +
-          '<path d="M352 176 217.6 336 160 272" stroke-linecap="round" stroke-linejoin="round"/>' +
-          "</svg>" +
-          (d.form_success || "You're on the list! We'll be in touch soon.");
-        successMsg.style.display = "flex";
-        successMsg.style.alignItems = "center";
-      } else throw new Error();
-    } catch {
-      submitBtn.disabled = false;
-      submitBtn.textContent =
-        translations[currentLang].form_submit || "Join Waitlist";
-      successMsg.innerHTML =
-        '<svg viewBox="0 0 512 512" fill="none" stroke="#FD5454" stroke-width="32" width="20" height="20" aria-hidden="true" style="margin-right:8px;flex-shrink:0">' +
-        '<path d="M85.57 446.25h340.86a24 24 0 0020.73-36.09L276.73 68.61a24 24 0 00-41.46 0L64.84 410.16a24 24 0 0020.73 36.09z" stroke-linecap="round" stroke-linejoin="round"/>' +
-        '<path d="M256 192v120M256 368h.01" stroke-linecap="round" stroke-linejoin="round"/>' +
-        '</svg>' +
-        '<span style="color:#FD5454">Submission failed. Please try again or email bilisumaere@gmail.com</span>';
-      successMsg.style.display = "flex";
-      successMsg.style.alignItems = "center";
+  if (btnPrev) {
+    btnPrev.addEventListener("click", () => {
+      prevSlide();
+    });
+  }
+
+  if (btnNext) {
+    btnNext.addEventListener("click", () => {
+      nextSlide();
+    });
+  }
+
+  // Pause on hover / touch
+  viewport.addEventListener("mouseenter", stopAuto);
+  viewport.addEventListener("mouseleave", startAuto);
+  viewport.addEventListener("touchstart", stopAuto, { passive: true });
+  viewport.addEventListener("touchend", startAuto, { passive: true });
+
+  // Touch and Drag
+  let startX = 0;
+  let isDown = false;
+
+  viewport.addEventListener("mousedown", e => {
+    isDown = true;
+    startX = e.clientX;
+    stopAuto();
+  });
+
+  window.addEventListener("mouseup", () => {
+    if (isDown) {
+      isDown = false;
+      startAuto();
     }
   });
-}
 
-/* ══════════════════════════════════════════════════════════════
-   11. ACTIVE NAV SECTION HIGHLIGHT
-   ══════════════════════════════════════════════════════════════ */
-(function trackSections() {
-  const sections = document.querySelectorAll("section[id],footer[id]");
-  const links = document.querySelectorAll(".nav-links a");
-  sections.forEach((s) => {
-    new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            links.forEach((a) => {
-              a.style.color =
-                a.getAttribute("href") === `#${e.target.id}` ? "#fff" : "";
-            });
-          }
-        });
-      },
-      { threshold: 0.4 },
-    ).observe(s);
+  viewport.addEventListener("mousemove", e => {
+    if (!isDown) return;
+    const diff = e.clientX - startX;
+    if (Math.abs(diff) > 55) {
+      if (diff > 0) prevSlide();
+      else nextSlide();
+      isDown = false;
+    }
+  });
+
+  viewport.addEventListener("touchend", e => {
+    const diff = e.changedTouches[0].clientX - startX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) prevSlide();
+      else nextSlide();
+    }
+  });
+
+  // Keyboard navigation
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft") {
+      prevSlide();
+    } else if (e.key === "ArrowRight") {
+      nextSlide();
+    }
+  });
+
+  // Init
+  const initTab = document.querySelector(".dock-tab.active");
+  updateDockIndicator(initTab);
+  render3D();
+  startAuto();
+
+  window.addEventListener("resize", () => {
+    const curTab = document.querySelector(".dock-tab.active");
+    updateDockIndicator(curTab);
+    render3D();
   });
 })();
-
-/* ══════════════════════════════════════════════════════════════
-   12. PUBLIC PROFILE ROUTER & RENDERER (/users/:customId)
-   ══════════════════════════════════════════════════════════════ */
-const PUBLIC_API_BASE_URL =
-  window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-    ? "http://localhost:5000"
-    : "https://omishgo-4nzk.onrender.com";
-
-function getInitials(name) {
-  if (!name) return "U";
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  }
-  return name.slice(0, 2).toUpperCase();
-}
-
-function escapeHtml(str) {
-  if (!str) return "";
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function updateProfileMetaTags(user) {
-  const isFarmer = user.role === "farmer";
-  const roleTitle = isFarmer ? "Verified Farmer Producer" : "Verified Wholesale Buyer";
-  const pageTitle = `OmishGo - ${user.name}, ${roleTitle}`;
-  const loc = [user.location?.zone, user.location?.region].filter(Boolean).join(", ");
-  const description = `${user.name} is a ${roleTitle}${loc ? ` based in ${loc}` : ""} on OmishGo direct farm-to-buyer marketplace.`;
-
-  document.title = pageTitle;
-
-  let ogTitle = document.querySelector('meta[property="og:title"]');
-  if (ogTitle) {
-    ogTitle.setAttribute("content", pageTitle);
-  }
-
-  let ogDesc = document.querySelector('meta[property="og:description"]');
-  if (ogDesc) {
-    ogDesc.setAttribute("content", description);
-  }
-}
 
 async function fetchAndRenderPublicProfile(customId) {
   const profileContainer = document.getElementById("public-profile-view");

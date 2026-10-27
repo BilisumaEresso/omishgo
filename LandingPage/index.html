@@ -4,10 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script>
-      if (window.location.protocol !== 'file:') {
-        document.write('<base href="/" />');
-      }
-    </script>    
+      (function() {
+        var p = window.location.pathname;
+        if (/\/users?\/[^\/]+/i.test(p)) {
+          var prefix = p.replace(/\/users?\/[^\/]+.*$/i, '');
+          var base = prefix ? (prefix.endsWith('/') ? prefix : prefix + '/') : '/';
+          document.write('<base href="' + base + '">');
+        }
+      })();
+    </script>
 
     <title>OmishGo - Ethiopia's Direct Farm-to-Buyer Marketplace</title>
     <meta
@@ -21,1054 +26,1092 @@
       property="og:description"
       content="Connecting Ethiopian farmers directly with buyers. No middlemen. Better prices."
     />
-    <meta property="og:image" content="https://omishgo.vercel.app/assets/video_poster.webp" />
+    <meta
+      property="og:image"
+      content="https://omishgo.vercel.app/assets/video_poster.webp"
+    />
     <meta property="og:type" content="website" />
-    <!-- C3: og:url — Deployed Vercel URL -->
     <meta property="og:url" content="https://omishgo.vercel.app" />
     <meta name="twitter:card" content="summary_large_image" />
 
     <!-- Manifest & Favicons -->
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
     <link
       rel="icon"
       type="image/png"
       sizes="16x16"
-      href="/assets/favicon-16.png"
+      href="assets/favicon-16.png"
     />
     <link
       rel="icon"
       type="image/png"
       sizes="32x32"
-      href="/assets/favicon-32.png"
+      href="assets/favicon-32.png"
     />
     <link
       rel="apple-touch-icon"
       sizes="180x180"
-      href="/assets/favicon-180.png"
+      href="assets/favicon-180.png"
     />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Serif+Ethiopic:wght@400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Manrope:wght@400;500;600;700;800&family=Noto+Serif+Ethiopic:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
 
-    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- ══════════ NAV ══════════ -->
-    <nav id="navbar" aria-label="Main navigation">
+    <!-- ══════════ TOP ANNOUNCEMENT ══════════ -->
+    <div class="announcement">
+      <span class="announcement-dot" aria-hidden="true"></span>
+      <span data-i18n="announcement_text"
+        >Built for Ethiopian agriculture / Designed around local markets</span
+      >
+      <a href="#solution" data-i18n="announcement_link"
+        >See how it works <span aria-hidden="true">↗</span></a
+      >
+    </div>
+
+    <!-- ══════════ SITE HEADER / NAV ══════════ -->
+    <header class="site-header" id="navbar" aria-label="Main navigation">
       <div class="nav-inner">
         <a href="#hero" class="nav-logo" aria-label="OmishGo home">
           <img
-            src="/assets/omishgo_new_general_logo-.png"
+            src="assets/omishgo_new_general_logo-.png"
             class="logo-img"
             alt="OmishGo logo"
-            width="40"
-            height="40"
+            width="34"
+            height="34"
           />
-          <span class="logo-text">OmishGo</span>
+          <span class="logo-text">Omish<span>Go</span></span>
         </a>
-        <ul class="nav-links" id="nav-links">
-          <li><a href="#problem" data-i18n="nav_problem">Problem</a></li>
-          <li><a href="#solution" data-i18n="nav_solution">How It Works</a></li>
-          <li><a href="#demo" data-i18n="nav_demo">Intro</a></li>
-          <li><a href="#screenshots" data-i18n="nav_screens">App</a></li>
-          <li><a href="#contact" data-i18n="nav_contact">Contact</a></li>
-          <li class="nav-mobile-cta">
-            <a
-              href="https://github.com/BilisumaEresso/omishgo/releases/download/v1.0.0-pilot/application-cded515d-5673-4459-9c5c-f61b9df04a00.apk"
-              class="btn btn-primary"
-              data-i18n="nav_cta"
-              download
-              >Get the App</a
-            >
-          </li>
-        </ul>
-        <div class="nav-actions">
-          <div
-            class="lang-switcher"
-            id="lang-switcher"
-            role="group"
-            aria-label="Language selector"
-          >
-            <button class="lang-btn active" data-lang="en" aria-pressed="true">
-              EN
-            </button>
-            <button class="lang-btn" data-lang="am" aria-pressed="false">
-              አማ
-            </button>
-            <button class="lang-btn" data-lang="or" aria-pressed="false">
-              OM
-            </button>
-          </div>
-          <a href="#download" class="btn btn-primary btn-sm" data-i18n="nav_cta"
-            >Get the App</a
+
+        <nav class="site-nav desktop-nav" aria-label="Main navigation">
+          <ul class="nav-links" id="nav-links">
+            <li><a href="#problem" data-i18n="nav_problem">Why OmishGo</a></li>
+            <li><a href="#solution" data-i18n="nav_solution">How It Works</a></li>
+            <li><a href="#for-everyone" data-i18n="nav_screens">Experience</a></li>
+            <li><a href="#screenshots">Screens</a></li>
+            <li><a href="#contact" data-i18n="nav_contact">Contact</a></li>
+            <li class="nav-mobile-cta">
+              <a
+                href="https://github.com/BilisumaEresso/omishgo/releases/download/v1.0.0-pilot/application-cded515d-5673-4459-9c5c-f61b9df04a00.apk"
+                class="button button-lime btn-full"
+                data-i18n="nav_cta"
+                download
+                >Get the App</a
+              >
+            </li>
+          </ul>
+        </nav>
+
+        <div class="header-actions">
+          <label class="language-select" aria-label="Choose language">
+            <span class="globe" aria-hidden="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </span>
+            <select id="languageSelect" aria-label="Select language">
+              <option value="en">EN</option>
+              <option value="am">አማ</option>
+              <option value="or">OM</option>
+            </select>
+            <span class="select-chevron" aria-hidden="true">▾</span>
+          </label>
+          <a
+            href="https://github.com/BilisumaEresso/omishgo/releases/download/v1.0.0-pilot/application-cded515d-5673-4459-9c5c-f61b9df04a00.apk"
+            class="button button-small button-primary"
+            data-i18n="nav_cta"
+            download
+            >Get the App <span>↗</span></a
           >
           <button
             class="hamburger"
             id="hamburger"
-            aria-label="Toggle menu"
+            aria-label="Toggle navigation menu"
             aria-expanded="false"
           >
             <span></span><span></span><span></span>
           </button>
         </div>
       </div>
-    </nav>
+    </header>
 
     <!-- ══════════ MAIN LANDING CONTENT ══════════ -->
     <main id="main-landing-content">
       <!-- ══════════ HERO ══════════ -->
-      <section id="hero" aria-labelledby="hero-heading">
-      <div class="hero-bg-gradient"></div>
-      <div
-        class="hero-particles"
-        id="particles-container"
-        aria-hidden="true"
-      ></div>
-      <div class="hero-grain" aria-hidden="true"></div>
-      <div class="container hero-content">
-        <div class="hero-text" data-reveal>
-          <div class="hero-badge">
-            <span class="hero-badge-dot" aria-hidden="true"></span>
-            <span data-i18n="hero_badge">Meki, Ethiopia - Open Pilot</span>
-          </div>
-          <h1 id="hero-heading">
-            <span class="hero-line-1" data-i18n="hero_h1a">Empowering</span>
-            <span class="hero-line-gradient" data-i18n="hero_h1b"
-              >Ethiopia's Farmers</span
-            >
-          </h1>
-          <p class="hero-amharic" lang="am" data-i18n="hero_amharic">
-            ያለ ደላላ ፣ ቀጥታ ከአርሶ አደር ወደ ገዢ
-          </p>
-          <!-- B1: corrected lang="om" (Oromo ISO 639-1 is "om", not "or" which is Odia) -->
-          <p class="hero-oromo" lang="om" data-i18n="hero_oromo">
-            Qonnaan bulaa irraa gara bitataatti, karaa salphaa
-          </p>
-          <p class="hero-sub" data-i18n="hero_sub">
-            A mobile marketplace connecting Ethiopian farmers directly with
-            buyers. Post produce, find it, agree on a price. No middleman
-            involved.
-          </p>
-          <div class="hero-ctas">
-            <a
-              href="https://github.com/BilisumaEresso/omishgo/releases/download/v1.0.0-pilot/application-cded515d-5673-4459-9c5c-f61b9df04a00.apk"
-              class="btn btn-primary btn-lg"
-              id="hero-download"
-              download
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                width="20"
-                height="20"
-                aria-hidden="true"
-              >
-                <path
-                  d="M12 16l-5-5 1.41-1.41L11 13.17V4h2v9.17l2.59-2.58L17 11l-5 5zM5 20h14v-2H5v2z"
-                />
-              </svg>
-              <span data-i18n="hero_cta1">Download APK</span>
-            </a>
-            <a href="#waitlist" class="btn btn-ghost btn-lg" id="hero-waitlist">
-              <span data-i18n="hero_cta2">Join the Pilot Waitlist</span>
-              <svg
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                width="18"
-                height="18"
-                aria-hidden="true"
-              >
-                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6-6-6z" />
-              </svg>
-            </a>
-          </div>
-          <!-- A5: hero_trust — see launch-report.md for flag -->
-          <div class="hero-trust">
-            <span data-i18n="hero_trust"
-              >In partnership with the Meki Farmers' Union, 2026 Pilot</span
-            >
-          </div>
-        </div>
-        <div
-          class="hero-phones"
-          data-reveal
-          data-delay="200"
-          aria-hidden="true"
-        >
-          <picture>
-            <source srcset="/assets/hero_phones_v2.webp" type="image/webp" />
-            <img
-              src="/assets/hero_phones_v2.jpg"
-              alt="OmishGo - Farmer Dashboard, Onboarding and Buyer Dashboard on three floating phones"
-              class="hero-phones-img"
-              width="1200"
-              height="896"
-            />
-          </picture>
-          <div class="phone-glow"></div>
-        </div>
-      </div>
-      <div class="hero-scroll-cue" aria-hidden="true">
-        <div class="scroll-line"></div>
-      </div>
-    </section>
+      <section class="hero dark-section" id="hero" aria-labelledby="hero-heading">
+        <div class="hero-orb orb-one" aria-hidden="true"></div>
+        <div class="hero-orb orb-two" aria-hidden="true"></div>
 
-    <!-- ══════════ STATS ══════════ -->
-    <section id="problem" aria-labelledby="problem-heading">
-      <div class="container">
-        <h2 id="problem-heading" data-reveal data-i18n="problem_h2">
-          Most of a farmer's earnings never reach them
-        </h2>
-        <p class="section-sub" data-reveal data-i18n="problem_sub">
-          Middlemen set the prices, control access to markets, and take the
-          largest share. Smallholder farmers have no alternative.
-        </p>
-        <div class="stats-grid">
-          <article class="stat-card" data-reveal data-delay="0">
-            <!-- D: trending-down-outline icon -->
-            <div class="stat-icon">
-              <svg
-                viewBox="0 0 512 512"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="32"
-                width="32"
-                height="32"
-                aria-hidden="true"
+        <div class="container hero-grid">
+          <div class="hero-copy" data-reveal>
+            <div class="eyebrow eyebrow-dark">
+              <span class="eyebrow-icon">✳</span>
+              <span data-i18n="hero_badge">Meki, Ethiopia - Open Pilot</span>
+            </div>
+            <h1 id="hero-heading">
+              <span class="hero-line-1" data-i18n="hero_h1a">Better markets</span>
+              <span class="hero-line-gradient" data-i18n="hero_h1b"
+                >begin with farmers.</span
               >
-                <path d="M352 368h112V256" />
-                <path
-                  d="m48 144 121.37 121.37a32 32 0 0 0 45.26 0l50.74-50.74a32 32 0 0 1 45.26 0L448 352"
-                />
-              </svg>
-            </div>
-            <div>
-              <span class="stat-number" data-count="40">0</span
-              ><span class="stat-unit">%</span>
-            </div>
-            <p class="stat-label" data-i18n="stat1_label">
-              of crop value lost to middleman markups
+            </h1>
+            <p class="hero-amharic" lang="am" data-i18n="hero_amharic">
+              ያለ ደላላ ፣ ቀጥታ ከአርሶ አደር ወደ ገዢ
             </p>
-          </article>
-
-          <article class="stat-card" data-reveal data-delay="100">
-            <!-- D: cash-outline icon -->
-            <div class="stat-icon">
-              <svg
-                viewBox="0 0 512 512"
-                fill="none"
-                stroke="currentColor"
-                stroke-linejoin="round"
-                stroke-width="32"
-                width="32"
-                height="32"
-                aria-hidden="true"
-              >
-                <rect
-                  width="448"
-                  height="256"
-                  x="32"
-                  y="80"
-                  rx="16"
-                  ry="16"
-                  transform="matrix(-1 0 0 -1 512 416)"
-                />
-                <path d="M64 384h384M96 432h320" stroke-linecap="round" />
-                <circle cx="256" cy="208" r="80" stroke-linecap="round" />
-                <path
-                  d="M480 160a80 80 0 0 1-80-80M32 160a80 80 0 0 0 80-80M480 256a80 80 0 0 0-80 80M32 256a80 80 0 0 1 80 80"
-                  stroke-linecap="round"
-                />
-              </svg>
-            </div>
-            <div>
-              <span class="stat-number" data-count="30">0</span
-              ><span class="stat-unit">%</span>
-            </div>
-            <p class="stat-label" data-i18n="stat2_label">
-              of the market price is all the farmer receives
+            <p class="hero-oromo" lang="om" data-i18n="hero_oromo">
+              Qonnaan bulaa irraa gara bitataatti, karaa salphaa
             </p>
-          </article>
+            <p class="hero-lede" data-i18n="hero_sub">
+              OmishGo brings farmers, buyers, and delivery partners closer
+              together, making agricultural trade easier to discover, coordinate,
+              and trust without middlemen markups.
+            </p>
 
-          <!-- B2: Rewritten stat-card — no fake animated counter, honest text claim -->
-          <article
-            class="stat-card stat-card-claim"
+            <div class="hero-buttons">
+              <a
+                href="https://github.com/BilisumaEresso/omishgo/releases/download/v1.0.0-pilot/application-cded515d-5673-4459-9c5c-f61b9df04a00.apk"
+                class="button button-lime"
+                id="hero-download"
+                download
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  width="18"
+                  height="18"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M12 16l-5-5 1.41-1.41L11 13.17V4h2v9.17l2.59-2.58L17 11l-5 5zM5 20h14v-2H5v2z"
+                  />
+                </svg>
+                <span data-i18n="hero_cta1">Download APK</span>
+                <span>↗</span>
+              </a>
+              <a href="#download" class="button button-outline" id="hero-waitlist">
+                <span data-i18n="hero_cta2">Join Pilot Waitlist</span>
+              </a>
+            </div>
+
+            <div class="hero-proof">
+              <div class="proof-avatars" aria-hidden="true">
+                <span>F</span><span>B</span><span>U</span>
+              </div>
+              <p>
+                <strong>Designed for local realities.</strong><br />
+                <span data-i18n="hero_trust"
+                  >In partnership with Meki Farmers' Union, 2026 Pilot</span
+                >
+              </p>
+            </div>
+          </div>
+
+          <!-- Hero 3D Phones Showcase with Real Screenshots -->
+          <div
+            class="hero-visual"
             data-reveal
-            data-delay="200"
+            data-delay="150"
+            aria-label="Illustration of the OmishGo mobile app with real screenshots"
           >
-            <!-- D: ribbon-outline icon -->
-            <div class="stat-icon">
-              <svg
-                viewBox="0 0 512 512"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="32"
-                width="32"
-                height="32"
-                aria-hidden="true"
-              >
-                <circle cx="256" cy="160" r="128" />
-                <path
-                  d="M143.65 227.82 48 400l86.86-.42a16 16 0 0 1 13.82 7.8L192 480l88.33-194.32"
-                />
-                <path
-                  d="M366.54 224 464 400l-86.86-.42a16 16 0 0 0-13.82 7.8L320 480l-64-140.8"
-                />
-                <circle cx="256" cy="160" r="64" />
-              </svg>
+            <div class="visual-caption">
+              <span class="live-dot"></span> ONE CONNECTED MARKETPLACE
+              <span class="caption-line"></span>
             </div>
-            <p class="stat-claim" data-i18n="stat3_claim">
-              A direct digital marketplace built for Ethiopian smallholder
-              farmers
-            </p>
-          </article>
-        </div>
-      </div>
-    </section>
+            <div class="phone-stage">
+              <!-- Left Floating Chip -->
+              <div class="floating-chip chip-left">
+                <span class="chip-icon">↗</span>
+                <span
+                  ><b>Clearer Choices</b><small>Direct produce listings</small></span
+                >
+              </div>
 
-    <!-- ══════════ HOW IT WORKS ══════════ -->
-    <section id="solution" aria-labelledby="solution-heading">
-      <div class="container">
-        <h2 id="solution-heading" data-reveal data-i18n="solution_h2">
-          Post a listing. Find it. Deal done.
-        </h2>
-        <div class="steps-grid">
-          <article class="step-card" data-reveal data-delay="0">
-            <div class="step-num">01</div>
-            <!-- D: leaf-outline icon (echoes OmishGo app logo's leaf mark) -->
-            <div class="step-icon-wrap">
-              <svg
-                viewBox="0 0 512 512"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="32"
-                width="34"
-                height="34"
-                aria-hidden="true"
-              >
-                <path
-                  d="M321.89 171.42C233 114 141 155.22 56 65.22c-19.8-21-8.3 235.5 98.1 332.7 77.79 71 197.9 63.08 238.4-5.92s18.28-163.17-70.61-220.58"
+              <!-- Left Phone: Buyer Catalog (Screenshot 200050) -->
+              <div class="phone phone-back phone-left" aria-hidden="true">
+                <div class="phone-notch"><span class="phone-camera-dot"></span></div>
+                <img
+                  src="assets/Screenshot_20260731-200050_OmishGo.webp"
+                  alt="OmishGo: Buyer Fresh Produce Catalog"
+                  class="phone-screen-img"
+                  loading="eager"
+                  width="480"
+                  height="1066"
                 />
-                <path d="M173 253c86 81 175 129 292 147" />
-              </svg>
+              </div>
+
+              <!-- Center Main Phone: Farmer Dashboard (Screenshot 195932) -->
+              <div class="phone phone-main" aria-hidden="true">
+                <div class="phone-notch"><span class="phone-camera-dot"></span></div>
+                <img
+                  src="assets/Screenshot_20260731-195932_OmishGo.webp"
+                  alt="OmishGo: Verified Farmer Dashboard"
+                  class="phone-screen-img"
+                  loading="eager"
+                  width="480"
+                  height="1066"
+                />
+              </div>
+
+              <!-- Right Phone: Order Tracking (Screenshot 200103) -->
+              <div class="phone phone-back phone-right" aria-hidden="true">
+                <div class="phone-notch"><span class="phone-camera-dot"></span></div>
+                <img
+                  src="assets/Screenshot_20260731-200103_OmishGo.webp"
+                  alt="OmishGo: Live Order Tracking"
+                  class="phone-screen-img"
+                  loading="eager"
+                  width="480"
+                  height="1066"
+                />
+              </div>
+
+              <!-- Right Floating Chip -->
+              <div class="floating-chip chip-right">
+                <span class="chip-icon chip-check">✓</span>
+                <span
+                  ><b>Trusted by Design</b><small>Verified participants</small></span
+                >
+              </div>
             </div>
-            <h3 data-i18n="step1_h">Farmer Posts a Listing</h3>
-            <p data-i18n="step1_p">
-              Take a photo, set a price in Birr, describe the produce. Listed in
-              seconds. Works on 2G.
-            </p>
-          </article>
-          <div class="step-arrow" aria-hidden="true">→</div>
-          <article class="step-card" data-reveal data-delay="150">
-            <div class="step-num">02</div>
-            <!-- D: search-outline icon -->
-            <div class="step-icon-wrap">
-              <svg
-                viewBox="0 0 512 512"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="32"
-                width="34"
-                height="34"
-                aria-hidden="true"
-              >
-                <path
-                  d="M221.09 64a157.09 157.09 0 1 0 157.09 157.09A157.1 157.1 0 0 0 221.09 64Z"
-                  stroke-miterlimit="10"
-                />
-                <path
-                  d="M338.29 338.29 448 448"
-                  stroke-linecap="round"
-                  stroke-miterlimit="10"
-                />
-              </svg>
+
+            <div class="visual-bottom">
+              <span>01 / THE OMISHGO EXPERIENCE</span>
+              <span class="visual-bottom-line"></span>
+              <span>MADE FOR LOCAL MARKETS</span>
             </div>
-            <h3 data-i18n="step2_h">Buyer Finds It, Messages Directly</h3>
-            <p data-i18n="step2_p">
-              Buyers browse listings, filter by crop or location, and message
-              the farmer directly inside the app.
-            </p>
-          </article>
-          <div class="step-arrow" aria-hidden="true">→</div>
-          <article class="step-card" data-reveal data-delay="300">
-            <div class="step-num">03</div>
-            <!-- D: checkmark-circle-outline icon (echoes OmishGo logo's checkmark motif) -->
-            <div class="step-icon-wrap">
-              <svg
-                viewBox="0 0 512 512"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="32"
-                width="34"
-                height="34"
-                aria-hidden="true"
+          </div>
+        </div>
+
+        <div class="hero-bottom-rule" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+      </section>
+
+      <!-- ══════════ SECTION 01: WHY OMISHGO / THE OPPORTUNITY ══════════ -->
+      <section class="intro-strip" id="problem" aria-labelledby="problem-heading">
+        <div class="container">
+          <div class="section-kicker">
+            <span>01</span> THE OPPORTUNITY
+          </div>
+          <div class="intro-grid">
+            <h2 id="problem-heading" data-reveal data-i18n="problem_h2">
+              Good produce deserves<br /><span>a better path to market.</span>
+            </h2>
+            <div class="intro-body" data-reveal data-delay="100">
+              <p data-i18n="problem_sub">
+                Farmers work hard to grow valuable produce. Yet finding buyers,
+                agreeing on fair prices, and coordinating transport can take days
+                while middlemen take the lion's share.
+              </p>
+              <p>
+                OmishGo is designed to make direct trade transparent, simple,
+                and reliable, strengthening the livelihood of local farming
+                communities.
+              </p>
+              <a class="text-link" href="#our-approach"
+                >Our approach <span>↗</span></a
               >
-                <path
-                  d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192Z"
-                  stroke-miterlimit="10"
-                />
-                <path
-                  d="M352 176 217.6 336 160 272"
+            </div>
+          </div>
+
+          <div class="insight-grid">
+            <article class="insight-card insight-featured" data-reveal data-delay="0">
+              <span class="insight-number">01 / FAIR RETURN</span>
+              <div class="insight-symbol">
+                <svg
+                  viewBox="0 0 512 512"
+                  fill="none"
+                  stroke="currentColor"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                />
-              </svg>
-            </div>
-            <h3 data-i18n="step3_h">Deal Agreed, Order Placed</h3>
-            <p data-i18n="step3_p">
-              Both sides get notified, stock updates automatically. No
-              paperwork, no chasing a middleman by phone.
-            </p>
-          </article>
-        </div>
-        <div class="lang-strip" data-reveal>
-          <span class="lang-pill">English</span>
-          <span class="lang-pill">አማርኛ</span>
-          <span class="lang-pill">Afaan Oromoo</span>
-          <p class="lang-strip-note" data-i18n="lang_note">
-            Every screen works fully in all three languages.
+                  stroke-width="32"
+                  width="24"
+                  height="24"
+                  aria-hidden="true"
+                >
+                  <path d="M352 368h112V256" />
+                  <path
+                    d="m48 144 121.37 121.37a32 32 0 0 0 45.26 0l50.74-50.74a32 32 0 0 1 45.26 0L448 352"
+                  />
+                </svg>
+              </div>
+              <div>
+                <span class="insight-stat-number" data-count="40">40</span
+                ><span class="insight-stat-unit">%</span>
+              </div>
+              <h3 data-i18n="stat1_label">
+                of crop value lost to middleman markups
+              </h3>
+              <p>
+                Direct digital listings eliminate unnecessary trader fees so
+                farmers keep more of their hard-earned revenue.
+              </p>
+            </article>
+
+            <article class="insight-card" data-reveal data-delay="100">
+              <span class="insight-number">02 / MARKET ACCESS</span>
+              <div class="insight-symbol">
+                <svg
+                  viewBox="0 0 512 512"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="32"
+                  width="24"
+                  height="24"
+                  aria-hidden="true"
+                >
+                  <rect
+                    width="448"
+                    height="256"
+                    x="32"
+                    y="80"
+                    rx="16"
+                    ry="16"
+                    transform="matrix(-1 0 0 -1 512 416)"
+                  />
+                  <path d="M64 384h384M96 432h320" stroke-linecap="round" />
+                  <circle cx="256" cy="208" r="80" stroke-linecap="round" />
+                </svg>
+              </div>
+              <div>
+                <span class="insight-stat-number" data-count="30">30</span
+                ><span class="insight-stat-unit">%</span>
+              </div>
+              <h3 data-i18n="stat2_label">
+                of the market price is all the farmer receives today
+              </h3>
+              <p>
+                OmishGo connects buyers in urban hubs directly to farm gates,
+                ensuring fair prices for both sides.
+              </p>
+            </article>
+
+            <article class="insight-card" data-reveal data-delay="200">
+              <span class="insight-number">03 / TRUSTED TRADE</span>
+              <div class="insight-symbol">
+                <svg
+                  viewBox="0 0 512 512"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="32"
+                  width="24"
+                  height="24"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192Z"
+                    stroke-miterlimit="10"
+                  />
+                  <path
+                    d="M352 176 217.6 336 160 272"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+              <div>
+                <span class="insight-stat-number">100</span
+                ><span class="insight-stat-unit">%</span>
+              </div>
+              <h3 data-i18n="stat3_claim">
+                Direct digital marketplace built for Ethiopian smallholder farmers
+              </h3>
+              <p>
+                Verified participants, visible order milestones, and
+                transparent records built with local cooperatives.
+              </p>
+            </article>
+          </div>
+          <p class="fine-print">
+            OmishGo's impact will be measured through pilot feedback and real
+            operational results, not assumptions.
           </p>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- ══════════ DEMO VIDEO ══════════ -->
-    <section id="demo" aria-labelledby="demo-heading">
-      <div class="demo-bg" aria-hidden="true"></div>
-      <div class="container demo-inner">
-        <h2 id="demo-heading" data-reveal data-i18n="demo_h2">
-          Introducing OmishGo
-        </h2>
-        <p class="section-sub light" data-reveal data-i18n="demo_sub">
-          A short overview of what OmishGo does and why it matters for
-          Ethiopian farmers and buyers.
-        </p>
-        <div class="video-wrapper" data-reveal>
-          <div class="video-player" id="video-player">
-            <picture>
-              <source srcset="/assets/video_poster.webp" type="image/webp" />
-              <img
-                src="/assets/video_poster.jpg"
-                alt="OmishGo intro video - Ethiopian farmer using smartphone in Rift Valley"
-                class="video-poster"
-                id="video-poster"
-                width="1376"
-                height="768"
-              />
-            </picture>
+      <!-- ══════════ SECTION 02: HOW IT WORKS / SIMPLE FROM THE START ══════════ -->
+      <section class="how-section" id="solution" aria-labelledby="solution-heading">
+        <div class="container">
+          <div class="section-kicker">
+            <span>02</span> SIMPLE FROM THE START
+          </div>
+          <div class="section-heading-row">
+            <h2 id="solution-heading" data-reveal data-i18n="solution_h2">
+              From farm to buyer.<br /><span>Fewer steps. More clarity.</span>
+            </h2>
+            <p data-reveal data-delay="100" data-i18n="solution_sub">
+              One clear flow for listing produce, placing an order, and
+              coordinating delivery across the Rift Valley.
+            </p>
+          </div>
+
+          <div class="steps-layout">
+            <div class="steps-list" data-reveal>
+              <article class="step-item active" data-step="0">
+                <span class="step-index">01</span>
+                <div>
+                  <h3 data-i18n="step1_h">Farmer lists produce</h3>
+                  <p data-i18n="step1_p">
+                    Snap a photo, set a price in Birr, describe the harvest.
+                    Listed in seconds and works smoothly on 2G.
+                  </p>
+                </div>
+                <span class="step-arrow" aria-hidden="true">↗</span>
+              </article>
+
+              <article class="step-item" data-step="1">
+                <span class="step-index">02</span>
+                <div>
+                  <h3 data-i18n="step2_h">Buyer finds and orders</h3>
+                  <p data-i18n="step2_p">
+                    Buyers browse fresh produce by crop or location, order the
+                    needed amount by kuntaala, and message directly in-app.
+                  </p>
+                </div>
+                <span class="step-arrow" aria-hidden="true">↗</span>
+              </article>
+
+              <article class="step-item" data-step="2">
+                <span class="step-index">03</span>
+                <div>
+                  <h3 data-i18n="step3_h">Delivery is coordinated</h3>
+                  <p data-i18n="step3_p">
+                    Track delivery status step-by-step. The local Union and
+                    logistics team keep all parties synchronized.
+                  </p>
+                </div>
+                <span class="step-arrow" aria-hidden="true">↗</span>
+              </article>
+
+              <article class="step-item" data-step="3">
+                <span class="step-index">04</span>
+                <div>
+                  <h3>Delivery is confirmed</h3>
+                  <p>
+                    Confirm receipt upon arrival, complete agreed payment, and
+                    leave trusted feedback on produce quality.
+                  </p>
+                </div>
+                <span class="step-arrow" aria-hidden="true">↗</span>
+              </article>
+            </div>
+
+            <!-- Interactive Flow Preview with Animated Basket -->
+            <div class="flow-preview" data-reveal data-delay="150">
+              <div class="preview-top">
+                <span class="preview-pill"><i></i> HOW IT WORKS</span>
+                <span>0<span id="stepCount">1</span> / 04</span>
+              </div>
+              <div class="preview-art" id="previewArt">
+                <div class="sun-disc"></div>
+                <div class="field field-one"></div>
+                <div class="field field-two"></div>
+                <div class="field field-three"></div>
+                <div class="produce-basket">
+                  <div class="basket-leaf">✳</div>
+                  <div class="basket-items">
+                    <span class="basket-tomato"></span>
+                    <span class="basket-cabbage"></span>
+                    <span class="basket-papaya"></span>
+                  </div>
+                  <div class="basket-base"></div>
+                </div>
+                <div class="preview-callout" id="previewCallout">
+                  <span>✓</span>
+                  <div>
+                    <b>Listing ready</b>
+                    <small>Available to verified buyers</small>
+                  </div>
+                </div>
+              </div>
+              <div class="preview-footer">
+                <b id="previewTitle">Put your produce on the map.</b>
+                <p id="previewText">
+                  A clear listing helps the right buyers discover what is
+                  available at transparent prices.
+                </p>
+                <div class="preview-progress">
+                  <span id="previewProgress"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lang-strip" data-reveal>
+            <span class="lang-pill">English</span>
+            <span class="lang-pill">አማርኛ</span>
+            <span class="lang-pill">Afaan Oromoo</span>
+            <p class="lang-strip-note" data-i18n="lang_note">
+              Every screen works fully in all three languages.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ SECTION 03: DESIGNED FOR REAL PEOPLE / EXPERIENCE ══════════ -->
+      <section
+        class="experience-section dark-section"
+        id="for-everyone"
+        aria-labelledby="experience-heading"
+      >
+        <div class="container">
+          <div class="experience-head">
+            <div>
+              <div class="section-kicker section-kicker-light">
+                <span>03</span> DESIGNED FOR REAL PEOPLE
+              </div>
+              <h2 id="experience-heading" data-reveal>
+                Powerful underneath.<br /><span>Simple on the surface.</span>
+              </h2>
+            </div>
+            <p data-reveal data-delay="100">
+              Technology should make agricultural trade easier, not complicated.
+              OmishGo is built around local languages, familiar units, and clear
+              actions.
+            </p>
+          </div>
+
+          <div
+            class="experience-tabs"
+            role="tablist"
+            aria-label="OmishGo role experience tabs"
+          >
             <button
-              class="play-btn"
-              id="play-btn"
-              aria-label="Play OmishGo demo video"
+              class="experience-tab active"
+              role="tab"
+              aria-selected="true"
+              data-role="farmer"
             >
-              <div class="play-ring"></div>
-              <svg
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                width="36"
-                height="36"
-                aria-hidden="true"
-              >
-                <path d="M8 5v14l11-7z" />
+              For farmers <span>↗</span>
+            </button>
+            <button
+              class="experience-tab"
+              role="tab"
+              aria-selected="false"
+              data-role="buyer"
+            >
+              For buyers <span>↗</span>
+            </button>
+            <button
+              class="experience-tab"
+              role="tab"
+              aria-selected="false"
+              data-role="union"
+            >
+              For the Union <span>↗</span>
+            </button>
+          </div>
+
+          <div class="experience-content">
+            <div class="experience-copy" data-reveal>
+              <span class="role-label" id="roleLabel">01 — FARMER EXPERIENCE</span>
+              <h3 id="roleTitle">Your produce.<br />Your progress.</h3>
+              <p id="roleDescription">
+                A simple dashboard to post available harvests, track incoming
+                orders, and follow your revenue transparently.
+              </p>
+              <ul id="roleFeatures">
+                <li><span>✓</span> Add produce in familiar local units (Kuntaala)</li>
+                <li><span>✓</span> View live order status and delivery updates</li>
+                <li><span>✓</span> Direct messaging with verified wholesale buyers</li>
+              </ul>
+              <div class="language-note">
+                <span>文</span>
+                <div>
+                  <b>Afaan Oromoo &amp; Amharic first</b>
+                  <small>Clear native labels, legible text, and no confusing steps.</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Experience Mockup with Real App Screenshot Preview -->
+            <div class="experience-mockup" data-reveal data-delay="150">
+              <div class="mockup-glow"></div>
+              
+              <!-- Floating Contextual Pill Top -->
+              <div class="exp-floating-pill pill-top" id="expPillTop">
+                <span class="pill-dot"></span>
+                <div>
+                  <b id="expPillTopTitle">ETB 270,000 Revenue</b>
+                  <small id="expPillTopSub">Real-time harvest sales</small>
+                </div>
+              </div>
+
+              <!-- High-Fidelity Phone Frame -->
+              <div class="device-showcase-phone">
+                <div class="device-speaker"></div>
+                <div class="device-camera"></div>
+                <div class="device-screen-wrap">
+                  <img
+                    id="dashboardScreenshot"
+                    src="assets/Screenshot_20260731-195932_OmishGo.webp"
+                    alt="OmishGo App Interface Preview"
+                    class="device-screen-img"
+                    loading="lazy"
+                  />
+                  <!-- Modern gesture indicator -->
+                  <div class="device-home-bar"></div>
+                </div>
+              </div>
+
+              <!-- Floating Contextual Pill Bottom -->
+              <div class="exp-floating-pill pill-bottom" id="expPillBottom">
+                <span class="pill-icon">✓</span>
+                <div>
+                  <b id="expPillBottomTitle">Demand: Onion +15%</b>
+                  <small id="expPillBottomSub">Direct wholesale pricing</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="experience-footnote">
+            <span>BUILT AROUND LOCAL REALITIES</span>
+            <span>Afaan Oromoo · አማርኛ · Kuntaala · Offline 2G Support</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ SCREENSHOTS GALLERY / 3D COVERFLOW CINEMA ══════════ -->
+      <section id="screenshots" class="cinema-section dark-section" aria-labelledby="screenshots-heading">
+        <div class="cinema-spotlight" aria-hidden="true"></div>
+
+        <div class="container">
+          <div class="cinema-header" data-reveal>
+            <div class="kicker-badge">
+              <span class="pulse-dot" aria-hidden="true"></span>
+              <span>APP · LIVE PILOT BUILD v1.0.0</span>
+            </div>
+            <h2 id="screenshots-heading" data-i18n="screens_h2">
+              Built for how farmers actually work
+            </h2>
+            <p class="section-sub light" data-i18n="screens_sub">
+              PIN login, offline support, three languages. 9 real screens from the
+              current pilot build.
+            </p>
+
+            <!-- Feature Micro-Badges -->
+            <div class="feature-strip">
+              <div class="f-pill"><span>⚡</span> Works 100% Offline (2G)</div>
+              <div class="f-pill"><span>🔒</span> 4-Digit Quick PIN Login</div>
+              <div class="f-pill"><span>🌐</span> Trilingual (EN · አማ · OM)</div>
+              <div class="f-pill"><span>📦</span> Kuntaala & Local Units</div>
+            </div>
+          </div>
+
+          <!-- Floating Glass Dock Filter Tabs -->
+          <div class="filter-dock-wrap" data-reveal>
+            <div class="filter-dock" id="filterDock" role="tablist" aria-label="Filter app screens by role">
+              <div class="dock-indicator" id="dockIndicator" aria-hidden="true"></div>
+              <button class="dock-tab active" data-filter="all" role="tab" aria-selected="true">
+                <span data-i18n="tab_all">All Screens</span> <span class="tab-badge">9</span>
+              </button>
+              <button class="dock-tab" data-filter="onboard" role="tab" aria-selected="false">
+                <span data-i18n="tab_onboard">Onboarding</span> <span class="tab-badge">4</span>
+              </button>
+              <button class="dock-tab" data-filter="farmer" role="tab" aria-selected="false">
+                <span data-i18n="tab_farmer">Farmer</span> <span class="tab-badge">3</span>
+              </button>
+              <button class="dock-tab" data-filter="buyer" role="tab" aria-selected="false">
+                <span data-i18n="tab_buyer">Buyer</span> <span class="tab-badge">2</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 3D Coverflow Viewport -->
+          <div class="coverflow-viewport" id="coverflowViewport" aria-label="App screenshot 3D carousel">
+            <div class="coverflow-track" id="coverflowTrack">
+
+              <!-- 1: Onboarding 1 -->
+              <div class="c-card" data-group="onboard" data-index="0" data-role="Onboarding" data-label-key="screen_s1" data-title="Sell Your Harvest Directly" data-sub="Post crops in seconds with local Kuntaala units">
+                <div class="c-notch"><div class="c-camera"></div></div>
+                <div class="c-screen">
+                  <picture>
+                    <source srcset="assets/Screenshot_20260727-073442_OmishGo.webp" type="image/webp" />
+                    <img src="assets/Screenshot_20260727-073442_OmishGo.jpg" alt="OmishGo onboarding: Sell Your Harvest" loading="lazy" width="480" height="1066" />
+                  </picture>
+                </div>
+                <div class="card-shadow" aria-hidden="true"></div>
+              </div>
+
+              <!-- 2: Onboarding 2 -->
+              <div class="c-card" data-group="onboard" data-index="1" data-role="Onboarding" data-label-key="screen_s2" data-title="Browse Fresh from the Farm" data-sub="Wholesale agricultural directory with real photos">
+                <div class="c-notch"><div class="c-camera"></div></div>
+                <div class="c-screen">
+                  <picture>
+                    <source srcset="assets/Screenshot_20260727-073449_OmishGo.webp" type="image/webp" />
+                    <img src="assets/Screenshot_20260727-073449_OmishGo.jpg" alt="OmishGo onboarding: Browse fresh from farm" loading="lazy" width="480" height="1066" />
+                  </picture>
+                </div>
+                <div class="card-shadow" aria-hidden="true"></div>
+              </div>
+
+              <!-- 3: Onboarding 3 -->
+              <div class="c-card" data-group="onboard" data-index="2" data-role="Onboarding" data-label-key="screen_s3" data-title="Farm Inputs at Your Door" data-sub="Cooperative fertilizer, seeds & tool distribution">
+                <div class="c-notch"><div class="c-camera"></div></div>
+                <div class="c-screen">
+                  <picture>
+                    <source srcset="assets/Screenshot_20260727-073456_OmishGo.webp" type="image/webp" />
+                    <img src="assets/Screenshot_20260727-073456_OmishGo.jpg" alt="OmishGo onboarding: Farm inputs listing" loading="lazy" width="480" height="1066" />
+                  </picture>
+                </div>
+                <div class="card-shadow" aria-hidden="true"></div>
+              </div>
+
+              <!-- 4: Onboarding 4 -->
+              <div class="c-card" data-group="onboard" data-index="3" data-role="Onboarding" data-label-key="screen_s4" data-title="See Delivery Progress" data-sub="End-to-end status from farm dispatch to warehouse">
+                <div class="c-notch"><div class="c-camera"></div></div>
+                <div class="c-screen">
+                  <picture>
+                    <source srcset="assets/Screenshot_20260727-073504_OmishGo.webp" type="image/webp" />
+                    <img src="assets/Screenshot_20260727-073504_OmishGo.jpg" alt="OmishGo onboarding: delivery progress" loading="lazy" width="480" height="1066" />
+                  </picture>
+                </div>
+                <div class="card-shadow" aria-hidden="true"></div>
+              </div>
+
+              <!-- 5: Farmer Dashboard -->
+              <div class="c-card" data-group="farmer" data-index="4" data-role="Farmer" data-label-key="screen_s5" data-title="Farmer Business Dashboard" data-sub="Active harvest listings, pending orders & ETB earnings">
+                <div class="c-notch"><div class="c-camera"></div></div>
+                <div class="c-screen">
+                  <picture>
+                    <source srcset="assets/Screenshot_20260731-195932_OmishGo.webp" type="image/webp" />
+                    <img src="assets/Screenshot_20260731-195932_OmishGo.jpg" alt="OmishGo farmer dashboard" loading="lazy" width="480" height="1066" />
+                  </picture>
+                </div>
+                <div class="card-shadow" aria-hidden="true"></div>
+              </div>
+
+              <!-- 6: Verified Producer Profile -->
+              <div class="c-card" data-group="farmer" data-index="5" data-role="Farmer" data-label-key="screen_s6" data-title="Verified Producer Account" data-sub="Official Meki Union accreditation and 4.9★ rating">
+                <div class="c-notch"><div class="c-camera"></div></div>
+                <div class="c-screen">
+                  <picture>
+                    <source srcset="assets/Screenshot_20260731-195953_OmishGo.webp" type="image/webp" />
+                    <img src="assets/Screenshot_20260731-195953_OmishGo.jpg" alt="OmishGo verified producer account profile" loading="lazy" width="480" height="1066" />
+                  </picture>
+                </div>
+                <div class="card-shadow" aria-hidden="true"></div>
+              </div>
+
+              <!-- 7: In-App Chat -->
+              <div class="c-card" data-group="farmer" data-index="6" data-role="Farmer" data-label-key="screen_s7" data-title="Direct Farmer & Buyer Chat" data-sub="Negotiate prices, pickup times & confirm orders">
+                <div class="c-notch"><div class="c-camera"></div></div>
+                <div class="c-screen">
+                  <picture>
+                    <source srcset="assets/Screenshot_20260731-200022_OmishGo.webp" type="image/webp" />
+                    <img src="assets/Screenshot_20260731-200022_OmishGo.jpg" alt="OmishGo in-app chat between farmer and buyer" loading="lazy" width="480" height="1066" />
+                  </picture>
+                </div>
+                <div class="card-shadow" aria-hidden="true"></div>
+              </div>
+
+              <!-- 8: Buyer Marketplace -->
+              <div class="c-card" data-group="buyer" data-index="7" data-role="Buyer" data-label-key="screen_s8" data-title="Fresh Produce Marketplace" data-sub="Search verified crops with transparent pricing">
+                <div class="c-notch"><div class="c-camera"></div></div>
+                <div class="c-screen">
+                  <picture>
+                    <source srcset="assets/Screenshot_20260731-200050_OmishGo.webp" type="image/webp" />
+                    <img src="assets/Screenshot_20260731-200050_OmishGo.jpg" alt="OmishGo buyer dashboard" loading="lazy" width="480" height="1066" />
+                  </picture>
+                </div>
+                <div class="card-shadow" aria-hidden="true"></div>
+              </div>
+
+              <!-- 9: Buyer Orders & Tracking -->
+              <div class="c-card" data-group="buyer" data-index="8" data-role="Buyer" data-label-key="screen_s9" data-title="Live Order Tracking (4 Steps)" data-sub="Confirmed → Packed → Dispatched → Delivered">
+                <div class="c-notch"><div class="c-camera"></div></div>
+                <div class="c-screen">
+                  <picture>
+                    <source srcset="assets/Screenshot_20260731-200103_OmishGo.webp" type="image/webp" />
+                    <img src="assets/Screenshot_20260731-200103_OmishGo.jpg" alt="OmishGo buyer orders screen with order progress" loading="lazy" width="480" height="1066" />
+                  </picture>
+                </div>
+                <div class="card-shadow" aria-hidden="true"></div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Live Contextual Telemetry Card -->
+          <div class="telemetry-card" id="telemetryCard" data-reveal>
+            <div class="telemetry-left">
+              <div class="telemetry-badge-row">
+                <span class="t-badge badge-farmer" id="tBadge">Farmer</span>
+                <span class="t-live-indicator">★ Real Pilot Build</span>
+              </div>
+              <div class="telemetry-title" id="tTitle">Farmer Business Dashboard</div>
+              <div class="telemetry-sub" id="tSub">Active harvest listings, pending orders & ETB earnings</div>
+            </div>
+            <div class="telemetry-counter">
+              <span id="tCurrent">05</span><small>/ <span id="tTotal">09</span></small>
+            </div>
+          </div>
+
+          <!-- Navigation Controllers -->
+          <div class="controls-row" data-reveal>
+            <button class="ctrl-orb" id="btnPrev" aria-label="Previous screenshot">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="15 18 9 12 15 6"></polyline>
               </svg>
             </button>
-            <!-- D: time-outline SVG icon is used in caption; text is set by JS when video is not yet ready -->
-            <div id="yt-frame-container"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ══════════ SCREENSHOTS — CINEMATIC 3D CAROUSEL ══════════ -->
-    <section id="screenshots" aria-labelledby="screenshots-heading">
-      <div class="container screens-header">
-        <h2 id="screenshots-heading" data-reveal data-i18n="screens_h2">
-          Built for how farmers actually work
-        </h2>
-        <p class="section-sub" data-reveal data-i18n="screens_sub">
-          PIN login, offline support, three languages. 9 screens from the
-          current build.
-        </p>
-        <div
-          class="screen-tabs"
-          data-reveal
-          role="tablist"
-          aria-label="Filter app screens by role"
-        >
-          <button
-            class="screen-tab active"
-            data-filter="all"
-            role="tab"
-            aria-selected="true"
-            data-i18n="tab_all"
-          >
-            All Screens
-          </button>
-          <button
-            class="screen-tab"
-            data-filter="onboard"
-            role="tab"
-            aria-selected="false"
-            data-i18n="tab_onboard"
-          >
-            Onboarding
-          </button>
-          <button
-            class="screen-tab"
-            data-filter="farmer"
-            role="tab"
-            aria-selected="false"
-            data-i18n="tab_farmer"
-          >
-            Farmer
-          </button>
-          <button
-            class="screen-tab"
-            data-filter="buyer"
-            role="tab"
-            aria-selected="false"
-            data-i18n="tab_buyer"
-          >
-            Buyer
-          </button>
-        </div>
-      </div>
-
-      <div
-        class="carousel-stage"
-        id="carousel-stage"
-        aria-label="App screenshot carousel"
-      >
-        <div class="carousel-track" id="carousel-track">
-          <!-- A4 fix: screen_s4 caption updated; A3/A4 data-label attrs kept in sync with en translations -->
-          <div
-            class="c-slide"
-            data-group="onboard"
-            data-label-key="screen_s1"
-            data-label="Sell Your Harvest Directly"
-          >
-            <div class="c-phone-wrap">
-              <div class="c-phone">
-                <picture
-                  ><source
-                    srcset="/assets/Screenshot_20260727-073442_OmishGo.webp"
-                    type="image/webp" />
-                  <img
-                    src="/assets/Screenshot_20260727-073442_OmishGo.jpg" alt="OmishGo onboarding: Sell Your Harvest" width="480" height="1066" loading="lazy" /></picture>
-              </div>
-              <div class="c-glow c-glow-green"></div>
-            </div>
-            <div class="c-meta">
-              <span class="c-role-badge farmer-badge">Farmer</span>
-              <p class="c-caption" data-i18n="screen_s1">
-                Sell Your Harvest Directly
-              </p>
-            </div>
-          </div>
-
-          <div
-            class="c-slide"
-            data-group="onboard"
-            data-label-key="screen_s2"
-            data-label="Browse Fresh from the Farm"
-          >
-            <div class="c-phone-wrap">
-              <div class="c-phone">
-                <picture
-                  ><source
-                    srcset="/assets/Screenshot_20260727-073449_OmishGo.webp"
-                    type="image/webp" />
-                  <img
-                    src="/assets/Screenshot_20260727-073449_OmishGo.jpg" alt="OmishGo onboarding: Browse fresh from farm" width="480" height="1066" loading="lazy" /></picture>
-              </div>
-              <div class="c-glow c-glow-blue"></div>
-            </div>
-            <div class="c-meta">
-              <span class="c-role-badge buyer-badge">Buyer</span>
-              <p class="c-caption" data-i18n="screen_s2">
-                Browse Fresh from the Farm
-              </p>
-            </div>
-          </div>
-
-          <div
-            class="c-slide"
-            data-group="onboard"
-            data-label-key="screen_s3"
-            data-label="Farm Inputs at Your Door"
-          >
-            <div class="c-phone-wrap">
-              <div class="c-phone">
-                <picture
-                  ><source
-                    srcset="/assets/Screenshot_20260727-073456_OmishGo.webp"
-                    type="image/webp" />
-                  <img
-                    src="/assets/Screenshot_20260727-073456_OmishGo.jpg" alt="OmishGo onboarding: Farm inputs listing" width="480" height="1066" loading="lazy" /></picture>
-              </div>
-              <div class="c-glow c-glow-amber"></div>
-            </div>
-            <div class="c-meta">
-              <span class="c-role-badge farmer-badge">Farmer</span>
-              <p class="c-caption" data-i18n="screen_s3">
-                Farm Inputs at Your Door
-              </p>
-            </div>
-          </div>
-
-          <!-- A4: "Track Every Delivery" → "See Delivery Progress" -->
-          <div
-            class="c-slide"
-            data-group="onboard"
-            data-label-key="screen_s4"
-            data-label="See Delivery Progress"
-          >
-            <div class="c-phone-wrap">
-              <div class="c-phone">
-                <picture
-                  ><source
-                    srcset="/assets/Screenshot_20260727-073504_OmishGo.webp"
-                    type="image/webp" />
-                  <img
-                    src="/assets/Screenshot_20260727-073504_OmishGo.jpg" alt="OmishGo onboarding: delivery progress" width="480" height="1066" loading="lazy" /></picture>
-              </div>
-              <div class="c-glow c-glow-purple"></div>
-            </div>
-            <div class="c-meta">
-              <span class="c-role-badge buyer-badge">Buyer</span>
-              <p class="c-caption" data-i18n="screen_s4">
-                See Delivery Progress
-              </p>
-            </div>
-          </div>
-
-          <!-- A3: "Farmer Dashboard — ETB 270,000 Revenue" → "Farmer Dashboard" -->
-          <div
-            class="c-slide"
-            data-group="farmer"
-            data-label-key="screen_s5"
-            data-label="Farmer Dashboard"
-          >
-            <div class="c-phone-wrap">
-              <div class="c-phone">
-                <picture
-                  ><source
-                    srcset="/assets/Screenshot_20260731-195932_OmishGo.webp"
-                    type="image/webp" />
-                  <img
-                    src="/assets/Screenshot_20260731-195932_OmishGo.jpg" alt="OmishGo farmer dashboard" width="480" height="1066" loading="lazy" /></picture>
-              </div>
-              <div class="c-glow c-glow-green"></div>
-            </div>
-            <div class="c-meta">
-              <span class="c-role-badge farmer-badge">Farmer</span>
-              <p class="c-caption" data-i18n="screen_s5">Farmer Dashboard</p>
-            </div>
-          </div>
-
-          <div
-            class="c-slide"
-            data-group="farmer"
-            data-label-key="screen_s6"
-            data-label="Verified Producer Profile"
-          >
-            <div class="c-phone-wrap">
-              <div class="c-phone">
-                <picture
-                  ><source
-                    srcset="/assets/Screenshot_20260731-195953_OmishGo.webp"
-                    type="image/webp" />
-                  <img
-                    src="/assets/Screenshot_20260731-195953_OmishGo.jpg" alt="OmishGo verified producer account profile" width="480" height="1066" loading="lazy" /></picture>
-              </div>
-              <div class="c-glow c-glow-green"></div>
-            </div>
-            <div class="c-meta">
-              <span class="c-role-badge farmer-badge">Farmer</span>
-              <p class="c-caption" data-i18n="screen_s6">
-                Verified Producer Profile
-              </p>
-            </div>
-          </div>
-
-          <div
-            class="c-slide"
-            data-group="farmer"
-            data-label-key="screen_s7"
-            data-label="Direct In-App Messaging"
-          >
-            <div class="c-phone-wrap">
-              <div class="c-phone c-phone-chat">
-                <picture
-                  ><source
-                    srcset="/assets/Screenshot_20260731-200022_OmishGo.webp"
-                    type="image/webp" />
-                  <img
-                    src="/assets/Screenshot_20260731-200022_OmishGo.jpg" alt="OmishGo in-app chat between farmer and buyer" width="480" height="1066" loading="lazy" /></picture>
-              </div>
-              <div class="c-glow c-glow-green"></div>
-            </div>
-            <div class="c-meta">
-              <span class="c-role-badge both-badge">Both</span>
-              <p class="c-caption" data-i18n="screen_s7">
-                Direct In-App Messaging
-              </p>
-            </div>
-          </div>
-
-          <!-- A3: "Buyer Dashboard — ETB 45,900 Saved" → "Buyer Dashboard" -->
-          <div
-            class="c-slide"
-            data-group="buyer"
-            data-label-key="screen_s8"
-            data-label="Buyer Dashboard"
-          >
-            <div class="c-phone-wrap">
-              <div class="c-phone">
-                <picture
-                  ><source
-                    srcset="/assets/Screenshot_20260731-200050_OmishGo.webp"
-                    type="image/webp" />
-                  <img
-                    src="/assets/Screenshot_20260731-200050_OmishGo.jpg" alt="OmishGo buyer dashboard" width="480" height="1066" loading="lazy" /></picture>
-              </div>
-              <div class="c-glow c-glow-blue"></div>
-            </div>
-            <div class="c-meta">
-              <span class="c-role-badge buyer-badge">Buyer</span>
-              <p class="c-caption" data-i18n="screen_s8">Buyer Dashboard</p>
-            </div>
-          </div>
-
-          <!-- A4: "My Orders — Live Order Tracking" → "My Orders — Order Progress" -->
-          <div
-            class="c-slide"
-            data-group="buyer"
-            data-label-key="screen_s9"
-            data-label="My Orders, Order Progress"
-          >
-            <div class="c-phone-wrap">
-              <div class="c-phone">
-                <picture
-                  ><source
-                    srcset="/assets/Screenshot_20260731-200103_OmishGo.webp"
-                    type="image/webp" />
-                  <img
-                    src="/assets/Screenshot_20260731-200103_OmishGo.jpg" alt="OmishGo buyer orders screen with order progress" width="480" height="1066" loading="lazy" /></picture>
-              </div>
-              <div class="c-glow c-glow-blue"></div>
-            </div>
-            <div class="c-meta">
-              <span class="c-role-badge buyer-badge">Buyer</span>
-              <p class="c-caption" data-i18n="screen_s9">
-                My Orders, Order Progress
-              </p>
-            </div>
-          </div>
-        </div>
-        <!-- /track -->
-      </div>
-      <!-- /stage -->
-
-      <div class="container carousel-controls-wrap">
-        <div class="carousel-controls">
-          <button class="carousel-btn" id="carousel-prev" aria-label="Previous">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-              <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z" />
-            </svg>
-          </button>
-          <div class="carousel-dots" id="carousel-dots" role="tablist"></div>
-          <button class="carousel-btn" id="carousel-next" aria-label="Next">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
-            </svg>
-          </button>
-        </div>
-        <p class="carousel-hint" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
-            <path
-              d="M4 14h4v-4H4v4zm0 5h4v-4H4v4zM4 9h4V5H4v4zm5 5h12v-4H9v4zm0 5h12v-4H9v4zM9 5v4h12V5H9z"
-            />
-          </svg>
-          Drag to explore · swipe on mobile
-        </p>
-      </div>
-    </section>
-
-    <!-- ══════════ PILOT ══════════ -->
-    <section id="pilot" aria-labelledby="pilot-heading">
-      <div class="container">
-        <div class="pilot-inner" data-reveal>
-          <div class="pilot-badge-row">
-            <span class="pilot-badge">
-              <svg
-                viewBox="0 0 512 512"
-                fill="none"
-                stroke="currentColor"
-                stroke-linejoin="round"
-                stroke-width="32"
-                width="14"
-                height="14"
-                aria-hidden="true"
-              >
-                <rect width="416" height="384" x="48" y="80" rx="48" />
-                <circle cx="296" cy="232" r="24" />
-                <circle cx="376" cy="232" r="24" />
-                <circle cx="296" cy="312" r="24" />
-                <circle cx="376" cy="312" r="24" />
-                <circle cx="136" cy="312" r="24" />
-                <circle cx="216" cy="312" r="24" />
-                <circle cx="136" cy="392" r="24" />
-                <circle cx="216" cy="392" r="24" />
-                <circle cx="296" cy="392" r="24" />
-                <path stroke-linecap="round" d="M128 48v32M384 48v32" />
-                <path d="M464 160H48" />
+            <div class="dots-strip" id="dotsStrip" role="tablist" aria-label="Screens carousel navigation"></div>
+            <button class="ctrl-orb" id="btnNext" aria-label="Next screenshot">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
-              Q3 2026
-            </span>
-            <span class="pilot-badge">
-              <svg
-                viewBox="0 0 512 512"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="32"
-                width="14"
-                height="14"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M402 168c-2.93 40.67-33.1 72-66 72s-63.12-31.32-66-72c-3-42.31 26.37-72 66-72s69 30.46 66 72"
-                />
-                <path
-                  stroke-miterlimit="10"
-                  d="M336 304c-65.17 0-127.84 32.37-143.54 95.41-2.08 8.34 3.15 16.59 11.72 16.59h263.65c8.57 0 13.77-8.25 11.72-16.59C463.85 335.36 401.18 304 336 304Z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M200 185.94c-2.34 32.48-26.72 58.06-53 58.06s-50.7-25.57-53-58.06C91.61 152.15 115.34 128 147 128s55.39 24.77 53 57.94"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-miterlimit="10"
-                  d="M206 306c-18.05-8.27-37.93-11.45-59-11.45-52 0-102.1 25.85-114.65 76.2-1.65 6.66 2.53 13.25 9.37 13.25H154"
-                />
-              </svg>
-              Farmers' Union admin
-            </span>
+            </button>
           </div>
-          <h2 id="pilot-heading" data-i18n="pilot_h2">
-            Running a closed pilot in Meki
-          </h2>
-          <p data-i18n="pilot_p">
-            The local Farmers' Union manages the pilot. They approve every
-            user, oversee produce quality, and build trust on the ground. We
-            scale only after this works.
+          <p class="carousel-hint" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+              <path d="M4 14h4v-4H4v4zm0 5h4v-4H4v4zM4 9h4V5H4v4zm5 5h12v-4H9v4zm0 5h12v-4H9v4zM9 5v4h12V5H9z" />
+            </svg>
+            Drag to explore or click flanking screens to focus
           </p>
         </div>
+      </section>
 
-      </div>
-    </section>
-
-    <!-- ══════════ DOWNLOAD / WAITLIST ══════════ -->
-    <section id="download" aria-labelledby="download-heading">
-      <div class="download-bg" aria-hidden="true"></div>
-      <div class="container download-inner" data-reveal>
-        <div class="download-text">
-          <div class="section-label dark" data-i18n="dl_label">Get OmishGo</div>
-          <h2 id="download-heading" data-i18n="dl_h2">Try OmishGo</h2>
-          <p data-i18n="dl_p">
-            Android APK. Works on 2G, PIN login, offline support. Free during
-            the pilot.
-          </p>
-          <div class="download-ctas">
-            <!--
-            A1: APK download — href="#waitlist" (safe inert fallback) until a real APK URL is available.
-            FLAG: replace href with real APK URL before launch (GitHub Release asset, EAS build link, or
-            Vercel static file URL). See launch-report.md for details.
-          -->
-            <a
-              href="https://github.com/BilisumaEresso/omishgo/releases/download/v1.0.0-pilot/application-cded515d-5673-4459-9c5c-f61b9df04a00.apk"
-              class="btn btn-dark btn-lg"
-              id="apk-download-btn"
-              download
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                width="20"
-                height="20"
-                aria-hidden="true"
-              >
-                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-              </svg>
-              <span>
-                <span
-                  data-i18n="dl_btn_apk"
-                  style="display: block; font-weight: 700"
-                  >Download APK</span
-                >
-                <span class="btn-sub" data-i18n="dl_apk_sub"
-                  >Direct APK Download (v1.0.0 Pilot)</span
-                >
-              </span>
-            </a>
-            <a
-              href="#waitlist"
-              class="btn btn-outline btn-lg"
-              id="waitlist-btn"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                width="20"
-                height="20"
-                aria-hidden="true"
-              >
-                <path
-                  d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
-                />
-              </svg>
-              <span>
-                <span
-                  data-i18n="dl_btn_waitlist"
-                  style="display: block; font-weight: 700"
-                  >Join Pilot Waitlist</span
-                >
-                <span class="btn-sub" data-i18n="dl_btn_waitlist_sub"
-                  >Farmers &amp; Buyers</span
-                >
-              </span>
-            </a>
+      <!-- ══════════ SECTION 04: TRUST BY DESIGN / OUR APPROACH ══════════ -->
+      <section class="principles-section" id="our-approach" aria-labelledby="approach-heading">
+        <div class="container">
+          <div class="section-kicker">
+            <span>04</span> TRUST BY DESIGN
           </div>
-        </div>
-        <div class="waitlist-form" id="waitlist">
-          <div class="form-card">
-            <h3 data-i18n="form_h">Stay in the loop</h3>
-            <p data-i18n="form_p">
-              We'll notify you when the public pilot opens in your area.
+          <div class="section-heading-row">
+            <h2 id="approach-heading">
+              Local by nature.<br /><span>Thoughtful by design.</span>
+            </h2>
+            <p>
+              Good technology is more than a beautiful screen. It needs to fit
+              the people, trade practices, and real infrastructure of Ethiopia.
             </p>
-            <!--
-            A2: Formspree action — FLAG: action is currently a placeholder. See launch-report.md.
-            Replace YOUR_FORM_ID with a real Formspree form ID before sharing this page with anyone.
-          -->
-            <!-- TODO: set real Formspree ID before launch -->
-            <form
-              id="waitlist-form"
-              action="https://formspree.io/f/YOUR_FORM_ID"
-              method="POST"
-              novalidate
-            >
-              <div class="form-group">
-                <label for="wl-name" data-i18n="form_name">Full Name</label>
-                <input
-                  type="text"
-                  id="wl-name"
-                  name="name"
-                  required
-                  autocomplete="name"
-                  placeholder="Abebe Girma"
-                />
-              </div>
-              <div class="form-group">
-                <label for="wl-phone" data-i18n="form_phone"
-                  >Phone Number</label
-                >
-                <input
-                  type="tel"
-                  id="wl-phone"
-                  name="phone"
-                  required
-                  autocomplete="tel"
-                  placeholder="+251 91X XXX XXXX"
-                />
-              </div>
-              <div class="form-group">
-                <label for="wl-role" data-i18n="form_role">I am a…</label>
-                <select id="wl-role" name="role" required>
-                  <option
-                    value=""
-                    disabled
-                    selected
-                    data-i18n="form_role_placeholder"
-                  >
-                    Select your role
-                  </option>
-                  <option value="farmer" data-i18n="form_role_farmer">
-                    Farmer (Qonnaan Bulaa / አርሶ አደር)
-                  </option>
-                  <option value="buyer" data-i18n="form_role_buyer">
-                    Buyer / Trader
-                  </option>
-                  <option value="investor" data-i18n="form_role_investor">
-                    Investor / Funder
-                  </option>
-                  <option value="other" data-i18n="form_role_other">
-                    Other
-                  </option>
-                </select>
-              </div>
-              <button
-                type="submit"
-                class="btn btn-primary btn-full"
-                id="form-submit-btn"
-                data-i18n="form_submit"
-              >
-                Join Waitlist
-              </button>
-              <!-- D: success message uses SVG icon set by JS, not emoji in translation string -->
-              <div
-                class="form-success"
-                id="form-success"
-                aria-live="polite"
-              ></div>
-            </form>
+          </div>
+
+          <div class="principle-grid">
+            <article class="principle-card" data-reveal data-delay="0">
+              <span class="principle-icon">Aa</span>
+              <span class="principle-tag">ACCESSIBILITY</span>
+              <h3>Language people know</h3>
+              <p>
+                Afaan Oromoo and Amharic first, straightforward labels, and
+                intuitive visual guidance.
+              </p>
+            </article>
+
+            <article class="principle-card" data-reveal data-delay="100">
+              <span class="principle-icon">100</span>
+              <span class="principle-tag">LOCAL COMMERCE</span>
+              <h3>Trade in familiar units</h3>
+              <p>
+                Quantities designed around Kuntaala and the way local produce
+                is actually bought and sold.
+              </p>
+            </article>
+
+            <article class="principle-card" data-reveal data-delay="200">
+              <span class="principle-icon">⌑</span>
+              <span class="principle-tag">ACCOUNTABILITY</span>
+              <h3>Verified participation</h3>
+              <p>
+                Farmers' Union assisted registration and verification before
+                marketplace access is granted.
+              </p>
+            </article>
+
+            <article class="principle-card" data-reveal data-delay="300">
+              <span class="principle-icon">↗</span>
+              <span class="principle-tag">RESPONSIBLE GROWTH</span>
+              <h3>Start small. Learn fast.</h3>
+              <p>
+                Begin with a focused pilot in Meki, listen to field evidence,
+                and scale only on proven success.
+              </p>
+            </article>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <!-- ══════════ CTA / DOWNLOAD & WAITLIST ══════════ -->
+      <section class="cta-section" id="download" aria-labelledby="download-heading">
+        <div class="cta-glow" aria-hidden="true"></div>
+        <div class="container cta-grid">
+          <div class="cta-copy" data-reveal>
+            <div class="eyebrow">
+              <span class="eyebrow-icon">✳</span> THE NEXT CHAPTER
+            </div>
+            <h2 id="download-heading" data-i18n="dl_h2">
+              Let's build a better<br />market <span>together.</span>
+            </h2>
+            <p data-i18n="dl_p">
+              Android APK. Optimized for 2G, PIN-based login, and offline
+              support. Free during the pilot. Are you a farmer, buyer, or union
+              partner? Join the early community and help shape what OmishGo becomes.
+            </p>
+
+            <div class="cta-actions">
+              <a
+                href="https://github.com/BilisumaEresso/omishgo/releases/download/v1.0.0-pilot/application-cded515d-5673-4459-9c5c-f61b9df04a00.apk"
+                class="button button-dark"
+                id="apk-download-btn"
+                download
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  width="18"
+                  height="18"
+                  aria-hidden="true"
+                >
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                </svg>
+                <span data-i18n="dl_btn_apk">Download APK (v1.0.0 Pilot)</span>
+                <span>↗</span>
+              </a>
+              <a
+                href="mailto:bilisumaere@gmail.com?subject=OmishGo%20Partnership"
+                class="button button-outline"
+                style="border-color: rgba(6, 43, 32, 0.35); color: #062b20"
+              >
+                Talk with OmishGo <span>↗</span>
+              </a>
+            </div>
+            <small class="cta-note"
+              >Early-stage project · Feedback and pilot conversations welcome</small
+            >
+          </div>
+
+          <!-- Functional Formspree Waitlist Form -->
+          <div class="waitlist-form" id="waitlist" data-reveal data-delay="150">
+            <div class="interest-card form-card">
+              <div class="form-top">
+                <span class="form-icon">↗</span>
+                <span class="form-tag">LET'S CONNECT</span>
+              </div>
+              <h3 data-i18n="form_h">Help shape the future.</h3>
+              <p data-i18n="form_p">
+                We'll notify you when the public pilot opens in your area.
+              </p>
+
+              <form
+                id="waitlist-form"
+                action="https://formspree.io/f/YOUR_FORM_ID"
+                method="POST"
+                novalidate
+              >
+                <div class="form-group">
+                  <label for="wl-name" data-i18n="form_name">Full Name</label>
+                  <input
+                    type="text"
+                    id="wl-name"
+                    name="name"
+                    required
+                    autocomplete="name"
+                    placeholder="e.g. Abebe Kebede"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="wl-phone" data-i18n="form_phone"
+                    >Phone Number</label
+                  >
+                  <input
+                    type="tel"
+                    id="wl-phone"
+                    name="phone"
+                    required
+                    autocomplete="tel"
+                    placeholder="+251 91X XXX XXXX"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="wl-role" data-i18n="form_role">I am a…</label>
+                  <select id="wl-role" name="role" required>
+                    <option
+                      value=""
+                      disabled
+                      selected
+                      data-i18n="form_role_placeholder"
+                    >
+                      Select your role
+                    </option>
+                    <option value="farmer" data-i18n="form_role_farmer">
+                      Farmer (Qonnaan Bulaa / አርሶ አደር)
+                    </option>
+                    <option value="buyer" data-i18n="form_role_buyer">
+                      Buyer / Trader
+                    </option>
+                    <option value="union">
+                      Farmers' Union / Cooperative
+                    </option>
+                    <option value="investor" data-i18n="form_role_investor">
+                      Investor / Funder
+                    </option>
+                    <option value="other" data-i18n="form_role_other">
+                      Other
+                    </option>
+                  </select>
+                </div>
+
+                <button
+                  type="submit"
+                  class="button button-primary btn-full form-submit"
+                  id="form-submit-btn"
+                  data-i18n="form_submit"
+                >
+                  Join Waitlist <span>↗</span>
+                </button>
+                <div
+                  class="form-success"
+                  id="form-success"
+                  aria-live="polite"
+                ></div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
-    <!-- ══════════ PUBLIC PROFILE CONTAINER ══════════ -->
-    <div id="public-profile-view" class="public-profile-section" style="display: none;"></div>
+    <!-- ══════════ PUBLIC PROFILE CONTAINER (/users/:id) ══════════ -->
+    <div
+      id="public-profile-view"
+      class="public-profile-section"
+      style="display: none"
+    ></div>
 
-    <!-- ══════════ FOOTER ══════════ -->
-    <footer id="contact" aria-label="Site footer">
-      <div class="container footer-inner">
-        <div class="footer-brand">
-          <a href="#hero" class="nav-logo footer-logo" aria-label="OmishGo">
+    <!-- ══════════ SITE FOOTER ══════════ -->
+    <footer class="site-footer dark-section" id="contact" aria-label="Site footer">
+      <div class="container footer-main">
+        <div class="footer-brand-col">
+          <a class="brand brand-footer" href="#hero">
             <img
-              src="/assets/omishgo_new_general_logo-.png"
+              src="assets/omishgo_new_general_logo-.png"
               class="logo-img"
               alt="OmishGo logo"
-              width="40"
-              height="40"
+              width="30"
+              height="30"
             />
-            <span class="logo-text">OmishGo</span>
+            <span>Omish<span style="color: var(--lime)">Go</span></span>
           </a>
-          <p class="footer-tagline" data-i18n="footer_tagline">
+          <p data-i18n="footer_tagline">
             Connecting Ethiopian farmers directly with buyers. No middlemen.
             Better prices.
           </p>
-          <!--
-          C5: FLAG — confirm each social link is live before launch. See launch-report.md.
-          t.me/omishgo · tiktok.com/@omishgo · hello@omishgo.et
-        -->
+          <span class="footer-tagline">Simple. Profitable. Trusted.</span>
+
           <div class="social-links" aria-label="Social media links">
             <a
               href="https://t.me/omishgo_official"
@@ -1078,13 +1121,7 @@
               id="social-telegram"
               aria-label="Telegram"
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                width="18"
-                height="18"
-                aria-hidden="true"
-              >
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path
                   d="M22.265 2.428L.943 10.872c-1.255.503-1.248 1.203-.228 1.515l5.43 1.694L19.185 5.63c.629-.381 1.203-.176.731.242L8.386 15.933l-.42 5.765c.616 0 .886-.28 1.224-.605l2.937-2.853 6.104 4.479c1.124.62 1.933.3 2.214-1.042l4.008-18.879c.407-1.636-.624-2.376-1.988-1.37z"
                 />
@@ -1099,15 +1136,9 @@
               id="social-tiktok"
               aria-label="TikTok"
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                width="18"
-                height="18"
-                aria-hidden="true"
-              >
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path
-                  d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.81a8.22 8.22 0 004.8 1.53V6.88a4.85 4.85 0 01-1.03-.19z"
+                  d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.33-6.34V8.81a8.22 8.22 0 004.8 1.53V6.88a4.85 4.85 0 01-1.03-.19z"
                 />
               </svg>
               TikTok Page
@@ -1118,13 +1149,7 @@
               id="social-email"
               aria-label="Email"
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                width="18"
-                height="18"
-                aria-hidden="true"
-              >
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path
                   d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
                 />
@@ -1133,63 +1158,46 @@
             </a>
           </div>
         </div>
+
         <div class="footer-links">
           <div class="footer-col">
-            <h4 data-i18n="footer_product">Product</h4>
-            <ul>
-              <li>
-                <a href="#solution" data-i18n="footer_how">How It Works</a>
-              </li>
-              <li>
-                <a href="#screenshots" data-i18n="footer_screens"
-                  >App Screens</a
-                >
-              </li>
-              <li><a href="#demo" data-i18n="footer_demo">Intro Video</a></li>
-              <li>
-                <a href="#download" data-i18n="footer_download">Download APK</a>
-              </li>
-            </ul>
+            <b data-i18n="footer_product">Product</b>
+            <a href="#problem" data-i18n="nav_problem">Why OmishGo</a>
+            <a href="#solution" data-i18n="footer_how">How It Works</a>
+            <a href="#for-everyone" data-i18n="footer_screens">The Experience</a>
+            <a href="#screenshots">App Screens</a>
           </div>
+
           <div class="footer-col">
-            <h4 data-i18n="footer_pilot">Pilot</h4>
-            <ul>
-              <li>
-                <a href="#pilot" data-i18n="footer_about">About the Pilot</a>
-              </li>
-              <li>
-                <a href="#waitlist" data-i18n="footer_join">Join Waitlist</a>
-              </li>
-              <li>
-                <a
-                  href="tel:+251938730818"
-                  data-i18n="footer_contact_link"
-                  >Contact Us</a
-                >
-              </li>
-            </ul>
+            <b data-i18n="footer_pilot">Pilot &amp; Get Involved</b>
+            <a href="#download" data-i18n="footer_about">About the Pilot</a>
+            <a href="#download" data-i18n="footer_join">Join Waitlist</a>
+            <a
+              href="https://github.com/BilisumaEresso/omishgo/releases/download/v1.0.0-pilot/application-cded515d-5673-4459-9c5c-f61b9df04a00.apk"
+              download
+              data-i18n="footer_download"
+              >Download APK</a
+            >
+            <a href="tel:+251938730818" data-i18n="footer_contact_link"
+              >Phone Contact</a
+            >
           </div>
+
           <div class="footer-col">
-            <h4 data-i18n="footer_lang_title">Language / ቋንቋ / Afaan</h4>
-            <ul>
-              <li>
-                <button class="lang-footer-btn" data-lang="en">English</button>
-              </li>
-              <li>
-                <button class="lang-footer-btn" data-lang="am">አማርኛ</button>
-              </li>
-              <li>
-                <button class="lang-footer-btn" data-lang="or">
-                  Afaan Oromoo
-                </button>
-              </li>
-            </ul>
+            <b data-i18n="footer_lang_title">Language / ቋንቋ / Afaan</b>
+            <button class="lang-footer-btn" data-lang="en">English</button>
+            <button class="lang-footer-btn" data-lang="am">አማርኛ</button>
+            <button class="lang-footer-btn" data-lang="or">Afaan Oromoo</button>
           </div>
         </div>
       </div>
+
       <div class="footer-bottom">
         <div class="container footer-bottom-inner">
-          <p data-i18n="footer_copy">© 2026 OmishGo. Built in Ethiopia</p>
+          <p data-i18n="footer_copy">
+            © <span id="year">2026</span> OmishGo. Built for Ethiopian
+            communities.
+          </p>
           <p class="footer-privacy" data-i18n="footer_privacy">
             Your contact info is used only to notify you about the pilot. We do
             not sell or share it.
@@ -1198,6 +1206,6 @@
       </div>
     </footer>
 
-    <script src="/main.js"></script>
+    <script src="main.js"></script>
   </body>
 </html>
